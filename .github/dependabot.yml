@@ -1,5 +1,7 @@
 # One grouped pull request per ecosystem, so updates arrive in a few reviews
-# rather than a stream. Toolchain versions in mise.toml are updated by hand.
+# rather than a stream. Major versions change the toolchain (TypeScript, or
+# Node, whose version mise.toml pins) and are upgraded by hand, as are the
+# versions in mise.toml.
 version: 2
 updates:
   - package-ecosystem: gomod
@@ -17,6 +19,9 @@ updates:
     groups:
       web-and-docs:
         patterns: ['*']
+    ignore:
+      - dependency-name: '*'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directories: [/, /.github/actions/setup]
@@ -30,3 +35,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]
