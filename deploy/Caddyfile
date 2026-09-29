@@ -1,0 +1,5 @@
+# Caddy obtains the certificate and sets X-Forwarded-* for you.
+# Run Sani with SANI_TRUST_PROXY=true.
+s.example.com {
+	reverse_proxy 127.0.0.1:8080
+}

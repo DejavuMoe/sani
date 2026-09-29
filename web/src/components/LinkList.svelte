@@ -1,0 +1,501 @@
+<script lang="ts">
+  import { flip } from 'svelte/animate';
+  import { slide } from 'svelte/transition';
+  import type { Sort } from '../lib/api';
+  import { t } from '../lib/i18n.svelte';
+  import { mod } from '../lib/keys';
+  import { links } from '../lib/links.svelte';
+  import Icon from './Icon.svelte';
+  import LinkRow from './LinkRow.svelte';
+  import Menu from './Menu.svelte';
+  import MenuItem from './MenuItem.svelte';
+
+  let search = $state<HTMLInputElement>();
+  let sentinel = $state<HTMLElement>();
+  let searchFocused = $state(false);
+  let slowLoad = $state(false);
+
+  export function focusSearch() {
+    search?.focus();
+    search?.select();
+  }
+
+  // Show placeholder rows only if the first page is slow to arrive.
+  $effect(() => {
+    if (links.loaded) {
+      slowLoad = false;
+      return;
+    }
+    const timer = setTimeout(() => (slowLoad = true), 200);
+    return () => clearTimeout(timer);
+  });
+
+  $effect(() => {
+    if (!sentinel) return;
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && links.loadMore(), {
+      rootMargin: '800px 0px',
+    });
+    io.observe(sentinel);
+    return () => io.disconnect();
+  });
+
+  const sorts: Sort[] = ['created', 'clicks', 'visited'];
+  const empty = $derived(links.loaded && links.items.length === 0);
+  const blank = $derived(empty && !links.query);
+
+  /** Splits a message around {key} placeholders so keys render as keycaps. */
+  function withKeys(text: string, keys: Record<string, string[]>) {
+    return text.split(/(\{\w+\})/).map((part) => {
+      const m = part.match(/^\{(\w+)\}$/);
+      return m && keys[m[1]] ? { keys: keys[m[1]] } : { text: part };
+    });
+  }
+</script>
+
+<section class="list-section" aria-label={t('list.label')}>
+  {#if !blank}
+  <div class="toolbar">
+    <label class="search" class:active={searchFocused || links.query}>
+      <Icon name="search" />
+      <span class="sr-only">{t('list.search')}</span>
+      <input
+        bind:this={search}
+        type="search"
+        placeholder={t('list.search')}
+        value={links.query}
+        oninput={(e) => links.search(e.currentTarget.value)}
+        onfocus={() => (searchFocused = true)}
+        onblur={() => (searchFocused = false)}
+        onkeydown={(e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            if (links.query) links.search('');
+            else search?.blur();
+          } else if (e.key === 'ArrowDown' && links.items.length) {
+            e.preventDefault();
+            links.selectedId = links.items[0].id;
+            search?.blur();
+            document.querySelector<HTMLElement>(`[data-link="${links.items[0].id}"] .main`)?.focus();
+          }
+        }}
+        autocomplete="off"
+        spellcheck="false"
+      />
+      {#if links.query}
+        <button class="clear" aria-label={t('list.clearSearch')} onclick={() => (links.search(''), search?.focus())}>
+          <Icon name="x" size={14} />
+        </button>
+      {:else if !searchFocused}
+        <kbd class="slash" aria-hidden="true">/</kbd>
+      {/if}
+    </label>
+    {#if links.query && links.loaded}
+      <span class="count" aria-live="polite">{t('list.results', { n: links.total })}</span>
+    {/if}
+    <Menu triggerClass="sort" label={t('list.sortBy')} align="end" minWidth={160}>
+      {#snippet button()}
+        <Icon name="sort" size={14} />
+        {t(`sort.${links.sort}`)}
+      {/snippet}
+      {#snippet children(close)}
+        {#each sorts as s (s)}
+          <MenuItem
+            checked={links.sort === s}
+            onclick={() => {
+              links.setSort(s);
+              close();
+            }}>{t(`sort.${s}`)}</MenuItem
+          >
+        {/each}
+      {/snippet}
+    </Menu>
+  </div>
+  {/if}
+
+  {#if blank}
+    <div class="blank">
+      <h2>{t('list.emptyTitle')}</h2>
+      <p>
+        {#each withKeys(t('list.emptyBody'), { enter: ['↵'] }) as part, i (i)}
+          {#if part.keys}{#each part.keys as k (k)}<kbd>{k}</kbd>{/each}{:else}{part.text}{/if}
+        {/each}
+      </p>
+      <p class="soft">
+        {#each withKeys(t('list.emptyPaste'), { key: [mod, 'V'] }) as part, i (i)}
+          {#if part.keys}{#each part.keys as k (k)}<kbd>{k}</kbd>{/each}{:else}{part.text}{/if}
+        {/each}
+      </p>
+    </div>
+  {:else if empty}
+    <div class="blank">
+      <p>{t('list.noResults', { q: links.query })}</p>
+      <button class="text-btn" onclick={() => links.search('')}>{t('list.clearSearch')}</button>
+    </div>
+  {:else if links.failed && !links.loaded}
+    <div class="blank">
+      <p>{t('list.loadError')}</p>
+      <button class="text-btn" onclick={() => links.load()}>{t('act.retry')}</button>
+    </div>
+  {:else if !links.loaded}
+    {#if slowLoad}
+      <div class="card" aria-busy="true" aria-label={t('list.loading')}>
+        {#each [0, 1, 2, 3] as i (i)}
+          <div class="ghost-row" style:--d="{i * 90}ms">
+            <span class="g g1"></span><span class="g g2"></span><span class="g g3"></span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  {:else}
+    <div class={['card', links.loading && 'stale']}>
+      <div class="head" aria-hidden="true">
+        <span class="h-slug">{t('list.col.link')}</span>
+        <span class="h-target">{t('list.col.target')}</span>
+        <span class="h-spark">{t('list.col.activity')}</span>
+        <button class={['h-clicks', links.sort === 'clicks' && 'on']} tabindex="-1" onclick={() => links.setSort('clicks')}>
+          {t('list.col.clicks')}
+        </button>
+        <button
+          class={['h-age', links.sort !== 'clicks' && 'on']}
+          tabindex="-1"
+          onclick={() => links.setSort(links.sort === 'created' ? 'visited' : 'created')}
+        >
+          {links.sort === 'visited' ? t('sort.visited') : t('list.col.created')}
+        </button>
+        <span class="h-copy"></span>
+      </div>
+      <ul>
+        {#each links.items as link (link.id)}
+          <li
+            animate:flip={{ duration: links.loading ? 0 : 200 }}
+            in:slide={{ duration: links.fresh.has(link.id) ? 220 : 0 }}
+            out:slide={{ duration: links.leaving.has(link.id) ? 200 : 0 }}
+          >
+            <LinkRow {link} />
+          </li>
+        {/each}
+      </ul>
+    </div>
+    <div bind:this={sentinel} class="sentinel" aria-hidden="true"></div>
+    {#if links.loadingMore}
+      <p class="more">{t('list.loading')}</p>
+    {/if}
+  {/if}
+</section>
+
+<style>
+  .list-section {
+    --col-slug: 150px;
+    --col-spark: 55px;
+    --col-clicks: 52px;
+    --col-age: 76px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .search {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    max-width: 360px;
+    height: 34px;
+    padding: 0 8px 0 11px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    color: var(--text-3);
+    cursor: text;
+    transition:
+      background-color var(--fast) var(--ease),
+      border-color var(--fast) var(--ease),
+      max-width var(--normal) var(--ease);
+  }
+
+  .search:hover {
+    background: var(--surface-2);
+  }
+
+  .search.active {
+    max-width: 480px;
+    border-color: var(--line-2);
+    background: var(--surface);
+  }
+
+  .search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 14%, transparent);
+  }
+
+  .search input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 13.5px;
+  }
+
+  .search input:focus {
+    outline: none;
+  }
+
+  .search input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .clear {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 4px;
+    color: var(--text-3);
+  }
+
+  .clear:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+
+  @media (hover: none) {
+    .slash {
+      display: none;
+    }
+  }
+
+  .count {
+    color: var(--text-3);
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  .toolbar :global(.sort) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    margin-left: auto;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    color: var(--text-2);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .toolbar :global(.sort:hover),
+  .toolbar :global(.sort[aria-expanded='true']) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition: opacity var(--normal) var(--ease);
+  }
+
+  .stale {
+    opacity: 0.6;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 34px;
+    padding: 0 10px 0 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-3);
+    font-size: 12px;
+  }
+
+  .head > * {
+    flex: none;
+  }
+
+  .h-slug {
+    width: var(--col-slug);
+  }
+
+  .h-target {
+    flex: 1;
+    margin-left: 2px;
+  }
+
+  .h-spark {
+    width: var(--col-spark);
+    text-align: right;
+  }
+
+  .h-clicks {
+    width: var(--col-clicks);
+    text-align: right;
+  }
+
+  .h-age {
+    width: var(--col-age);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .h-copy {
+    width: 30px;
+  }
+
+  .head button {
+    color: var(--text-3);
+    font-size: 12px;
+  }
+
+  .head button:hover {
+    color: var(--text);
+  }
+
+  .head button.on {
+    color: var(--text-2);
+    font-weight: 500;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .blank {
+    padding: 56px 24px 64px;
+    border: 1px dashed transparent;
+    color: var(--text-2);
+    text-align: center;
+  }
+
+  .blank h2 {
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .blank p {
+    max-width: 420px;
+    margin: 0 auto;
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+
+  .blank .soft {
+    margin-top: 4px;
+    color: var(--text-3);
+  }
+
+  .blank kbd {
+    margin: 0 2px;
+    vertical-align: 1px;
+  }
+
+  .blank kbd + kbd {
+    margin-left: 0;
+  }
+
+  .text-btn {
+    margin-top: 10px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .text-btn:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .ghost-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 60px;
+    padding: 0 16px;
+    border-top: 1px solid var(--line);
+    animation: breathe 1.1s ease-in-out var(--d) infinite alternate;
+  }
+
+  .ghost-row:first-child {
+    border-top: 0;
+  }
+
+  .g {
+    height: 10px;
+    border-radius: 3px;
+    background: var(--surface-2);
+  }
+
+  .g1 {
+    width: 90px;
+  }
+
+  .g2 {
+    flex: 1;
+    max-width: 320px;
+  }
+
+  .g3 {
+    width: 40px;
+    margin-left: auto;
+  }
+
+  @keyframes breathe {
+    from {
+      opacity: 0.5;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .sentinel {
+    height: 1px;
+  }
+
+  .more {
+    padding: 14px;
+    color: var(--text-3);
+    font-size: 12.5px;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .h-spark {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .head {
+      display: none;
+    }
+
+    .search {
+      max-width: none;
+    }
+
+    .search.active {
+      max-width: none;
+    }
+
+    .count {
+      display: none;
+    }
+  }
+</style>

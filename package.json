@@ -1,0 +1,19 @@
+{
+  "name": "sani",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --filter sani-web dev",
+    "build": "pnpm --filter sani-web build",
+    "check": "pnpm --recursive check",
+    "test": "pnpm --filter sani-web test",
+    "docs:dev": "pnpm --filter sani-docs dev",
+    "docs:build": "pnpm --filter sani-docs build",
+    "docs:preview": "pnpm --filter sani-docs preview",
+    "docs:check": "pnpm --filter sani-docs check"
+  }
+}

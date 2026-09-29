@@ -1,0 +1,6 @@
+# Everything is stored with LF line endings, whatever the platform.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.woff2 binary

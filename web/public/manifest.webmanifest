@@ -1,0 +1,20 @@
+{
+  "name": "Sani",
+  "short_name": "Sani",
+  "description": "A small, fast link shortener",
+  "start_url": "/admin/",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#f7f7f5",
+  "theme_color": "#f7f7f5",
+  "icons": [
+    { "src": "/admin/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/admin/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/admin/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "/admin/new",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}

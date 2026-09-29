@@ -1,0 +1,639 @@
+/*
+ * The docs wear the admin app's design: warm neutrals, one blue accent,
+ * hairlines rather than shadows, Inter and IBM Plex Mono. The tokens mirror
+ * web/src/app.css; VitePress variables are mapped onto them below.
+ */
+
+:root {
+  --sn-font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Noto Sans SC", sans-serif;
+  --sn-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
+    "PingFang SC", "Microsoft YaHei", monospace;
+  --sn-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --sn-bg: #fcfcfb;
+  --sn-canvas: #f7f7f5;
+  --sn-surface: #ffffff;
+  --sn-surface-2: #f2f1ee;
+  --sn-surface-3: #e9e8e4;
+  --sn-line: #e7e5e0;
+  --sn-line-2: #d9d6cf;
+  --sn-text: #1c1b19;
+  --sn-text-2: #56544e;
+  --sn-text-3: #716e67;
+  --sn-text-4: #b3b0a8;
+  --sn-accent: #2d4be0;
+  --sn-accent-hover: #2340c8;
+  --sn-accent-soft: #edf0fd;
+  --sn-accent-line: #c3ccf7;
+  --sn-ink: #1c1b19;
+  --sn-ink-hover: #34332f;
+  --sn-on-ink: #fafaf8;
+  --sn-success: #1b7a45;
+  --sn-warning: #975800;
+  --sn-danger: #b8372a;
+  --sn-shadow-pop: 0 1px 2px rgb(28 27 25 / 0.05), 0 8px 28px -6px rgb(28 27 25 / 0.16);
+  --sn-selection: #d7ddfb;
+}
+
+.dark {
+  --sn-bg: #111110;
+  --sn-canvas: #111110;
+  --sn-surface: #191918;
+  --sn-surface-2: #20201e;
+  --sn-surface-3: #292927;
+  --sn-line: #292826;
+  --sn-line-2: #3a3936;
+  --sn-text: #edece7;
+  --sn-text-2: #b3b1a9;
+  --sn-text-3: #8a887f;
+  --sn-text-4: #5b5954;
+  --sn-accent: #7189ff;
+  --sn-accent-hover: #8b9dff;
+  --sn-accent-soft: #1b2140;
+  --sn-accent-line: #34407a;
+  --sn-ink: #edece7;
+  --sn-ink-hover: #d9d8d2;
+  --sn-on-ink: #141413;
+  --sn-success: #4cc584;
+  --sn-warning: #e9a94a;
+  --sn-danger: #ff7462;
+  --sn-shadow-pop: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -8px rgb(0 0 0 / 0.7);
+  --sn-selection: #2f3a73;
+}
+
+/* VitePress, mapped onto the tokens. */
+:root,
+.dark {
+  --vp-font-family-base: var(--sn-font-sans);
+  --vp-font-family-mono: var(--sn-font-mono);
+
+  --vp-c-bg: var(--sn-bg);
+  --vp-c-bg-alt: var(--sn-canvas);
+  --vp-c-bg-elv: var(--sn-surface);
+  --vp-c-bg-soft: var(--sn-surface-2);
+
+  --vp-c-text-1: var(--sn-text);
+  --vp-c-text-2: var(--sn-text-2);
+  --vp-c-text-3: var(--sn-text-3);
+
+  --vp-c-border: var(--sn-line-2);
+  --vp-c-divider: var(--sn-line);
+  --vp-c-gutter: var(--sn-line);
+
+  --vp-c-brand-1: var(--sn-accent);
+  --vp-c-brand-2: var(--sn-accent-hover);
+  --vp-c-brand-3: var(--sn-accent);
+  --vp-c-brand-soft: var(--sn-accent-soft);
+
+  --vp-c-default-1: var(--sn-text-2);
+  --vp-c-default-2: var(--sn-surface-3);
+  --vp-c-default-3: var(--sn-line-2);
+  --vp-c-default-soft: var(--sn-surface-2);
+
+  --vp-c-tip-1: var(--sn-accent);
+  --vp-c-tip-2: var(--sn-accent-hover);
+  --vp-c-tip-3: var(--sn-accent);
+  --vp-c-tip-soft: var(--sn-accent-soft);
+  --vp-c-warning-1: var(--sn-warning);
+  --vp-c-warning-soft: color-mix(in oklab, var(--sn-warning) 9%, var(--sn-bg));
+  --vp-c-danger-1: var(--sn-danger);
+  --vp-c-danger-soft: color-mix(in oklab, var(--sn-danger) 8%, var(--sn-bg));
+
+  --vp-button-brand-bg: var(--sn-ink);
+  --vp-button-brand-border: var(--sn-ink);
+  --vp-button-brand-text: var(--sn-on-ink);
+  --vp-button-brand-hover-bg: var(--sn-ink-hover);
+  --vp-button-brand-hover-border: var(--sn-ink-hover);
+  --vp-button-brand-hover-text: var(--sn-on-ink);
+  --vp-button-brand-active-bg: var(--sn-ink);
+  --vp-button-brand-active-text: var(--sn-on-ink);
+
+  --vp-code-font-size: 0.875em;
+  --vp-code-color: var(--sn-text);
+  --vp-code-bg: var(--sn-surface-2);
+  --vp-code-block-bg: var(--sn-canvas);
+  --vp-code-block-divider-color: var(--sn-line);
+  --vp-code-tab-bg: var(--sn-canvas);
+  --vp-code-tab-divider: var(--sn-line);
+  --vp-code-tab-text-color: var(--sn-text-3);
+  --vp-code-tab-hover-text-color: var(--sn-text);
+  --vp-code-tab-active-text-color: var(--sn-text);
+  --vp-code-tab-active-bar-color: var(--sn-accent);
+  --vp-code-copy-code-bg: var(--sn-surface);
+  --vp-code-copy-code-border-color: var(--sn-line-2);
+  --vp-code-copy-code-hover-bg: var(--sn-surface);
+  --vp-code-copy-code-hover-border-color: var(--sn-line-2);
+  --vp-code-copy-copied-text-content: "已复制";
+
+  --vp-nav-bg-color: var(--sn-bg);
+  --vp-nav-screen-bg-color: var(--sn-bg);
+  --vp-local-nav-bg-color: var(--sn-bg);
+  --vp-sidebar-bg-color: var(--sn-canvas);
+
+  --vp-local-search-bg: var(--sn-canvas);
+  --vp-local-search-result-bg: var(--sn-surface);
+  --vp-local-search-result-border: var(--sn-line);
+  --vp-local-search-result-selected-bg: var(--sn-surface);
+  --vp-local-search-result-selected-border: var(--sn-accent);
+  --vp-local-search-highlight-bg: var(--sn-accent-soft);
+  --vp-local-search-highlight-text: var(--sn-accent);
+
+  --vp-custom-block-font-size: 15px;
+  --vp-custom-block-code-font-size: 13.5px;
+}
+
+:lang(en) {
+  --vp-code-copy-copied-text-content: "Copied";
+}
+
+::selection {
+  background: var(--sn-selection);
+}
+
+html {
+  scroll-padding-top: calc(var(--vp-nav-height) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Nav: a solid bar with one hairline, like the app's header. */
+.VPNavBar,
+.VPNavBar.has-sidebar .content-body,
+.VPNavBar:not(.home.top) .content-body {
+  background: var(--vp-nav-bg-color) !important;
+}
+
+.VPNavBar .divider-line,
+.VPNavBar.has-sidebar .divider-line {
+  background: var(--sn-line) !important;
+}
+
+.VPNavBarTitle .title {
+  gap: 9px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.VPNavBarTitle .logo {
+  height: 22px;
+  width: 22px;
+}
+
+/* Sidebar */
+.VPSidebar {
+  border-right: 1px solid var(--sn-line);
+}
+
+.VPSidebarItem.level-0 > .item > .text,
+.VPSidebarItem.level-0 > .item > .link > .text {
+  color: var(--sn-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.VPSidebarItem .text {
+  font-size: 14px;
+}
+
+.VPSidebarItem.is-active > .item .link > .text {
+  font-weight: 500;
+}
+
+/* Reading */
+.vp-doc {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.vp-doc :lang(zh-CN),
+:lang(zh-CN) .vp-doc {
+  line-height: 1.8;
+}
+
+/* The section a page belongs to, above its title (see markdown.ts). */
+.vp-doc .sn-eyebrow {
+  margin: 0 0 10px;
+  color: var(--sn-accent);
+  font-size: 13.5px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.vp-doc .sn-eyebrow:lang(en) {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  text-wrap: balance;
+}
+
+.vp-doc p,
+.vp-doc li {
+  text-wrap: pretty;
+}
+
+.vp-doc h1 {
+  margin-bottom: 20px;
+  font-size: 34px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+}
+
+.vp-doc h2 {
+  margin: 56px 0 18px;
+  padding-top: 26px;
+  border-top: 1px solid var(--sn-line);
+  font-size: 23px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+}
+
+.vp-doc h3 {
+  margin: 36px 0 12px;
+  font-size: 18.5px;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+}
+
+.vp-doc h4 {
+  margin: 28px 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.vp-doc p,
+.vp-doc summary {
+  margin: 14px 0;
+}
+
+.vp-doc .lead {
+  margin: -4px 0 28px;
+  color: var(--sn-text-2);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.vp-doc a {
+  font-weight: inherit;
+  text-decoration-color: color-mix(in oklab, var(--sn-accent) 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
+}
+
+.vp-doc a:hover {
+  color: var(--sn-accent-hover);
+  text-decoration-color: currentColor;
+}
+
+.vp-doc strong {
+  font-weight: 600;
+}
+
+.vp-doc ul,
+.vp-doc ol {
+  padding-left: 1.3em;
+}
+
+.vp-doc li + li {
+  margin-top: 6px;
+}
+
+.vp-doc li::marker {
+  color: var(--sn-text-4);
+}
+
+.vp-doc ol > li::marker {
+  color: var(--sn-text-3);
+  font-feature-settings: "tnum";
+  font-size: 0.92em;
+}
+
+.vp-doc hr {
+  margin: 40px 0;
+  border-top: 1px solid var(--sn-line);
+}
+
+.vp-doc blockquote {
+  border-left: 2px solid var(--sn-line-2);
+  color: var(--sn-text-2);
+}
+
+.vp-doc :not(pre) > code {
+  padding: 0.14em 0.4em;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.vp-doc a > code {
+  color: inherit;
+}
+
+.vp-doc h2 code,
+.vp-doc h3 code {
+  font-size: 0.9em;
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  border: 1px solid var(--sn-line-2);
+  border-bottom-width: 1.5px;
+  border-radius: 5px;
+  background: var(--sn-surface);
+  color: var(--sn-text-2);
+  font: 500 0.78em/1 var(--sn-font-sans);
+  vertical-align: 0.1em;
+}
+
+/* Tables: hairlines between rows, nothing else. */
+.vp-doc .table-wrap {
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.vp-doc tr {
+  border-top: 0;
+  background: none !important;
+}
+
+.vp-doc th,
+.vp-doc td {
+  padding: 10px 16px 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--sn-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.vp-doc th:last-child,
+.vp-doc td:last-child {
+  padding-right: 0;
+}
+
+.vp-doc th {
+  padding-top: 0;
+  border-bottom-color: var(--sn-line-2);
+  background: none;
+  color: var(--sn-text-3);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.vp-doc td code {
+  font-size: 0.86em;
+}
+
+/* First columns hold short labels; a Chinese one never breaks mid-word. */
+.vp-doc td:first-child {
+  word-break: keep-all;
+}
+
+/* Code blocks */
+.vp-doc div[class*="language-"],
+.vp-block {
+  border: 1px solid var(--sn-line);
+  border-radius: 10px;
+}
+
+.vp-doc div[class*="language-"] > span.lang {
+  color: var(--sn-text-3);
+  font-family: var(--sn-font-mono);
+  font-size: 11px;
+}
+
+.vp-doc [class*="language-"] pre,
+.vp-doc [class*="language-"] code {
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+/* Log lines are long and their end matters, so they wrap instead of scrolling. */
+.vp-doc div.language-log code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vp-doc .vp-code-group .tabs {
+  border: 1px solid var(--sn-line);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+
+.vp-doc .vp-code-group div[class*="language-"] {
+  border-radius: 0 0 10px 10px;
+}
+
+@media (max-width: 639px) {
+  .vp-doc div[class*="language-"],
+  .vp-doc .vp-code-group .tabs {
+    margin-inline: -24px;
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+/* Callouts: a quiet surface with a colored title. */
+.custom-block {
+  border: 1px solid var(--sn-line);
+  border-radius: 10px;
+  line-height: 1.7;
+}
+
+.custom-block .custom-block-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.custom-block.tip,
+.custom-block.info,
+.custom-block.details {
+  background: var(--sn-canvas);
+  color: var(--sn-text-2);
+}
+
+.custom-block.tip {
+  border-color: color-mix(in oklab, var(--sn-accent) 22%, var(--sn-line));
+  background: color-mix(in oklab, var(--sn-accent) 4%, var(--sn-bg));
+}
+
+.custom-block.tip .custom-block-title {
+  color: var(--sn-accent);
+}
+
+.custom-block.warning {
+  border-color: color-mix(in oklab, var(--sn-warning) 28%, var(--sn-line));
+  color: var(--sn-text-2);
+}
+
+.custom-block.warning .custom-block-title {
+  color: var(--sn-warning);
+}
+
+.custom-block.danger {
+  border-color: color-mix(in oklab, var(--sn-danger) 26%, var(--sn-line));
+  color: var(--sn-text-2);
+}
+
+.custom-block.danger .custom-block-title {
+  color: var(--sn-danger);
+}
+
+.custom-block a {
+  color: var(--sn-accent);
+}
+
+.custom-block code {
+  background: color-mix(in oklab, var(--sn-text) 7%, transparent);
+}
+
+/* Endpoints: `GET /api/links` lines and method chips. */
+.vp-doc .endpoint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--sn-line);
+  border-radius: 10px;
+  background: var(--sn-canvas);
+}
+
+.vp-doc .endpoint .path {
+  padding: 0;
+  background: none;
+  color: var(--sn-text);
+  font-size: 14.5px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.vp-doc code.method {
+  --m: var(--sn-text-2);
+  padding: 0.2em 0.5em;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--m) 11%, transparent);
+  /* A touch of the text color keeps AA contrast on the tinted chip. */
+  color: color-mix(in oklab, var(--m) 85%, var(--sn-text));
+  font-size: 0.74em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.vp-doc .endpoint code.method {
+  font-size: 11.5px;
+}
+
+.vp-doc code.method-get,
+.vp-doc code.method-head {
+  --m: var(--sn-success);
+}
+
+.vp-doc code.method-post {
+  --m: var(--sn-accent);
+}
+
+.vp-doc code.method-put,
+.vp-doc code.method-patch {
+  --m: var(--sn-warning);
+}
+
+.vp-doc code.method-delete {
+  --m: var(--sn-danger);
+}
+
+/* Status labels in tables: a dot plus the word, never color alone. */
+.vp-doc .sn-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--sn-text-2);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.vp-doc .sn-status::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sn-text-4);
+}
+
+.vp-doc .sn-status.done::before {
+  background: var(--sn-success);
+}
+
+.vp-doc .sn-status.planned::before {
+  box-sizing: border-box;
+  border: 1.5px solid var(--sn-text-3);
+  background: transparent;
+}
+
+/* Outline */
+.VPDocAsideOutline .outline-title {
+  color: var(--sn-text-3);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.VPDocAsideOutline .outline-link {
+  font-size: 13px;
+}
+
+/* Prev / next */
+.VPDocFooter .pager-link {
+  border-color: var(--sn-line);
+  border-radius: 10px;
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: var(--sn-line-2);
+}
+
+.VPDocFooter .pager-link .title {
+  font-weight: 550;
+}
+
+/* Local search */
+.VPLocalSearchBox .shell {
+  border: 1px solid var(--sn-line);
+  box-shadow: var(--sn-shadow-pop);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}

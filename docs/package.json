@@ -1,0 +1,29 @@
+{
+  "name": "sani-docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vitepress dev --host 127.0.0.1 --port 5174",
+    "build": "node .vitepress/sync/check.ts && vitepress build",
+    "preview": "vitepress preview --host 127.0.0.1 --port 4174",
+    "check": "node .vitepress/sync/check.ts && vue-tsc --noEmit",
+    "a11y": "node scripts/a11y.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "catalog:",
+    "@fontsource/ibm-plex-mono": "catalog:",
+    "vitepress": "1.6.4",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "axe-core": "catalog:",
+    "typescript": "catalog:",
+    "vue-tsc": "3.3.11"
+  }
+}

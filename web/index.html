@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="robots" content="noindex" />
+    <title>Sani</title>
+    <link rel="icon" href="/admin/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/admin/apple-touch-icon.png" />
+    <link rel="manifest" href="/admin/manifest.webmanifest" />
+    <script>(function(){try{var d=document.documentElement,t=localStorage.getItem("sani.theme"),l=localStorage.getItem("sani.lang");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";d.dataset.theme=t;if(!l)l=/^zh/i.test(navigator.language)?"zh":"en";d.lang=l==="zh"?"zh-CN":"en"}catch(e){}})()</script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+# Build output
+/bin/
+/internal/webui/dist/*
+!/internal/webui/dist/.gitkeep
+node_modules/
+web/shots/
+web/test-results/
+web/playwright-report/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+*.test
+coverage.out
+
+# Runtime data
+/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example

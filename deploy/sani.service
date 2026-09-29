@@ -1,0 +1,36 @@
+# /etc/systemd/system/sani.service
+# Install the binary as /usr/local/bin/sani, then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now sani
+[Unit]
+Description=Sani link shortener
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+DynamicUser=yes
+StateDirectory=sani
+Environment=SANI_LISTEN=127.0.0.1:8080
+Environment=SANI_DATA_DIR=/var/lib/sani
+Environment=SANI_TRUST_PROXY=true
+Environment=TZ=Asia/Shanghai
+# Environment=SANI_BASE_URL=https://s.example.com
+ExecStart=/usr/local/bin/sani
+Restart=on-failure
+RestartSec=2s
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
