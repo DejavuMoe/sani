@@ -1,4 +1,4 @@
-.PHONY: install check test build web binary dev-backend dev-frontend demo e2e bench load docker docs docs-dev clean
+.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e bench load docker docs docs-dev clean
 
 # Run through mise when it is installed, so the pinned toolchain is used.
 RUN     ?= $(shell command -v mise >/dev/null 2>&1 && echo "mise exec --")
@@ -28,6 +28,10 @@ binary:
 	CGO_ENABLED=0 $(RUN) go build -trimpath -ldflags "$(LDFLAGS)" -o bin/sani ./cmd/sani
 
 build: web binary
+
+# Release archives for every platform, and SHA256SUMS, in dist/.
+dist:
+	VERSION=$(VERSION) $(RUN) bash scripts/dist.sh
 
 dev-backend:
 	SANI_LISTEN=127.0.0.1:8080 SANI_DATA_DIR=./data $(RUN) go run ./cmd/sani
@@ -64,5 +68,5 @@ docs-dev:
 	$(RUN) pnpm --dir docs dev
 
 clean:
-	rm -rf bin
+	rm -rf bin dist
 	find internal/webui/dist -mindepth 1 ! -name .gitkeep -delete

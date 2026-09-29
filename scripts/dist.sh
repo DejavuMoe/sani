@@ -47,6 +47,7 @@ for target in "${targets[@]}"; do
   CGO_ENABLED=0 GOOS=$os GOARCH=$arch GOARM=$arm \
     go build -trimpath -ldflags "-s -w -buildid= -X main.version=$version" -o "$dir/$exe" ./cmd/sani
   cp LICENSE README.md "$dir/"
+  chmod 644 "$dir/LICENSE" "$dir/README.md"
   touch -d "@$SOURCE_DATE_EPOCH" "$dir"/*
 
   if [ "$os" = windows ]; then

@@ -6,7 +6,10 @@ set -euo pipefail
 
 tag=${1:?usage: scripts/release-notes.sh vX.Y.Z}
 changelog=docs/en/project/changelog.md
-notes=$(awk -v heading="## $tag" '$0 == heading { on = 1; next } on && /^## / { exit } on' "$changelog")
+# The section without its heading, and without the date the release page
+# shows anyway.
+notes=$(awk -v heading="## $tag" '$0 == heading { on = 1; next } on && /^## / { exit } on' "$changelog" |
+  sed -E '1,/[^[:space:]]/ s/^[0-9]{4}-[0-9]{2}-[0-9]{2} · //')
 if [ -z "$(tr -d '[:space:]' <<<"$notes")" ]; then
   echo "release-notes: $changelog has no section \"## $tag\"" >&2
   exit 1
