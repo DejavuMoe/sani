@@ -1,0 +1,26 @@
+name: Set up
+description: The toolchain pinned in mise.toml, and the dependencies of the pnpm workspace and the Go module.
+
+runs:
+  using: composite
+  steps:
+    - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+
+    - id: paths
+      shell: bash
+      run: |
+        echo "pnpm=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        echo "gomod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+        echo "gobuild=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ${{ steps.paths.outputs.pnpm }}
+          ${{ steps.paths.outputs.gomod }}
+          ${{ steps.paths.outputs.gobuild }}
+        key: deps-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'go.sum', 'mise.toml') }}
+        restore-keys: deps-${{ runner.os }}-
+
+    - shell: bash
+      run: make install
