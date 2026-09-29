@@ -4,7 +4,7 @@
 
 ## v0.1.0
 
-2026-09-29 · The first version: feature-complete, without published images or binaries yet.
+2026-09-30 · The first public release.
 
 ### Redirects and statistics
 
@@ -37,6 +37,7 @@
 - The first password requires the setup code from the log, or can be set with `SANI_PASSWORD`.
 - `sani backup` for online backups, including to standard output; `sani passwd` to reset the password; `sani healthcheck` for container health checks.
 - Example configurations for Docker Compose, systemd, Caddy and nginx.
+- Images on GHCR for `linux/amd64`, `linux/arm64` and `linux/arm/v7`, and binaries for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance.
 
 ### Security
 
@@ -46,5 +47,5 @@
 
 ### Documentation
 
-- An English and Chinese documentation site with a deployment config builder, a live demo and a performance chart.
+- An English and Chinese documentation site at [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/en/), with a deployment config builder, a live demo and a performance chart.
 - Settings, API, error codes, commands, reserved slugs and benchmark figures are checked against the source at build time.

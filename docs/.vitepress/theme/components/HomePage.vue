@@ -77,9 +77,9 @@ interface Line {
 
 const steps = computed<{ title: string; note: string; lines: Line[]; copy: boolean }[]>(() => [
   {
-    title: pick('获取代码', 'Get the code'),
-    note: pick('还没有发布的镜像，第一次启动时会在本机构建。', 'There’s no published image yet; the first start builds one locally.'),
-    lines: [{ text: 'git clone https://github.com/DejavuMoe/sani' }, { text: 'cd sani' }],
+    title: pick('下载 compose.yaml', 'Download compose.yaml'),
+    note: pick('镜像来自 GHCR，支持 amd64、arm64 和 armv7。', 'The image comes from GHCR, for amd64, arm64 and armv7.'),
+    lines: [{ text: 'mkdir sani && cd sani' }, { text: 'curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/main/compose.yaml' }],
     copy: true,
   },
   {

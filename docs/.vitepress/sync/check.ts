@@ -12,10 +12,10 @@ import { fileURLToPath } from 'node:url';
 import { benchmark } from '../data/benchmark.ts';
 import { groups } from '../pages.ts';
 import { buildCompose, buildProxy, buildService, type BuilderInput } from './builder.ts';
-import { apiRoutes, commands, docsRoot, envVars, errorCodes, read, reservedSlugs } from './source.ts';
+import { apiRoutes, commands, docsRoot, envVars, errorCodes, read, release, reservedSlugs } from './source.ts';
 
 export interface Check {
-  id: 'pages' | 'config' | 'readme' | 'api' | 'errors' | 'cli' | 'reserved' | 'benchmark' | 'builder' | 'assets';
+  id: 'pages' | 'config' | 'readme' | 'api' | 'errors' | 'cli' | 'reserved' | 'benchmark' | 'builder' | 'release' | 'assets';
   /** How many facts were compared. */
   count: number;
   problems: string[];
@@ -226,13 +226,34 @@ function checkBuilder(): Check {
   return { id: 'builder', count: runs.length, problems };
 }
 
+/**
+ * The deploy page names every archive and image platform a release publishes,
+ * and nothing it doesn't; compose.yaml uses the image the release pushes.
+ */
+function checkRelease(): Check {
+  const problems: string[] = [];
+  const { image, archives, platforms } = release();
+  const quoted = (s: string) => '`' + s + '`';
+  for (const { dir } of locales) {
+    const file = `${dir}guide/deploy.md`;
+    const md = doc(dir, 'guide/deploy');
+    for (const a of archives) if (!md.includes(quoted(a))) problems.push(`${file}: the archive ${a} is not listed`);
+    for (const p of platforms) if (!md.includes(quoted(p))) problems.push(`${file}: the image platform ${p} is not listed`);
+    const listed = new Set([...md.matchAll(/`(sani-[a-z0-9]+-[a-z0-9]+\.(?:tar\.gz|zip))`/g)].map((m) => m[1]));
+    for (const a of listed) if (!archives.includes(a)) problems.push(`${file}: ${a} is not built by scripts/dist.sh`);
+  }
+  const composeImage = /^\s+image: (\S+?)(:\S+)?(\s|$)/m.exec(read('compose.yaml'))?.[1];
+  if (composeImage !== image) problems.push(`compose.yaml: the image is ${composeImage}, but releases push ${image}`);
+  return { id: 'release', count: archives.length + platforms.length + 1, problems };
+}
+
 function checkAssets(): Check {
   const same = read('web/public/favicon.svg') === readFileSync(join(docsRoot, 'public/favicon.svg'), 'utf8');
   return { id: 'assets', count: 1, problems: same ? [] : ['docs/public/favicon.svg differs from web/public/favicon.svg'] };
 }
 
 export function runChecks(): Check[] {
-  const checks = [checkPages, checkConfig, checkReadme, checkApi, checkErrors, checkCli, checkReserved, checkBenchmark, checkBuilder, checkAssets];
+  const checks = [checkPages, checkConfig, checkReadme, checkApi, checkErrors, checkCli, checkReserved, checkBenchmark, checkBuilder, checkRelease, checkAssets];
   return checks.map((check) => {
     try {
       return check();

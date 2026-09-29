@@ -11,6 +11,7 @@ make install          # web and docs dependencies (one pnpm workspace, frozen lo
 make check            # gofmt, go vet, svelte-check --fail-on-warnings, docs sync check, vue-tsc
 make test             # go test -race ./..., vitest
 make build            # web → internal/webui/dist, then ./bin/sani
+make dist             # release archives for every platform + SHA256SUMS in dist/ (after make web)
 make e2e              # Playwright against a fresh ./bin/sani on 127.0.0.1:18765
 make bench            # handler, cache and click-recorder benchmarks
 make load             # bombardier load test; fails if clicks ≠ redirects
@@ -30,6 +31,7 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 - `internal/store`: SQLite schema, migrations (`PRAGMA user_version`) and queries.
 - `internal/links`: pure rules for slugs and URLs. `internal/meta`: the title/icon fetcher.
 - `web/src`: Svelte 5 (runes) + TypeScript. `lib/` holds state and helpers, `components/` and `views/` the UI.
+- `.github/`: CI (`ci.yml`), releases on `v*` tags (`release.yml`: archives, the GHCR image, provenance, notes from the changelog) and the Pages deploy (`docs.yml`). Actions are pinned by commit SHA, with the version in a comment.
 - `docs/`: the VitePress site. Chinese pages at `docs/`, English ones at the same paths under `docs/en/`, listed in `docs/.vitepress/pages.ts`; theme and components in `docs/.vitepress/theme/`.
 
 ## The docs follow the code
@@ -40,7 +42,10 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 - API routes or error codes: `reference/api.md` (every endpoint, the index table and the error table);
 - subcommands: `reference/cli.md`; reserved slugs: `guide/usage.md`;
 - benchmark results: `docs/.vitepress/data/benchmark.ts` and both READMEs;
-- `compose.yaml` or `deploy/*`: the deploy page's builder (`sync/builder.ts`) must still find the lines it fills in.
+- `compose.yaml` or `deploy/*`: the deploy page's builder (`sync/builder.ts`) must still find the lines it fills in;
+- release platforms (`targets` in `scripts/dist.sh`, `platforms:` in `release.yml`): the download table and image platforms in `guide/deploy.md`.
+
+A release needs an entry `## vX.Y.Z` in both changelogs before the tag is pushed; the release workflow stops without one.
 
 Update both languages; the check names what's missing. Anything else the docs claim about behavior (limits, timeouts, defaults) is checked by hand against the code, so read it before you change it.
 

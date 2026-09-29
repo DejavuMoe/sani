@@ -62,23 +62,26 @@ sudo systemctl start sani
 
 迁移到另一台服务器也是同样的步骤：在旧服务器上备份，在新服务器上恢复，最后把 DNS 指过去。
 
-## 升级
+## 升级 {#upgrade}
+
+先[备份](#backup)，再换上新版本：
 
 ::: code-group
 
 ```sh [Docker]
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 ```sh [systemd]
+curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
 sudo install -m 755 sani /usr/local/bin/sani
 sudo systemctl restart sani
 ```
 
 :::
 
-数据库结构会在启动时自动升级。升级前请先备份：旧版本的程序打不开升级过的数据库，回退只能用升级前的备份。
+每个版本改了什么、升级时要注意什么，写在[更新日志](../project/changelog)里。数据库结构会在启动时自动升级，旧版本的程序打不开升级过的数据库，所以回退只能用升级前的备份。
 
 ## 重设密码
 

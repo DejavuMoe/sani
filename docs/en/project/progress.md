@@ -1,6 +1,6 @@
 # Status
 
-<p class="lead">Sani is at v0.1.0: feature-complete, tested and load-tested, but not formally released yet. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
+<p class="lead">Sani is at v0.1.0, its first public release: feature-complete, tested and load-tested, with ready-made images and binaries. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
 
 ## Where things stand {#current}
 
@@ -13,9 +13,9 @@
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |
 | Operations | <span class="sn-status done">Done</span> | Online backups, password reset, health checks |
 | Documentation | <span class="sn-status done">Done</span> | This site: English and Chinese, checked against the source at build time |
-| Release | <span class="sn-status planned">Planned</span> | Version tags, with images and binaries for amd64 and arm64 |
-| Continuous integration | <span class="sn-status planned">Planned</span> | Checks, tests, end-to-end tests and the docs check on every commit |
-| Hosted docs | <span class="sn-status planned">Planned</span> | For now, browse them locally with `make docs-dev` |
+| Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
+| Continuous integration | <span class="sn-status done">Done</span> | Every commit runs the checks and tests (Linux, macOS, Windows), the end-to-end tests, axe and a vulnerability scan, and builds the image and every binary |
+| Hosted docs | <span class="sn-status done">Done</span> | At [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/en/), updated on every push to main |
 
 ## Build-time checks {#checks}
 
@@ -35,9 +35,8 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 
 ## Next {#next}
 
-1. **Release.** Tag v0.1.0 and build images and binaries for several architectures automatically, with checksums. Deploying then no longer needs a local build.
-2. **Continuous integration.** Run `make check test e2e`, including the docs check, on every commit.
-3. **Hosted docs.** Publish this site as a static website.
+1. **Listening.** v0.1.0 is the first public release; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
+2. **Settling for 1.0.** The API, the settings and the database schema are fixed at 1.0; after that, incompatible changes only come with a new major version.
 
 Under consideration, not decided:
 

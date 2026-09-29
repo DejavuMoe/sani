@@ -1,10 +1,19 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { defineConfig, type DefaultTheme } from 'vitepress';
 import { readableTokens } from './contrast';
 import { saniMarkdown } from './markdown';
 import { groups, prefix, type Lang } from './pages';
 
 const repo = 'https://github.com/DejavuMoe/sani';
+
+// The published site lives under https://dejavumoe.github.io/sani/; local
+// builds and previews stay at the root.
+const base = process.env.DOCS_BASE ?? '/';
+const site = 'https://dejavumoe.github.io/sani/';
+
+// Pages show when they last changed, but only where there is Git history to
+// ask: the Linux build mirror has none.
+const git = existsSync(new URL('../../.git', import.meta.url));
 
 // The version in the nav is the newest entry of the changelog, so the two
 // cannot disagree.
@@ -42,6 +51,7 @@ const zhTheme: DefaultTheme.Config = {
   outline: { level: [2, 3], label: '本页内容' },
   docFooter: { prev: '上一页', next: '下一页' },
   editLink: { pattern: `${repo}/edit/main/docs/:path`, text: '在 GitHub 上修改此页' },
+  lastUpdated: { text: '最后更新', formatOptions: { dateStyle: 'medium' } },
   darkModeSwitchLabel: '外观',
   lightModeSwitchTitle: '切换到浅色',
   darkModeSwitchTitle: '切换到深色',
@@ -64,6 +74,7 @@ const enTheme: DefaultTheme.Config = {
   sidebar: sidebar('en'),
   outline: { level: [2, 3], label: 'On this page' },
   editLink: { pattern: `${repo}/edit/main/docs/:path`, text: 'Edit this page on GitHub' },
+  lastUpdated: { text: 'Last updated', formatOptions: { dateStyle: 'medium' } },
   externalLinkIcon: true,
   notFound: {
     title: 'This page doesn’t exist',
@@ -76,15 +87,18 @@ const enTheme: DefaultTheme.Config = {
 
 export default defineConfig({
   title: 'Sani',
+  base,
   cleanUrls: true,
-  // The Linux build mirror carries no Git metadata, so no "last updated".
-  lastUpdated: false,
+  lastUpdated: git,
+  sitemap: { hostname: site },
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
     ['meta', { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#f7f7f5' }],
     ['meta', { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#111110' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'Sani' }],
+    ['meta', { property: 'og:image', content: `${site}screenshots/dashboard-light-en.png` }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
   ],
 
   locales: {

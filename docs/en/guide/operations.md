@@ -62,23 +62,26 @@ The image has no shell, so with Docker a throwaway `alpine` container copies the
 
 Moving to another server is the same: back up on the old one, restore on the new one, then point DNS at it.
 
-## Upgrading
+## Upgrading {#upgrade}
+
+[Back up](#backup) first, then put the new version in place:
 
 ::: code-group
 
 ```sh [Docker]
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 ```sh [systemd]
+curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
 sudo install -m 755 sani /usr/local/bin/sani
 sudo systemctl restart sani
 ```
 
 :::
 
-The database schema is upgraded at startup. Back up first: an older binary can’t open an upgraded database, so rolling back means restoring the backup from before the upgrade.
+What each version changes, and anything to watch for when upgrading, is in the [changelog](../project/changelog). The database schema is upgraded on start and older versions can’t open it afterwards, so going back means restoring the backup from before the upgrade.
 
 ## Resetting the password
 

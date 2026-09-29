@@ -120,7 +120,7 @@ const files = computed<File[]>(() => {
     out.push({
       id: 'compose',
       name: 'compose.yaml',
-      where: pick('保存到仓库根目录，替换原来的 compose.yaml', 'Save it in the repository root, replacing the compose.yaml there'),
+      where: pick('保存到服务器上一个新建的目录里，比如 ~/sani', 'Save it in a new directory on the server, such as ~/sani'),
       lang: 'yaml',
       built: buildCompose(compose, input.value),
     });
@@ -187,17 +187,20 @@ const steps = computed(() => {
   const list: { text: string; code?: string }[] = [];
   if (compose) {
     list.push({
-      text: pick('获取代码，并用上面的 compose.yaml 替换仓库里的同名文件：', 'Get the code and replace its compose.yaml with the one above:'),
-      code: 'git clone https://github.com/DejavuMoe/sani && cd sani',
+      text: pick('在服务器上新建一个目录，把上面的 compose.yaml 保存进去：', 'Create a directory on the server and save the compose.yaml above in it:'),
+      code: 'mkdir ~/sani && cd ~/sani',
     });
     list.push({
-      text: pick('构建并启动。目前没有预构建镜像，第一次会在本机构建，大约一分钟：', 'Build and start it. There is no published image yet, so the first run builds one locally, in about a minute:'),
+      text: pick('拉取镜像并启动：', 'Pull the image and start it:'),
       code: 'docker compose up -d',
     });
   } else {
     list.push({
-      text: pick('在装有 Go、Node 和 pnpm 的机器上构建，再把二进制文件放到服务器上：', 'Build on a machine with Go, Node and pnpm, then copy the binary to the server:'),
-      code: 'make build && scp bin/sani server:/usr/local/bin/sani',
+      text: pick(
+        '在服务器上下载最新版本并安装。ARM 服务器把 amd64 换成 arm64 或 armv7：',
+        'Download the latest release on the server and install it. On an ARM server, use arm64 or armv7 instead of amd64:',
+      ),
+      code: 'curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani && sudo install -m 755 sani /usr/local/bin/sani',
     });
     list.push({
       text: pick('把 sani.service 保存到上面的位置，然后启用：', 'Save sani.service where shown above, then enable it:'),

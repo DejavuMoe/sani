@@ -7,9 +7,12 @@
 ::: code-group
 
 ```sh [Docker]
-git clone https://github.com/DejavuMoe/sani && cd sani
-docker build -t sani .
-docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data sani
+docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data ghcr.io/dejavumoe/sani
+```
+
+```sh [Binary]
+curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
+SANI_LISTEN=127.0.0.1:8080 ./sani     # keeps its data in ./data
 ```
 
 ```sh [From source]
@@ -20,7 +23,7 @@ SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # keeps its data in ./data
 
 :::
 
-There are no published images or binaries yet, so the first build downloads its dependencies and takes a little while. The repository’s `compose.yaml` is meant for a real deployment, with a domain and a reverse proxy in mind; for a local try, `docker run` is simpler.
+Binaries for other systems and architectures are listed under [Deployment](./deploy#binaries). The repository’s `compose.yaml` is meant for a real deployment, with a domain and a reverse proxy in mind; for a local try, `docker run` is simpler.
 
 ## Choose the admin password
 

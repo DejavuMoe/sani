@@ -1,6 +1,6 @@
 # 进度
 
-<p class="lead">Sani 目前的版本是 v0.1.0：功能已经完整，经过了测试和压测，但还没有正式发布。这一页记录做到了哪里、接下来做什么，以及哪些事情刻意不做。页面上的核对结果和数字，都是在构建文档时从源码中得出的。</p>
+<p class="lead">Sani 目前的版本是 v0.1.0，也是第一个公开发布的版本：功能完整，经过了测试和压测，有现成的镜像和二进制文件。这一页记录做到了哪里、接下来做什么，以及哪些事情刻意不做。页面上的核对结果和数字，都是在构建文档时从源码中得出的。</p>
 
 ## 现状 {#current}
 
@@ -13,9 +13,9 @@
 | 部署 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的 Docker 镜像，systemd、Caddy 和 nginx 示例 |
 | 运维 | <span class="sn-status done">已完成</span> | 在线备份、重设密码、健康检查 |
 | 文档 | <span class="sn-status done">已完成</span> | 本站：中英双语，构建时与源码核对 |
-| 正式发布 | <span class="sn-status planned">计划中</span> | 打版本标签，发布 amd64 和 arm64 的镜像与二进制文件 |
-| 持续集成 | <span class="sn-status planned">计划中</span> | 每次提交运行检查、测试、端到端测试和文档核对 |
-| 文档站上线 | <span class="sn-status planned">计划中</span> | 目前在本地用 `make docs-dev` 浏览 |
+| 发布 | <span class="sn-status done">已完成</span> | 打标签即发布：GHCR 上的多平台镜像，Linux、macOS、Windows 和 FreeBSD 的二进制文件，附校验和与构建来源证明 |
+| 持续集成 | <span class="sn-status done">已完成</span> | 每次提交都运行检查和测试（Linux、macOS、Windows）、端到端测试、axe 检查、漏洞扫描，并试构建镜像和全部二进制文件 |
+| 文档站 | <span class="sn-status done">已完成</span> | 部署在 [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/)，每次推送到 main 后自动更新 |
 
 ## 构建时核对 {#checks}
 
@@ -35,9 +35,8 @@
 
 ## 接下来 {#next}
 
-1. **正式发布**：给 v0.1.0 打标签，自动构建多架构的镜像和二进制文件，并附上校验和。之后部署就不需要在本机构建了。
-2. **持续集成**：每次提交都运行 `make check test e2e`，其中包括文档与源码的核对。
-3. **文档站上线**：把本站部署为静态网站。
+1. **听取反馈**：v0.1.0 是第一个公开版本，接下来以修复问题、打磨细节为主。有问题欢迎在 [GitHub](https://github.com/DejavuMoe/sani/issues) 上反馈。
+2. **为 1.0 定型**：API、配置项和数据库结构在 1.0 时固定下来，之后只有主版本号变化时才会有不兼容的修改。
 
 还在考虑、没有决定的功能：
 

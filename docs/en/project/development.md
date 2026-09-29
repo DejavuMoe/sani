@@ -26,8 +26,9 @@ internal/config     reading the environment
 internal/webui      embeds the built admin app
 web/                the admin app: Svelte 5 + TypeScript, built with Vite
 docs/               this site: VitePress
-scripts/            demo data and the load test
+scripts/            demo data, the load test and release scripts
 deploy/             systemd, Caddy and nginx examples
+.github/            workflows for CI, releases and the docs site; issue forms
 ```
 
 The Go module is at the repository root. `web` and `docs` are two packages of one pnpm workspace sharing a lockfile, and shared dependencies such as the fonts get their versions from the `catalog` in `pnpm-workspace.yaml`.
@@ -45,6 +46,7 @@ The Go module is at the repository root. `web` and `docs` are two packages of on
 | `make bench` | Benchmarks for redirects, the cache and click counting |
 | `make load` | The load test, including the click count check |
 | `make build` | Build the admin app, then `bin/sani` |
+| `make dist` | Build the release archives for every platform, and `SHA256SUMS`, in `dist/` |
 | `make docker` | Build the Docker image |
 | `make docs-dev` | Serve the docs on `127.0.0.1:5174` |
 | `make docs` | Build the static docs into `docs/.vitepress/dist` |
@@ -80,6 +82,7 @@ When you change the code, update the matching docs:
 | Subcommands | `reference/cli.md` |
 | Reserved slugs | `guide/usage.md` |
 | Benchmark results | `docs/.vitepress/data/benchmark.ts` and both READMEs |
+| Release platforms | The download table and image platforms in `guide/deploy.md` |
 
 Update both languages; if you miss one, the check names exactly what’s missing.
 
@@ -96,3 +99,31 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 ```
 
 The second instance has no password yet and provides the first-run screen. That screen shows the instance’s address, so it uses port 8080 from the quick start. The screenshots land in `docs/public/screenshots/`.
+
+## CI and releases {#release}
+
+Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml):
+
+- `make check test`, and the Go tests on macOS and Windows as well;
+- the end-to-end tests, and axe over the admin app;
+- a docs build, with axe over every page;
+- a build of the image for every release platform, which is then started and has to pass its health check;
+- the release archives for every platform;
+- `govulncheck` for known vulnerabilities. It also runs every Monday, so a new advisory doesn’t wait for a commit.
+
+After a push to `main`, the docs site is deployed to GitHub Pages.
+
+To release a new version:
+
+1. Add an entry for it to both changelogs, headed like `## v0.2.0`.
+2. Commit, push, and wait for CI.
+3. Tag it and push the tag:
+
+   ```sh
+   git tag -a v0.2.0 -m v0.2.0
+   git push origin v0.2.0
+   ```
+
+The release workflow first makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.2.0-rc.1` is marked as a pre-release and doesn’t move the image’s `latest`.
+
+Locally, `make web dist VERSION=v0.2.0` produces the same archives as the release. Building one commit twice gives byte-for-byte identical files.

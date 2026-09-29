@@ -10,25 +10,62 @@ The builder edits the repository’s actual `compose.yaml`, `deploy/sani.service
 
 ## With Docker Compose
 
+Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64`, `linux/arm64` and `linux/arm/v7` (a Raspberry Pi, for example). Create a directory on the server, save the generated `compose.yaml` in it, and start Sani:
+
+```sh
+docker compose up -d
+```
+
 A few things worth knowing about `compose.yaml`:
 
 - **Localhost only.** The port is published as `127.0.0.1:8080:8080`, so outside traffic has to come through the reverse proxy.
 - **Data in a volume.** The database lives in the `sani-data` volume, mounted at `/data`. Removing or recreating the container keeps it.
-- **A tiny image.** It’s built `FROM scratch` and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
+- **A tiny image.** It’s built `FROM scratch`, about 24 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
-There’s no published image yet: `docker compose up -d` builds one locally. Upgrading later happens in the same directory:
+The image has these tags:
+
+| Tag | Points at |
+|---|---|
+| `latest` | The newest release |
+| `0.1` | The newest patch release of 0.1, which only fixes things |
+| `0.1.0` | That one version, for good |
+
+`compose.yaml` uses `latest`. To decide for yourself when to upgrade, put a version number there instead. To upgrade, [back up](./operations#backup) first, then pull the new image:
 
 ```sh
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
-## With systemd
+To build the image from source instead, replace the `image:` line with `build: .` in a checkout of the repository and run `docker compose up -d --build`.
 
-Without Docker, let systemd run the binary. First get the binary:
+## With systemd {#binaries}
+
+Without Docker, let systemd run the binary. Every release has archives for these platforms on [GitHub Releases](https://github.com/DejavuMoe/sani/releases), each with the `sani` binary, the license and the readme:
+
+| System | Architecture | File |
+|---|---|---|
+| Linux | x86-64 | `sani-linux-amd64.tar.gz` |
+| Linux | ARM64 | `sani-linux-arm64.tar.gz` |
+| Linux | ARMv7 (32-bit) | `sani-linux-armv7.tar.gz` |
+| macOS | Intel | `sani-darwin-amd64.tar.gz` |
+| macOS | Apple silicon | `sani-darwin-arm64.tar.gz` |
+| Windows | x86-64 | `sani-windows-amd64.zip` |
+| Windows | ARM64 | `sani-windows-arm64.zip` |
+| FreeBSD | x86-64 | `sani-freebsd-amd64.tar.gz` |
+
+The binary is statically linked and needs no libraries on the server. On macOS, Windows or FreeBSD, unpack it and run `sani` (`sani.exe` on Windows), configured the same way. On a Linux server, download it, check it against the checksums, and install it:
 
 ::: code-group
+
+```sh [Download]
+base=https://github.com/DejavuMoe/sani/releases/latest/download
+curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
+sha256sum --ignore-missing -c SHA256SUMS
+tar -xzf sani-linux-amd64.tar.gz sani
+sudo install -m 755 sani /usr/local/bin/sani
+```
 
 ```sh [Build from source]
 make install build        # needs Go, Node and pnpm; produces bin/sani
@@ -36,15 +73,18 @@ scp bin/sani server:/tmp/sani
 ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 ```
 
-```sh [Copy it out of the image]
-docker build -t sani .
-docker create --name sani-bin sani
-docker cp sani-bin:/sani ./sani && docker rm sani-bin
-```
-
 :::
 
-The binary is statically linked and needs no libraries on the server. If the build machine’s OS or architecture differs from the server’s, run `make install web` and then cross-compile with something like `GOOS=linux GOARCH=arm64 make binary`.
+`latest/download` always points at the newest release; to pin one, use a path like `download/v0.1.0` instead.
+
+::: tip Checking where a build came from
+Release files and images are built by GitHub Actions from the tagged commit, with build provenance attached. With the [GitHub CLI](https://cli.github.com), you can confirm that what you have really came from this repository:
+
+```sh
+gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:latest --repo DejavuMoe/sani
+```
+:::
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:
 

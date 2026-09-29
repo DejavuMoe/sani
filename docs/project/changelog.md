@@ -4,7 +4,7 @@
 
 ## v0.1.0
 
-2026-09-29 · 第一个版本。功能完整，尚未发布预构建的镜像和二进制文件。
+2026-09-30 · 第一个公开发布的版本。
 
 ### 跳转与统计
 
@@ -37,6 +37,7 @@
 - 首次设置密码需要启动日志里的设置码，也可以用 `SANI_PASSWORD` 指定。
 - `sani backup` 在线备份数据库，可以输出到标准输出；`sani passwd` 重设密码；`sani healthcheck` 用于容器健康检查。
 - 提供 Docker Compose、systemd、Caddy 和 nginx 的示例配置。
+- 镜像发布在 GHCR，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`；二进制文件覆盖 Linux、macOS、Windows 和 FreeBSD，附 `SHA256SUMS` 和构建来源证明。
 
 ### 安全
 
@@ -46,5 +47,5 @@
 
 ### 文档
 
-- 中英双语的文档站，包括部署配置生成器、交互演示和性能图表。
+- 中英双语的文档站，部署在 [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/)，包括部署配置生成器、交互演示和性能图表。
 - 构建时把配置项、API、错误码、命令行、保留短码和压测数据与源码逐项核对。

@@ -113,6 +113,28 @@ export function slugRules(): { alphabet: string; length: number; blockedSchemes:
   return { alphabet, length: +length, blockedSchemes: [...blocked[1].matchAll(/"([^"]+)":/g)].map((m) => m[1]) };
 }
 
+export interface Release {
+  image: string;
+  /** Archive file names, such as sani-linux-amd64.tar.gz, from scripts/dist.sh. */
+  archives: string[];
+  /** Image platforms, such as linux/arm/v7, from the release workflow. */
+  platforms: string[];
+}
+
+/** What a release publishes, from the script and the workflow that build it. */
+export function release(): Release {
+  const workflow = read('.github/workflows/release.yml');
+  const image = /^ {2}IMAGE: (\S+)$/m.exec(workflow)?.[1];
+  const platforms = /^\s+platforms: (\S+)$/m.exec(workflow)?.[1].split(',');
+  const targets = /^targets=\(\n([^)]*)\)/m.exec(read('scripts/dist.sh'))?.[1].trim().split(/\s+/);
+  if (!image || !platforms || !targets) throw new Error('release targets not found in scripts/dist.sh and .github/workflows/release.yml');
+  const archives = targets.map((t) => {
+    const [os, arch, arm] = t.split('/');
+    return `sani-${os}-${arch}${arm ? `v${arm}` : ''}.${os === 'windows' ? 'zip' : 'tar.gz'}`;
+  });
+  return { image, archives, platforms };
+}
+
 /** Subcommands listed in the binary's own usage text. */
 export function commands(): string[] {
   const usage = /const usage = `([^`]*)`/.exec(read('cmd/sani/main.go'))?.[1] ?? '';

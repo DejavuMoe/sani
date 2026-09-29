@@ -51,6 +51,10 @@ const checkCopy: Record<Check['id'], { zh: [string, string, string]; en: [string
     zh: ['配置生成器', '部署页的生成器在仓库的部署文件里找得到要改的每一行', '个文件'],
     en: ['Config builder', 'The deploy page’s builder finds every line it edits in the repository’s files', 'files'],
   },
+  release: {
+    zh: ['发布', '部署页列出的下载文件和镜像平台，正是发布流程实际构建的那些', '项'],
+    en: ['Releases', 'The downloads and image platforms on the deploy page are the ones a release builds', 'items'],
+  },
   assets: {
     zh: ['图标', '文档站的图标与管理界面相同', '个文件'],
     en: ['Icon', 'The site’s icon is the admin app’s', 'file'],

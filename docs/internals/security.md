@@ -86,6 +86,15 @@
 
 Sani 不保存访问者的 IP 地址和 User-Agent，不设置 Cookie，只保存聚合后的计数，详见[统计口径](../guide/statistics)。访问者看到的 404 和 410 页面不加载任何外部资源，带有禁止一切脚本的内容安全策略，并告诉搜索引擎不要收录。
 
+## 发布的文件 {#releases}
+
+镜像和二进制文件都由 GitHub Actions 从打了标签的提交构建，不经过任何人的电脑：
+
+- **校验和**：每个版本附带 `SHA256SUMS`，覆盖全部压缩包。
+- **构建来源证明**：压缩包和镜像都有 GitHub 签发的来源证明，记录它是由哪个仓库、哪个提交、哪个工作流构建的。用 `gh attestation verify` 就能核对，方法见[部署](../guide/deploy#binaries)。镜像还附带 SBOM，列出了其中的全部依赖。
+- **可复现**：同一个提交构建两次，得到的压缩包逐字节相同。
+- **依赖更新**：Dependabot 定期提出依赖更新，CI 每周用 `govulncheck` 检查一次已知漏洞。
+
 ## 报告安全问题 {#reporting}
 
 发现安全问题时，请不要公开提交 issue，而是通过 GitHub 的 [私密漏洞报告](https://github.com/DejavuMoe/sani/security/advisories/new) 告诉我们。

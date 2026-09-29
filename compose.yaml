@@ -1,7 +1,8 @@
 services:
   sani:
-    build: .
-    image: sani:latest
+    # Or pin a version, such as ghcr.io/dejavumoe/sani:0.1.0. To build from
+    # a checkout of the repository instead, replace this line with `build: .`
+    image: ghcr.io/dejavumoe/sani:latest
     container_name: sani
     restart: unless-stopped
     # Localhost only: put a TLS reverse proxy in front (see deploy/).

@@ -10,25 +10,62 @@
 
 ## 用 Docker Compose
 
+每个版本都会发布多平台镜像 `ghcr.io/dejavumoe/sani`，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`（比如树莓派）。在服务器上新建一个目录，把生成的 `compose.yaml` 保存进去，然后启动：
+
+```sh
+docker compose up -d
+```
+
 `compose.yaml` 里值得了解的几点：
 
 - **只监听本机**：端口映射为 `127.0.0.1:8080:8080`，外面的访问都要经过反向代理。
 - **数据在卷里**：数据库保存在 `sani-data` 卷中，挂载到容器里的 `/data`。删除或重建容器不会丢数据。
-- **镜像很小**：镜像基于 `scratch`，里面只有 `sani` 程序和 CA 证书，以 65532 号非特权用户运行，没有 shell。要在容器里执行命令，直接运行 `/sani`，比如 `docker exec -it sani /sani passwd`。
+- **镜像很小**：镜像基于 `scratch`，大约 24 MB，里面只有 `sani` 程序和 CA 证书，以 65532 号非特权用户运行，没有 shell。要在容器里执行命令，直接运行 `/sani`，比如 `docker exec -it sani /sani passwd`。
 - **自带健康检查**：镜像定义了 `HEALTHCHECK`，`docker ps` 里能看到 `healthy`。
 
-目前还没有发布预构建的镜像，`docker compose up -d` 会在本机构建。以后升级也是在仓库目录里：
+镜像有这几种标签：
+
+| 标签 | 指向 |
+|---|---|
+| `latest` | 最新的正式版本 |
+| `0.1` | 0.1 系列最新的修订版本，只包含修复 |
+| `0.1.0` | 固定的某一个版本 |
+
+`compose.yaml` 默认使用 `latest`。想自己决定什么时候升级，就把标签换成具体的版本号。升级时先[备份](./operations#backup)，再拉取新镜像：
 
 ```sh
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
-## 用 systemd
+想从源码构建镜像，在仓库目录里把 `image:` 这一行换成 `build: .`，再运行 `docker compose up -d --build`。
 
-不用 Docker 时，可以把二进制文件交给 systemd 管理。先得到二进制文件：
+## 用 systemd {#binaries}
+
+不用 Docker 时，可以把二进制文件交给 systemd 管理。每个版本都在 [GitHub Releases](https://github.com/DejavuMoe/sani/releases) 上提供这些平台的压缩包，里面是 `sani` 程序、许可证和说明：
+
+| 系统 | 架构 | 文件 |
+|---|---|---|
+| Linux | x86-64 | `sani-linux-amd64.tar.gz` |
+| Linux | ARM64 | `sani-linux-arm64.tar.gz` |
+| Linux | ARMv7（32 位） | `sani-linux-armv7.tar.gz` |
+| macOS | Intel | `sani-darwin-amd64.tar.gz` |
+| macOS | Apple 芯片 | `sani-darwin-arm64.tar.gz` |
+| Windows | x86-64 | `sani-windows-amd64.zip` |
+| Windows | ARM64 | `sani-windows-arm64.zip` |
+| FreeBSD | x86-64 | `sani-freebsd-amd64.tar.gz` |
+
+二进制文件是静态链接的，不依赖服务器上的任何库。在 macOS、Windows 或 FreeBSD 上，解压后直接运行 `sani`（Windows 上是 `sani.exe`），配置方式完全相同。在 Linux 服务器上，下载、核对校验和，然后安装：
 
 ::: code-group
+
+```sh [下载]
+base=https://github.com/DejavuMoe/sani/releases/latest/download
+curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
+sha256sum --ignore-missing -c SHA256SUMS
+tar -xzf sani-linux-amd64.tar.gz sani
+sudo install -m 755 sani /usr/local/bin/sani
+```
 
 ```sh [从源码构建]
 make install build        # 需要 Go、Node 和 pnpm，产物为 bin/sani
@@ -36,15 +73,18 @@ scp bin/sani server:/tmp/sani
 ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 ```
 
-```sh [从镜像中取出]
-docker build -t sani .
-docker create --name sani-bin sani
-docker cp sani-bin:/sani ./sani && docker rm sani-bin
-```
-
 :::
 
-二进制文件是静态链接的，不依赖服务器上的任何库。构建机和服务器的系统或架构不同时，先 `make install web`，再用 `GOOS=linux GOARCH=arm64 make binary` 这样的方式交叉编译。
+`latest/download` 总是指向最新版本；要固定版本，把它换成 `download/v0.1.0` 这样的路径。
+
+::: tip 验证构建来源
+发布的文件和镜像都由 GitHub Actions 从打了标签的提交构建，并附带构建来源证明。装有 [GitHub CLI](https://cli.github.com) 时，可以确认手里的文件确实出自这个仓库：
+
+```sh
+gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:latest --repo DejavuMoe/sani
+```
+:::
 
 然后把生成的 `sani.service` 保存到 `/etc/systemd/system/`，启用它：
 

@@ -7,9 +7,12 @@
 ::: code-group
 
 ```sh [Docker]
-git clone https://github.com/DejavuMoe/sani && cd sani
-docker build -t sani .
-docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data sani
+docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data ghcr.io/dejavumoe/sani
+```
+
+```sh [二进制文件]
+curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
+SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 ```
 
 ```sh [从源码构建]
@@ -20,7 +23,7 @@ SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # 数据保存在 ./data 目录
 
 :::
 
-目前还没有发布预构建的镜像和二进制文件，第一次构建要下载依赖，需要稍等一会儿。仓库里的 `compose.yaml` 是为正式部署准备的，写好了域名和反向代理的设置；在本机试用，直接 `docker run` 更省事。
+其他系统和架构的二进制文件见[部署](./deploy#binaries)一页。仓库里的 `compose.yaml` 是为正式部署准备的，写好了域名和反向代理的设置；在本机试用，直接 `docker run` 更省事。
 
 ## 设置管理员密码
 

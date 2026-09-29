@@ -26,8 +26,9 @@ internal/config     读取环境变量
 internal/webui      嵌入构建好的管理界面
 web/                管理界面：Svelte 5 + TypeScript，Vite 构建
 docs/               本文档站：VitePress
-scripts/            演示数据和压测脚本
+scripts/            演示数据、压测和发布脚本
 deploy/             systemd、Caddy 和 nginx 的示例配置
+.github/            CI、发布和文档部署的工作流，issue 模板
 ```
 
 Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的两个包，共用一份锁文件，字体等共同依赖的版本写在 `pnpm-workspace.yaml` 的 `catalog` 里。
@@ -45,6 +46,7 @@ Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的
 | `make bench` | 跳转、缓存和点击计数的基准测试 |
 | `make load` | 压测，并核对点击数 |
 | `make build` | 构建管理界面，再构建 `bin/sani` |
+| `make dist` | 构建全部平台的发布压缩包和 `SHA256SUMS`，输出到 `dist/` |
 | `make docker` | 构建 Docker 镜像 |
 | `make docs-dev` | 启动文档站，打开 `127.0.0.1:5174` |
 | `make docs` | 构建静态文档站，输出到 `docs/.vitepress/dist` |
@@ -80,6 +82,7 @@ Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的
 | 子命令 | `reference/cli.md` |
 | 保留的短码 | `guide/usage.md` |
 | 压测结果 | `docs/.vitepress/data/benchmark.ts` 和两份 README |
+| 发布的平台 | `guide/deploy.md` 的下载文件表和镜像平台 |
 
 中文和英文两个版本都要更新；漏掉的话，核对会指出具体是哪一项。
 
@@ -96,3 +99,31 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 ```
 
 第二个实例没有密码，用来拍首次设置的页面。这个页面会显示实例的地址，所以它使用快速开始里的 8080 端口。截图保存在 `docs/public/screenshots/`。
+
+## 持续集成与发布 {#release}
+
+每次推送和拉取请求都会运行 [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml)：
+
+- `make check test`，另外在 macOS 和 Windows 上运行 Go 测试；
+- 端到端测试，以及对管理界面的 axe 检查；
+- 构建文档站，对每一页做 axe 检查；
+- 为每个发布平台试构建镜像，启动它，等健康检查通过；
+- 构建全部二进制文件的压缩包；
+- 用 `govulncheck` 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
+
+推送到 `main` 之后，文档站会自动部署到 GitHub Pages。
+
+发布一个新版本：
+
+1. 在两份更新日志里写好新版本的条目，标题是 `## v0.2.0` 这样的格式；
+2. 提交并推送，等 CI 通过；
+3. 打标签并推送：
+
+   ```sh
+   git tag -a v0.2.0 -m v0.2.0
+   git push origin v0.2.0
+   ```
+
+发布流程会先确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.2.0-rc.1` 这样的标签会标记为预发布，不会更新镜像的 `latest`。
+
+在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。
