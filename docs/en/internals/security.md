@@ -91,7 +91,7 @@ Sani doesn’t store visitors’ IP addresses or User-Agents, sets no cookies an
 Images and binaries are built by GitHub Actions from the tagged commit, without passing through anyone’s computer:
 
 - **Checksums.** Every release has a `SHA256SUMS` covering all archives.
-- **Build provenance.** Archives and images carry provenance signed by GitHub, recording the repository, commit and workflow that built them. `gh attestation verify` checks it; [Deployment](../guide/deploy#binaries) shows how. Images also carry an SBOM listing everything inside.
+- **Build provenance.** Archives and images carry provenance signed by GitHub, recording the repository, commit and workflow that built them. `gh attestation verify` checks it; [Deployment](../guide/deploy#verify) shows how. Images also carry an SBOM listing everything inside.
 - **Reproducible.** Building one commit twice gives byte-for-byte identical archives.
 - **Dependency updates.** Dependabot proposes dependency updates regularly, and CI checks for known vulnerabilities with `govulncheck` every week.
 

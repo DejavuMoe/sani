@@ -77,14 +77,14 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 `latest/download` 总是指向最新版本；要固定版本，把它换成 `download/v0.1.0` 这样的路径。
 
-::: tip 验证构建来源
+### 核对来源 {#verify}
+
 发布的文件和镜像都由 GitHub Actions 从打了标签的提交构建，并附带构建来源证明。装有 [GitHub CLI](https://cli.github.com) 时，可以确认手里的文件确实出自这个仓库：
 
 ```sh
-gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:latest --repo DejavuMoe/sani
+gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:latest -R DejavuMoe/sani
 ```
-:::
 
 然后把生成的 `sani.service` 保存到 `/etc/systemd/system/`，启用它：
 

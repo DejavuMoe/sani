@@ -77,14 +77,14 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 `latest/download` always points at the newest release; to pin one, use a path like `download/v0.1.0` instead.
 
-::: tip Checking where a build came from
+### Checking where a build came from {#verify}
+
 Release files and images are built by GitHub Actions from the tagged commit, with build provenance attached. With the [GitHub CLI](https://cli.github.com), you can confirm that what you have really came from this repository:
 
 ```sh
-gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:latest --repo DejavuMoe/sani
+gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:latest -R DejavuMoe/sani
 ```
-:::
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:
 
