@@ -1,0 +1,22 @@
+name: Idea · 功能建议
+description: Something Sani could do. 希望 Sani 能做到的事。
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sani stays small on purpose. Before you write, have a look at what it [deliberately won’t do](https://dejavumoe.github.io/sani/en/project/progress#non-goals).
+        Sani 刻意保持简单。提建议之前，可以先看看[不做什么](https://dejavumoe.github.io/sani/project/progress#non-goals)。
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem · 要解决的问题
+      description: What you are trying to do, and what gets in the way today. 你想做什么，现在卡在哪里。
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind · 你的设想
+    validations:
+      required: false

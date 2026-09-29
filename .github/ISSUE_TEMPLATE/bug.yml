@@ -1,0 +1,49 @@
+name: Bug report · 问题反馈
+description: Something doesn’t work as the docs say. 与文档描述不符的行为。
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. Chinese or English, whichever you prefer. 中文或英文都可以。
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened · 发生了什么
+      description: What you did, what you expected, and what happened instead. 你做了什么、预期是什么、实际发生了什么。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce · 复现步骤
+      placeholder: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version · 版本
+      description: The output of `sani version`, or the image tag. `sani version` 的输出，或者镜像标签。
+      placeholder: sani v0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Running with · 运行方式
+      options:
+        - Docker / Docker Compose
+        - systemd
+        - The binary directly · 直接运行二进制文件
+        - Something else · 其他
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs · 日志
+      description: Anything relevant from the log. Remove setup codes, passwords and tokens. 相关的日志；请去掉设置码、密码和令牌。
+      render: log

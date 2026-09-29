@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation · 文档
+    url: https://dejavumoe.github.io/sani/en/
+    about: Setup, configuration, the API and how things work. 部署、配置、API 和原理。
+  - name: Report a vulnerability · 报告安全问题
+    url: https://github.com/DejavuMoe/sani/security/advisories/new
+    about: Privately, please; not in a public issue. 请私下报告，不要公开提交 issue。
