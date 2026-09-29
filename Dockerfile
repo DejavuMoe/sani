@@ -1,6 +1,9 @@
+# Multi-platform builds cross-compile: the first two stages run on the build
+# machine's own platform, and only the binary targets the image's platform.
+
 # 1. The admin app, built into internal/webui/dist. Only the web package of
 # the pnpm workspace is installed; the docs site is not part of the image.
-FROM node:24-alpine AS web
+FROM --platform=$BUILDPLATFORM node:24-alpine AS web
 WORKDIR /src
 RUN npm install --global pnpm@12.5.1
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
@@ -11,7 +14,7 @@ COPY web web
 RUN pnpm --filter sani-web build
 
 # 2. One static binary with the app embedded.
-FROM golang:1.27-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS build
 RUN apk add --no-cache ca-certificates
 WORKDIR /src
 ENV CGO_ENABLED=0
@@ -21,11 +24,18 @@ COPY cmd cmd
 COPY internal internal
 COPY --from=web /src/internal/webui/dist internal/webui/dist
 ARG VERSION=dev
-RUN go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o /out/sani ./cmd/sani \
+ARG TARGETOS TARGETARCH TARGETVARIANT
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH GOARM=${TARGETVARIANT#v} \
+    go build -trimpath -ldflags="-s -w -buildid= -X main.version=${VERSION}" -o /out/sani ./cmd/sani \
  && mkdir -p /out/data
 
 # 3. Nothing else: the binary, CA roots for title fetching, and a data volume.
 FROM scratch
+LABEL org.opencontainers.image.title="Sani" \
+      org.opencontainers.image.description="A small, fast link shortener you host yourself: one binary, one SQLite file." \
+      org.opencontainers.image.source="https://github.com/DejavuMoe/sani" \
+      org.opencontainers.image.documentation="https://dejavumoe.github.io/sani/en/" \
+      org.opencontainers.image.licenses="MIT"
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /out/sani /sani
 COPY --from=build --chown=65532:65532 /out/data /data
