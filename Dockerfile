@@ -3,7 +3,7 @@
 
 # 1. The admin app, built into internal/webui/dist. Only the web package of
 # the pnpm workspace is installed; the docs site is not part of the image.
-FROM --platform=$BUILDPLATFORM node:24-alpine AS web
+FROM --platform=$BUILDPLATFORM node:26-alpine AS web
 WORKDIR /src
 RUN npm install --global pnpm@12.5.1
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
