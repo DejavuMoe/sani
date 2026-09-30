@@ -6,7 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/DejavuMoe/sani?label=release)](https://github.com/DejavuMoe/sani/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[文档](https://dejavumoe.github.io/sani/) · [下载](https://github.com/DejavuMoe/sani/releases) · [English](README.md)
+[文档](docs/guide/introduction.md) · [下载](https://github.com/DejavuMoe/sani/releases) · [English](README.md)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/public/screenshots/dashboard-dark-zh.png">
@@ -25,7 +25,7 @@
 
 ## 文档
 
-完整的中英文文档在 **[dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/)**：[部署](https://dejavumoe.github.io/sani/guide/deploy)与[运维](https://dejavumoe.github.io/sani/guide/operations)指南，[配置项](https://dejavumoe.github.io/sani/reference/configuration)、[HTTP API](https://dejavumoe.github.io/sani/reference/api) 和[命令行](https://dejavumoe.github.io/sani/reference/cli)参考，以及 Sani 内部是怎么工作的。部署页有一个配置生成器，填上域名就能拿到全部部署文件。每次构建都会拿文档与源码逐项核对，所以文档里列出的配置项、接口、错误码和命令，就是代码里实际有的那些。
+完整的中英文文档在 [docs/](docs/) 目录里：[部署](docs/guide/deploy.md)与[运维](docs/guide/operations.md)指南，[配置项](docs/reference/configuration.md)、[HTTP API](docs/reference/api.md) 和[命令行](docs/reference/cli.md)参考，以及 Sani 内部是怎么工作的。它是一个 VitePress 站点，`make install docs-dev` 就能在 `127.0.0.1:5174` 上浏览，部署页还有一个配置生成器，填上域名就能拿到全部部署文件。每次构建都会拿文档与源码逐项核对，所以文档里列出的配置项、接口、错误码和命令，就是代码里实际有的那些。
 
 ## 快速开始
 
@@ -55,7 +55,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 ## 配置
 
-全部通过环境变量配置，示例见 [.env.example](.env.example)，每一项的详细说明见[配置项](https://dejavumoe.github.io/sani/reference/configuration)。
+全部通过环境变量配置，示例见 [.env.example](.env.example)，每一项的详细说明见[配置项](docs/reference/configuration.md)。
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
@@ -92,7 +92,7 @@ curl -X POST https://s.example.com/api/links \
   -d '{"url": "https://example.com/some/long/path", "slug": "demo"}'
 ```
 
-每个接口和错误码的说明见 [HTTP API](https://dejavumoe.github.io/sani/reference/api)。
+每个接口和错误码的说明见 [HTTP API](docs/reference/api.md)。
 
 **导入与导出**：设置 → 数据，可以把全部链接导出为 JSON 或 CSV。导入支持 Sani 自己的导出文件、Shlink 的 JSON（`shortCode`、`longUrl`、`visitsSummary` 等字段）、Sink 的导出、YOURLS 或 Kutt 的 CSV，以及任何带 `url` 列的 CSV。已存在的短码会被跳过，并列出来告诉你。
 
@@ -117,7 +117,7 @@ curl -X POST https://s.example.com/api/links \
 - SQLite 使用 WAL 模式，一个写连接加一组读连接，读永远不用等写。
 - 管理界面内嵌在二进制中，构建时预先用 Brotli 和 gzip 压缩好。
 
-测试方法和微基准测试见文档里的[性能](https://dejavumoe.github.io/sani/internals/performance)。
+测试方法和微基准测试见文档里的[性能](docs/internals/performance.md)。
 
 ## 项目结构
 
@@ -134,7 +134,7 @@ web/                管理界面：Svelte 5 + TypeScript，Vite 构建
 docs/               文档站：VitePress，构建时与源码核对
 ```
 
-安全方面（详见文档里的[安全](https://dejavumoe.github.io/sani/internals/security)）：
+安全方面（详见文档里的[安全](docs/internals/security.md)）：
 
 - 会话 Cookie 为 HttpOnly、SameSite=Strict，只作用于 `/api/`，跨站请求一律拒绝（`http.CrossOriginProtection`）。
 - API 令牌和会话凭据只保存 SHA-256 哈希，密码使用 argon2id。
@@ -157,7 +157,7 @@ make check test e2e   # gofmt、vet、类型检查、文档核对；Go（-race�
 make load             # 上面的压测
 ```
 
-改动需要遵守的规则见文档里的[参与开发](https://dejavumoe.github.io/sani/project/development)，提交改动的方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。安全问题请[私下报告](SECURITY.md)，不要公开提交 issue。
+改动需要遵守的规则见文档里的[参与开发](docs/project/development.md)，提交改动的方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。安全问题请[私下报告](SECURITY.md)，不要公开提交 issue。
 
 ## 数据与备份
 
@@ -167,7 +167,7 @@ make load             # 上面的压测
 docker exec sani /sani backup - > sani-backup.db
 ```
 
-恢复时先停止服务，再用副本替换 `sani.db`；具体步骤、定时备份和升级方法见[运维](https://dejavumoe.github.io/sani/guide/operations)。想要可移植的链接列表，用设置 → 数据 → 导出。
+恢复时先停止服务，再用副本替换 `sani.db`；具体步骤、定时备份和升级方法见[运维](docs/guide/operations.md)。想要可移植的链接列表，用设置 → 数据 → 导出。
 
 ## 许可证
 

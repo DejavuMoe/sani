@@ -31,7 +31,7 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 - `internal/store`: SQLite schema, migrations (`PRAGMA user_version`) and queries.
 - `internal/links`: pure rules for slugs and URLs. `internal/meta`: the title/icon fetcher.
 - `web/src`: Svelte 5 (runes) + TypeScript. `lib/` holds state and helpers, `components/` and `views/` the UI.
-- `.github/`: CI (`ci.yml`), releases on `v*` tags (`release.yml`: archives, the GHCR image, provenance, notes from the changelog) and the Pages deploy (`docs.yml`). Actions are pinned by commit SHA, with the version in a comment.
+- `.github/`: CI (`ci.yml`), releases on `v*` tags (`release.yml`: archives, the GHCR image, provenance, notes from the changelog). Actions are pinned by commit SHA, with the version in a comment.
 - `docs/`: the VitePress site. Chinese pages at `docs/`, English ones at the same paths under `docs/en/`, listed in `docs/.vitepress/pages.ts`; theme and components in `docs/.vitepress/theme/`.
 
 ## The docs follow the code

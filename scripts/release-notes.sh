@@ -15,7 +15,7 @@ if [ -z "$(tr -d '[:space:]' <<<"$notes")" ]; then
   exit 1
 fi
 
-docs=https://dejavumoe.github.io/sani
+docs=https://github.com/DejavuMoe/sani/blob/main/docs
 cat <<NOTES
 $notes
 
@@ -36,6 +36,6 @@ gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
 \`\`\`
 
 Back up before upgrading: the database schema is upgraded on start, and older
-versions cannot open it afterwards. See [deployment]($docs/en/guide/deploy) and
-[operations]($docs/en/guide/operations) · [中文更新日志]($docs/project/changelog)
+versions cannot open it afterwards. See [deployment]($docs/en/guide/deploy.md) and
+[operations]($docs/en/guide/operations.md) · [中文更新日志]($docs/project/changelog.md)
 NOTES

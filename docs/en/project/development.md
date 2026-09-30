@@ -111,8 +111,6 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 - the release archives for every platform;
 - `govulncheck` for known vulnerabilities. It also runs every Monday, so a new advisory doesn’t wait for a commit.
 
-After a push to `main`, the docs site is deployed to GitHub Pages.
-
 To release a new version:
 
 1. Add an entry for it to both changelogs, headed like `## v0.2.0`.

@@ -20,7 +20,7 @@ to the latest version to get them.
 ## Scope
 
 What Sani defends against, and how, is described on the
-[security page](https://dejavumoe.github.io/sani/en/internals/security) of the
+[security page](docs/en/internals/security.md) of the
 docs: the admin session and API tokens, the first-run setup code, the SSRF
 guard of the title fetcher, blocked URL schemes, rate limits and the admin
 app’s content security policy. A way around any of these is in scope.

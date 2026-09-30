@@ -47,5 +47,5 @@
 
 ### Documentation
 
-- An English and Chinese documentation site at [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/en/), with a deployment config builder, a live demo and a performance chart.
+- An English and Chinese documentation site with a deployment config builder, a live demo and a performance chart.
 - Settings, API, error codes, commands, reserved slugs and benchmark figures are checked against the source at build time.

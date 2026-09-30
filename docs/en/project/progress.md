@@ -15,7 +15,7 @@
 | Documentation | <span class="sn-status done">Done</span> | This site: English and Chinese, checked against the source at build time |
 | Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
 | Continuous integration | <span class="sn-status done">Done</span> | Every commit runs the checks and tests (Linux, macOS, Windows), the end-to-end tests, axe and a vulnerability scan, and builds the image and every binary |
-| Hosted docs | <span class="sn-status done">Done</span> | At [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/en/), updated on every push to main |
+| Hosted docs | <span class="sn-status planned">Planned</span> | For now, browse them locally with `make docs-dev` |
 
 ## Build-time checks {#checks}
 
@@ -37,6 +37,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 
 1. **Listening.** v0.1.0 is the first public release; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
 2. **Settling for 1.0.** The API, the settings and the database schema are fixed at 1.0; after that, incompatible changes only come with a new major version.
+3. **Hosted docs.** Publish this site as a static website.
 
 Under consideration, not decided:
 

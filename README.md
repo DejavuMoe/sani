@@ -6,7 +6,7 @@ A small, fast link shortener you host yourself. One binary, one SQLite file, no 
 [![Release](https://img.shields.io/github/v/release/DejavuMoe/sani?label=release)](https://github.com/DejavuMoe/sani/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[Documentation](https://dejavumoe.github.io/sani/en/) · [Releases](https://github.com/DejavuMoe/sani/releases) · [中文说明](README.zh-CN.md)
+[Documentation](docs/en/guide/introduction.md) · [Releases](https://github.com/DejavuMoe/sani/releases) · [中文说明](README.zh-CN.md)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/public/screenshots/dashboard-dark-en.png">
@@ -25,7 +25,7 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 
 ## Documentation
 
-The documentation, in English and Chinese, is at **[dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/en/)**: guides for [deployment](https://dejavumoe.github.io/sani/en/guide/deploy) and [operations](https://dejavumoe.github.io/sani/en/guide/operations), the [configuration](https://dejavumoe.github.io/sani/en/reference/configuration), [HTTP API](https://dejavumoe.github.io/sani/en/reference/api) and [command line](https://dejavumoe.github.io/sani/en/reference/cli) references, and how Sani works inside. The deploy page has a config builder that writes the deployment files for your domain. Every build checks the docs against the source, so the settings, endpoints, error codes and commands they list are the ones the code has.
+The documentation, in English and Chinese, lives in [docs/](docs/): guides for [deployment](docs/en/guide/deploy.md) and [operations](docs/en/guide/operations.md), the [configuration](docs/en/reference/configuration.md), [HTTP API](docs/en/reference/api.md) and [command line](docs/en/reference/cli.md) references, and how Sani works inside. It's a VitePress site; `make install docs-dev` serves it on `127.0.0.1:5174`, and its deploy page has a config builder that writes the deployment files for your domain. Every build checks the docs against the source, so the settings, endpoints, error codes and commands they list are the ones the code has.
 
 ## Quick start
 
@@ -55,7 +55,7 @@ The binary embeds the admin app and needs nothing else at runtime. To build it y
 
 ## Configuration
 
-Everything is set through environment variables. See [.env.example](.env.example) and the [configuration reference](https://dejavumoe.github.io/sani/en/reference/configuration).
+Everything is set through environment variables. See [.env.example](.env.example) and the [configuration reference](docs/en/reference/configuration.md).
 
 | Variable | Default | What it does |
 |---|---|---|
@@ -92,7 +92,7 @@ curl -X POST https://s.example.com/api/links \
   -d '{"url": "https://example.com/some/long/path", "slug": "demo"}'
 ```
 
-The [API reference](https://dejavumoe.github.io/sani/en/reference/api) covers every endpoint and error code.
+The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
 
 **Import and export.** Settings → Data exports every link as JSON or CSV. Import accepts Sani's own export, Shlink's JSON (`shortCode`, `longUrl`, `visitsSummary`, …), Sink's export, YOURLS or Kutt CSVs, and any CSV with a `url` column. Slugs that already exist are skipped and listed.
 
@@ -117,7 +117,7 @@ How it gets there:
 - SQLite runs in WAL mode with a single writer connection and a pool of readers, so reads never wait for writes.
 - The admin app is embedded in the binary and precompressed with Brotli and gzip at build time.
 
-[Performance](https://dejavumoe.github.io/sani/en/internals/performance) in the docs has the method and the microbenchmarks.
+[Performance](docs/en/internals/performance.md) in the docs has the method and the microbenchmarks.
 
 ## How it's built
 
@@ -134,7 +134,7 @@ web/                the admin app: Svelte 5 + TypeScript, built with Vite
 docs/               the documentation site: VitePress, checked against the source
 ```
 
-Security choices worth knowing (the [security page](https://dejavumoe.github.io/sani/en/internals/security) has the details):
+Security choices worth knowing (the [security page](docs/en/internals/security.md) has the details):
 
 - Sessions are HttpOnly, SameSite=Strict cookies scoped to `/api/`, and cross-origin requests are refused (`http.CrossOriginProtection`).
 - API tokens and session secrets are stored as SHA-256 hashes, and the password as argon2id.
@@ -157,7 +157,7 @@ make check test e2e   # gofmt, vet, type checks, the docs sync check; Go (-race)
 make load             # the benchmark above
 ```
 
-[Development](https://dejavumoe.github.io/sani/en/project/development) in the docs lists the rules a change has to keep, and [CONTRIBUTING.md](CONTRIBUTING.md) how to propose one. Security problems go through [private reporting](SECURITY.md), not public issues.
+[Development](docs/en/project/development.md) in the docs lists the rules a change has to keep, and [CONTRIBUTING.md](CONTRIBUTING.md) how to propose one. Security problems go through [private reporting](SECURITY.md), not public issues.
 
 ## Data and backups
 
@@ -167,7 +167,7 @@ Everything lives in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL m
 docker exec sani /sani backup - > sani-backup.db
 ```
 
-To restore, stop Sani and put the copy in place of `sani.db`; [Operations](https://dejavumoe.github.io/sani/en/guide/operations) has the steps, a cron example and upgrades. For a portable list of your links, use Settings → Data → Export.
+To restore, stop Sani and put the copy in place of `sani.db`; [Operations](docs/en/guide/operations.md) has the steps, a cron example and upgrades. For a portable list of your links, use Settings → Data → Export.
 
 ## License
 

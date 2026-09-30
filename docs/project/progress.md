@@ -15,7 +15,7 @@
 | 文档 | <span class="sn-status done">已完成</span> | 本站：中英双语，构建时与源码核对 |
 | 发布 | <span class="sn-status done">已完成</span> | 打标签即发布：GHCR 上的多平台镜像，Linux、macOS、Windows 和 FreeBSD 的二进制文件，附校验和与构建来源证明 |
 | 持续集成 | <span class="sn-status done">已完成</span> | 每次提交都运行检查和测试（Linux、macOS、Windows）、端到端测试、axe 检查、漏洞扫描，并试构建镜像和全部二进制文件 |
-| 文档站 | <span class="sn-status done">已完成</span> | 部署在 [dejavumoe.github.io/sani](https://dejavumoe.github.io/sani/)，每次推送到 main 后自动更新 |
+| 文档站上线 | <span class="sn-status planned">计划中</span> | 目前在本地用 `make docs-dev` 浏览 |
 
 ## 构建时核对 {#checks}
 
@@ -37,6 +37,7 @@
 
 1. **听取反馈**：v0.1.0 是第一个公开版本，接下来以修复问题、打磨细节为主。有问题欢迎在 [GitHub](https://github.com/DejavuMoe/sani/issues) 上反馈。
 2. **为 1.0 定型**：API、配置项和数据库结构在 1.0 时固定下来，之后只有主版本号变化时才会有不兼容的修改。
+3. **文档站上线**：把本站部署为静态网站。
 
 还在考虑、没有决定的功能：
 

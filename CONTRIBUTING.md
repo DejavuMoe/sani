@@ -3,19 +3,19 @@
 Thanks for your interest. Bug reports, fixes and documentation improvements
 are all welcome, in Chinese or English.
 
-欢迎反馈问题、修复缺陷和改进文档，中文或英文都可以。开发环境和约定见[参与开发](https://dejavumoe.github.io/sani/project/development)。
+欢迎反馈问题、修复缺陷和改进文档，中文或英文都可以。开发环境和约定见[参与开发](docs/project/development.md)。
 
 ## Before you start
 
 Sani is a link shortener for one person, and stays small on purpose. For a
 new feature, please open an issue first so we can agree on whether and how it
-fits; the [status page](https://dejavumoe.github.io/sani/en/project/progress#non-goals)
+fits; the [status page](docs/en/project/progress.md)
 lists what Sani deliberately won’t do. Fixes and small improvements can go
 straight to a pull request.
 
 ## Making a change
 
-The [development guide](https://dejavumoe.github.io/sani/en/project/development)
+The [development guide](docs/en/project/development.md)
 covers the toolchain, the commands and the conventions. In short:
 
 ```sh

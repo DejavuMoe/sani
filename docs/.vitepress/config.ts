@@ -6,11 +6,6 @@ import { groups, prefix, type Lang } from './pages';
 
 const repo = 'https://github.com/DejavuMoe/sani';
 
-// The published site lives under https://dejavumoe.github.io/sani/; local
-// builds and previews stay at the root.
-const base = process.env.DOCS_BASE ?? '/';
-const site = 'https://dejavumoe.github.io/sani/';
-
 // Pages show when they last changed, but only where there is Git history to
 // ask: the Linux build mirror has none.
 const git = existsSync(new URL('../../.git', import.meta.url));
@@ -87,18 +82,14 @@ const enTheme: DefaultTheme.Config = {
 
 export default defineConfig({
   title: 'Sani',
-  base,
   cleanUrls: true,
   lastUpdated: git,
-  sitemap: { hostname: site },
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['meta', { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#f7f7f5' }],
     ['meta', { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#111110' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'Sani' }],
-    ['meta', { property: 'og:image', content: `${site}screenshots/dashboard-light-en.png` }],
-    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
   ],
 
   locales: {
