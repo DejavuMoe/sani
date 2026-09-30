@@ -47,6 +47,14 @@ Under “More options”, when creating a link or any time later:
 - **Delete.** Press <kbd>Del</kbd> (<kbd>⌘</kbd> <kbd>⌫</kbd> on a Mac). There’s no confirmation dialog; the notification offers undo instead. An hour after deletion, the link and its statistics are gone for good.
 - **Reusing a slug.** A deleted link’s slug is free for a new link right away. Once a new link takes it, the old one can no longer be restored.
 
+## Several links at once {#bulk}
+
+Click “Select” above the list, or press <kbd>X</kbd> on a selected row, to enter selection mode. A click on a row then checks it; <kbd>Shift</kbd>-click another row to check everything in between, and the box at the left of the action bar checks every loaded link.
+
+With links checked, the action bar turns them on or off, or deletes them, up to 500 at a time. Deleting offers undo, as usual. Press <kbd>Esc</kbd> or click “Done” to leave selection mode.
+
+Search first and then check everything to handle a group of related links at once, such as turning off all the links of a campaign. Changing the search or the sort clears the checks, so nothing out of sight gets changed.
+
 ## Finding and sorting
 
 Search matches slugs, titles and destinations; press <kbd>/</kbd> to start typing. Pasting a full short link finds that link.
@@ -77,7 +85,8 @@ Press <kbd>?</kbd> in the admin app to see them any time.
 | <kbd>C</kbd> | Copy the short link |
 | <kbd>E</kbd> | Edit |
 | <kbd>Ctrl</kbd> <kbd>Enter</kbd> / <kbd>⌘</kbd> <kbd>Enter</kbd> | Save changes |
-| <kbd>Del</kbd> / <kbd>⌘</kbd> <kbd>⌫</kbd> | Delete, with undo |
+| <kbd>Del</kbd> / <kbd>⌘</kbd> <kbd>⌫</kbd> | Delete, with undo; with links checked, deletes all of them |
+| <kbd>X</kbd> | Check or uncheck, for [bulk actions](#bulk) |
 | <kbd>Esc</kbd> | Close or clear |
 | <kbd>?</kbd> | Show shortcuts |
 

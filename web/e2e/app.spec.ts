@@ -142,6 +142,42 @@ test('keyboard: move, copy and open the shortcut sheet', async () => {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
+test('several links at once: turn off, turn on, delete with undo', async () => {
+  await page.getByRole('button', { name: 'Select several links' }).click();
+  const bar = page.getByRole('group', { name: 'Bulk actions' });
+  await expect(bar).toContainText('Select links');
+  await page.getByRole('checkbox', { name: 'Select all loaded links' }).click();
+  await expect(bar).toContainText('2 selected');
+
+  await bar.getByRole('button', { name: 'Turn off' }).click();
+  await expect(page.locator('.toast').last()).toContainText('Turned off 2 links');
+  await expect(page.locator('.row .badge')).toHaveCount(2);
+  expect((await follow('svelte')).status).toBe(410);
+  await bar.getByRole('button', { name: 'Turn on' }).click();
+  await expect(page.locator('.row .badge')).toHaveCount(0);
+  expect((await follow('svelte')).status).toBe(302);
+
+  // In selection mode a click on a row unchecks it instead of opening it.
+  await page.locator('.row', { hasText: '/svelte' }).locator('.main').click();
+  await expect(bar).toContainText('1 selected');
+  await expect(page.locator('.detail')).toHaveCount(0);
+  await bar.getByRole('button', { name: 'Delete' }).click();
+  await expect(page.locator('.row')).toHaveCount(1);
+  await expect(page.locator('.row', { hasText: '/svelte' })).toHaveCount(1);
+  await expect(bar).toHaveCount(0);
+  await page.locator('.toast').last().getByRole('button', { name: 'Undo' }).click();
+  await expect(page.locator('.toast').last()).toContainText('Restored 1 link');
+  await expect(page.locator('.row')).toHaveCount(2);
+
+  // X checks the selected row from the keyboard; Escape leaves selection mode.
+  await page.locator('body').click({ position: { x: 5, y: 300 } });
+  await page.keyboard.press('j');
+  await page.keyboard.press('x');
+  await expect(bar).toContainText('1 selected');
+  await page.keyboard.press('Escape');
+  await expect(bar).toHaveCount(0);
+});
+
 test('an API token can create links and be revoked', async () => {
   await page.goto('/admin/settings');
   await page.getByLabel('Token name').fill('e2e');

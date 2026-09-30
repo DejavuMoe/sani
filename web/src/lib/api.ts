@@ -1,6 +1,7 @@
 export type LinkStatus = 'active' | 'disabled' | 'expired' | 'exhausted';
 export type MetaState = 'pending' | 'ok' | 'failed' | 'manual';
 export type Sort = 'created' | 'clicks' | 'visited';
+export type BulkAction = 'enable' | 'disable' | 'delete' | 'restore';
 
 export interface Link {
   id: number;
@@ -151,6 +152,8 @@ export const api = {
   updateLink: (id: number, input: LinkInput) => request<Link>('PATCH', `/links/${id}`, input),
   deleteLink: (id: number) => request<void>('DELETE', `/links/${id}`),
   restoreLink: (id: number) => request<Link>('POST', `/links/${id}/restore`),
+  /** Returns the links that changed; for delete, as they were. */
+  bulk: (action: BulkAction, ids: number[]) => request<{ items: Link[] }>('POST', '/links/bulk', { action, ids }),
   refreshLink: (id: number) => request<Link>('POST', `/links/${id}/refresh`),
   stats: (id: number, days: number) => request<LinkStats>('GET', `/links/${id}/stats?days=${days}`),
   checkSlug: (slug: string, signal?: AbortSignal) =>

@@ -31,6 +31,7 @@ curl https://s.example.com/api/links \
 |---|---|---|
 | `GET` | `/api/links` | [列出链接](#list) |
 | `POST` | `/api/links` | [创建链接](#create) |
+| `POST` | `/api/links/bulk` | [批量修改链接](#bulk) |
 | `GET` | `/api/links/{id}` | [读取一条链接](#get) |
 | `PATCH` | `/api/links/{id}` | [修改链接](#update) |
 | `DELETE` | `/api/links/{id}` | [删除链接](#delete) |
@@ -163,6 +164,20 @@ curl https://s.example.com/api/links \
 `POST /api/links/{id}/restore`
 
 撤销删除，返回恢复后的[链接对象](#link-object)。超过一小时，或者短码已经被新链接占用时，返回 `404`。
+
+### 批量修改链接 {#bulk}
+
+`POST /api/links/bulk`
+
+在一个事务里启用、停用、删除或恢复多条链接：
+
+```json
+{ "action": "disable", "ids": [12, 15, 31] }
+```
+
+- `action` 是 `enable`、`disable`、`delete` 或 `restore` 之一，`ids` 列出 1 到 500 条链接。
+- 返回 `{"items": [...]}`：发生了变化的[链接](#link-object)。`delete` 返回删除之前的样子，其他操作返回修改之后的样子。不存在的 id、本来就处在目标状态的链接，以及[已经无法恢复](#restore)的链接都不会出现在里面，所以列表可能比 `ids` 短。
+- 删除的链接在一小时内可以恢复，和[单条删除](#delete)一样。
 
 ### 重新获取标题和图标 {#refresh}
 
@@ -356,6 +371,7 @@ curl https://s.example.com/api/import \
 | `expires_past` | 400 | `expiresAt` 早于当前时间 |
 | `max_clicks_invalid` | 400 | `maxClicks` 不是 0 到 10¹² 之间的整数 |
 | `redirect_invalid` | 400 | `redirect` 不是 301、302、307 或 308 |
+| `bulk_invalid` | 400 | 批量修改的 `action` 不认识，或者 `ids` 不是 1 到 500 条 |
 | `base_url_invalid` | 400 | 域名格式不对，应该形如 `https://s.example.com` |
 | `name_invalid` | 400 | 令牌名称为空，或者超过 60 个字符 |
 | `password_short` | 400 | 密码少于 8 个字符 |

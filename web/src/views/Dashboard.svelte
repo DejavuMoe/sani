@@ -61,6 +61,12 @@
   }
 
   function removeSelected(e: KeyboardEvent) {
+    // With links checked, the delete key acts on all of them.
+    if (links.picked.size) {
+      e.preventDefault();
+      links.bulk('delete');
+      return;
+    }
     const l = selected();
     if (!l) return;
     e.preventDefault();
@@ -79,7 +85,8 @@
         const id = links.expandedId;
         links.expandedId = null;
         rowButton(id)?.focus();
-      } else if (links.query) links.search('');
+      } else if (links.picking) links.stopPicking();
+      else if (links.query) links.search('');
       else links.selectedId = null;
       return;
     }
@@ -111,7 +118,16 @@
         const l = selected();
         if (!l || onButton) return;
         e.preventDefault();
-        links.expandedId = links.expandedId === l.id ? null : l.id;
+        if (links.picking) links.togglePick(l.id);
+        else links.expandedId = links.expandedId === l.id ? null : l.id;
+        break;
+      }
+      case 'x':
+      case 'X': {
+        const l = selected();
+        if (!l) return;
+        e.preventDefault();
+        links.togglePick(l.id, e.shiftKey);
         break;
       }
       case 'c': {
@@ -123,7 +139,7 @@
       }
       case 'e': {
         const l = selected();
-        if (!l) return;
+        if (!l || links.picking) return;
         e.preventDefault();
         links.expandedId = l.id;
         links.editingId = l.id;

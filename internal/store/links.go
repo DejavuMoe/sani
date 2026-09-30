@@ -276,6 +276,107 @@ func (s *Store) RestoreLink(ctx context.Context, id int64) (*Link, error) {
 	return getLink(ctx, s.w, id)
 }
 
+// BulkAction is a change applied to many links at once.
+type BulkAction int
+
+const (
+	BulkEnable BulkAction = iota
+	BulkDisable
+	BulkDelete
+	BulkRestore
+)
+
+// Bulk applies action to the links with the given ids in one transaction and
+// returns the links it changed: as they are afterwards, or, for BulkDelete, as
+// they were. Ids that don't exist or are already in the target state are
+// skipped, as is restoring a link whose slug has been taken over since.
+func (s *Store) Bulk(ctx context.Context, action BulkAction, ids []int64, now int64) ([]*Link, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	in := "(" + strings.TrimSuffix(strings.Repeat("?,", len(ids)), ",") + ")"
+	idArgs := make([]any, len(ids))
+	for i, id := range ids {
+		idArgs[i] = id
+	}
+	var stmt string
+	var args []any
+	switch action {
+	case BulkEnable, BulkDisable:
+		on := action == BulkEnable
+		stmt = `UPDATE links SET enabled = ?, updated_at = ? WHERE deleted_at = 0 AND enabled != ? AND id IN ` + in
+		args = []any{on, now, on}
+	case BulkDelete:
+		stmt = `UPDATE links SET deleted_at = ? WHERE deleted_at = 0 AND id IN ` + in
+		args = []any{now}
+	case BulkRestore:
+		stmt = `UPDATE links SET deleted_at = 0 WHERE deleted_at != 0 AND id IN ` + in
+	}
+	stmt += ` RETURNING id`
+	args = append(args, idArgs...)
+
+	var out []*Link
+	err := s.tx(ctx, func(tx *sql.Tx) error {
+		// A deleted link can't be read afterwards, so read it first.
+		if action == BulkDelete {
+			var err error
+			if out, err = linksIn(ctx, tx, in, idArgs); err != nil {
+				return err
+			}
+		}
+		rows, err := tx.QueryContext(ctx, stmt, args...)
+		if err != nil {
+			return err
+		}
+		changed := map[int64]bool{}
+		for rows.Next() {
+			var id int64
+			if err := rows.Scan(&id); err != nil {
+				rows.Close()
+				return err
+			}
+			changed[id] = true
+		}
+		rows.Close()
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		if action != BulkDelete {
+			if out, err = linksIn(ctx, tx, in, idArgs); err != nil {
+				return err
+			}
+		}
+		kept := out[:0]
+		for _, l := range out {
+			if changed[l.ID] {
+				kept = append(kept, l)
+			}
+		}
+		out = kept
+		return nil
+	})
+	return out, err
+}
+
+// linksIn reads the live links whose id is in the list, oldest first.
+func linksIn(ctx context.Context, tx *sql.Tx, in string, ids []any) ([]*Link, error) {
+	rows, err := tx.QueryContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+
+		` WHERE l.deleted_at = 0 AND l.id IN `+in+` ORDER BY l.id`, ids...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []*Link
+	for rows.Next() {
+		l, err := scanLink(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, l)
+	}
+	return out, rows.Err()
+}
+
 // PurgeDeleted permanently removes links deleted before the given time.
 func (s *Store) PurgeDeleted(ctx context.Context, before int64) (int64, error) {
 	res, err := s.w.ExecContext(ctx, `DELETE FROM links WHERE deleted_at != 0 AND deleted_at < ?`, before)
