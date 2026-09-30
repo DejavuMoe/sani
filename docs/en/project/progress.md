@@ -36,7 +36,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 ## Next {#next}
 
 1. **Listening.** v0.1.0 is the first public release; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
-2. **Settling for 1.0.** The API, the settings and the database schema are fixed at 1.0; after that, incompatible changes only come with a new major version.
+2. **Settling for 1.0.** The API, the settings and the database schema are fixed at 1.0; after that, incompatible changes only come with a new major version. [Versioning](./versioning) spells out the promise.
 3. **Hosted docs.** Publish this site as a static website.
 
 Under consideration, not decided:

@@ -279,7 +279,7 @@ curl https://s.example.com/api/import \
 
 `GET /api/tokens`
 
-返回令牌列表，每一项形如 `{"id": 3, "name": "iPhone 快捷指令", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`。`hint` 是令牌的开头几个字符，方便辨认；`usedAt` 是最近一次使用的时间，精确到分钟，没用过时为 `null`。
+返回 `{"items": [...]}`，即令牌列表，每一项形如 `{"id": 3, "name": "iPhone 快捷指令", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`。`hint` 是令牌的开头几个字符，方便辨认；`usedAt` 是最近一次使用的时间，精确到分钟，没用过时为 `null`。
 
 `POST /api/tokens`
 

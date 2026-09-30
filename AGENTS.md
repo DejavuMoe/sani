@@ -45,7 +45,7 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 - `compose.yaml` or `deploy/*`: the deploy page's builder (`sync/builder.ts`) must still find the lines it fills in;
 - release platforms (`targets` in `scripts/dist.sh`, `platforms:` in `release.yml`): the download table and image platforms in `guide/deploy.md`.
 
-A release needs an entry `## vX.Y.Z` in both changelogs before the tag is pushed; the release workflow stops without one.
+User-facing changes go under “Unreleased” at the top of both changelogs (`docs/project/changelog.md`, `docs/en/project/changelog.md`), breaking ones under their own heading with upgrade steps. Releasing turns that section into `## vX.Y.Z`; the release workflow stops without it. What a version number promises is in `docs/project/versioning.md`: keep changes within it, or mark them as breaking.
 
 Update both languages; the check names what's missing. Anything else the docs claim about behavior (limits, timeouts, defaults) is checked by hand against the code, so read it before you change it.
 

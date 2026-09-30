@@ -113,7 +113,7 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 
 To release a new version:
 
-1. Add an entry for it to both changelogs, headed like `## v0.2.0`.
+1. Turn the “Unreleased” section of both changelogs into the new version, headed like `## v0.2.0`, with the date on the next line.
 2. Commit, push, and wait for CI.
 3. Tag it and push the tag:
 

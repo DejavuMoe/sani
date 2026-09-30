@@ -433,6 +433,9 @@ func TestAPITokens(t *testing.T) {
 	if strings.Contains(string(list.body), secret) {
 		t.Fatal("token list must not reveal secrets")
 	}
+	if items, _ := list.json()["items"].([]any); len(items) != 1 {
+		t.Fatalf("token list = %s", list.body)
+	}
 
 	anon := &http.Client{}
 	create := func(auth string) int {
