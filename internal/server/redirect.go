@@ -36,7 +36,8 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 		s.pages.render(w, r, pageError, slug)
 		return
 	}
-	if e == nil {
+	// Texts and files open under /p/, not here.
+	if e == nil || e.Kind != 0 {
 		s.pages.render(w, r, pageNotFound, slug)
 		return
 	}

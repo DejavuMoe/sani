@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/hex"
 	"errors"
 	"net/http"
 	"net/url"
@@ -14,25 +15,27 @@ import (
 )
 
 type linkDTO struct {
-	ID          int64      `json:"id"`
-	Slug        string     `json:"slug"`
-	ShortURL    string     `json:"shortUrl"`
-	URL         string     `json:"url"`
-	Host        string     `json:"host"`
-	Title       string     `json:"title"`
-	Meta        string     `json:"meta"`
-	Icon        bool       `json:"icon"`
-	Redirect    int        `json:"redirect"`
-	Enabled     bool       `json:"enabled"`
-	Status      string     `json:"status"`
-	ExpiresAt   *time.Time `json:"expiresAt"`
-	MaxClicks   *int64     `json:"maxClicks"`
-	Clicks      int64      `json:"clicks"`
-	LastClickAt *time.Time `json:"lastClickAt"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
-	Spark       []int64    `json:"spark,omitempty"`
-	Reused      bool       `json:"reused,omitempty"`
+	ID          int64       `json:"id"`
+	Kind        string      `json:"kind"`
+	Content     *contentDTO `json:"content"`
+	Slug        string      `json:"slug"`
+	ShortURL    string      `json:"shortUrl"`
+	URL         string      `json:"url"`
+	Host        string      `json:"host"`
+	Title       string      `json:"title"`
+	Meta        string      `json:"meta"`
+	Icon        bool        `json:"icon"`
+	Redirect    int         `json:"redirect"`
+	Enabled     bool        `json:"enabled"`
+	Status      string      `json:"status"`
+	ExpiresAt   *time.Time  `json:"expiresAt"`
+	MaxClicks   *int64      `json:"maxClicks"`
+	Clicks      int64       `json:"clicks"`
+	LastClickAt *time.Time  `json:"lastClickAt"`
+	CreatedAt   time.Time   `json:"createdAt"`
+	UpdatedAt   time.Time   `json:"updatedAt"`
+	Spark       []int64     `json:"spark,omitempty"`
+	Reused      bool        `json:"reused,omitempty"`
 }
 
 var metaNames = map[store.MetaState]string{
@@ -42,12 +45,56 @@ var metaNames = map[store.MetaState]string{
 	store.MetaManual:  "manual",
 }
 
+// contentDTO describes what a text or file link shares.
+type contentDTO struct {
+	Format  string `json:"format,omitempty"`  // text: "plain" or "code"
+	Preview string `json:"preview,omitempty"` // text: its first line
+	Lines   *int64 `json:"lines,omitempty"`   // text
+	Name    string `json:"name,omitempty"`    // file
+	Type    string `json:"type,omitempty"`    // file
+	SHA256  string `json:"sha256,omitempty"`  // file
+	Size    int64  `json:"size"`
+	// RawURL serves the bytes from the files origin; null without one.
+	RawURL *string `json:"rawUrl"`
+}
+
+var kindNames = map[store.Kind]string{store.KindURL: "url", store.KindText: "text", store.KindFile: "file"}
+
+var formatNames = map[store.Format]string{store.FormatPlain: "plain", store.FormatCode: "code"}
+
+// shortPath is where visitors open a link: texts and files live under /p/.
+func shortPath(l *store.Link) string {
+	if l.Kind == store.KindURL {
+		return "/" + l.Slug
+	}
+	return "/p/" + l.Slug
+}
+
+func (s *Server) contentDTO(l *store.Link) *contentDTO {
+	c := l.Content
+	if c == nil {
+		return nil
+	}
+	d := &contentDTO{Size: c.Size}
+	if raw := s.rawURL(l); raw != "" {
+		d.RawURL = &raw
+	}
+	if l.Kind == store.KindText {
+		d.Format, d.Preview, d.Lines = formatNames[c.Format], c.Name, &c.Lines
+	} else {
+		d.Name, d.Type, d.SHA256 = c.Name, c.Type, hex.EncodeToString(c.SHA256)
+	}
+	return d
+}
+
 func (s *Server) toDTO(base string, l *store.Link, now int64) linkDTO {
 	clicks := l.Clicks + s.clicks.Pending(l.ID)
 	d := linkDTO{
 		ID:          l.ID,
+		Kind:        kindNames[l.Kind],
+		Content:     s.contentDTO(l),
 		Slug:        l.Slug,
-		ShortURL:    base + "/" + l.Slug,
+		ShortURL:    base + shortPath(l),
 		URL:         l.URL,
 		Host:        strings.TrimPrefix(l.Host, "www."),
 		Title:       l.Title,
@@ -90,6 +137,9 @@ type linkInput struct {
 	// Reuse returns an existing plain link to the same destination instead
 	// of creating another one; "shorten this page" flows set it.
 	Reuse bool `json:"reuse"`
+	// Text and Format belong to text links only.
+	Text   *string `json:"text"`
+	Format *string `json:"format"`
 }
 
 type inputError struct {
@@ -102,6 +152,10 @@ func (e *inputError) Error() string { return e.msg }
 
 func badInput(code, msg string) *inputError {
 	return &inputError{status: http.StatusBadRequest, code: code, msg: msg}
+}
+
+func tooLarge(code, msg string) *inputError {
+	return &inputError{status: http.StatusRequestEntityTooLarge, code: code, msg: msg}
 }
 
 var linkErrors = map[error]string{
@@ -179,7 +233,36 @@ func (s *Server) resolveInput(r *http.Request, in *linkInput, now int64) (*store
 		}
 		p.MaxClicks = &n
 	}
+	if in.Text != nil {
+		if strings.TrimSpace(*in.Text) == "" {
+			return nil, badInput("text_required", "text cannot be empty")
+		}
+		if len(*in.Text) > links.MaxTextBytes {
+			return nil, tooLarge("text_too_large", "texts are limited to 1 MB")
+		}
+		p.Text = in.Text
+	}
+	if in.Format != nil {
+		f, ok := formats[*in.Format]
+		if !ok {
+			return nil, badInput("format_invalid", `format must be "plain" or "code"`)
+		}
+		p.Format = &f
+	}
 	return p, nil
+}
+
+var formats = map[string]store.Format{"plain": store.FormatPlain, "code": store.FormatCode}
+
+// checkKind refuses the fields that don't apply to a link of kind k.
+func checkKind(k store.Kind, p *store.Patch) *inputError {
+	switch {
+	case k != store.KindURL && (p.URL != nil || p.Redirect != nil):
+		return badInput("kind_mismatch", "texts and files have no destination or redirect type")
+	case k != store.KindText && (p.Text != nil || p.Format != nil):
+		return badInput("kind_mismatch", "only text links have a text and a format")
+	}
+	return nil
 }
 
 // pointsHere reports whether a destination is a short link on this server,
@@ -203,6 +286,11 @@ func (s *Server) listLinks(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	lq := store.ListQuery{Sort: q.Get("sort")}
 	lq.Limit, _ = strconv.Atoi(q.Get("limit"))
+	for k, name := range kindNames {
+		if q.Get("kind") == name {
+			lq.Kind = &k
+		}
+	}
 	if c := q.Get("cursor"); c != "" {
 		cur, ok := store.ParseCursor(c)
 		if !ok {
@@ -216,6 +304,7 @@ func (s *Server) listLinks(w http.ResponseWriter, r *http.Request) {
 	// Pasting a short URL into search should find that link.
 	search = strings.TrimPrefix(search, base+"/")
 	search = strings.TrimPrefix(search, "/")
+	search = strings.TrimPrefix(search, "p/")
 	lq.Search = search
 
 	res, err := s.store.ListLinks(r.Context(), lq)
@@ -265,6 +354,9 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().UnixMilli()
 	p, ierr := s.resolveInput(r, &in, now)
+	if ierr == nil {
+		ierr = checkKind(store.KindURL, p)
+	}
 	if ierr != nil {
 		writeError(w, ierr.status, ierr.code, ierr.msg)
 		return
@@ -292,20 +384,9 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	if p.Title != nil {
-		l.Title = *p.Title
-	}
+	applyOptions(l, p)
 	if p.Redirect != nil {
 		l.Redirect = *p.Redirect
-	}
-	if p.Enabled != nil {
-		l.Enabled = *p.Enabled
-	}
-	if p.ExpiresAt != nil {
-		l.ExpiresAt = *p.ExpiresAt
-	}
-	if p.MaxClicks != nil {
-		l.MaxClicks = *p.MaxClicks
 	}
 	switch {
 	case l.Title != "":
@@ -314,22 +395,9 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 		l.Meta = store.MetaFailed
 	}
 
-	var err error
-	if p.Slug != nil && *p.Slug != "" {
-		l.Slug = *p.Slug
-		err = s.store.CreateLink(r.Context(), l, true)
-	} else {
-		err = s.createGenerated(r, l)
-	}
-	if errors.Is(err, store.ErrSlugTaken) {
-		writeError(w, http.StatusConflict, "slug_taken", "this slug is already in use")
+	if !s.save(w, r, l, p.Slug) {
 		return
 	}
-	if err != nil {
-		s.internalError(w, r, err)
-		return
-	}
-	s.cache.Invalidate(links.Key(l.Slug))
 	if l.Meta == store.MetaPending {
 		s.fetchMetaLater(l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"))
 	}
@@ -340,6 +408,9 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 // the space at the configured length gets crowded.
 func (s *Server) createGenerated(r *http.Request, l *store.Link) error {
 	n := s.opt.SlugLength
+	if l.Kind != store.KindURL {
+		n = max(n, sharedSlugLength)
+	}
 	for attempt := 0; ; attempt++ {
 		l.Slug = links.Generate(n)
 		if links.IsReserved(l.Slug) {
@@ -381,7 +452,7 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var in linkInput
-	if !decodeJSON(w, r, &in) {
+	if !decodeJSONMax(w, r, &in, maxTextBody) {
 		return
 	}
 	now := time.Now().UnixMilli()
@@ -403,11 +474,21 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 		s.internalError(w, r, err)
 		return
 	}
+	if ierr := checkKind(current.Kind, p); ierr != nil {
+		writeError(w, ierr.status, ierr.code, ierr.msg)
+		return
+	}
 
 	// An owner-provided title is kept for good; clearing it, or moving an
-	// auto-titled link elsewhere, fetches a fresh one.
+	// auto-titled link elsewhere, fetches a fresh one. Texts and files have
+	// nothing to fetch a title from.
 	refetch := false
 	switch {
+	case current.Kind != store.KindURL:
+		if p.Title != nil {
+			m := store.MetaManual
+			p.Meta = &m
+		}
 	case p.Title != nil && *p.Title != "":
 		m := store.MetaManual
 		p.Meta = &m
@@ -546,6 +627,10 @@ func (s *Server) refreshLink(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		s.internalError(w, r, err)
+		return
+	}
+	if l.Kind != store.KindURL {
+		writeError(w, http.StatusBadRequest, "kind_mismatch", "texts and files have no page to fetch a title from")
 		return
 	}
 	if l.Meta != store.MetaManual {

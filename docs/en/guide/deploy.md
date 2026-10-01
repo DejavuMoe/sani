@@ -19,7 +19,7 @@ docker compose up -d
 A few things worth knowing about `compose.yaml`:
 
 - **Localhost only.** The port is published as `127.0.0.1:8080:8080`, so outside traffic has to come through the reverse proxy.
-- **Data in a volume.** The database lives in the `sani-data` volume, mounted at `/data`. Removing or recreating the container keeps it.
+- **Data in a volume.** The database and shared files live in the `sani-data` volume, mounted at `/data`. Removing or recreating the container keeps it.
 - **A tiny image.** It’s built `FROM scratch`, about 24 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
@@ -97,7 +97,7 @@ journalctl -u sani -f        # the log has the setup code for the first visit
 The example unit already takes care of:
 
 - **No user to create.** `DynamicUser=yes` has systemd allocate a system user for Sani.
-- **A fixed data directory.** `StateDirectory=sani` keeps the database in `/var/lib/sani`.
+- **A fixed data directory.** `StateDirectory=sani` keeps the database and shared files in `/var/lib/sani`.
 - **Localhost only, in a sandbox.** It listens on `127.0.0.1:8080`, sees the system directories read-only, can’t gain privileges and can only use network and local sockets.
 
 ## Reverse proxy {#proxy}
@@ -120,7 +120,7 @@ Caddy obtains and renews the certificate and sets those headers on its own, so t
 
 ### nginx
 
-nginx needs a certificate you provide, for example from certbot. The example uses Let’s Encrypt’s default paths, and its second `server` block redirects HTTP to HTTPS:
+nginx needs a certificate you provide, for example from certbot. The example uses Let’s Encrypt’s default paths, and its second `server` block redirects HTTP to HTTPS. nginx accepts request bodies of 1 MB by default, too little for imports and uploads, so the example raises that limit:
 
 ::: code-group
 
@@ -145,6 +145,19 @@ Short links use the first of these that is set:
 Setting `SANI_BASE_URL` in production is a good idea. Short links then don’t depend on where you opened the admin app, and the setup code in the log comes with a link you can open directly.
 
 Someone opening the bare domain `https://s.example.com/` lands on the admin app’s sign-in page. To send them to your home page instead, set [`SANI_ROOT_REDIRECT`](../reference/configuration#sani-root-redirect).
+
+## Files domain {#files-domain}
+
+[Sharing files](./usage#shares) needs a second domain, such as `f.example.com`, that serves the files and raw text. It’s the same Sani behind the same proxy; there’s nothing else to run.
+
+1. **DNS.** Point the files domain at the same server.
+2. **The proxy.** Serve it like the short domain, with the same headers: list it in the Caddy site address (`s.example.com, f.example.com {`), or add it to both `server_name` lines in nginx, with a certificate that covers both. The builder above does this when you fill in a files domain.
+3. **Body size.** Uploads can be as large as [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) plus 1 MB. Caddy has no limit by default; in nginx, set `client_max_body_size` to at least that, as the example does for the default 64 MB. If you raise `SANI_MAX_FILE_MB`, raise this too.
+4. **Sani.** Set [`SANI_FILES_URL`](../reference/configuration#sani-files-url) to `https://f.example.com` and restart.
+
+The files domain must be a different host, not just another port: browsers share cookies across the ports of one host, and keeping uploaded files away from the admin app’s cookies is the point. A subdomain of the short domain is fine, since Sani’s session cookie is never sent to subdomains. Uploads go to the short domain’s API; only the downloads come from the files domain.
+
+Without a files domain, texts still work: visitors read and copy them on their page.
 
 ## The first password {#first-password}
 

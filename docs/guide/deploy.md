@@ -19,7 +19,7 @@ docker compose up -d
 `compose.yaml` 里值得了解的几点：
 
 - **只监听本机**：端口映射为 `127.0.0.1:8080:8080`，外面的访问都要经过反向代理。
-- **数据在卷里**：数据库保存在 `sani-data` 卷中，挂载到容器里的 `/data`。删除或重建容器不会丢数据。
+- **数据在卷里**：数据库和分享的文件保存在 `sani-data` 卷中，挂载到容器里的 `/data`。删除或重建容器不会丢数据。
 - **镜像很小**：镜像基于 `scratch`，大约 24 MB，里面只有 `sani` 程序和 CA 证书，以 65532 号非特权用户运行，没有 shell。要在容器里执行命令，直接运行 `/sani`，比如 `docker exec -it sani /sani passwd`。
 - **自带健康检查**：镜像定义了 `HEALTHCHECK`，`docker ps` 里能看到 `healthy`。
 
@@ -97,7 +97,7 @@ journalctl -u sani -f        # 日志里有首次设置用的设置码
 示例的单元文件已经做好了这些事：
 
 - **不用手动建用户**：`DynamicUser=yes` 让 systemd 临时分配一个系统用户来运行 Sani。
-- **数据目录固定**：`StateDirectory=sani`，数据库保存在 `/var/lib/sani`。
+- **数据目录固定**：`StateDirectory=sani`，数据库和分享的文件保存在 `/var/lib/sani`。
 - **只监听本机，并且在沙箱里运行**：监听 `127.0.0.1:8080`，系统目录只读，不能提权，只能使用网络和本地套接字。
 
 ## 反向代理 {#proxy}
@@ -120,7 +120,7 @@ Caddy 会自动申请和续期证书，也会自动设置上面这些请求头�
 
 ### nginx
 
-nginx 需要你自己准备证书，比如用 certbot 申请。示例里的证书路径是 Let’s Encrypt 的默认位置，第二个 `server` 块把 HTTP 请求跳转到 HTTPS：
+nginx 需要你自己准备证书，比如用 certbot 申请。示例里的证书路径是 Let’s Encrypt 的默认位置，第二个 `server` 块把 HTTP 请求跳转到 HTTPS。nginx 默认只接受 1 MB 的请求体，导入和上传都不够用，所以示例调大了这个上限：
 
 ::: code-group
 
@@ -145,6 +145,19 @@ Traefik、Cloudflare Tunnel 这类方案也一样，满足上面三条要求就�
 正式部署时建议设置 `SANI_BASE_URL`。这样短链接的地址不会因为你从哪里打开管理界面而改变，启动日志里的设置码也会附带一个可以直接打开的链接。
 
 有人直接访问裸域名 `https://s.example.com/` 时，默认会进入管理界面的登录页。想让它跳到你的主页，设置 [`SANI_ROOT_REDIRECT`](../reference/configuration#sani-root-redirect)。
+
+## 文件域名 {#files-domain}
+
+[分享文件](./usage#shares)需要第二个域名，比如 `f.example.com`，用来提供文件和原始文本。它背后还是同一个 Sani、同一个反向代理，不需要额外运行任何东西。
+
+1. **DNS**：把文件域名也指向这台服务器。
+2. **反向代理**：和短链接域名一样转发，请求头也一样。Caddy 把它写进站点地址（`s.example.com, f.example.com {`）；nginx 把它加到两处 `server_name` 里，并使用同时包含两个域名的证书。在上面的生成器里填写文件域名，会自动改好。
+3. **请求体大小**：上传最大可以是 [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) 再加 1 MB。Caddy 默认不限制；nginx 要把 `client_max_body_size` 设得至少这么大，示例按默认的 64 MB 设好了。调大 `SANI_MAX_FILE_MB` 时，这里也要跟着调大。
+4. **Sani**：把 [`SANI_FILES_URL`](../reference/configuration#sani-files-url) 设为 `https://f.example.com`，然后重启。
+
+文件域名必须是另一个主机名，只换端口不行：浏览器在同一个主机名的不同端口之间共享 Cookie，而让上传的文件远离管理界面的 Cookie 正是这么做的目的。用短链接域名的子域名没有问题，Sani 的会话 Cookie 不会发给子域名。上传走的是短链接域名上的 API，只有下载从文件域名提供。
+
+不设置文件域名时，文本照样可以分享，访问者在页面上阅读和复制。
 
 ## 首次设置密码 {#first-password}
 

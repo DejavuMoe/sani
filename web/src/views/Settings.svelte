@@ -423,6 +423,10 @@
       <dl class="about">
         <div><dt>{t('settings.version')}</dt><dd class="mono">{config?.version ?? '–'}</dd></div>
         <div><dt>{t('settings.timezone')}</dt><dd>{config?.timezone ?? '–'}</dd></div>
+        <div>
+          <dt>{t('settings.files')}</dt>
+          <dd class={config?.filesUrl ? 'mono' : ''}>{config?.filesUrl ?? t('settings.filesOff')}</dd>
+        </div>
       </dl>
     </div>
   </section>

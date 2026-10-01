@@ -13,10 +13,13 @@
 | `/` | A redirect to `SANI_ROOT_REDIRECT`, `/admin/` by default |
 | `/admin/…` | The embedded admin app, a single-page app |
 | `/api/…` | The [JSON API](../reference/api) |
+| `/p/…` | The pages of [shared texts and files](../guide/usage#shares) |
 | `/healthz` | Health check, answers `ok` |
-| `/robots.txt` | Asks search engines to stay out of `/admin/` and `/api/` |
+| `/robots.txt` | Asks search engines to stay out of `/admin/`, `/api/` and `/p/` |
 | `/favicon.ico` and friends | The admin app’s icons |
 | Everything else | Short links |
+
+A request for the [files domain](../reference/configuration#sani-files-url) is told apart by its host before any of these, and only ever reaches the handler that serves shared bytes.
 
 ## The hot path
 
@@ -50,13 +53,16 @@ SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure 
 
 | Table | Contents |
 |---|---|
-| `links` | Each link: slug and lookup key, destination, title, settings, total clicks, last visit, deletion time |
+| `links` | Each link: kind, slug and lookup key, destination, title, settings, total clicks, last visit, deletion time |
+| `contents` | What a text or file shares: a text’s body, format and line count, or a file’s name, type, SHA-256 and stored name |
 | `clicks_daily` | Clicks per link per day |
 | `referrers` | Clicks per link per referring site, at most 200 sites per link |
 | `settings` | The password hash and the short domain from Settings |
 | `sessions` | Sign-in sessions, stored as hashes of their secrets |
 | `tokens` | API tokens, stored as hashes |
 | `favicons` | Fetched site icons, one per host |
+
+Shared files themselves are not in the database but in `files/` in the data directory, each under a random name; texts and files share the cache and click counting with links.
 
 The schema version is kept in `PRAGMA user_version`. At startup, any upgrades not yet applied run in order, each in its own transaction.
 
@@ -67,6 +73,7 @@ The schema version is kept in `PRAGMA user_version`. At startup, any upgrades no
 | Writing clicks | Every 2 seconds | Writes the clicks in memory to the database as one batch |
 | Purging deleted links | Every minute | Removes links deleted more than an hour ago, with their statistics |
 | Purging sessions | Every hour | Removes expired sessions |
+| Sweeping files | Every 10 minutes | Removes stored files no link refers to any more, and uploads that never finished |
 | Fetching titles and icons | When links are created | At most 3 at a time, each for at most 20 seconds |
 
 ## Titles and icons

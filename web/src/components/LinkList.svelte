@@ -1,11 +1,11 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
-  import type { Sort } from '../lib/api';
+  import type { LinkKind, Sort } from '../lib/api';
   import { t } from '../lib/i18n.svelte';
   import { mod } from '../lib/keys';
   import { links, MAX_PICK } from '../lib/links.svelte';
-  import Icon from './Icon.svelte';
+  import Icon, { type IconName } from './Icon.svelte';
   import LinkRow from './LinkRow.svelte';
   import Menu from './Menu.svelte';
   import MenuItem from './MenuItem.svelte';
@@ -40,13 +40,15 @@
   });
 
   const sorts: Sort[] = ['created', 'clicks', 'visited'];
+  const kinds: (LinkKind | null)[] = [null, 'url', 'text', 'file'];
+  const kindIcon: Record<LinkKind, IconName> = { url: 'link', text: 'text', file: 'file' };
 
   // The select-all box reflects the loaded links it would check.
   const pickable = $derived(links.items.slice(0, MAX_PICK));
   const allPicked = $derived(pickable.length > 0 && pickable.every((l) => links.picked.has(l.id)));
   const nonePicked = $derived(links.picked.size === 0);
   const empty = $derived(links.loaded && links.items.length === 0);
-  const blank = $derived(empty && !links.query);
+  const blank = $derived(empty && !links.query && !links.kind);
 
   /** Splits a message around {key} placeholders so keys render as keycaps. */
   function withKeys(text: string, keys: Record<string, string[]>) {
@@ -107,6 +109,24 @@
       <Icon name="select" size={14} />
       <span class="pick-text">{t('bulk.start')}</span>
     </button>
+    <Menu triggerClass={['kind', links.kind && 'on'].filter(Boolean).join(' ')} label={t('filter.label')} align="end" minWidth={160}>
+      {#snippet button()}
+        <Icon name={links.kind ? kindIcon[links.kind] : 'sliders'} size={14} />
+        <span class="kind-text">{t(`filter.${links.kind ?? 'all'}`)}</span>
+      {/snippet}
+      {#snippet children(close)}
+        {#each kinds as k (k ?? 'all')}
+          <MenuItem
+            icon={k ? kindIcon[k] : undefined}
+            checked={links.kind === k}
+            onclick={() => {
+              links.setKind(k);
+              close();
+            }}>{t(`filter.${k ?? 'all'}`)}</MenuItem
+          >
+        {/each}
+      {/snippet}
+    </Menu>
     <Menu triggerClass="sort" label={t('list.sortBy')} align="end" minWidth={160}>
       {#snippet button()}
         <Icon name="sort" size={14} />
@@ -173,10 +193,15 @@
         {/each}
       </p>
     </div>
-  {:else if empty}
+  {:else if empty && links.query}
     <div class="blank">
       <p>{t('list.noResults', { q: links.query })}</p>
       <button class="text-btn" onclick={() => links.search('')}>{t('list.clearSearch')}</button>
+    </div>
+  {:else if empty}
+    <div class="blank">
+      <p>{t(links.kind === 'text' ? 'list.noneText' : links.kind === 'file' ? 'list.noneFile' : 'list.noneUrl')}</p>
+      <button class="text-btn" onclick={() => links.setKind(null)}>{t('list.showAll')}</button>
     </div>
   {:else if links.failed && !links.loaded}
     <div class="blank">
@@ -366,7 +391,30 @@
     color: var(--accent);
   }
 
-  .pick + :global(.sort) {
+  .toolbar :global(.kind) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    color: var(--text-2);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .toolbar :global(.kind:hover),
+  .toolbar :global(.kind[aria-expanded='true']) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .toolbar :global(.kind.on) {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .toolbar :global(.kind) + :global(.sort) {
     margin-left: 0;
   }
 
@@ -680,6 +728,7 @@
     }
 
     .pick-text,
+    .kind-text,
     .bulkbar .name {
       display: none;
     }

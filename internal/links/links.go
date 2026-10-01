@@ -39,6 +39,7 @@ const alphabet = "23456789abcdefghjkmnpqrstuvwxyz"
 var reserved = map[string]struct{}{
 	"admin":                {},
 	"api":                  {},
+	"p":                    {},
 	"rest":                 {},
 	"healthz":              {},
 	"robots.txt":           {},
@@ -369,6 +370,68 @@ func escapeNonASCII(s string) string {
 		b.WriteByte(hex[c&15])
 	}
 	return b.String()
+}
+
+// MaxTextBytes bounds a shared text. A megabyte is a long log or a big
+// source file; anything larger belongs in a file.
+const MaxTextBytes = 1 << 20
+
+// TextLines counts the lines of a text; a final newline ends the last line
+// rather than starting another.
+func TextLines(s string) int64 {
+	if s == "" {
+		return 0
+	}
+	n := int64(strings.Count(s, "\n"))
+	if !strings.HasSuffix(s, "\n") {
+		n++
+	}
+	return n
+}
+
+// TextPreview returns a text's first non-blank line, shortened, to stand in
+// for a title.
+func TextPreview(s string) string {
+	for line := range strings.Lines(s) {
+		if line = strings.TrimSpace(line); line != "" {
+			r := []rune(line)
+			if len(r) > 120 {
+				line = strings.TrimSpace(string(r[:119])) + "…"
+			}
+			return strings.Join(strings.Fields(line), " ")
+		}
+	}
+	return ""
+}
+
+// FileName reduces an uploaded file's name to something safe to show and to
+// put in a Content-Disposition header: the last path segment, without
+// control characters, at most 255 bytes with its extension kept.
+func FileName(raw string) string {
+	raw = strings.ReplaceAll(raw, `\`, "/")
+	raw = raw[strings.LastIndexByte(raw, '/')+1:]
+	if !utf8.ValidString(raw) {
+		raw = strings.ToValidUTF8(raw, "")
+	}
+	name := strings.Join(strings.FieldsFunc(raw, func(r rune) bool {
+		return unicode.IsControl(r) || unicode.Is(unicode.Bidi_Control, r)
+	}), "")
+	name = strings.TrimSpace(name)
+	if name == "" || name == "." || name == ".." {
+		return "file"
+	}
+	if len(name) > 255 {
+		ext := ""
+		if i := strings.LastIndexByte(name, '.'); i > 0 && len(name)-i <= 16 {
+			ext = name[i:]
+		}
+		stem := name[:255-len(ext)]
+		for !utf8.ValidString(stem) {
+			stem = stem[:len(stem)-1]
+		}
+		name = stem + ext
+	}
+	return name
 }
 
 // CleanTitle collapses whitespace and bounds the length of a title.

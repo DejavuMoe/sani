@@ -1,6 +1,6 @@
 # 运维
 
-<p class="lead">Sani 的全部数据都在一个 SQLite 文件里，日常要做的事情不多：定期备份，偶尔升级，忘记密码时重设。</p>
+<p class="lead">Sani 的全部数据都在一个 SQLite 文件里，外加一个存放分享文件的目录，日常要做的事情不多：定期备份，偶尔升级，忘记密码时重设。</p>
 
 ## 备份 {#backup}
 
@@ -33,7 +33,26 @@ sani backup ~/backups/sani-$(date +%F).db
 15 4 * * * docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
 ```
 
-只想要一份可以导入别处的链接清单，用设置 → 数据 → 导出（见[导入与导出](./import-export)）。导出文件不包含每日统计、来源和令牌，不能代替备份。
+只想要一份可以导入别处的链接清单，用设置 → 数据 → 导出（见[导入与导出](./import-export)）。导出文件不包含每日统计、来源、令牌、文本和文件，不能代替备份。
+
+### 分享的文件 {#backup-files}
+
+文本保存在数据库里，但[分享的文件](./usage#shares)放在数据库旁边的 `files/` 目录里，`sani backup` 也会提醒你这一点。请在备份数据库**之后**复制这个目录：文件上传后就不会再变，所以之后复制的目录里，一定有数据库提到的每一个文件。
+
+::: code-group
+
+```sh [Docker]
+docker run --rm --volumes-from sani -v "$PWD":/backup alpine \
+  tar -czf /backup/sani-files-$(date +%F).tar.gz -C /data files
+```
+
+```sh [systemd]
+sudo tar -czf /root/sani-files-$(date +%F).tar.gz -C /var/lib/sani files
+```
+
+:::
+
+文件很多时，每次用 `rsync` 同步到同一个位置，只会复制新增的文件。链接删除后大约一小时，它的文件会从 `files/` 里自动删除。
 
 ## 恢复
 
@@ -58,7 +77,7 @@ sudo systemctl start sani
 
 :::
 
-镜像里没有 shell，所以 Docker 下借一个临时的 `alpine` 容器来复制文件，并把文件的所有者改成 Sani 运行时的用户。
+镜像里没有 shell，所以 Docker 下借一个临时的 `alpine` 容器来复制文件，并把文件的所有者改成 Sani 运行时的用户。分享的文件也要恢复时，在同一步里把压缩包解到数据目录，比如 `tar -xzf /backup/sani-files-2026-09-29.tar.gz -C /data && chown -R 65532:65532 /data/files`。恢复后的数据库不认识的文件会被自动清理。
 
 迁移到另一台服务器也是同样的步骤：在旧服务器上备份，在新服务器上恢复，最后把 DNS 指过去。
 
@@ -138,5 +157,9 @@ Sani 不记录访问日志，跳转请求不会出现在日志里。需要访问
 **标题和图标一直获取不到。** 可能是服务器访问不了外网，目标网站拒绝了抓取，或者目标解析到了内网地址（Sani 不会访问内网）。服务器需要通过代理访问外网时，设置 `HTTPS_PROXY`。`SANI_LOG_LEVEL=debug` 能看到每次失败的原因。
 
 **点击数比预想的少。** 爬虫、链接预览和你自己在管理界面里的点击都不计入。永久跳转（301）会被浏览器缓存，同一个浏览器之后的访问不再经过 Sani。详见[统计口径](./statistics)。
+
+**“文件”标签页提示分享文件需要一个单独的域名。** 按[文件域名](./deploy#files-domain)的步骤配置好，并设置 `SANI_FILES_URL`。
+
+**文件没超过上限，上传却提示太大。** 反向代理在 Sani 收到之前就拒绝了请求体：调大 nginx 的 `client_max_body_size`，或者你所用代理的对应设置。
 
 **打开管理界面，只看到 “The admin app is not part of this build”。** 这个二进制文件是直接用 `go build` 构建的，没有先构建前端。用 `make build` 重新构建。

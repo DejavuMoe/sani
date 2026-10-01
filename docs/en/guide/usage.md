@@ -26,7 +26,7 @@ When you pick a slug yourself, the field tells you as you type whether it’s fr
 - after the first character, also `-`, `_` and `.`, but no `.` at the end;
 - at most 64 characters;
 - case doesn’t matter: `/GitHub` and `/github` are the same link;
-- these are used by Sani itself and can’t be taken: `admin`, `api`, `rest`, `healthz`, `robots.txt`, `favicon.ico`, `favicon.svg`, `apple-touch-icon.png`.
+- these are used by Sani itself and can’t be taken: `admin`, `api`, `p`, `rest`, `healthz`, `robots.txt`, `favicon.ico`, `favicon.svg`, `apple-touch-icon.png`.
 
 ## Link options
 
@@ -55,9 +55,26 @@ With links checked, the action bar turns them on or off, or deletes them, up to 
 
 Search first and then check everything to handle a group of related links at once, such as turning off all the links of a campaign. Changing the search or the sort clears the checks, so nothing out of sight gets changed.
 
+## Texts and files {#shares}
+
+Besides links, Sani shares a piece of text or a file. Switch to the Text or File tab above the link box, or start from anywhere on the page:
+
+- **Paste text.** Pasting text with several lines, or a line that isn’t a link, opens it in the Text tab. A link on its own is shortened as usual.
+- **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 64 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that.
+
+A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MB. Nothing is rendered: Markdown and HTML show as written.
+
+Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Share”; for a file, the bar shows the upload’s progress and can cancel it. The address, such as `s.example.com/p/k3m9x2qv7h`, is copied as with a link. Expiry, the visit limit and the off switch work the same way; a visit limit of 1 makes a text that can be read once.
+
+Generated slugs for texts and files are 10 characters long instead of 5. Nothing lists your shares, so the address is what keeps them private, and 10 characters can’t be guessed. You can still pick a slug yourself.
+
+Visitors open the address and see a page with the text, a Copy button and, if you set up a [files domain](./deploy#files-domain), Raw and Download buttons. A file’s page shows its name, type, size and SHA-256, and a Download button. The bytes always come from the files domain, never from your short domain, so a file can’t pose as a page of your site; that’s why sharing files needs one.
+
+In the list, texts and files show `/p/` before the slug and an icon instead of a site icon. Their details show the text, or the file’s name and SHA-256, with “Copy text” or “Copy download link”. The admin app has no download button: a download from it would use up a visit. To edit a text, press <kbd>E</kbd>; a file can’t be replaced, so share a new one.
+
 ## Finding and sorting
 
-Search matches slugs, titles and destinations; press <kbd>/</kbd> to start typing. Pasting a full short link finds that link.
+Search matches slugs, titles, destinations, file names and the first line of texts; press <kbd>/</kbd> to start typing. Pasting a full short link finds that link. Next to it, “All types” narrows the list to links, texts or files.
 
 The list sorts by “Newest”, “Most clicked” or “Last visited”.
 
@@ -116,4 +133,5 @@ A token has full access and keeps working after a password change. It’s shown 
 - **The redirect.** Visitors go straight to the destination, with no page in between.
 - **Query strings.** A visitor’s query string is added to the destination, as in `s.example.com/gh?utm_source=x`. Turn this off with [`SANI_FORWARD_QUERY`](../reference/configuration#sani-forward-query).
 - **Forgiving addresses.** A trailing `/` or different capitalization still redirects.
+- **Texts and files.** They open at `/p/{slug}` on a page in the visitor’s language; `/{slug}` without the `/p/` doesn’t find them.
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.

@@ -20,8 +20,41 @@ const (
 	MetaManual  MetaState = 3 // title set by the owner; never overwritten
 )
 
+// Kind is what a link does when visited.
+type Kind int
+
+const (
+	KindURL  Kind = 0 // redirects to URL
+	KindText Kind = 1 // shows a text at /p/{slug}
+	KindFile Kind = 2 // offers a file at /p/{slug}
+)
+
+// Format is how a shared text is shown.
+type Format int
+
+const (
+	FormatPlain Format = 0 // wrapped, in the body font
+	FormatCode  Format = 1 // monospace with line numbers
+)
+
+// Content describes what a text or file link shares.
+type Content struct {
+	Format Format
+	Name   string // a file's download name; a text's first line
+	Type   string // a file's media type
+	Size   int64  // bytes
+	Lines  int64  // lines of a text
+	SHA256 []byte // of a file
+	File   string // a file's name in the files directory
+	// Text is the body of a text. Listings leave it empty; it is set when
+	// creating a link and read with TextBody.
+	Text string
+}
+
 type Link struct {
 	ID          int64
+	Kind        Kind
+	Content     *Content // nil for KindURL
 	Slug        string
 	URL         string
 	Host        string // exact hostname of URL, used to fetch and group favicons
@@ -41,6 +74,7 @@ type Link struct {
 // Target is the part of a link the redirect path needs.
 type Target struct {
 	ID        int64
+	Kind      Kind
 	URL       string
 	Redirect  int
 	Enabled   bool
@@ -51,21 +85,27 @@ type Target struct {
 
 const linkCols = `l.id, l.slug, l.url, l.host, l.title, l.meta, l.redirect, l.enabled,
 	l.expires_at, l.max_clicks, l.clicks, l.last_click_at, l.created_at, l.updated_at,
-	coalesce(f.type != '', 0)`
+	coalesce(f.type != '', 0), l.kind, coalesce(c.format, 0), coalesce(c.name, ''), coalesce(c.type, ''),
+	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, '')`
 
-const linkFrom = `links l LEFT JOIN favicons f ON f.host = l.host`
+const linkFrom = `links l LEFT JOIN favicons f ON f.host = l.host LEFT JOIN contents c ON c.link_id = l.id`
 
 type scanner interface{ Scan(...any) error }
 
 func scanLink(row scanner) (*Link, error) {
 	var l Link
+	var c Content
 	err := row.Scan(&l.ID, &l.Slug, &l.URL, &l.Host, &l.Title, &l.Meta, &l.Redirect, &l.Enabled,
-		&l.ExpiresAt, &l.MaxClicks, &l.Clicks, &l.LastClickAt, &l.CreatedAt, &l.UpdatedAt, &l.HasIcon)
+		&l.ExpiresAt, &l.MaxClicks, &l.Clicks, &l.LastClickAt, &l.CreatedAt, &l.UpdatedAt, &l.HasIcon,
+		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
 	if err != nil {
 		return nil, err
+	}
+	if l.Kind != KindURL {
+		l.Content = &c
 	}
 	return &l, nil
 }
@@ -106,10 +146,10 @@ func claimSlug(ctx context.Context, tx *sql.Tx, key string, id int64, reclaim bo
 
 func insertLink(ctx context.Context, tx *sql.Tx, l *Link) error {
 	res, err := tx.ExecContext(ctx, `INSERT INTO links
-		(slug, slug_key, url, host, title, meta, redirect, enabled, expires_at, max_clicks,
+		(kind, slug, slug_key, url, host, title, meta, redirect, enabled, expires_at, max_clicks,
 		 clicks, last_click_at, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		l.Slug, links.Key(l.Slug), l.URL, l.Host, l.Title, l.Meta, l.Redirect, l.Enabled,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		l.Kind, l.Slug, links.Key(l.Slug), l.URL, l.Host, l.Title, l.Meta, l.Redirect, l.Enabled,
 		l.ExpiresAt, l.MaxClicks, l.Clicks, l.LastClickAt, l.CreatedAt, l.UpdatedAt)
 	if isUniqueViolation(err) {
 		return ErrSlugTaken
@@ -117,7 +157,18 @@ func insertLink(ctx context.Context, tx *sql.Tx, l *Link) error {
 	if err != nil {
 		return err
 	}
-	l.ID, err = res.LastInsertId()
+	if l.ID, err = res.LastInsertId(); err != nil {
+		return err
+	}
+	if c := l.Content; c != nil {
+		var body any
+		if l.Kind == KindText {
+			body = c.Text
+		}
+		_, err = tx.ExecContext(ctx, `INSERT INTO contents
+			(link_id, format, name, type, size, lines, sha256, file, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			l.ID, c.Format, c.Name, c.Type, c.Size, c.Lines, c.SHA256, c.File, body)
+	}
 	return err
 }
 
@@ -139,9 +190,9 @@ func (s *Store) GetLink(ctx context.Context, id int64) (*Link, error) {
 // Resolve loads the redirect target for a lookup key.
 func (s *Store) Resolve(ctx context.Context, key string) (*Target, error) {
 	var t Target
-	err := s.r.QueryRowContext(ctx, `SELECT id, url, redirect, enabled, expires_at, max_clicks, clicks
+	err := s.r.QueryRowContext(ctx, `SELECT id, kind, url, redirect, enabled, expires_at, max_clicks, clicks
 		FROM links WHERE slug_key = ? AND deleted_at = 0`, key).
-		Scan(&t.ID, &t.URL, &t.Redirect, &t.Enabled, &t.ExpiresAt, &t.MaxClicks, &t.Clicks)
+		Scan(&t.ID, &t.Kind, &t.URL, &t.Redirect, &t.Enabled, &t.ExpiresAt, &t.MaxClicks, &t.Clicks)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -155,7 +206,7 @@ func (s *Store) Resolve(ctx context.Context, key string) (*Target, error) {
 // click limit and a temporary redirect, so it can stand in for a new one.
 func (s *Store) FindPlainLink(ctx context.Context, url string) (*Link, error) {
 	return scanLink(s.r.QueryRowContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+`
-		WHERE l.url = ? AND l.deleted_at = 0 AND l.enabled = 1 AND l.expires_at = 0
+		WHERE l.url = ? AND l.kind = 0 AND l.deleted_at = 0 AND l.enabled = 1 AND l.expires_at = 0
 		AND l.max_clicks = 0 AND l.redirect = 302
 		ORDER BY l.id DESC LIMIT 1`, url))
 }
@@ -183,6 +234,8 @@ type Patch struct {
 	Enabled   *bool
 	ExpiresAt *int64
 	MaxClicks *int64
+	Text      *string // replaces a text's body
+	Format    *Format
 }
 
 // UpdateLink applies p and returns the link before and after the change.
@@ -238,6 +291,18 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 		}
 		if err != nil {
 			return err
+		}
+		if p.Text != nil {
+			_, err = tx.ExecContext(ctx, `UPDATE contents SET body = ?, size = ?, lines = ?, name = ? WHERE link_id = ?`,
+				*p.Text, len(*p.Text), links.TextLines(*p.Text), links.TextPreview(*p.Text), id)
+			if err != nil {
+				return err
+			}
+		}
+		if p.Format != nil {
+			if _, err = tx.ExecContext(ctx, `UPDATE contents SET format = ? WHERE link_id = ?`, *p.Format, id); err != nil {
+				return err
+			}
 		}
 		after, err = getLink(ctx, tx, id)
 		return err
@@ -410,6 +475,7 @@ func ParseCursor(s string) (*Cursor, bool) {
 
 type ListQuery struct {
 	Search string
+	Kind   *Kind  // nil lists every kind
 	Sort   string // "created" (default), "clicks" or "visited"
 	After  *Cursor
 	Limit  int
@@ -442,15 +508,20 @@ func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error)
 	}
 	where := []string{"l.deleted_at = 0"}
 	var args []any
+	if q.Kind != nil {
+		where = append(where, "l.kind = ?")
+		args = append(args, *q.Kind)
+	}
 	if q.Search != "" {
 		pat := "%" + escapeLike(strings.ToLower(q.Search)) + "%"
-		where = append(where, `(l.slug_key LIKE ? ESCAPE '\' OR l.url LIKE ? ESCAPE '\' OR l.title LIKE ? ESCAPE '\')`)
-		args = append(args, pat, pat, pat)
+		where = append(where, `(l.slug_key LIKE ? ESCAPE '\' OR l.url LIKE ? ESCAPE '\' OR l.title LIKE ? ESCAPE '\'
+			OR c.name LIKE ? ESCAPE '\')`)
+		args = append(args, pat, pat, pat, pat)
 	}
 
 	res := &ListResult{Links: []*Link{}}
-	if err := s.r.QueryRowContext(ctx, `SELECT count(*) FROM links l WHERE `+strings.Join(where, " AND "), args...).
-		Scan(&res.Total); err != nil {
+	if err := s.r.QueryRowContext(ctx, `SELECT count(*) FROM links l LEFT JOIN contents c ON c.link_id = l.id
+		WHERE `+strings.Join(where, " AND "), args...).Scan(&res.Total); err != nil {
 		return nil, err
 	}
 
@@ -493,10 +564,40 @@ func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error)
 	return res, nil
 }
 
-// AllLinks returns every live link, oldest first.
+// TextBody returns the body of a live text link.
+func (s *Store) TextBody(ctx context.Context, id int64) (string, error) {
+	var body string
+	err := s.r.QueryRowContext(ctx, `SELECT coalesce(c.body, '') FROM links l JOIN contents c ON c.link_id = l.id
+		WHERE l.id = ? AND l.kind = ? AND l.deleted_at = 0`, id, KindText).Scan(&body)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", ErrNotFound
+	}
+	return body, err
+}
+
+// StoredFiles returns the names of every file a link still refers to,
+// deleted links included until they are purged.
+func (s *Store) StoredFiles(ctx context.Context) (map[string]bool, error) {
+	rows, err := s.r.QueryContext(ctx, `SELECT file FROM contents WHERE file != ''`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]bool{}
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		out[name] = true
+	}
+	return out, rows.Err()
+}
+
+// AllLinks returns every live link that redirects, oldest first.
 func (s *Store) AllLinks(ctx context.Context) ([]*Link, error) {
 	rows, err := s.r.QueryContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+
-		` WHERE l.deleted_at = 0 ORDER BY l.created_at, l.id`)
+		` WHERE l.deleted_at = 0 AND l.kind = 0 ORDER BY l.created_at, l.id`)
 	if err != nil {
 		return nil, err
 	}

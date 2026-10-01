@@ -22,6 +22,8 @@ type Config struct {
 	FetchMeta    bool
 	ForwardQuery bool
 	CacheSize    int
+	FilesURL     string // origin that serves shared files and raw text; "" turns file sharing off
+	MaxFileMB    int
 	LogLevel     slog.Level
 	LogJSON      bool
 }
@@ -57,6 +59,27 @@ func envInt(key string, def, lo, hi int) (int, error) {
 	return n, nil
 }
 
+// origin accepts "https://s.example.com", optionally with a trailing slash,
+// and returns it lowercased.
+func origin(raw string) (string, bool) {
+	raw = strings.TrimSuffix(raw, "/")
+	u, err := url.Parse(raw)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" ||
+		u.Path != "" || u.RawQuery != "" || u.Fragment != "" || u.User != nil {
+		return "", false
+	}
+	return strings.ToLower(u.Scheme) + "://" + strings.ToLower(u.Host), true
+}
+
+// Hostname returns the host of an origin without its port.
+func Hostname(origin string) string {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return ""
+	}
+	return u.Hostname()
+}
+
 // Load reads the configuration. Unset variables take documented defaults.
 func Load() (*Config, error) {
 	c := &Config{
@@ -75,14 +98,27 @@ func Load() (*Config, error) {
 	}
 
 	if b := env("SANI_BASE_URL", ""); b != "" {
-		b = strings.TrimSuffix(b, "/")
-		u, e := url.Parse(b)
-		if e != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" || u.Path != "" {
-			collect(fmt.Errorf("SANI_BASE_URL: expected an origin such as https://s.example.com, got %q", b))
+		if o, ok := origin(b); ok {
+			c.BaseURL = o
 		} else {
-			c.BaseURL = strings.ToLower(u.Scheme) + "://" + strings.ToLower(u.Host)
+			collect(fmt.Errorf("SANI_BASE_URL: expected an origin such as https://s.example.com, got %q", b))
 		}
 	}
+	if f := env("SANI_FILES_URL", ""); f != "" {
+		o, ok := origin(f)
+		switch {
+		case !ok:
+			collect(fmt.Errorf("SANI_FILES_URL: expected an origin such as https://f.example.com, got %q", f))
+		case Hostname(o) == Hostname(c.BaseURL):
+			// Shared files need a host of their own: browsers share cookies
+			// across the ports of one host.
+			collect(fmt.Errorf("SANI_FILES_URL: use a different host from SANI_BASE_URL"))
+		default:
+			c.FilesURL = o
+		}
+	}
+	c.MaxFileMB, err = envInt("SANI_MAX_FILE_MB", 64, 1, 4096)
+	collect(err)
 	if c.RootRedirect != "" {
 		u, e := url.Parse(c.RootRedirect)
 		if e != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {

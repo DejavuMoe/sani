@@ -17,6 +17,8 @@
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | 是否自动获取网页标题和图标 |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | 是否把查询参数带到目标网址 |
 | [`SANI_CACHE_SIZE`](#sani-cache-size) | `100000` | 内存中缓存的跳转目标数量 |
+| [`SANI_FILES_URL`](#sani-files-url) | — | 提供文件下载和原始文本的域名 |
+| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `64` | 单个文件的大小上限（MB） |
 | [`SANI_LOG_LEVEL`](#sani-log-level) | `info` | 日志级别 |
 | [`SANI_LOG_FORMAT`](#sani-log-format) | `text` | 日志格式 |
 | [`TZ`](#tz) | 系统时区 | 每日统计使用的时区 |
@@ -31,7 +33,7 @@
 
 ### `SANI_DATA_DIR`
 
-默认 `data`，是相对于工作目录的路径。数据库文件 `sani.db` 放在这个目录里，目录不存在时会自动创建。Docker 镜像里是 `/data`，systemd 示例里是 `/var/lib/sani`。
+默认 `data`，是相对于工作目录的路径。数据库文件 `sani.db` 放在这个目录里，分享的文件放在其中的 `files` 目录，目录不存在时会自动创建。Docker 镜像里是 `/data`，systemd 示例里是 `/var/lib/sani`。
 
 目录里还会出现 `sani.db-wal` 和 `sani.db-shm`，这是 SQLite WAL 模式的正常文件，不要单独删除它们。复制数据库请用 [`sani backup`](./cli#sani-backup)。
 
@@ -107,6 +109,22 @@ https://s.example.com/gh?utm_source=weekly
 默认 `100000`，可以设为 64 到 100,000,000。内存中最多缓存多少个跳转目标。另外，Sani 还会缓存最多这个数量四分之一的“不存在的短码”，这样有人扫描随机短码时，既不会反复查询数据库，也不会把真实的链接挤出缓存。
 
 缓存满了之后随机淘汰。链接总数明显小于这个值时，访问过的链接都会留在内存里。
+
+## 分享
+
+### `SANI_FILES_URL`
+
+没有默认值。文本和文件的原始内容从这个地址提供，比如 `https://f.example.com`。和 `SANI_BASE_URL` 一样，只能包含协议和域名（可以带端口），而且**必须是另一个域名**：只换端口不行，因为浏览器在同一个域名的不同端口之间共享 Cookie。
+
+不设置时，仍然可以分享文本，访问者在 `/p/` 页面上阅读和复制；但不能上传文件，文本页面上也没有“原始文本”和“下载”按钮。
+
+这个域名指向同一个 Sani 进程，不需要单独部署。Sani 按请求的 `Host`（开启了 [`SANI_TRUST_PROXY`](#sani-trust-proxy) 时按 `X-Forwarded-Host`）区分两个域名。文件域名只提供分享的内容和一个拒绝所有爬虫的 `robots.txt`，其他路径一律 404。为什么要单独一个域名，见[安全](../internals/security#shares)。
+
+### `SANI_MAX_FILE_MB`
+
+默认 `64`，可以设为 1 到 4096。单个文件的大小上限，单位是 MB（1 MB = 1,048,576 字节）。超过上限的上传会被拒绝，已经收到的部分随即删除。
+
+反向代理通常也有自己的请求体上限，要同时调大，见[部署](../guide/deploy#files-domain)。文本的上限固定为 1 MB，不受这个变量影响。
 
 ## 日志
 

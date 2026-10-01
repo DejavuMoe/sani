@@ -20,7 +20,14 @@ import (
 )
 
 func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
+	var files *string
+	if s.opt.FilesURL != "" {
+		files = &s.opt.FilesURL
+	}
 	writeJSON(w, http.StatusOK, map[string]any{
+		"filesUrl":        files,
+		"maxFileSize":     s.opt.MaxFileBytes,
+		"maxTextSize":     links.MaxTextBytes,
 		"version":         s.opt.Version,
 		"baseUrl":         s.baseURL(r),
 		"baseUrlSource":   s.baseSource(),
@@ -45,6 +52,14 @@ func normalizeOrigin(raw string) (string, bool) {
 	return strings.ToLower(u.Scheme) + "://" + strings.ToLower(u.Host), true
 }
 
+func hostname(origin string) string {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return ""
+	}
+	return u.Hostname()
+}
+
 func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		BaseURL nullable[string] `json:"baseUrl"`
@@ -60,7 +75,7 @@ func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 		value := ""
 		if !in.BaseURL.Null && strings.TrimSpace(in.BaseURL.Value) != "" {
 			v, ok := normalizeOrigin(in.BaseURL.Value)
-			if !ok {
+			if !ok || (s.filesHost != "" && hostname(v) == hostname(s.opt.FilesURL)) {
 				writeError(w, http.StatusBadRequest, "base_url_invalid", "use an origin such as https://s.example.com")
 				return
 			}

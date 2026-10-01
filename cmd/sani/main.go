@@ -142,6 +142,9 @@ func serve() error {
 		SetupCode:       setupCode,
 		CacheSize:       cfg.CacheSize,
 		Version:         version,
+		FilesURL:        cfg.FilesURL,
+		FilesDir:        filepath.Join(cfg.DataDir, "files"),
+		MaxFileBytes:    int64(cfg.MaxFileMB) << 20,
 	}, st, rec, meta.New(), webui.FS(), log)
 	if err != nil {
 		return err
@@ -160,7 +163,11 @@ func serve() error {
 	if err != nil {
 		return err
 	}
-	log.Info("sani is ready", "addr", ln.Addr().String(), "data", cfg.DataDir, "tz", time.Local.String(), "version", version)
+	ready := []any{"addr", ln.Addr().String(), "data", cfg.DataDir, "tz", time.Local.String(), "version", version}
+	if cfg.FilesURL != "" {
+		ready = append(ready, "files", cfg.FilesURL)
+	}
+	log.Info("sani is ready", ready...)
 
 	bg, stopBackground := context.WithCancel(context.Background())
 	defer stopBackground()
@@ -277,6 +284,12 @@ func backup() error {
 	}
 	ctx := context.Background()
 	src := filepath.Join(cfg.DataDir, "sani.db")
+	// Shared files stay out of the copy: they never change once uploaded, so
+	// copying the directory after the database is enough.
+	files := filepath.Join(cfg.DataDir, "files")
+	if entries, err := os.ReadDir(files); err == nil && len(entries) > 0 {
+		defer fmt.Fprintf(os.Stderr, "Shared files are not in the database; copy %s as well.\n", files)
+	}
 	if dst := os.Args[2]; dst != "-" {
 		if err := store.Backup(ctx, src, dst); err != nil {
 			return err

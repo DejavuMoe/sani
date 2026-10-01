@@ -11,6 +11,8 @@ const base = process.env.SANI_URL ?? 'http://127.0.0.1:8080';
 const password = process.env.SANI_DEMO_PASSWORD ?? 'sani-demo';
 const fresh = process.env.SANI_FRESH_URL;
 
+const phone = { width: 390, height: 800 };
+
 const screens = [
   ...(fresh ? [{ name: 'setup', path: '/admin/', auth: false, origin: fresh }] : []),
   { name: 'login', path: '/admin/', auth: false },
@@ -44,17 +46,68 @@ const screens = [
     },
   },
   { name: 'settings', path: '/admin/settings' },
+  {
+    name: 'share-text',
+    path: '/admin/',
+    run: async (page) => {
+      await page.getByRole('tab', { name: '文本' }).click();
+      await page.locator('#share-text-body').fill('server {\n    listen 443;\n}');
+      await page.locator('#create-panel-text').getByRole('radio', { name: '代码' }).click();
+    },
+  },
+  {
+    name: 'share-file',
+    path: '/admin/',
+    run: async (page) => {
+      await page.getByRole('tab', { name: '文件' }).click();
+      await page.locator('#create-panel-file input[type=file]').setInputFiles({
+        name: 'notes.txt',
+        mimeType: 'text/plain',
+        buffer: Buffer.from('notes'),
+      });
+    },
+  },
+  {
+    name: 'text-detail',
+    path: '/admin/',
+    run: async (page) => {
+      await page.locator('.row', { hasText: '/p/nginx-conf' }).locator('.main').click();
+      await page.waitForSelector('.preview');
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    name: 'text-editor-phone',
+    path: '/admin/',
+    viewport: phone,
+    run: async (page) => {
+      await page.locator('.row', { hasText: '/p/nginx-conf' }).locator('.main').click();
+      await page.keyboard.press('e');
+      await page.waitForSelector('.editor textarea:not([disabled])');
+    },
+  },
+  { name: 'visitor-text', path: '/p/nginx-conf' },
+  { name: 'visitor-text-phone', path: '/p/nginx-conf', viewport: phone },
+  {
+    name: 'visitor-file',
+    // The seeded file has a generated slug.
+    path: async (request) => {
+      const res = await request.get(`${base}/api/links?kind=file`);
+      return `/p/${(await res.json()).items[0].slug}`;
+    },
+  },
 ];
 
 const browser = await chromium.launch();
 let total = 0;
 for (const theme of ['light', 'dark']) {
   for (const s of screens) {
-    const ctx = await browser.newContext({ colorScheme: theme, locale: 'zh-CN', bypassCSP: true });
+    const ctx = await browser.newContext({ colorScheme: theme, locale: 'zh-CN', bypassCSP: true, viewport: s.viewport });
     await ctx.addInitScript((t) => localStorage.setItem('sani.theme', t), theme);
     if (s.auth !== false) await ctx.request.post(`${base}/api/session`, { data: { password } });
     const page = await ctx.newPage();
-    await page.goto((s.origin ?? base) + s.path, { waitUntil: 'networkidle' });
+    const path = typeof s.path === 'function' ? await s.path(ctx.request) : s.path;
+    await page.goto((s.origin ?? base) + path, { waitUntil: 'networkidle' });
     if (s.run) await s.run(page);
     await page.addScriptTag({ content: axe });
     const result = await page.evaluate(async () => {
@@ -68,6 +121,9 @@ for (const theme of ['light', 'dark']) {
         count: v.nodes.length,
       }));
     });
+    // Not an axe rule, but a page that scrolls sideways fails reflow (WCAG 1.4.10).
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (wide > 0) result.push({ id: 'reflow', impact: 'serious', help: `page is ${wide}px wider than the viewport`, nodes: [], count: 1 });
     total += result.length;
     console.log(`\n[${theme}] ${s.name}: ${result.length ? result.length + ' violation(s)' : 'clean'}`);
     for (const v of result) {

@@ -31,6 +31,28 @@ func TestOverrides(t *testing.T) {
 	}
 }
 
+func TestFilesURL(t *testing.T) {
+	t.Setenv("SANI_BASE_URL", "https://s.example.com")
+	t.Setenv("SANI_FILES_URL", "https://F.example.com/")
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.FilesURL != "https://f.example.com" || c.MaxFileMB != 64 {
+		t.Fatalf("files = %q, %d MB", c.FilesURL, c.MaxFileMB)
+	}
+
+	// Another port of the same host shares its cookies.
+	t.Setenv("SANI_FILES_URL", "https://s.example.com:8443")
+	if _, err := Load(); err == nil || !strings.Contains(err.Error(), "SANI_FILES_URL") {
+		t.Fatalf("same host accepted: %v", err)
+	}
+	t.Setenv("SANI_FILES_URL", "https://f.example.com/raw")
+	if _, err := Load(); err == nil {
+		t.Fatal("a path was accepted")
+	}
+}
+
 func TestInvalidValuesAreReportedTogether(t *testing.T) {
 	t.Setenv("SANI_BASE_URL", "s.example.com/path")
 	t.Setenv("SANI_SLUG_LENGTH", "99")

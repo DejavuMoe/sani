@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -148,6 +149,86 @@ func TestPurgeAndCascade(t *testing.T) {
 	// Clicks for a purged link are dropped without failing the batch.
 	if err := s.ApplyClicks(ctx, b); err != nil {
 		t.Fatalf("ApplyClicks for purged link: %v", err)
+	}
+}
+
+func TestContents(t *testing.T) {
+	ctx := context.Background()
+	s := open(t)
+	text := &Link{Kind: KindText, Slug: "note", Enabled: true, Redirect: 302, CreatedAt: 1, UpdatedAt: 1,
+		Content: &Content{Format: FormatCode, Name: "package main", Size: 13, Lines: 1, Text: "package main\n"}}
+	file := &Link{Kind: KindFile, Slug: "doc", Enabled: true, Redirect: 302, CreatedAt: 2, UpdatedAt: 2,
+		Content: &Content{Name: "report.pdf", Type: "application/pdf", Size: 9, SHA256: []byte{1, 2}, File: "ab12"}}
+	for _, l := range []*Link{text, file, newLink("site", "https://example.com", 3)} {
+		if err := s.CreateLink(ctx, l, true); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got, err := s.GetLink(ctx, text.ID)
+	if err != nil || got.Kind != KindText || got.Content == nil || got.Content.Lines != 1 || got.Content.Text != "" {
+		t.Fatalf("text link = %+v %+v, %v", got, got.Content, err)
+	}
+	if body, err := s.TextBody(ctx, text.ID); err != nil || body != "package main\n" {
+		t.Fatalf("TextBody = %q, %v", body, err)
+	}
+	if _, err := s.TextBody(ctx, file.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("TextBody of a file: %v", err)
+	}
+	if t2, _ := s.Resolve(ctx, "doc"); t2 == nil || t2.Kind != KindFile {
+		t.Fatalf("Resolve(doc) = %+v", t2)
+	}
+
+	body, format := "fmt.Println()\nreturn\n", FormatPlain
+	if _, after, err := s.UpdateLink(ctx, text.ID, Patch{Text: &body, Format: &format}, 5); err != nil ||
+		after.Content.Lines != 2 || after.Content.Name != "fmt.Println()" || after.Content.Format != FormatPlain {
+		t.Fatalf("UpdateLink text = %+v, %v", after.Content, err)
+	}
+
+	kind := KindFile
+	res, _ := s.ListLinks(ctx, ListQuery{Kind: &kind})
+	if res.Total != 1 || res.Links[0].ID != file.ID {
+		t.Fatalf("kind filter = %d links", res.Total)
+	}
+	if res, _ := s.ListLinks(ctx, ListQuery{Search: "report"}); res.Total != 1 {
+		t.Fatalf("search by file name = %d", res.Total)
+	}
+	if all, _ := s.AllLinks(ctx); len(all) != 1 || all[0].Slug != "site" {
+		t.Fatalf("AllLinks = %v", all)
+	}
+
+	// A deleted file stays on disk until its link is purged.
+	s.DeleteLink(ctx, file.ID, 10)
+	if names, _ := s.StoredFiles(ctx); !names["ab12"] {
+		t.Fatalf("StoredFiles before the purge = %v", names)
+	}
+	s.PurgeDeleted(ctx, 11)
+	if names, _ := s.StoredFiles(ctx); len(names) != 0 {
+		t.Fatalf("StoredFiles after the purge = %v", names)
+	}
+}
+
+func TestMigrateFromFirstSchema(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "old.db")
+	db, err := sql.Open("sqlite", dsn(path, true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.Exec(migrations[0] + `; PRAGMA user_version = 1;
+		INSERT INTO links (slug, slug_key, url, created_at, updated_at) VALUES ('old', 'old', 'https://example.com', 1, 1)`); err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+
+	s, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	l, err := s.Resolve(ctx, "old")
+	if err != nil || l.Kind != KindURL || l.URL != "https://example.com" {
+		t.Fatalf("link from the first schema = %+v, %v", l, err)
 	}
 }
 

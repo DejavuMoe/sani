@@ -8,7 +8,7 @@
 - **认证**：除了登录和首次设置相关的接口，都需要认证。脚本使用 API 令牌，放在 `Authorization: Bearer sani_…` 或 `X-Api-Key: sani_…` 请求头里；管理界面使用会话 Cookie。令牌在设置 → API 令牌里创建，拥有完整权限。
 - **跨站请求**：浏览器从其他网站发来的请求会被拒绝，判断依据是浏览器自动附带的 `Sec-Fetch-Site` 和 `Origin` 请求头。脚本和命令行工具不带这些请求头，不受影响。
 - **时间**：RFC 3339 格式的 UTC 时间，比如 `2026-09-28T09:30:00Z`。
-- **大小**：请求体最大 1 MB，导入接口最大 32 MB。
+- **大小**：请求体最大 1 MB。创建和修改链接的请求最大 8 MB，这样即使 JSON 转义了很多字符，1 MB 上限的文本也放得下；导入接口最大 32 MB；上传文件时，上限是[文件大小上限](./configuration#sani-max-file-mb)再加上 1 MB 的表单开销。
 - **缓存**：所有响应都带 `Cache-Control: no-store`。
 - **错误**：出错时返回对应的 HTTP 状态码和下面这个结构。`code` 是稳定的，程序应该根据它判断；`message` 是给人看的英文说明，以后可能调整。全部错误码见[错误码](#errors)。
 
@@ -38,6 +38,9 @@ curl https://s.example.com/api/links \
 | `POST` | `/api/links/{id}/restore` | [恢复刚删除的链接](#restore) |
 | `POST` | `/api/links/{id}/refresh` | [重新获取标题和图标](#refresh) |
 | `GET` | `/api/links/{id}/stats` | [一条链接的统计](#stats) |
+| `POST` | `/api/texts` | [分享文本](#create-text) |
+| `POST` | `/api/files` | [分享文件](#create-file) |
+| `GET` | `/api/links/{id}/text` | [读取分享的文本](#read-text) |
 | `GET` | `/api/slugs/{slug}` | [检查短码是否可用](#slug-check) |
 | `GET` | `/api/overview` | [全部链接的概览](#overview) |
 | `GET` | `/api/favicons/{host}` | [网站图标](#favicons) |
@@ -62,6 +65,8 @@ curl https://s.example.com/api/links \
 ```json
 {
   "id": 12,
+  "kind": "url",
+  "content": null,
   "slug": "gh",
   "shortUrl": "https://s.example.com/gh",
   "url": "https://github.com/DejavuMoe/sani",
@@ -83,9 +88,11 @@ curl https://s.example.com/api/links \
 
 | 字段 | 说明 |
 |---|---|
+| `kind` | `url` 是短链接，`text` 和 `file` 是[分享](#shares)。 |
+| `content` | 文本或文件分享的内容，见[下文](#shares)；短链接为 `null`。 |
 | `slug` | 短码，保留创建时的大小写。查找时不区分大小写。 |
-| `shortUrl` | 完整的短链接，域名的来源见[部署](../guide/deploy#domain)。 |
-| `url` | 规范化之后的目标网址。 |
+| `shortUrl` | 完整的短链接，文本和文件的短码前面多一段 `/p/`。域名的来源见[部署](../guide/deploy#domain)。 |
+| `url` | 规范化之后的目标网址。文本和文件为空字符串。 |
 | `host` | 目标网址的域名，去掉了 `www.`。`mailto:` 这类没有域名的网址为空字符串。 |
 | `title` | 标题，没有时为空字符串。 |
 | `meta` | 标题的来源：`pending` 正在获取，`ok` 从网页获取，`failed` 没有获取到，`manual` 由你设置，以后不会被自动覆盖。 |
@@ -121,7 +128,8 @@ curl https://s.example.com/api/links \
 
 | 参数 | 说明 |
 |---|---|
-| `q` | 按短码、标题和目标网址搜索。也可以直接传完整的短链接。 |
+| `q` | 按短码、标题、目标网址、文件名和文本的第一行搜索。也可以直接传完整的短链接。 |
+| `kind` | 只返回这一[类型](#link-object)的链接：`url`、`text` 或 `file`。 |
 | `sort` | `created`（默认，最近创建）、`clicks`（点击最多）或 `visited`（最近访问）。 |
 | `limit` | 每页数量，1 到 200，默认 50。 |
 | `cursor` | 上一页返回的 `next`。 |
@@ -149,9 +157,10 @@ curl https://s.example.com/api/links \
 - `expiresAt` 或 `maxClicks` 传 `null`，表示清除；
 - `title` 传空字符串，表示重新自动获取标题；
 - 修改 `url` 时，如果原来的标题是自动获取的，会重新获取；
-- 修改 `slug` 后，旧短码立即失效。
+- 修改 `slug` 后，旧短码立即失效；
+- 对于文本，`text` 和 `format` 替换它的内容和格式。
 
-修改在下一次访问时就会生效。返回修改后的[链接对象](#link-object)。
+文本和文件没有 `url` 和 `redirect`；`text` 和 `format` 只属于文本。把它们发给别的类型的链接，会得到 `kind_mismatch`。文件的内容不能替换，需要的话重新分享一个。修改在下一次访问时就会生效。返回修改后的[链接对象](#link-object)。
 
 ### 删除链接 {#delete}
 
@@ -183,7 +192,7 @@ curl https://s.example.com/api/links \
 
 `POST /api/links/{id}/refresh`
 
-重新获取目标网页的标题和网站图标，等获取完成后返回[链接对象](#link-object)，可能需要几秒钟。你自己设置的标题会保留。
+重新获取目标网页的标题和网站图标，等获取完成后返回[链接对象](#link-object)，可能需要几秒钟。你自己设置的标题会保留。文本和文件没有网页可以获取，会得到 `kind_mismatch`。
 
 ### 统计 {#stats}
 
@@ -217,6 +226,76 @@ curl https://s.example.com/api/links \
 ```
 
 `reason` 可能是 `slug_taken`、`slug_reserved`、`slug_invalid` 或 `slug_too_long`，可用时没有这个字段。
+
+## 文本和文件 {#shares}
+
+分享是一种不跳转、而是展示内容的链接：访问者在 `/p/{slug}` 打开它，原始内容从[文件域名](./configuration#sani-files-url)提供。分享和短链接共用同一套短码，`gh` 不能既是短链接又是分享。它们同样有 `title`、`enabled`、`expiresAt` 和 `maxClicks`，同样有[统计](#stats)；列表、删除、恢复和批量接口对它们一视同仁。分享没有列表可以翻，短码就是唯一的保护，所以自动生成的短码至少 10 位。
+
+分享的 `content`：
+
+```json
+{
+  "format": "code",
+  "preview": "server {",
+  "lines": 11,
+  "size": 286,
+  "rawUrl": "https://f.example.com/nginx-conf"
+}
+```
+
+```json
+{
+  "name": "设计评审 v3.pdf",
+  "type": "application/pdf",
+  "sha256": "67b21479e9f0cda26f49fe72be530b79adb35d2040cb207f61f0cc7bd2847f6e",
+  "size": 597,
+  "rawUrl": "https://f.example.com/tn5ya24hh6/%E8%AE%BE%E8%AE%A1%E8%AF%84%E5%AE%A1%20v3.pdf"
+}
+```
+
+| 字段 | 说明 |
+|---|---|
+| `format` | 文本：`plain` 按普通文字排版，`code` 等宽显示并带行号。 |
+| `preview` | 文本：第一个非空行，最多 120 个字符。 |
+| `lines` | 文本：行数。 |
+| `name`、`type` | 文件：文件名和媒体类型。类型按扩展名判断，没有扩展名时看文件开头的内容。 |
+| `sha256` | 文件：内容的 SHA-256，十六进制。 |
+| `size` | 大小，单位是字节。 |
+| `rawUrl` | 文件域名上的原始内容，没有文件域名时为 `null`。打开它计为一次访问。 |
+
+### 分享文本 {#create-text}
+
+`POST /api/texts`
+
+```json
+{ "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
+```
+
+`text` 必填，最多 1 MB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
+
+### 分享文件 {#create-file}
+
+`POST /api/files`
+
+请求体是 `multipart/form-data`：一个 `file` 部分，以及可选的 `slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 字段，值是文本，含义与[创建链接](#create)相同：
+
+```sh
+curl https://s.example.com/api/files \
+  -H "Authorization: Bearer $SANI_TOKEN" \
+  -F file=@report.pdf -F maxClicks=10
+```
+
+- 文件不能为空，大小上限由 [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb) 决定。文件边接收边写入磁盘，不会整个放进内存。
+- 保留文件名，但去掉路径、控制字符和看不见的文字方向标记。
+- 分享文件需要文件域名，没有设置时返回 `409 files_disabled`。
+
+成功时返回 `201` 和新建的[链接对象](#link-object)。
+
+### 读取分享的文本 {#read-text}
+
+`GET /api/links/{id}/text`
+
+返回 `{"text": "…"}`，即完整的文本内容，列表里不包含它。读取不计入访问。不是文本的链接返回 `404`。
 
 ## 概览 {#overview}
 
@@ -274,11 +353,14 @@ curl https://s.example.com/api/import \
   "fetchMeta": true,
   "forwardQuery": true,
   "passwordFromEnv": false,
-  "timezone": "Asia/Shanghai"
+  "timezone": "Asia/Shanghai",
+  "filesUrl": "https://f.example.com",
+  "maxFileSize": 67108864,
+  "maxTextSize": 1048576
 }
 ```
 
-`baseUrlSource` 表示短链接域名的来源：`env` 来自 `SANI_BASE_URL`，`setting` 来自设置页，`request` 来自当前请求的地址。
+`baseUrlSource` 表示短链接域名的来源：`env` 来自 `SANI_BASE_URL`，`setting` 来自设置页，`request` 来自当前请求的地址。`filesUrl` 是[文件域名](./configuration#sani-files-url)，没有设置时为 `null`；`maxFileSize` 和 `maxTextSize` 是文件和文本的大小上限，单位是字节。
 
 `PATCH /api/config`
 
@@ -288,7 +370,7 @@ curl https://s.example.com/api/import \
 { "baseUrl": "https://s.example.com" }
 ```
 
-传 `null` 或空字符串表示清除。设置了 `SANI_BASE_URL` 时返回 `409`。成功时返回修改后的设置。
+传 `null` 或空字符串表示清除。短链接域名不能和文件域名相同。设置了 `SANI_BASE_URL` 时返回 `409`。成功时返回修改后的设置。
 
 ## API 令牌 {#tokens}
 
@@ -348,6 +430,20 @@ curl https://s.example.com/api/import \
 - 临时跳转（302、307）带 `Cache-Control: private, max-age=0`，每次访问都会经过 Sani；永久跳转（301、308）带 `Cache-Control: public, max-age=86400`，浏览器最多缓存一天。
 - 短码不存在时返回 `404`，链接停用、过期或访问次数用完时返回 `410`，都是按访问者语言显示的简单 HTML 页面。
 - 只接受 `GET` 和 `HEAD`，其他方法返回 `405`。
+- 文本和文件在这个路径下返回 `404`，它们在 `/p/` 下。
+
+`GET /p/{slug}`
+
+- 显示文本（经过转义，按访问者语言显示界面）的页面，或者介绍文件、带下载按钮的页面。`404` 和 `410` 与跳转相同。
+- 打开文本页面计为一次访问；文件页面不计，下载才计。
+- 页面里唯一的脚本是复制按钮，内容安全策略按哈希放行它。
+
+文件域名上：
+
+- `GET /{slug}` 把文本作为 `text/plain` 返回，把文件作为附件返回；`GET /{slug}/{name}` 一律作为下载，文本的文件名是 `{slug}.txt`。文件支持 `Range` 请求，`ETag` 是它的 SHA-256。
+- 所有响应都在沙箱里，不能被其他网站嵌入或放进框架，也不会被缓存和收录。`robots.txt` 拒绝所有爬虫，其他路径一律 `404`。
+- 每次获取都计为一次访问，`curl` 和 `wget` 也算；续传、爬虫、链接预览和 `HEAD` 请求不算。达到访问上限的链接返回 `410`。
+- 已经有 32 个下载在进行时，新的下载返回 `503` 和 `Retry-After`，不计入访问。
 
 `GET /healthz`
 
@@ -357,7 +453,7 @@ curl https://s.example.com/api/import \
 
 | 错误码 | 状态码 | 含义 |
 |---|---|---|
-| `bad_json` | 400 | 请求体不是合法的 JSON 对象，或者超过 1 MB |
+| `bad_json` | 400 | 请求体不是合法的 JSON 对象 |
 | `cursor_invalid` | 400 | 分页游标无效 |
 | `url_required` | 400 | 缺少目标网址 |
 | `url_invalid` | 400 | 目标网址无效 |
@@ -371,6 +467,11 @@ curl https://s.example.com/api/import \
 | `expires_past` | 400 | `expiresAt` 早于当前时间 |
 | `max_clicks_invalid` | 400 | `maxClicks` 不是 0 到 10¹² 之间的整数 |
 | `redirect_invalid` | 400 | `redirect` 不是 301、302、307 或 308 |
+| `text_required` | 400 | 缺少文本，或者文本只有空白 |
+| `format_invalid` | 400 | `format` 不是 `plain` 或 `code` |
+| `kind_mismatch` | 400 | 字段不适用于这种链接，比如给文本传 `url`，或者对分享重新获取标题 |
+| `file_required` | 400 | 上传里没有 `file` 部分，或者文件是空的 |
+| `upload_invalid` | 400 | 上传不是格式正确的 `multipart/form-data`、包含多个文件，或者某个字段超过 4 KB |
 | `bulk_invalid` | 400 | 批量修改的 `action` 不认识，或者 `ids` 不是 1 到 500 条 |
 | `base_url_invalid` | 400 | 域名格式不对，应该形如 `https://s.example.com` |
 | `name_invalid` | 400 | 令牌名称为空，或者超过 60 个字符 |
@@ -388,6 +489,9 @@ curl https://s.example.com/api/import \
 | `needs_setup` | 409 | 还没有设置密码，无法登录 |
 | `password_env` | 409 | 密码由 `SANI_PASSWORD` 管理，不能通过 API 修改 |
 | `base_url_env` | 409 | 短链接域名由 `SANI_BASE_URL` 固定，不能通过 API 修改 |
-| `too_large` | 413 | 导入的文件超过 32 MB |
+| `files_disabled` | 409 | 没有设置文件域名，不能分享文件 |
+| `too_large` | 413 | 请求体超过[上限](#conventions)，比如导入的文件超过 32 MB |
+| `text_too_large` | 413 | 文本超过 1 MB |
+| `file_too_large` | 413 | 文件超过 `SANI_MAX_FILE_MB` 设置的上限 |
 | `rate_limited` | 429 | 失败次数太多，按 `Retry-After` 等待后再试 |
 | `internal` | 500 | 服务端出错，详情见服务器日志 |

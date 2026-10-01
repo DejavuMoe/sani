@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import AppHeader from '../components/AppHeader.svelte';
-  import Composer from '../components/Composer.svelte';
+  import Creator from '../components/Creator.svelte';
   import LinkList from '../components/LinkList.svelte';
   import Summary from '../components/Summary.svelte';
   import { copyText } from '../lib/clipboard';
@@ -12,7 +12,7 @@
   import { ui } from '../lib/ui.svelte';
   import { extractURL, stripScheme } from '../lib/url';
 
-  let composer = $state<Composer>();
+  let composer = $state<Creator>();
   let list = $state<LinkList>();
 
   onMount(() => {
@@ -151,23 +151,42 @@
     }
   }
 
-  // Paste a link anywhere on the page to start shortening it.
+  // Paste anywhere on the page: a link to shorten it, a file or other text
+  // to share it.
   function onpaste(e: ClipboardEvent) {
     if (isTyping(e.target) || document.querySelector('dialog[open]')) return;
-    const url = extractURL(e.clipboardData?.getData('text/plain') ?? '');
-    if (!url) return;
-    e.preventDefault();
-    composer?.fill(url, 'paste');
+    const file = e.clipboardData?.files[0];
+    if (file) {
+      e.preventDefault();
+      composer?.fillFile(file);
+      return;
+    }
+    const text = e.clipboardData?.getData('text/plain') ?? '';
+    const url = extractURL(text);
+    // A URL inside a longer text is still a text to share.
+    if (url && (url === text.trim() || !text.includes('\n'))) {
+      e.preventDefault();
+      composer?.fill(url, 'paste');
+    } else if (text.trim()) {
+      e.preventDefault();
+      composer?.fillText(text);
+    }
   }
 
   function ondragover(e: DragEvent) {
     const types = e.dataTransfer?.types ?? [];
-    if (types.includes('text/uri-list') || types.includes('text/plain')) e.preventDefault();
+    if (types.includes('Files') || types.includes('text/uri-list') || types.includes('text/plain')) e.preventDefault();
   }
 
   function ondrop(e: DragEvent) {
     if (isTyping(e.target)) return;
     const data = e.dataTransfer;
+    const file = data?.files[0];
+    if (file) {
+      e.preventDefault();
+      composer?.fillFile(file);
+      return;
+    }
     const url = extractURL(data?.getData('text/uri-list').split('\n')[0] || data?.getData('text/plain') || '');
     if (!url) return;
     e.preventDefault();
@@ -181,7 +200,7 @@
 <AppHeader />
 <main class="page">
   <h1 class="sr-only">Sani</h1>
-  <Composer bind:this={composer} />
+  <Creator bind:this={composer} />
   <Summary />
   <LinkList bind:this={list} />
 </main>

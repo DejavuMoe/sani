@@ -33,8 +33,10 @@ build: web binary
 dist:
 	VERSION=$(VERSION) $(RUN) bash scripts/dist.sh
 
+# Shared files are served on http://localhost:8080: the same server, but
+# another origin than the 127.0.0.1 the admin app runs on.
 dev-backend:
-	SANI_LISTEN=127.0.0.1:8080 SANI_DATA_DIR=./data $(RUN) go run ./cmd/sani
+	SANI_LISTEN=127.0.0.1:8080 SANI_DATA_DIR=./data SANI_FILES_URL=http://localhost:8080 $(RUN) go run ./cmd/sani
 
 # Vite on 127.0.0.1:5173/admin/, proxying /api to dev-backend.
 dev-frontend:
@@ -44,7 +46,7 @@ dev-frontend:
 demo: build
 	rm -rf ./data/demo
 	$(RUN) go run ./scripts/seed -data ./data/demo -password sani-demo
-	SANI_LISTEN=127.0.0.1:8080 SANI_DATA_DIR=./data/demo ./bin/sani
+	SANI_LISTEN=127.0.0.1:8080 SANI_DATA_DIR=./data/demo SANI_FILES_URL=http://localhost:8080 ./bin/sani
 
 e2e: build
 	$(RUN) pnpm --dir web e2e

@@ -5,6 +5,7 @@ package server
 import (
 	"context"
 	"errors"
+	"html/template"
 	"io"
 	"io/fs"
 	"log/slog"
@@ -34,6 +35,12 @@ type Options struct {
 	CacheSize       int
 	Version         string
 
+	// FilesURL is the origin that serves shared files and raw text; empty
+	// turns file sharing off. FilesDir holds the uploaded files.
+	FilesURL     string
+	FilesDir     string
+	MaxFileBytes int64
+
 	// SetupCode must accompany the first password, so a fresh instance on
 	// the internet cannot be claimed by whoever finds it first. It is
 	// printed to the log at startup.
@@ -58,21 +65,33 @@ type Server struct {
 	cancel   context.CancelFunc
 	jobs     sync.WaitGroup
 	jobSlots chan struct{}
+
+	filesHost string        // host[:port] of FilesURL
+	downloads chan struct{} // bounds concurrent file downloads
+	share     *template.Template
 }
 
 func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetcher, ui fs.FS, log *slog.Logger) (*Server, error) {
 	if opt.SlugLength <= 0 {
 		opt.SlugLength = 5
 	}
+	if opt.MaxFileBytes <= 0 {
+		opt.MaxFileBytes = 64 << 20
+	}
 	s := &Server{
-		opt:      opt,
-		store:    st,
-		clicks:   rec,
-		fetcher:  fetcher,
-		log:      log,
-		logins:   auth.NewLimiter(8, 15*time.Minute),
-		pages:    newPages(),
-		jobSlots: make(chan struct{}, 3),
+		opt:       opt,
+		store:     st,
+		clicks:    rec,
+		fetcher:   fetcher,
+		log:       log,
+		logins:    auth.NewLimiter(8, 15*time.Minute),
+		pages:     newPages(),
+		jobSlots:  make(chan struct{}, 3),
+		downloads: make(chan struct{}, maxDownloads),
+		share:     template.Must(template.New("share").Parse(sharePage)),
+	}
+	if opt.FilesURL != "" {
+		_, s.filesHost, _ = strings.Cut(opt.FilesURL, "://")
 	}
 	s.ctx, s.cancel = context.WithCancel(context.Background())
 	s.cache = cache.New(opt.CacheSize, s.loadTarget)
@@ -100,6 +119,7 @@ func (s *Server) loadTarget(ctx context.Context, key string) (*cache.Entry, erro
 	}
 	e := &cache.Entry{
 		ID:        t.ID,
+		Kind:      uint8(t.Kind),
 		Location:  links.Location(t.URL),
 		Code:      t.Redirect,
 		Enabled:   t.Enabled,
@@ -111,8 +131,14 @@ func (s *Server) loadTarget(ctx context.Context, key string) (*cache.Entry, erro
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if s.filesHost != "" && s.onFilesOrigin(r) {
+		s.serveFiles(w, r)
+		return
+	}
 	p := r.URL.Path
 	switch {
+	case len(p) > 3 && strings.HasPrefix(p, "/p/"):
+		s.serveShare(w, r)
 	case p == "/":
 		s.serveRoot(w, r)
 	case strings.HasPrefix(p, "/api/"):
@@ -126,7 +152,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case p == "/robots.txt":
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.Header().Set("Cache-Control", "public, max-age=86400")
-		io.WriteString(w, "User-agent: *\nDisallow: /admin/\nDisallow: /api/\n")
+		io.WriteString(w, "User-agent: *\nDisallow: /admin/\nDisallow: /api/\nDisallow: /p/\n")
 	case p == "/favicon.ico" || p == "/favicon.svg" || p == "/apple-touch-icon.png":
 		s.web.serveRootFile(w, r, strings.TrimPrefix(p, "/"))
 	default:
@@ -177,6 +203,9 @@ func (s *Server) RunMaintenance(ctx context.Context) {
 			if err := s.store.PurgeSessions(ctx, now.UnixMilli()); err != nil {
 				s.log.Error("purge sessions", "err", err)
 			}
+		}
+		if i%10 == 0 {
+			s.sweepFiles(ctx, now)
 		}
 	}
 }

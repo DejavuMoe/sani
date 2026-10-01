@@ -19,6 +19,7 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 - **Quick to use.** Paste a link anywhere on the page, or drop one in. Custom slugs are checked as you type, the whole dashboard works from the keyboard, and deleting offers undo instead of a confirmation dialog.
 - **Simple statistics.** Total and daily clicks, top referrers, last visit. Clicks from crawlers, link previews, prefetches and your own dashboard are not counted.
 - **Per-link controls.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. You can edit the destination and the change applies immediately.
+- **Texts and files, too.** Share a note, a config snippet (monospace, with line numbers) or a file up to 64 MB at `/p/…`, with the same expiry, visit limit and statistics. The raw bytes come from a domain of their own.
 - **Works with what you use.** A bookmarklet, the Android share sheet (install it as an app), API tokens for scripts and Shortcuts, and import from Shlink, Sink, YOURLS or CSV.
 - **Unicode slugs.** `s.example.com/简历` works. Slugs match case-insensitively.
 - **Chinese and English**, with light and dark themes, on desktop and mobile.
@@ -60,7 +61,7 @@ Everything is set through environment variables. See [.env.example](.env.example
 | Variable | Default | What it does |
 |---|---|---|
 | `SANI_LISTEN` | `:8080` | Address to listen on. |
-| `SANI_DATA_DIR` | `data` | Directory for `sani.db`. |
+| `SANI_DATA_DIR` | `data` | Directory for `sani.db` and shared files (`files/`). |
 | `SANI_BASE_URL` | — | Public origin of your short links, e.g. `https://s.example.com`. Without it, short links use the address you're visiting; you can also set it in Settings. |
 | `SANI_PASSWORD` | — | Fixed admin password (8+ characters). Without it, you choose one on first visit. |
 | `SANI_SETUP_CODE` | random | The code the first visit asks for. By default a new one is generated at each start, until a password exists, and printed to the log. |
@@ -70,10 +71,12 @@ Everything is set through environment variables. See [.env.example](.env.example
 | `SANI_FETCH_META` | `true` | Fetch the page title and icon for new links. Private and loopback addresses are never fetched. |
 | `SANI_FORWARD_QUERY` | `true` | Append the visitor's query string to the destination (`/gh?utm_source=x`). |
 | `SANI_CACHE_SIZE` | `100000` | Redirect targets kept in memory. |
+| `SANI_FILES_URL` | — | A second domain, such as `https://f.example.com`, pointed at the same Sani, that serves shared files and raw text. Sharing files needs it. |
+| `SANI_MAX_FILE_MB` | `64` | Largest file you can share, in MB (1–4096). |
 | `SANI_LOG_LEVEL` / `SANI_LOG_FORMAT` | `info` / `text` | `debug`…`error`; `text` or `json`. |
 | `TZ` | system | Time zone the daily statistics use. |
 
-The admin app lives at `/admin/` and the API at `/api/`; every other path is a short link. The slugs `admin`, `api`, `rest`, `healthz`, `robots.txt` and the favicon names are reserved.
+The admin app lives at `/admin/`, the API at `/api/` and shared texts and files at `/p/`; every other path is a short link. The slugs `admin`, `api`, `p`, `rest`, `healthz`, `robots.txt` and the favicon names are reserved.
 
 ## Everyday use
 
@@ -93,6 +96,8 @@ curl -X POST https://s.example.com/api/links \
 ```
 
 The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
+
+**Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. Generated slugs for shares are 10 characters long, since nothing else keeps them private.
 
 **Import and export.** Settings → Data exports every link as JSON or CSV. Import accepts Sani's own export, Shlink's JSON (`shortCode`, `longUrl`, `visitsSummary`, …), Sink's export, YOURLS or Kutt CSVs, and any CSV with a `url` column. Slugs that already exist are skipped and listed.
 
@@ -140,7 +145,7 @@ Security choices worth knowing (the [security page](docs/en/internals/security.m
 - API tokens and session secrets are stored as SHA-256 hashes, and the password as argon2id.
 - A fresh instance only accepts its first password together with the setup code from its log, and sign-in and setup attempts are rate-limited per client.
 - The admin app runs under a strict CSP with no inline scripts except its hashed theme bootstrap.
-- Fetched favicons are served inert.
+- Fetched favicons are served inert, and so is everything on the files domain: shared files and raw text are sandboxed downloads on an origin that holds no session.
 - Link destinations can't be `javascript:`, `data:` or `file:` URLs, and the title fetcher refuses private, loopback and link-local addresses, including after DNS resolution.
 - Referrers come from a header anyone can forge, so each link keeps at most 200 referrer hosts and counts the rest as "Other sites".
 
@@ -161,13 +166,13 @@ make load             # the benchmark above
 
 ## Data and backups
 
-Everything lives in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL mode. `sani backup FILE` writes a consistent copy while Sani keeps running; with `-` as the file name the copy goes to standard output, which is how it works with Docker, since the image has no shell:
+Links and texts live in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL mode; shared files are in `files/` next to it, so back that directory up as well. `sani backup FILE` writes a consistent copy while Sani keeps running; with `-` as the file name the copy goes to standard output, which is how it works with Docker, since the image has no shell:
 
 ```sh
 docker exec sani /sani backup - > sani-backup.db
 ```
 
-To restore, stop Sani and put the copy in place of `sani.db`; [Operations](docs/en/guide/operations.md) has the steps, a cron example and upgrades. For a portable list of your links, use Settings → Data → Export.
+To restore, stop Sani and put the copy in place of `sani.db`; [Operations](docs/en/guide/operations.md) has the steps, a cron example and upgrades. For a portable list of your links, use Settings → Data → Export (it leaves texts and files out).
 
 ## License
 

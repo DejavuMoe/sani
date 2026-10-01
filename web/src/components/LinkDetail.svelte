@@ -8,9 +8,11 @@
   import { links } from '../lib/links.svelte';
   import { download, fileName, qrPNG, qrSVG } from '../lib/qr';
   import { toasts } from '../lib/toast.svelte';
+  import { formatSize, mediaType } from '../lib/size';
   import { stripScheme } from '../lib/url';
   import BarChart from './BarChart.svelte';
   import Button from './Button.svelte';
+  import Icon from './Icon.svelte';
   import LinkEditor from './LinkEditor.svelte';
   import QRCode from './QRCode.svelte';
   import Segmented from './Segmented.svelte';
@@ -48,6 +50,34 @@
   }
 
   const today = $derived(stats ? stats.days[stats.days.length - 1].count : (link.spark?.[13] ?? 0));
+  const visitsLabel = $derived(
+    link.kind === 'text' ? t('detail.views') : link.kind === 'file' ? t('detail.downloads') : t('detail.clicks'),
+  );
+
+  // A text's body isn't part of the link; fetch it, and again after an edit.
+  let body = $state<string | null>(null);
+  $effect(() => {
+    if (link.kind !== 'text') return;
+    const linkId = id;
+    void link.updatedAt;
+    untrack(async () => {
+      try {
+        const r = await api.linkText(linkId);
+        if (linkId === id) body = r.text;
+      } catch {
+        /* the list notices a deleted link on its own */
+      }
+    });
+  });
+
+  async function copyBody() {
+    if (body !== null && (await copyText(body))) toasts.success(t('share.textCopied'));
+  }
+
+  async function copyRaw() {
+    const raw = link.content?.rawUrl;
+    if (raw && (await copyText(raw))) toasts.success(t('act.copied'), { detail: stripScheme(raw) });
+  }
 
   async function copy() {
     if (await copyText(link.shortUrl)) toasts.success(t('act.copied'), { detail: stripScheme(link.shortUrl) });
@@ -92,15 +122,42 @@
             </Button>
           </div>
         </div>
-        <p class="dest">
-          <span class="dest-k">{t('detail.destination')}</span>
-          <a href={link.url} target="_blank" rel="noopener noreferrer">{link.url}</a>
-        </p>
+        {#if link.kind === 'text' && link.content}
+          {@const c = link.content}
+          <section class="content" aria-label={t('detail.text')}>
+            <div class="content-head">
+              <span class="content-meta">
+                {c.format === 'code' ? t('format.code') : t('format.plain')} · {t('share.lines', { n: c.lines ?? 0 })} · {formatSize(c.size)}
+              </span>
+              <Button size="sm" variant="ghost" icon="copy" disabled={body === null} onclick={copyBody}>{t('share.copyText')}</Button>
+            </div>
+            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+            <pre class={['preview', c.format === 'code' && 'code']} tabindex="0">{body ?? t('share.loading')}</pre>
+          </section>
+        {:else if link.kind === 'file' && link.content}
+          {@const c = link.content}
+          <section class="content file" aria-label={t('detail.file')}>
+            <span class="ficon"><Icon name="file" size={18} /></span>
+            <span class="finfo">
+              <span class="fname">{c.name}</span>
+              <span class="fmeta">{mediaType(c.type)} · {formatSize(c.size)}</span>
+              <span class="sum" title={c.sha256}>SHA-256 {c.sha256?.slice(0, 16)}…</span>
+            </span>
+            {#if c.rawUrl}
+              <Button size="sm" variant="ghost" icon="link" onclick={copyRaw}>{t('share.copyRaw')}</Button>
+            {/if}
+          </section>
+        {:else}
+          <p class="dest">
+            <span class="dest-k">{t('detail.destination')}</span>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">{link.url}</a>
+          </p>
+        {/if}
 
         <div class="stats-head">
           <dl class="figs">
             <div>
-              <dt>{t('detail.clicks')}</dt>
+              <dt>{visitsLabel}</dt>
               <dd>{formatNumber(link.clicks)}</dd>
             </div>
             <div>
@@ -173,10 +230,12 @@
                 : t('composer.noLimit')}
             </dd>
           </div>
-          <div>
-            <dt>{t('detail.redirect')}</dt>
-            <dd>{redirectLabel} <span class="code">{link.redirect}</span></dd>
-          </div>
+          {#if link.kind === 'url'}
+            <div>
+              <dt>{t('detail.redirect')}</dt>
+              <dd>{redirectLabel} <span class="code">{link.redirect}</span></dd>
+            </div>
+          {/if}
         </dl>
       </aside>
     </div>
@@ -263,6 +322,93 @@
   .dest a:hover {
     color: var(--text);
     text-decoration-color: currentColor;
+  }
+
+  .content {
+    margin-top: 14px;
+  }
+
+  .content-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .content-meta {
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+
+  .preview {
+    max-height: 280px;
+    margin: 0;
+    padding: 12px 14px;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .preview.code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    white-space: pre;
+    overflow-wrap: normal;
+    tab-size: 4;
+  }
+
+  .content.file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .ficon {
+    display: grid;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text-2);
+  }
+
+  .finfo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .fname {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fmeta {
+    color: var(--text-2);
+    font-size: 12.5px;
+  }
+
+  .sum {
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
   }
 
   .stats-head {
@@ -452,7 +598,7 @@
 
   @media (max-width: 760px) {
     .grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 22px;
     }
 

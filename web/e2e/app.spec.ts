@@ -74,13 +74,13 @@ test('a pasted URL becomes a short link on the clipboard', async () => {
 test('custom slugs are checked while typing and conflicts are explained', async () => {
   await page.getByLabel('Long URL').fill('https://github.com/sveltejs/svelte');
   await page.locator('#composer-slug').fill('svelte');
-  await expect(page.locator('.options')).toContainText('Available');
+  await expect(page.locator('#create-panel-url .options')).toContainText('Available');
   await page.keyboard.press('Enter');
   await expect(page.locator('.row', { hasText: '/svelte' })).toBeVisible();
 
   await page.getByLabel('Long URL').fill('https://svelte.dev');
   await page.locator('#composer-slug').fill('SVELTE');
-  await expect(page.locator('.options')).toContainText('Taken');
+  await expect(page.locator('#create-panel-url .options')).toContainText('Taken');
   await page.getByRole('button', { name: /Shorten/ }).click();
   await expect(page.locator('#composer-error')).toContainText('taken');
   await page.locator('#composer-slug').fill('');
@@ -176,6 +176,84 @@ test('several links at once: turn off, turn on, delete with undo', async () => {
   await expect(bar).toContainText('1 selected');
   await page.keyboard.press('Escape');
   await expect(bar).toHaveCount(0);
+});
+
+const port = Number(process.env.SANI_E2E_PORT ?? 18765);
+const filesOrigin = `http://localhost:${port}`;
+
+test('a text is shared at /p/ and served raw from the files origin', async () => {
+  const text = 'func main() {\n\tprintln("<hi>")\n}\n';
+  await page.getByRole('tab', { name: 'Text' }).click();
+  const body = page.getByLabel('Text to share');
+  await body.fill(text);
+  await page.locator('#create-panel-text').getByRole('radio', { name: 'Code' }).click();
+  await body.press('Control+Enter');
+  await expect(page.locator('.toast').last()).toContainText('Copied');
+
+  const short = await clipboard();
+  expect(short).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/p\/[a-z0-9]{10}$/);
+  const slug = short.split('/').pop()!;
+  const row = page.locator('.row', { hasText: `/p/${slug}` });
+  await expect(row).toContainText('func main() {');
+  await expect(row).toContainText('Code · 3 lines');
+
+  const visitor = await page.context().newPage();
+  await visitor.goto(short);
+  await visitor.bringToFront();
+  expect(await visitor.locator('#text').evaluate((el) => el.textContent)).toBe(text);
+  // The label turns into "Copied" once the write has finished.
+  const copy = visitor.locator('[data-copy]');
+  await expect(copy).toHaveAccessibleName('Copy');
+  await copy.click();
+  await expect(copy).toHaveText('Copied');
+  expect(await visitor.evaluate(() => navigator.clipboard.readText())).toBe(text);
+  const raw = await visitor.request.get(`${filesOrigin}/${slug}`);
+  expect(await raw.text()).toBe(text);
+  expect(raw.headers()['content-security-policy']).toContain('sandbox');
+  await visitor.close();
+  await page.bringToFront();
+
+  // The owner reads it in the details without using up a view.
+  await row.locator('.main').click();
+  await expect(row.locator('.preview')).toHaveText(text.trimEnd(), { useInnerText: true });
+  await expect(row.locator('.figs')).toContainText('Views');
+  await page.keyboard.press('Escape');
+});
+
+test('a file is uploaded and downloaded from the files origin', async () => {
+  await page.getByRole('tab', { name: 'File' }).click();
+  const panel = page.locator('#create-panel-file');
+  await panel.locator('input[type=file]').setInputFiles({
+    name: '会议纪要.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello from a file\n'),
+  });
+  await expect(panel).toContainText('会议纪要.txt');
+  await panel.getByRole('button', { name: 'Share' }).click();
+  await expect(page.locator('.toast').last()).toContainText(/Copied|Created/);
+
+  const row = page.locator('.row', { hasText: '会议纪要.txt' });
+  await expect(row).toContainText('/p/');
+  const slug = (await row.locator('.slug').textContent())!.trim().replace(/^\/p\//, '');
+
+  const visitor = await page.context().newPage();
+  await visitor.goto(`/p/${slug}`);
+  const download = visitor.getByRole('link', { name: 'Download file' });
+  await expect(download).toHaveAttribute('href', `${filesOrigin}/${slug}/${encodeURIComponent('会议纪要.txt')}`);
+  const res = await visitor.request.get((await download.getAttribute('href'))!);
+  expect(await res.text()).toBe('hello from a file\n');
+  expect(res.headers()['content-disposition']).toContain('attachment');
+  await visitor.close();
+  await page.bringToFront();
+
+  // The type filter shows just the files.
+  await page.getByRole('button', { name: 'Filter by type' }).click();
+  await page.getByRole('menuitemradio', { name: 'Files' }).click();
+  await expect(page.locator('.row')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Filter by type' }).click();
+  await page.getByRole('menuitemradio', { name: 'All types' }).click();
+  await expect(page.locator('.row')).toHaveCount(4);
+  await page.getByRole('tab', { name: 'Link' }).click();
 });
 
 test('an API token can create links and be revoked', async () => {

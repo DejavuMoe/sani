@@ -12,6 +12,7 @@ services:
       TZ: Asia/Shanghai # days in the stats follow this zone
       SANI_BASE_URL: https://s.example.com # the domain your short links use
       SANI_TRUST_PROXY: "true" # the proxy sets X-Forwarded-* headers
+      # SANI_FILES_URL: https://f.example.com # a second domain for shared files, also served by the proxy
       # SANI_PASSWORD: change-me # optional; otherwise pick one on first visit with the setup code from `docker logs sani`
       # SANI_ROOT_REDIRECT: https://example.com # where the bare domain goes
     volumes:

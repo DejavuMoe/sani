@@ -8,6 +8,7 @@
 |---|---|---|
 | Redirects and statistics | <span class="sn-status done">Done</span> | In-memory cache, click aggregation, crawler and preview filtering, expiry, visit limits |
 | Admin app | <span class="sn-status done">Done</span> | English and Chinese, light and dark, keyboard control, bulk actions, QR codes, bookmarklet, phone share menu |
+| Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own; in the next release |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
 | Import and export | <span class="sn-status done">Done</span> | Sani, Shlink, Sink and all kinds of CSV |
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |
@@ -42,6 +43,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 Under consideration, not decided:
 
 - **Tags.** Group links once there are many, if there’s a way to do it without adding complexity.
+- **Markdown.** Show shared texts written in Markdown as formatted text; for now they’re plain text or code.
 
 ## Not planned {#non-goals}
 
@@ -51,4 +53,5 @@ Sani is meant to be a simple link shortener for one person. These would turn it 
 - visitor tracking: location, device, browser, UTM breakdowns;
 - routing visitors to different destinations by device, region or percentage;
 - interstitial pages and ads before the redirect;
+- uploads from visitors, and end-to-end encryption for shares;
 - depending on external services such as PostgreSQL or Redis.

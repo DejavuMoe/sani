@@ -4,7 +4,7 @@
 
 ## Export {#export}
 
-Settings → Data → “Export all links” gives you a JSON or CSV file. The API does the same: [`GET /api/export`](../reference/api#export), with `?format=csv` for CSV.
+Settings → Data → “Export all links” gives you a JSON or CSV file. The API does the same: [`GET /api/export`](../reference/api#export), with `?format=csv` for CSV. Exports hold short links only, not shared texts and files; a [backup](./operations#backup) keeps those.
 
 The JSON looks like this; fields without a value are left out:
 

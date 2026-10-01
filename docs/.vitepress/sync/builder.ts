@@ -9,6 +9,7 @@ export interface BuilderInput {
   tz: string; // "Asia/Shanghai"
   password: string; // "" keeps the first-run setup code
   rootRedirect: string; // "" keeps the admin app on "/"
+  filesDomain?: string; // "f.example.com"; empty leaves file sharing off
 }
 
 export interface Built {
@@ -17,8 +18,9 @@ export interface Built {
   filled: number[];
 }
 
-/** The domain the example files use. */
+/** The domains the example files use. */
 export const EXAMPLE_DOMAIN = 's.example.com';
+export const EXAMPLE_FILES_DOMAIN = 'f.example.com';
 
 /** Returned by a rule in place of a line it leaves as it is. */
 const KEEP = Symbol('keep');
@@ -60,6 +62,7 @@ export function buildCompose(src: string, o: BuilderInput): Built {
         (m) => [o.password ? `${m[1]}${m[2]}"${o.password}" # fixed; no setup code needed` : KEEP],
       ],
       [/^(\s*)# (SANI_ROOT_REDIRECT: )\S+( #.*)$/, (m) => [o.rootRedirect ? m[1] + m[2] + o.rootRedirect + m[3] : KEEP]],
+      [/^(\s*)# (SANI_FILES_URL: )\S+( #.*)$/, (m) => [o.filesDomain ? `${m[1]}${m[2]}https://${o.filesDomain}${m[3]}` : KEEP]],
     ],
     'compose.yaml',
   );
@@ -74,6 +77,7 @@ export function buildService(src: string, o: BuilderInput): Built {
     [
       [/^(Environment=TZ=)\S+$/, (m) => [m[1] + o.tz]],
       [/^# (Environment=SANI_BASE_URL=)\S+$/, (m) => [`${m[1]}https://${o.domain}`]],
+      [/^# (Environment=SANI_FILES_URL=)\S+$/, (m) => [o.filesDomain ? `${m[1]}https://${o.filesDomain}` : KEEP]],
       [
         /^Environment=SANI_TRUST_PROXY=true$/,
         () => [
@@ -87,17 +91,30 @@ export function buildService(src: string, o: BuilderInput): Built {
   );
 }
 
-/** Caddyfile and nginx.conf only need the domain swapped. */
+/**
+ * Caddyfile and nginx.conf need the domain swapped, and with a files domain,
+ * that domain added to the site block's address or the server_name lines.
+ */
 export function buildProxy(src: string, o: BuilderInput, file: string): Built {
   if (!src.includes(EXAMPLE_DOMAIN)) throw new Error(`${file}: ${EXAMPLE_DOMAIN} not found`);
+  const names = [new RegExp(`^(${EXAMPLE_DOMAIN})( \\{)$`), new RegExp(`^(\\s*server_name ${EXAMPLE_DOMAIN})(;)$`)];
+  const files = o.filesDomain;
+  if (files && !src.split('\n').some((l) => names.some((re) => re.test(l)))) {
+    throw new Error(`${file}: no site address or server_name line for the files domain`);
+  }
   const out: string[] = [];
   const filled: number[] = [];
   src
     .replace(/\n$/, '')
     .split('\n')
     .forEach((line, i) => {
-      if (line.includes(EXAMPLE_DOMAIN)) filled.push(i);
-      out.push(line.replaceAll(EXAMPLE_DOMAIN, o.domain));
+      let next = line;
+      if (files) {
+        for (const re of names) next = next.replace(re, (_, head, tail) => `${head}${tail === ';' ? ' ' : ', '}${files}${tail}`);
+        next = next.replaceAll(EXAMPLE_FILES_DOMAIN, files);
+      }
+      if (next !== line || line.includes(EXAMPLE_DOMAIN)) filled.push(i);
+      out.push(next.replaceAll(EXAMPLE_DOMAIN, o.domain));
     });
   return { text: out.join('\n') + '\n', filled };
 }
