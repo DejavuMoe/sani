@@ -14,6 +14,7 @@
     [['E'], 'keys.edit'],
     [[mod, '↵'], 'keys.save'],
     [isMac ? ['⌘', '⌫'] : ['Del'], 'keys.delete'],
+    [['X'], 'keys.pick'],
     [['Esc'], 'keys.escape'],
     [['?'], 'keys.help'],
   ];

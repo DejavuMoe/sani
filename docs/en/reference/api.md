@@ -31,6 +31,7 @@ curl https://s.example.com/api/links \
 |---|---|---|
 | `GET` | `/api/links` | [List links](#list) |
 | `POST` | `/api/links` | [Create a link](#create) |
+| `POST` | `/api/links/bulk` | [Change several links at once](#bulk) |
 | `GET` | `/api/links/{id}` | [Read a link](#get) |
 | `PATCH` | `/api/links/{id}` | [Update a link](#update) |
 | `DELETE` | `/api/links/{id}` | [Delete a link](#delete) |
@@ -163,6 +164,20 @@ Returns `204`. The link stops redirecting at once but can be restored for an hou
 `POST /api/links/{id}/restore`
 
 Undoes a delete and returns the restored [link](#link-object). Returns `404` after an hour, or when a new link has taken the slug.
+
+### Change several links at once {#bulk}
+
+`POST /api/links/bulk`
+
+Turns links on or off, deletes or restores them, in one transaction:
+
+```json
+{ "action": "disable", "ids": [12, 15, 31] }
+```
+
+- `action` is `enable`, `disable`, `delete` or `restore`, and `ids` lists 1 to 500 links.
+- Returns `{"items": [...]}`: the [links](#link-object) that changed, as they are now, or, for `delete`, as they were before. Ids that don’t exist, links already in that state and links that can [no longer be restored](#restore) are left out, so the list can be shorter than `ids`.
+- Deleted links can be restored for an hour, as with [a single delete](#delete).
 
 ### Fetch the title and icon again {#refresh}
 
@@ -356,6 +371,7 @@ Returns `200` with `ok`, for health checks.
 | `expires_past` | 400 | `expiresAt` is in the past |
 | `max_clicks_invalid` | 400 | `maxClicks` isn’t a whole number from 0 to 10¹² |
 | `redirect_invalid` | 400 | `redirect` isn’t 301, 302, 307 or 308 |
+| `bulk_invalid` | 400 | A bulk change with an unknown `action`, or without 1 to 500 `ids` |
 | `base_url_invalid` | 400 | The domain should look like `https://s.example.com` |
 | `name_invalid` | 400 | The token name is empty or over 60 characters |
 | `password_short` | 400 | The password is shorter than 8 characters |

@@ -30,6 +30,7 @@ func (s *Server) routes() http.Handler {
 
 	mux.Handle("GET /api/links", a(s.listLinks))
 	mux.Handle("POST /api/links", a(s.createLink))
+	mux.Handle("POST /api/links/bulk", a(s.bulkLinks))
 	mux.Handle("GET /api/links/{id}", a(s.getLink))
 	mux.Handle("PATCH /api/links/{id}", a(s.updateLink))
 	mux.Handle("DELETE /api/links/{id}", a(s.deleteLink))

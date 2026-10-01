@@ -1,9 +1,11 @@
 import { SvelteSet } from 'svelte/reactivity';
-import { api, ApiError, type Link, type LinkInput, type Overview, type Sort } from './api';
+import { api, ApiError, type BulkAction, type Link, type LinkInput, type Overview, type Sort } from './api';
 import { errorText, t } from './i18n.svelte';
 import { toasts } from './toast.svelte';
 
 const PAGE = 50;
+/** The server takes at most this many links per bulk request. */
+export const MAX_PICK = 500;
 
 class LinksStore {
   items = $state<Link[]>([]);
@@ -27,6 +29,15 @@ class LinksStore {
 
   overview = $state<Overview | null>(null);
 
+  /** Selection mode: rows toggle a checkbox instead of opening. */
+  picking = $state(false);
+  /** Links checked for a bulk action. */
+  picked = new SvelteSet<number>();
+  /** Where a shift-click range starts. */
+  private anchor: number | null = null;
+  /** A bulk request is in flight. */
+  busy = $state(false);
+
   private seq = 0;
   private ctrl: AbortController | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -44,6 +55,9 @@ class LinksStore {
       this.total = res.total;
       this.next = res.next;
       this.loaded = true;
+      // Checked links the new view doesn't show would be acted on unseen.
+      this.picked.clear();
+      this.anchor = null;
       if (this.selectedId !== null && !res.items.some((l) => l.id === this.selectedId)) this.selectedId = null;
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return;
@@ -205,6 +219,110 @@ class LinksStore {
     toasts.show(t('detail.deleted', { slug: '/' + link.slug }), {
       action: { label: t('act.undo'), run: () => this.restore(link, index) },
     });
+  }
+
+  startPicking() {
+    this.picking = true;
+    this.expandedId = null;
+    this.editingId = null;
+  }
+
+  stopPicking() {
+    this.picking = false;
+    this.picked.clear();
+    this.anchor = null;
+  }
+
+  /** Check or uncheck a link; with range, everything from the last one clicked. */
+  togglePick(id: number, range = false) {
+    if (!this.picking) this.startPicking();
+    const ids = this.items.map((l) => l.id);
+    const to = ids.indexOf(id);
+    const from = range && this.anchor !== null ? ids.indexOf(this.anchor) : -1;
+    const span = from < 0 ? [id] : ids.slice(Math.min(from, to), Math.max(from, to) + 1);
+    const on = !this.picked.has(id);
+    for (const x of span) {
+      if (!on) this.picked.delete(x);
+      else if (this.picked.size < MAX_PICK) this.picked.add(x);
+    }
+    this.anchor = id;
+  }
+
+  /** Check every loaded link, or none when they already are. */
+  togglePickAll() {
+    const ids = this.items.slice(0, MAX_PICK).map((l) => l.id);
+    const all = ids.length > 0 && ids.every((id) => this.picked.has(id));
+    this.picked.clear();
+    if (!all) for (const id of ids) this.picked.add(id);
+  }
+
+  /** Turns the checked links on or off, or deletes them with undo. */
+  async bulk(action: Exclude<BulkAction, 'restore'>) {
+    const targets = this.items.filter((l) => this.picked.has(l.id));
+    if (!targets.length || this.busy) return;
+    this.busy = true;
+    try {
+      if (action === 'delete') await this.bulkDelete(targets);
+      else await this.bulkSwitch(action, targets);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  private async bulkSwitch(action: 'enable' | 'disable', targets: Link[]) {
+    try {
+      const { items } = await api.bulk(action, targets.map((l) => l.id));
+      for (const l of items) this.upsert(l);
+      toasts.show(
+        items.length ? t(action === 'enable' ? 'bulk.turnedOn' : 'bulk.turnedOff', { n: items.length }) : t('bulk.unchanged'),
+      );
+    } catch (e) {
+      toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
+    }
+  }
+
+  private async bulkDelete(targets: Link[]) {
+    const ids = new Set(targets.map((l) => l.id));
+    const removed = this.items.map((link, index) => ({ link, index })).filter((x) => ids.has(x.link.id));
+    try {
+      await api.bulk('delete', [...ids]);
+    } catch (e) {
+      toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
+      return;
+    }
+    for (const id of ids) {
+      this.leaving.add(id);
+      setTimeout(() => this.leaving.delete(id), 400);
+    }
+    this.items = this.items.filter((l) => !ids.has(l.id));
+    this.total = Math.max(0, this.total - ids.size);
+    if (this.selectedId !== null && ids.has(this.selectedId)) this.selectedId = null;
+    this.stopPicking();
+    this.refreshOverview();
+    toasts.show(t('bulk.deleted', { n: ids.size }), {
+      action: { label: t('act.undo'), run: () => this.bulkRestore(removed) },
+    });
+  }
+
+  private async bulkRestore(removed: { link: Link; index: number }[]) {
+    try {
+      const { items } = await api.bulk(
+        'restore',
+        removed.map((x) => x.link.id),
+      );
+      const back = new Map(items.map((l) => [l.id, l]));
+      // Ascending, so each link lands where it was.
+      for (const { link, index } of removed) {
+        const restored = back.get(link.id);
+        if (!restored) continue;
+        this.place({ ...restored, spark: link.spark }, index);
+        this.flash(restored.id);
+      }
+      this.refreshOverview();
+      toasts.show(t('bulk.restored', { n: items.length }));
+    } catch (e) {
+      toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
+    }
   }
 
   async restore(link: Link, index: number) {

@@ -77,7 +77,7 @@ The admin app lives at `/admin/` and the API at `/api/`; every other path is a s
 
 ## Everyday use
 
-**Keyboard.** `N` new link · `/` search · `J`/`K` move · `Enter` open · `C` copy · `E` edit · `Del` (or `⌘⌫` on a Mac) delete, with undo · `Esc` close · `?` all shortcuts. Paste a URL anywhere on the page to start shortening it.
+**Keyboard.** `N` new link · `/` search · `J`/`K` move · `Enter` open · `C` copy · `E` edit · `Del` (or `⌘⌫` on a Mac) delete, with undo · `X` check several links to turn them on, off or delete them at once · `Esc` close · `?` all shortcuts. Paste a URL anywhere on the page to start shortening it.
 
 **Bookmarklet.** Settings → Shortcuts → drag “Shorten this page” to your bookmarks bar. Clicking it on any page opens a small window that shortens that page, reusing your existing link if you've shortened it before, and copies the result.
 

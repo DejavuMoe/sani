@@ -476,6 +476,63 @@ func (s *Server) restoreLink(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
 }
 
+var bulkActions = map[string]store.BulkAction{
+	"enable":  store.BulkEnable,
+	"disable": store.BulkDisable,
+	"delete":  store.BulkDelete,
+	"restore": store.BulkRestore,
+}
+
+// maxBulk bounds one request; the admin app never sends more than it has
+// loaded, which is a few hundred links at most.
+const maxBulk = 500
+
+// bulkLinks turns links on or off, deletes or restores them, many at once.
+func (s *Server) bulkLinks(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Action string  `json:"action"`
+		IDs    []int64 `json:"ids"`
+	}
+	if !decodeJSON(w, r, &in) {
+		return
+	}
+	action, ok := bulkActions[in.Action]
+	if !ok {
+		writeError(w, http.StatusBadRequest, "bulk_invalid", "action must be enable, disable, delete or restore")
+		return
+	}
+	seen := map[int64]bool{}
+	ids := make([]int64, 0, len(in.IDs))
+	for _, id := range in.IDs {
+		if id > 0 && !seen[id] {
+			seen[id] = true
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 || len(ids) > maxBulk {
+		writeError(w, http.StatusBadRequest, "bulk_invalid", "ids must list 1 to 500 links")
+		return
+	}
+	now := time.Now().UnixMilli()
+	changed, err := s.store.Bulk(r.Context(), action, ids, now)
+	if err != nil {
+		s.internalError(w, r, err)
+		return
+	}
+	keys := make([]string, len(changed))
+	for i, l := range changed {
+		keys[i] = links.Key(l.Slug)
+	}
+	s.cache.Invalidate(keys...)
+	base := s.baseURL(r)
+	items := make([]linkDTO, len(changed))
+	for i, l := range changed {
+		items[i] = s.toDTO(base, l, now)
+	}
+	s.log.Info("bulk change", "action", in.Action, "links", len(changed))
+	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
 // refreshLink fetches the title and icon again and waits for the result.
 func (s *Server) refreshLink(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(w, r)

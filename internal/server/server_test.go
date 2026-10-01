@@ -406,6 +406,73 @@ func TestDeleteAndRestore(t *testing.T) {
 	}
 }
 
+func TestBulk(t *testing.T) {
+	e := newEnv(t, Options{})
+	e.signIn()
+	var ids []any
+	for _, slug := range []string{"b1", "b2", "b3"} {
+		ids = append(ids, e.create(map[string]any{"url": "https://" + slug + ".example", "slug": slug})["id"])
+		e.visit("/" + slug) // cache it
+	}
+	bulk := func(action string, ids ...any) []any {
+		t.Helper()
+		r := e.req("POST", "/api/links/bulk", map[string]any{"action": action, "ids": ids})
+		if r.status != 200 {
+			t.Fatalf("%s: %d %s", action, r.status, r.body)
+		}
+		items, _ := r.json()["items"].([]any)
+		return items
+	}
+	status := func(slug string) int { t.Helper(); return e.visit("/" + slug).status }
+
+	// Only links that change are returned; unknown ids are skipped.
+	if got := bulk("disable", ids[0], ids[1], 9999); len(got) != 2 || got[0].(map[string]any)["status"] != "disabled" {
+		t.Fatalf("disable = %v", got)
+	}
+	if got := bulk("disable", ids[0]); len(got) != 0 {
+		t.Fatalf("disabling again = %v", got)
+	}
+	if status("b1") != 410 || status("b2") != 410 || status("b3") != 302 {
+		t.Fatal("disabled links still redirect, or the other one stopped")
+	}
+	if got := bulk("enable", ids...); len(got) != 2 {
+		t.Fatalf("enable = %v", got)
+	}
+	if status("b1") != 302 {
+		t.Fatal("enabled link does not redirect")
+	}
+
+	// Deleting returns the links as they were, and restoring brings them back.
+	if got := bulk("delete", ids[1], ids[2], ids[2]); len(got) != 2 || got[0].(map[string]any)["slug"] != "b2" {
+		t.Fatalf("delete = %v", got)
+	}
+	if status("b2") != 404 || status("b3") != 404 || status("b1") != 302 {
+		t.Fatal("delete hit the wrong links")
+	}
+	e.create(map[string]any{"url": "https://new.example", "slug": "b3"}) // takes over the slug
+	if got := bulk("restore", ids...); len(got) != 1 || got[0].(map[string]any)["slug"] != "b2" {
+		t.Fatalf("restore = %v", got)
+	}
+	if status("b2") != 302 {
+		t.Fatal("restored link does not redirect")
+	}
+
+	tooMany := make([]int, 501)
+	for i := range tooMany {
+		tooMany[i] = i + 1
+	}
+	for _, body := range []map[string]any{
+		{"action": "archive", "ids": []any{ids[0]}},
+		{"action": "delete", "ids": []any{}},
+		{"action": "delete", "ids": []any{-1}},
+		{"action": "delete", "ids": tooMany},
+	} {
+		if r := e.req("POST", "/api/links/bulk", body); r.code() != "bulk_invalid" {
+			t.Errorf("%v: %d %s", body, r.status, r.body)
+		}
+	}
+}
+
 func TestCrossOriginRefused(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()

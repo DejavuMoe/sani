@@ -4,6 +4,11 @@
 
 ## Unreleased {#unreleased}
 
+### New
+
+- **Bulk actions.** Check several links in the list and turn them on, off or delete them at once, with undo. Click “Select” above the list or press <kbd>X</kbd> to start; <kbd>Shift</kbd>-click checks a range. See [Everyday use](../guide/usage#bulk).
+- A new endpoint, `POST /api/links/bulk`, changes up to 500 links at once; see the [HTTP API](../reference/api#bulk).
+
 ### Breaking changes
 
 - `GET /api/tokens` now returns `{"items": [...]}`, like the list of links, so fields can be added later without breaking scripts. Scripts that read the response as an array should read its `items` instead.

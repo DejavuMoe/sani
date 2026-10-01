@@ -72,6 +72,7 @@
     file: ['M9 1.75H4.75A2 2 0 0 0 2.75 3.75v8.5a2 2 0 0 0 2 2h6.5a2 2 0 0 0 2-2V6z', 'M9 1.75V6h4.25'],
     sort: ['M5.25 3.25v9.5', 'M2.75 10.25l2.5 2.5 2.5-2.5', 'M10.75 12.75v-9.5', 'M8.25 5.75l2.5-2.5 2.5 2.5'],
     dot: ['M8 8h.01'],
+    select: [rect(2.75, 2.75, 10.5, 10.5, 2.25), 'M5.6 8.1l1.7 1.7 3.1-3.4'],
   } satisfies Record<string, string[]>;
 
   export type IconName = keyof typeof icons;

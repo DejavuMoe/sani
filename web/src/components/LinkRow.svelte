@@ -15,6 +15,7 @@
 
   const expanded = $derived(links.expandedId === link.id);
   const selected = $derived(links.selectedId === link.id);
+  const picked = $derived(links.picked.has(link.id));
   const fresh = $derived(links.fresh.has(link.id));
   const parts = $derived(displayParts(link.url));
   const spark = $derived(link.spark ?? new Array(14).fill(0));
@@ -26,10 +27,14 @@
   let copied = $state(false);
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
-  function toggle() {
+  function toggle(e: MouseEvent) {
     // Selecting text in a row should not fold it open or shut.
     if (getSelection()?.toString()) return;
     links.selectedId = link.id;
+    if (links.picking) {
+      links.togglePick(link.id, e.shiftKey);
+      return;
+    }
     if (expanded) {
       links.expandedId = null;
       links.editingId = null;
@@ -49,16 +54,31 @@
 </script>
 
 <div
-  class={['row', expanded && 'expanded', selected && 'selected', fresh && 'fresh', link.status !== 'active' && 'inactive']}
+  class={[
+    'row',
+    expanded && 'expanded',
+    selected && 'selected',
+    fresh && 'fresh',
+    picked && 'picked',
+    link.status !== 'active' && 'inactive',
+  ]}
   data-link={link.id}
 >
   <!-- The button carries keyboard access; the whole line is a larger mouse target. -->
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="line" onclick={toggle}>
+    {#if links.picking}
+      <span class={['box', picked && 'on']} aria-hidden="true">
+        {#if picked}<Icon name="check" size={12} stroke={2.25} />{/if}
+      </span>
+    {/if}
+    <!-- In selection mode the row is a checkbox; otherwise it opens the details. -->
     <button
       class="main"
-      aria-expanded={expanded}
-      aria-controls="detail-{link.id}"
+      role={links.picking ? 'checkbox' : undefined}
+      aria-checked={links.picking ? picked : undefined}
+      aria-expanded={links.picking ? undefined : expanded}
+      aria-controls={links.picking ? undefined : `detail-${link.id}`}
       onfocus={() => (links.selectedId = link.id)}
     >
       <span class="slug">
@@ -141,6 +161,42 @@
     width: 2px;
     border-radius: 0 2px 2px 0;
     background: var(--accent);
+  }
+
+  /* Half-strength, so the row's dimmest text keeps AA contrast on it. */
+  .picked .line,
+  .picked .line:hover {
+    background: color-mix(in oklab, var(--accent-soft) 50%, var(--surface));
+  }
+
+  .box {
+    display: grid;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    /* The box is the control: its edge keeps 3:1 against the row. */
+    border: 1.5px solid var(--text-3);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    color: #fff;
+    transition:
+      background-color var(--fast) var(--ease),
+      border-color var(--fast) var(--ease);
+  }
+
+  .line:hover .box {
+    border-color: var(--text-2);
+  }
+
+  .box.on,
+  .line:hover .box.on {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  :global([data-theme='dark']) .box.on {
+    color: #0d0f1c;
   }
 
   .fresh .line {
@@ -365,6 +421,10 @@
 
     .copy {
       margin-top: -3px;
+    }
+
+    .box {
+      margin-top: 2px;
     }
   }
 </style>

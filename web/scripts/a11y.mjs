@@ -33,6 +33,16 @@ const screens = [
       await page.waitForSelector('.editor');
     },
   },
+  {
+    name: 'bulk',
+    path: '/admin/',
+    run: async (page) => {
+      await page.locator('.toolbar .pick').click();
+      await page.locator('.row .main').nth(1).click();
+      await page.locator('.row .main').nth(2).click();
+      await page.waitForSelector('.bulkbar');
+    },
+  },
   { name: 'settings', path: '/admin/settings' },
 ];
 

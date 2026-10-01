@@ -4,7 +4,7 @@
   import type { Sort } from '../lib/api';
   import { t } from '../lib/i18n.svelte';
   import { mod } from '../lib/keys';
-  import { links } from '../lib/links.svelte';
+  import { links, MAX_PICK } from '../lib/links.svelte';
   import Icon from './Icon.svelte';
   import LinkRow from './LinkRow.svelte';
   import Menu from './Menu.svelte';
@@ -40,6 +40,11 @@
   });
 
   const sorts: Sort[] = ['created', 'clicks', 'visited'];
+
+  // The select-all box reflects the loaded links it would check.
+  const pickable = $derived(links.items.slice(0, MAX_PICK));
+  const allPicked = $derived(pickable.length > 0 && pickable.every((l) => links.picked.has(l.id)));
+  const nonePicked = $derived(links.picked.size === 0);
   const empty = $derived(links.loaded && links.items.length === 0);
   const blank = $derived(empty && !links.query);
 
@@ -92,6 +97,16 @@
     {#if links.query && links.loaded}
       <span class="count" aria-live="polite">{t('list.results', { n: links.total })}</span>
     {/if}
+    <button
+      class={['pick', links.picking && 'on']}
+      aria-pressed={links.picking}
+      aria-label={t('bulk.startLabel')}
+      title={t('bulk.startLabel')}
+      onclick={() => (links.picking ? links.stopPicking() : links.startPicking())}
+    >
+      <Icon name="select" size={14} />
+      <span class="pick-text">{t('bulk.start')}</span>
+    </button>
     <Menu triggerClass="sort" label={t('list.sortBy')} align="end" minWidth={160}>
       {#snippet button()}
         <Icon name="sort" size={14} />
@@ -110,6 +125,38 @@
       {/snippet}
     </Menu>
   </div>
+  {/if}
+
+  {#if links.picking && !empty}
+    <div class="bulkbar" role="group" aria-label={t('bulk.label')}>
+      <button
+        class="all"
+        role="checkbox"
+        aria-checked={allPicked ? true : nonePicked ? false : 'mixed'}
+        aria-label={t('bulk.all')}
+        title={t('bulk.all')}
+        onclick={() => links.togglePickAll()}
+      >
+        <span class={['box', !nonePicked && 'on']} aria-hidden="true">
+          {#if allPicked}<Icon name="check" size={12} stroke={2.25} />{:else if !nonePicked}<span class="dash"></span>{/if}
+        </span>
+      </button>
+      <span class="picked-count" aria-live="polite">
+        {nonePicked ? t('bulk.none') : t('bulk.count', { n: links.picked.size })}
+      </span>
+      <span class="actions">
+        <button disabled={nonePicked || links.busy} aria-label={t('bulk.enable')} onclick={() => links.bulk('enable')}>
+          <Icon name="power" size={14} /><span class="name">{t('bulk.enable')}</span>
+        </button>
+        <button disabled={nonePicked || links.busy} aria-label={t('bulk.disable')} onclick={() => links.bulk('disable')}>
+          <Icon name="pause" size={14} /><span class="name">{t('bulk.disable')}</span>
+        </button>
+        <button class="danger" disabled={nonePicked || links.busy} aria-label={t('bulk.delete')} onclick={() => links.bulk('delete')}>
+          <Icon name="trash" size={14} /><span class="name">{t('bulk.delete')}</span>
+        </button>
+      </span>
+      <button class="done" onclick={() => links.stopPicking()}>{t('bulk.done')}</button>
+    </div>
   {/if}
 
   {#if blank}
@@ -149,6 +196,7 @@
   {:else}
     <div class={['card', links.loading && 'stale']}>
       <div class="head" aria-hidden="true">
+        {#if links.picking}<span class="h-pick"></span>{/if}
         <span class="h-slug">{t('list.col.link')}</span>
         <span class="h-target">{t('list.col.target')}</span>
         <span class="h-spark">{t('list.col.activity')}</span>
@@ -202,6 +250,7 @@
     display: flex;
     flex: 1;
     align-items: center;
+    min-width: 0;
     gap: 8px;
     max-width: 360px;
     height: 34px;
@@ -292,6 +341,138 @@
   .toolbar :global(.sort[aria-expanded='true']) {
     background: var(--surface-2);
     color: var(--text);
+  }
+
+  .pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    margin-left: auto;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    color: var(--text-2);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .pick:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .pick.on {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .pick + :global(.sort) {
+    margin-left: 0;
+  }
+
+  .bulkbar {
+    position: sticky;
+    z-index: 10;
+    top: 56px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 44px;
+    margin-bottom: 10px;
+    padding: 0 8px 0 16px;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .bulkbar .all {
+    display: grid;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    border-radius: var(--radius-xs);
+  }
+
+  .bulkbar .box {
+    display: grid;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    border: 1.5px solid var(--text-3);
+    border-radius: var(--radius-xs);
+    color: #fff;
+  }
+
+  .bulkbar .box.on {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  :global([data-theme='dark']) .bulkbar .box.on {
+    color: #0d0f1c;
+  }
+
+  .dash {
+    width: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+  }
+
+  .picked-count {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .bulkbar button:not(.all) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .bulkbar button:not(.all):hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .bulkbar .danger {
+    color: var(--danger);
+  }
+
+  .bulkbar .danger:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  .bulkbar button:disabled {
+    opacity: 0.45;
+  }
+
+  .bulkbar .done {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .h-pick {
+    width: 16px;
   }
 
   .card {
@@ -495,6 +676,11 @@
     }
 
     .count {
+      display: none;
+    }
+
+    .pick-text,
+    .bulkbar .name {
       display: none;
     }
   }
