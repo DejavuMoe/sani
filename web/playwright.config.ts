@@ -28,6 +28,8 @@ export default defineConfig({
     env: {
       SANI_LISTEN: `127.0.0.1:${port}`,
       SANI_DATA_DIR: dataDir,
+      // The same server under another origin, as a separate domain would be.
+      SANI_FILES_URL: `http://localhost:${port}`,
       SANI_FETCH_META: 'false',
       SANI_SETUP_CODE: 'e2e-test-code',
       SANI_LOG_LEVEL: 'warn',

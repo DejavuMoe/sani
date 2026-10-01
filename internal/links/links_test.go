@@ -3,6 +3,7 @@ package links
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestNormalizeURL(t *testing.T) {
@@ -151,5 +152,42 @@ func TestCleanTitle(t *testing.T) {
 	long := CleanTitle(strings.Repeat("字", MaxTitleLength+50))
 	if n := len([]rune(long)); n != MaxTitleLength {
 		t.Errorf("CleanTitle length = %d, want %d", n, MaxTitleLength)
+	}
+}
+
+func TestTextRules(t *testing.T) {
+	for in, want := range map[string]int64{"": 0, "a": 1, "a\n": 1, "a\nb": 2, "\n\n": 2} {
+		if got := TextLines(in); got != want {
+			t.Errorf("TextLines(%q) = %d, want %d", in, got, want)
+		}
+	}
+	if got := TextPreview("\n  \n  func  main() {\nx"); got != "func main() {" {
+		t.Errorf("TextPreview = %q", got)
+	}
+	if got := TextPreview(strings.Repeat("长", 200)); len([]rune(got)) != 120 {
+		t.Errorf("TextPreview length = %d", len([]rune(got)))
+	}
+}
+
+func TestFileName(t *testing.T) {
+	for in, want := range map[string]string{
+		"report.pdf":            "report.pdf",
+		`C:\Users\me\photo.JPG`: "photo.JPG",
+		"../../etc/passwd":      "passwd",
+		"evil\u202egpj.exe":     "evilgpj.exe",
+		"tab\there.txt":         "tabhere.txt",
+		"..":                    "file",
+		"":                      "file",
+		"dir/":                  "file",
+		"  spaced name .txt  ":  "spaced name .txt",
+		"bad\xffbytes.txt":      "badbytes.txt",
+	} {
+		if got := FileName(in); got != want {
+			t.Errorf("FileName(%q) = %q, want %q", in, got, want)
+		}
+	}
+	long := FileName(strings.Repeat("名", 200) + ".tar.gz")
+	if len(long) > 255 || !strings.HasSuffix(long, ".gz") || !utf8.ValidString(long) {
+		t.Errorf("long name = %q (%d bytes)", long, len(long))
 	}
 }

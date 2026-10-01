@@ -10,6 +10,7 @@
 - **Fast redirects.** Targets live in memory, and recording statistics never sits in a redirect’s way. On a laptop, Sani serves about 130,000 redirects a second and counts every single click (see [Performance](../internals/performance)).
 - **Enough statistics.** Total and daily clicks, referring sites and the last visit. Crawlers, link previews, browser prefetches and your own clicks don’t count.
 - **Control over every link.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. A new destination applies from the very next visit.
+- **Texts and files too.** Share a note, a snippet of code or a file at `/p/…`, with the same expiry, visit limit and statistics as a link. See [Everyday use](./usage#shares).
 - **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 24 MB, and there’s no Redis, PostgreSQL or anything else to run next to it.
 - **Any language.** A slug like `s.example.com/简历` just works, and both the admin app and the pages visitors see come in English and Chinese.
 
@@ -31,7 +32,7 @@ It’s probably not for you if you need:
 
 **Redirects come first.** Everything serves one goal: redirects must be fast, whatever else is happening. Database writes, statistics and title fetching all happen off the redirect path.
 
-**No external services.** One process is the whole thing. Backing up is copying one database file, and moving is putting it on another machine.
+**No external services.** One process is the whole thing. Backing up is copying one database file, plus the directory of shared files if you share files, and moving is putting them on another machine.
 
 ## Next
 

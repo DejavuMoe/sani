@@ -2,6 +2,29 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+Texts and files: share a note, a piece of code or a file from the same dashboard. If you script against the API, read “Breaking changes” first.
+
+### New
+
+- **Texts and files.** The Text and File tabs above the link box share a text, as plain text or monospace code with line numbers, or a file up to 64 MB. Paste a block of text or a file anywhere on the page to start. Visitors open them at `/p/{slug}`, where they can read, copy or download; expiry, visit limits, the off switch and statistics work as for links. See [Everyday use](../guide/usage#shares).
+- **A files domain.** Raw text and file downloads come from a second domain set with [`SANI_FILES_URL`](../reference/configuration#sani-files-url), pointed at the same Sani, which serves nothing else and holds no session. Sharing files needs it; texts work without it. [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) sets the size limit. [Deployment](../guide/deploy#files-domain) has the proxy configuration.
+- Downloads from the files domain count as visits even from `curl` and `wget`, which is how people fetch files; resumed downloads, crawlers and previews don’t. See [Statistics](../guide/statistics#shares).
+- The list can show just links, texts or files, and search finds file names and the first line of texts.
+- New endpoints `POST /api/texts`, `POST /api/files` and `GET /api/links/{id}/text`; links have new fields `kind` and `content`, and `GET /api/links` takes a `kind` filter. See the [HTTP API](../reference/api#shares).
+- Shared files live in `files/` in the data directory; `sani backup` reminds you to copy it.
+
+### Breaking changes
+
+- `GET /api/links` and the bulk endpoint now include texts and files, whose `url` is empty. Scripts that only expect short links should ask for `?kind=url`.
+- `p` is a reserved slug now, as `/p/` holds the shares. A link you already have at `/p` keeps working, but no new one can take that slug.
+- A JSON body over its size limit now gets `413 too_large` instead of `400 bad_json`.
+
+### Upgrading
+
+The database schema is upgraded on start. To share files, add a DNS record for the files domain, add it to your reverse proxy, raise the proxy’s request body limit and set `SANI_FILES_URL`; [Deployment](../guide/deploy#files-domain) shows each step. Back up `files/` along with `sani.db` from then on.
+
 ## v0.2.0
 
 2026-10-01 · Bulk actions, and groundwork for 1.0. If you script against the API, read “Breaking changes” first.

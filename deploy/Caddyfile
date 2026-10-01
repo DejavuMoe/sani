@@ -1,5 +1,6 @@
 # Caddy obtains the certificate and sets X-Forwarded-* for you.
-# Run Sani with SANI_TRUST_PROXY=true.
+# Run Sani with SANI_TRUST_PROXY=true. To share files, list the files
+# domain (SANI_FILES_URL) here too: s.example.com, f.example.com {
 s.example.com {
 	reverse_proxy 127.0.0.1:8080
 }

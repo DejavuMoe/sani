@@ -1,5 +1,15 @@
 import { SvelteSet } from 'svelte/reactivity';
-import { api, ApiError, type BulkAction, type Link, type LinkInput, type Overview, type Sort } from './api';
+import {
+  api,
+  ApiError,
+  type BulkAction,
+  type FileFields,
+  type Link,
+  type LinkInput,
+  type LinkKind,
+  type Overview,
+  type Sort,
+} from './api';
 import { errorText, t } from './i18n.svelte';
 import { toasts } from './toast.svelte';
 
@@ -13,6 +23,8 @@ class LinksStore {
   next = $state<string | null>(null);
   query = $state('');
   sort = $state<Sort>('created');
+  /** Show only links of this kind; null shows all of them. */
+  kind = $state<LinkKind | null>(null);
   /** First page for the current query has arrived. */
   loaded = $state(false);
   loading = $state(false);
@@ -49,7 +61,7 @@ class LinksStore {
     this.loading = true;
     this.failed = false;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, limit: PAGE }, ctrl.signal);
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
       this.items = res.items;
       this.total = res.total;
@@ -72,7 +84,7 @@ class LinksStore {
     const seq = this.seq;
     this.loadingMore = true;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, cursor: this.next, limit: PAGE });
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, cursor: this.next, limit: PAGE });
       if (seq !== this.seq) return;
       const seen = new Set(this.items.map((l) => l.id));
       this.items = [...this.items, ...res.items.filter((l) => !seen.has(l.id))];
@@ -97,13 +109,24 @@ class LinksStore {
     this.load();
   }
 
+  setKind(kind: LinkKind | null) {
+    if (kind === this.kind) return;
+    this.kind = kind;
+    this.load();
+  }
+
   /** Refresh counts after returning to the tab, keeping scroll and pages. */
   async refresh() {
     this.refreshOverview();
     if (!this.loaded) return;
     const seq = this.seq;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, limit: Math.min(200, Math.max(PAGE, this.items.length)) });
+      const res = await api.links({
+        q: this.query,
+        sort: this.sort,
+        kind: this.kind,
+        limit: Math.min(200, Math.max(PAGE, this.items.length)),
+      });
       if (seq !== this.seq) return;
       const byId = new Map(res.items.map((l) => [l.id, l]));
       this.items = this.items.map((l) => byId.get(l.id) ?? l);
@@ -135,7 +158,9 @@ class LinksStore {
       this.upsert(link);
       return;
     }
-    const visible = !this.query || [link.slug, link.title, link.url].some((s) => s.toLowerCase().includes(this.query.toLowerCase()));
+    const q = this.query.toLowerCase();
+    const fields = [link.slug, link.title, link.url, link.content?.preview ?? '', link.content?.name ?? ''];
+    const visible = (!q || fields.some((s) => s.toLowerCase().includes(q))) && (!this.kind || this.kind === link.kind);
     if (!visible) return;
     const at = this.sort === 'created' && index === 0 ? 0 : Math.min(index, this.items.length);
     this.items = [...this.items.slice(0, at), link, ...this.items.slice(at)];
@@ -151,12 +176,33 @@ class LinksStore {
 
   async create(input: LinkInput): Promise<Link> {
     const link = await api.createLink(input);
+    this.added(link);
+    this.watchMeta(link);
+    return link;
+  }
+
+  async createText(input: LinkInput & { text: string }): Promise<Link> {
+    const link = await api.createText(input);
+    this.added(link);
+    return link;
+  }
+
+  async createFile(
+    file: File,
+    fields: FileFields,
+    onProgress?: (sent: number, total: number) => void,
+    signal?: AbortSignal,
+  ): Promise<Link> {
+    const link = await api.uploadFile(file, fields, onProgress, signal);
+    this.added(link);
+    return link;
+  }
+
+  private added(link: Link) {
     this.place(link);
     this.flash(link.id);
     this.selectedId = link.id;
     this.refreshOverview();
-    this.watchMeta(link);
-    return link;
   }
 
   /** Titles are fetched in the background; pick them up when they land. */

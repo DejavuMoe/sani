@@ -2,9 +2,27 @@ export type LinkStatus = 'active' | 'disabled' | 'expired' | 'exhausted';
 export type MetaState = 'pending' | 'ok' | 'failed' | 'manual';
 export type Sort = 'created' | 'clicks' | 'visited';
 export type BulkAction = 'enable' | 'disable' | 'delete' | 'restore';
+/** What a link does: redirect, or share a text or a file at /p/{slug}. */
+export type LinkKind = 'url' | 'text' | 'file';
+export type TextFormat = 'plain' | 'code';
+
+export interface LinkContent {
+  size: number;
+  /** The bytes on the files origin; null when it isn't configured. */
+  rawUrl: string | null;
+  format?: TextFormat;
+  /** A text's first line. */
+  preview?: string;
+  lines?: number;
+  name?: string;
+  type?: string;
+  sha256?: string;
+}
 
 export interface Link {
   id: number;
+  kind: LinkKind;
+  content: LinkContent | null;
   slug: string;
   shortUrl: string;
   url: string;
@@ -35,6 +53,16 @@ export interface LinkInput {
   expiresAt?: string | null;
   maxClicks?: number | null;
   reuse?: boolean;
+  text?: string;
+  format?: TextFormat;
+}
+
+/** Settings sent with an uploaded file, as multipart fields. */
+export interface FileFields {
+  slug?: string;
+  title?: string;
+  expiresAt?: string;
+  maxClicks?: number;
 }
 
 export interface DayCount {
@@ -66,6 +94,10 @@ export interface Config {
   forwardQuery: boolean;
   passwordFromEnv: boolean;
   timezone: string;
+  /** Origin that serves shared files and raw text; null turns file sharing off. */
+  filesUrl: string | null;
+  maxFileSize: number;
+  maxTextSize: number;
 }
 
 export interface Token {
@@ -115,12 +147,48 @@ async function request<T>(method: string, path: string, body?: unknown, init?: R
   }
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => null);
-  if (!res.ok) {
-    const e = data?.error ?? {};
-    if (res.status === 401 && e.code === 'unauthorized') onUnauthorized();
-    throw new ApiError(res.status, e.code ?? 'http_' + res.status, e.message ?? res.statusText, data?.retryAfter);
-  }
+  if (!res.ok) throw failure(res.status, data, res.statusText);
   return data as T;
+}
+
+function failure(status: number, body: unknown, statusText = ''): ApiError {
+  const data = body as { error?: { code?: string; message?: string }; retryAfter?: number } | null;
+  const e = data?.error ?? {};
+  if (status === 401 && e.code === 'unauthorized') onUnauthorized();
+  // A proxy's own 413 has no code, but means the same as Sani's.
+  const code = e.code ?? (status === 413 ? 'too_large' : 'http_' + status);
+  return new ApiError(status, code, e.message ?? statusText, data?.retryAfter);
+}
+
+/**
+ * Uploads a file as a new link. XMLHttpRequest rather than fetch, because
+ * only it reports upload progress.
+ */
+function uploadFile(
+  file: File,
+  fields: FileFields,
+  onProgress?: (sent: number, total: number) => void,
+  signal?: AbortSignal,
+): Promise<Link> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== '') form.append(k, String(v));
+    form.append('file', file, file.name);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/files');
+    xhr.responseType = 'json';
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded, e.total);
+    // A reverse proxy with a smaller body limit answers 413 without Sani's body.
+    const tooLarge = () => new ApiError(413, 'file_too_large', 'the file is too large');
+    xhr.onload = () =>
+      xhr.status === 201
+        ? resolve(xhr.response)
+        : reject(xhr.status === 413 && !xhr.response?.error ? tooLarge() : failure(xhr.status, xhr.response));
+    xhr.onerror = () => reject(new ApiError(0, 'network', 'network error'));
+    xhr.onabort = () => reject(new DOMException('upload canceled', 'AbortError'));
+    signal?.addEventListener('abort', () => xhr.abort(), { once: true });
+    xhr.send(form);
+  });
 }
 
 export const api = {
@@ -136,9 +204,13 @@ export const api = {
   setBaseUrl: (baseUrl: string | null) => request<Config>('PATCH', '/config', { baseUrl }),
   overview: (days = 30) => request<Overview>('GET', `/overview?days=${days}`),
 
-  links: (q: { q?: string; sort?: Sort; cursor?: string | null; limit?: number }, signal?: AbortSignal) => {
+  links: (
+    q: { q?: string; sort?: Sort; kind?: LinkKind | null; cursor?: string | null; limit?: number },
+    signal?: AbortSignal,
+  ) => {
     const p = new URLSearchParams();
     if (q.q) p.set('q', q.q);
+    if (q.kind) p.set('kind', q.kind);
     if (q.sort && q.sort !== 'created') p.set('sort', q.sort);
     if (q.cursor) p.set('cursor', q.cursor);
     if (q.limit) p.set('limit', String(q.limit));
@@ -149,6 +221,9 @@ export const api = {
   },
   link: (id: number) => request<Link>('GET', `/links/${id}`),
   createLink: (input: LinkInput) => request<Link>('POST', '/links', input),
+  createText: (input: LinkInput & { text: string }) => request<Link>('POST', '/texts', input),
+  uploadFile,
+  linkText: (id: number) => request<{ text: string }>('GET', `/links/${id}/text`),
   updateLink: (id: number, input: LinkInput) => request<Link>('PATCH', `/links/${id}`, input),
   deleteLink: (id: number) => request<void>('DELETE', `/links/${id}`),
   restoreLink: (id: number) => request<Link>('POST', `/links/${id}/restore`),

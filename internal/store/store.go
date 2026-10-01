@@ -168,6 +168,22 @@ var migrations = []string{
 		data       BLOB    NOT NULL,
 		fetched_at INTEGER NOT NULL
 	) WITHOUT ROWID;`,
+
+	// 2: links that share text or a file instead of redirecting. The body
+	// comes last so reading the other columns never touches its pages.
+	`ALTER TABLE links ADD COLUMN kind INTEGER NOT NULL DEFAULT 0;
+
+	CREATE TABLE contents (
+		link_id INTEGER PRIMARY KEY REFERENCES links (id) ON DELETE CASCADE,
+		format  INTEGER NOT NULL DEFAULT 0,
+		name    TEXT    NOT NULL DEFAULT '',
+		type    TEXT    NOT NULL DEFAULT '',
+		size    INTEGER NOT NULL,
+		lines   INTEGER NOT NULL DEFAULT 0,
+		sha256  BLOB,
+		file    TEXT    NOT NULL DEFAULT '',
+		body    TEXT
+	);`,
 }
 
 func migrate(ctx context.Context, db *sql.DB) error {

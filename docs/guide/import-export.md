@@ -4,7 +4,7 @@
 
 ## 导出 {#export}
 
-在设置 → 数据里选择“导出全部链接”，可以得到 JSON 或 CSV 文件。也可以用 API：[`GET /api/export`](../reference/api#export)，加上 `?format=csv` 得到 CSV。
+在设置 → 数据里选择“导出全部链接”，可以得到 JSON 或 CSV 文件。也可以用 API：[`GET /api/export`](../reference/api#export)，加上 `?format=csv` 得到 CSV。导出只包含短链接，不包含分享的文本和文件；它们要靠[备份](./operations#backup)保存。
 
 JSON 文件的结构如下，没有值的字段会省略：
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { ApiError, type Link, type LinkInput } from '../lib/api';
+  import { onMount, tick } from 'svelte';
+  import { api, ApiError, type Link, type LinkInput, type TextFormat } from '../lib/api';
   import { fromISO, sameExpiry, toISO, type Expiry } from '../lib/expiry';
   import { errorText, t } from '../lib/i18n.svelte';
   import { mod, modEnter } from '../lib/keys';
@@ -16,9 +16,14 @@
 
   let { link }: { link: Link } = $props();
 
+  const isURL = $derived(link.kind === 'url');
+  const isText = $derived(link.kind === 'text');
+
   function initial() {
     return {
       url: link.url,
+      text: '',
+      format: (link.content?.format ?? 'plain') as TextFormat,
       slug: link.slug,
       title: link.meta === 'manual' || link.meta === 'ok' ? link.title : '',
       expiry: fromISO(link.expiresAt) as Expiry,
@@ -32,21 +37,26 @@
   let form = $state(initial());
   let slugStatus = $state<SlugStatus>('idle');
   let saving = $state(false);
-  let errors = $state<{ url?: string; slug?: string; maxClicks?: string; other?: string }>({});
+  let errors = $state<{ url?: string; text?: string; slug?: string; maxClicks?: string; other?: string }>({});
   let urlField = $state<HTMLTextAreaElement>();
+  /** A text's body as saved; it can't be edited before it arrives. */
+  let saved = $state<string | null>(null);
+  const loaded = $derived(!isText || saved !== null);
 
-  const prefix = $derived(hostOf(session.origin));
+  const prefix = $derived(hostOf(session.origin) + (isURL ? '' : '/p'));
   const renamed = $derived(form.slug.trim() !== '' && !sameSlug(form.slug.trim(), start.slug));
 
   function patch(): LinkInput {
     const p: LinkInput = {};
-    if (form.url.trim() !== start.url) p.url = form.url.trim();
+    if (isURL && form.url.trim() !== start.url) p.url = form.url.trim();
+    if (isText && loaded && form.text !== start.text) p.text = form.text;
+    if (isText && form.format !== start.format) p.format = form.format;
     if (form.slug.trim() !== start.slug) p.slug = form.slug.trim();
     if (form.title.trim() !== start.title) p.title = form.title.trim();
     if (!sameExpiry(form.expiry, start.expiry)) p.expiresAt = toISO(form.expiry);
     const limit = form.maxClicks.trim();
     if (limit !== start.maxClicks) p.maxClicks = limit ? Number(limit) : null;
-    if (form.redirect !== start.redirect) p.redirect = form.redirect;
+    if (isURL && form.redirect !== start.redirect) p.redirect = form.redirect;
     if (form.enabled !== start.enabled) p.enabled = form.enabled;
     return p;
   }
@@ -56,13 +66,31 @@
   function autosize() {
     if (!urlField) return;
     urlField.style.height = 'auto';
-    urlField.style.height = `${urlField.scrollHeight + 2}px`;
+    const cap = isText ? innerHeight * 0.5 : Infinity;
+    urlField.style.height = `${Math.min(urlField.scrollHeight + 2, cap)}px`;
+  }
+
+  async function ready() {
+    await tick();
+    autosize();
+    urlField?.focus();
+    if (isURL) urlField?.setSelectionRange(urlField.value.length, urlField.value.length);
   }
 
   onMount(() => {
-    autosize();
-    urlField?.focus();
-    urlField?.setSelectionRange(urlField.value.length, urlField.value.length);
+    if (!isText) {
+      ready();
+      return;
+    }
+    api.linkText(link.id).then(
+      (r) => {
+        start.text = r.text;
+        form.text = r.text;
+        saved = r.text;
+        ready();
+      },
+      (e) => (errors = { other: errorText(e instanceof ApiError ? e.code : 'unknown') }),
+    );
   });
 
   function cancel() {
@@ -72,7 +100,8 @@
   async function save() {
     if (saving) return;
     errors = {};
-    if (!form.url.trim()) return void (errors = { url: t('err.url_required') });
+    if (isURL && !form.url.trim()) return void (errors = { url: t('err.url_required') });
+    if (isText && loaded && !form.text.trim()) return void (errors = { text: t('err.text_required') });
     if (!form.slug.trim()) return void (errors = { slug: t('err.slug_invalid') });
     if (blocking.includes(slugStatus)) return void (errors = { slug: t(`slug.${slugStatus}` as 'slug.taken') });
     if (form.maxClicks.trim() && !/^[1-9]\d*$/.test(form.maxClicks.trim()))
@@ -88,6 +117,7 @@
       const code = e instanceof ApiError ? e.code : 'unknown';
       const text = errorText(code);
       if (code.startsWith('url_')) errors = { url: text };
+      else if (code.startsWith('text_')) errors = { text };
       else if (code.startsWith('slug_')) errors = { slug: text };
       else if (code === 'max_clicks_invalid') errors = { maxClicks: text };
       else errors = { other: text };
@@ -118,21 +148,52 @@
   {onkeydown}
   novalidate
 >
-  <div class="cell wide">
-    <label class="label" for="edit-url-{link.id}">{t('detail.destination')}</label>
-    <textarea
-      bind:this={urlField}
-      id="edit-url-{link.id}"
-      class="field mono url"
-      rows="1"
-      bind:value={form.url}
-      oninput={autosize}
-      spellcheck="false"
-      autocapitalize="off"
-      aria-invalid={!!errors.url || undefined}
-    ></textarea>
-    {#if errors.url}<p class="error-text">{errors.url}</p>{/if}
-  </div>
+  {#if isURL}
+    <div class="cell wide">
+      <label class="label" for="edit-url-{link.id}">{t('detail.destination')}</label>
+      <textarea
+        bind:this={urlField}
+        id="edit-url-{link.id}"
+        class="field mono url"
+        rows="1"
+        bind:value={form.url}
+        oninput={autosize}
+        spellcheck="false"
+        autocapitalize="off"
+        aria-invalid={!!errors.url || undefined}
+      ></textarea>
+      {#if errors.url}<p class="error-text">{errors.url}</p>{/if}
+    </div>
+  {:else if isText}
+    <div class="cell wide">
+      <div class="text-head">
+        <label class="label" for="edit-text-{link.id}">{t('detail.text')}</label>
+        <Segmented
+          size="sm"
+          label={t('share.format')}
+          value={form.format}
+          onchange={(v) => (form.format = v)}
+          options={[
+            { value: 'plain', label: t('format.plain') },
+            { value: 'code', label: t('format.code') },
+          ]}
+        />
+      </div>
+      <textarea
+        bind:this={urlField}
+        id="edit-text-{link.id}"
+        class={['field', 'body', form.format === 'code' && 'mono']}
+        rows="6"
+        bind:value={form.text}
+        oninput={autosize}
+        disabled={!loaded}
+        placeholder={loaded ? '' : t('share.loading')}
+        spellcheck={form.format === 'plain'}
+        aria-invalid={!!errors.text || undefined}
+      ></textarea>
+      {#if errors.text}<p class="error-text">{errors.text}</p>{/if}
+    </div>
+  {/if}
 
   <div class="cell">
     <label class="label" for="edit-slug-{link.id}">{t('composer.slug')}</label>
@@ -153,7 +214,13 @@
 
   <div class="cell">
     <label class="label" for="edit-title-{link.id}">{t('composer.title')}</label>
-    <input id="edit-title-{link.id}" class="field" bind:value={form.title} placeholder={t('composer.titleAuto')} maxlength="300" />
+    <input
+      id="edit-title-{link.id}"
+      class="field"
+      bind:value={form.title}
+      placeholder={isURL ? t('composer.titleAuto') : t('share.optional')}
+      maxlength="300"
+    />
   </div>
 
   <div class="cell">
@@ -174,19 +241,21 @@
     {#if errors.maxClicks}<p class="error-text">{errors.maxClicks}</p>{/if}
   </div>
 
-  <div class="cell">
-    <span class="label">{t('composer.redirect')}</span>
-    <Segmented
-      label={t('composer.redirect')}
-      value={form.redirect === 308 ? 301 : form.redirect === 307 ? 302 : form.redirect}
-      onchange={(v) => (form.redirect = v)}
-      options={[
-        { value: 302, label: t('redirect.302') },
-        { value: 301, label: t('redirect.301') },
-      ]}
-    />
-    <p class="hint">{t('redirect.hint')}</p>
-  </div>
+  {#if isURL}
+    <div class="cell">
+      <span class="label">{t('composer.redirect')}</span>
+      <Segmented
+        label={t('composer.redirect')}
+        value={form.redirect === 308 ? 301 : form.redirect === 307 ? 302 : form.redirect}
+        onchange={(v) => (form.redirect = v)}
+        options={[
+          { value: 302, label: t('redirect.302') },
+          { value: 301, label: t('redirect.301') },
+        ]}
+      />
+      <p class="hint">{t('redirect.hint')}</p>
+    </div>
+  {/if}
 
   <div class="cell switch-row">
     <Switch id="edit-enabled-{link.id}" checked={form.enabled} onchange={(v) => (form.enabled = v)} label={t('detail.enabled')} />
@@ -222,6 +291,31 @@
     font-size: 13px;
     line-height: 1.5;
     overflow-wrap: anywhere;
+  }
+
+  .text-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .text-head .label {
+    margin-bottom: 0;
+  }
+
+  .body {
+    min-height: 120px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .body.mono {
+    font-size: 12.5px;
+    tab-size: 4;
+    white-space: pre;
+    overflow-x: auto;
   }
 
   .editor :global(.picker-field) {
@@ -298,7 +392,8 @@
 
   @media (max-width: 640px) {
     .editor {
-      grid-template-columns: 1fr;
+      /* minmax keeps a long line of code from widening the column. */
+      grid-template-columns: minmax(0, 1fr);
       padding: 16px 14px 12px;
     }
 

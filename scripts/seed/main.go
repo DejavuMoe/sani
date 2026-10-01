@@ -7,11 +7,15 @@ package main
 
 import (
 	"context"
+	crand "crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"log"
 	"math"
 	"math/rand/v2"
+	"mime"
 	"os"
 	"path/filepath"
 	"time"
@@ -35,6 +39,49 @@ type demo struct {
 	off     bool
 	limit   int64
 	lastAgo time.Duration
+
+	// A shared text or file instead of a destination URL.
+	text   string
+	code   bool
+	file   string
+	fileOf func() []byte
+}
+
+const nginxConf = `server {
+    listen 443 ssl;
+    server_name s.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+`
+
+// demoPDF is a small, valid PDF with one page of text.
+func demoPDF() []byte {
+	body := "BT /F1 18 Tf 72 720 Td (Sani design review, v3) Tj ET"
+	objs := []string{
+		"<< /Type /Catalog /Pages 2 0 R >>",
+		"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+		"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+		fmt.Sprintf("<< /Length %d >>\nstream\n%s\nendstream", len(body), body),
+		"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+	}
+	out := []byte("%PDF-1.4\n")
+	offsets := make([]int, len(objs))
+	for i, o := range objs {
+		offsets[i] = len(out)
+		out = fmt.Appendf(out, "%d 0 obj\n%s\nendobj\n", i+1, o)
+	}
+	xref := len(out)
+	out = fmt.Appendf(out, "xref\n0 %d\n0000000000 65535 f \n", len(objs)+1)
+	for _, off := range offsets {
+		out = fmt.Appendf(out, "%010d 00000 n \n", off)
+	}
+	return fmt.Appendf(out, "trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n", len(objs)+1, xref)
 }
 
 var social = map[string]float64{"": 0.42, "t.co": 0.18, "weibo.com": 0.12, "github.com": 0.1, "google.com": 0.08, "news.ycombinator.com": 0.06, "v2ex.com": 0.04}
@@ -44,6 +91,8 @@ var demos = []demo{
 	{slug: "blog", url: "https://dejavu.moe/", title: "Dejavu’s Blog", age: 57, rate: 22, refs: map[string]float64{"": 0.55, "google.com": 0.2, "t.co": 0.15, "bing.com": 0.1}, lastAgo: 26 * time.Minute},
 	{slug: "简历", url: "https://dejavu.moe/resume", title: "简历 · 工作经历与项目", age: 44, rate: 3, refs: map[string]float64{"": 0.8, "linkedin.com": 0.2}, lastAgo: 5 * time.Hour},
 	{slug: "weekly-42", url: "https://mp.weixin.qq.com/s/Qm7rXk2pLwE9aZ3cVb8Nfg", title: "周刊第 42 期：把长期主义当作一种工程习惯", age: 9, rate: 64, burst: 8, refs: map[string]float64{"": 0.7, "weibo.com": 0.18, "douban.com": 0.12}, lastAgo: 2 * time.Minute},
+	{slug: "nginx-conf", text: nginxConf, code: true, title: "Nginx 反向代理配置", age: 4, rate: 6, refs: map[string]float64{"": 0.7, "github.com": 0.3}, lastAgo: 3 * time.Hour},
+	{file: "Sani 设计评审 v3.pdf", fileOf: demoPDF, age: 2, rate: 4, limit: 50, refs: map[string]float64{"": 1}, lastAgo: 90 * time.Minute},
 	{slug: "", url: "https://www.figma.com/design/7f3Kd92/Onboarding-Flow?node-id=12-345&t=Xy8", title: "Onboarding Flow – Figma", age: 12, rate: 5, refs: map[string]float64{"": 0.9, "slack.com": 0.1}, lastAgo: 50 * time.Minute},
 	{slug: "", url: "https://arxiv.org/abs/2409.01234", title: "Scaling Laws for Retrieval-Augmented Language Models", age: 27, rate: 9, burst: 25, refs: map[string]float64{"": 0.35, "t.co": 0.4, "news.ycombinator.com": 0.25}, lastAgo: 3 * time.Hour},
 	{slug: "talk", url: "https://www.youtube.com/watch?v=R7tq3-GvhlQ", title: "GopherCon 2026 — Designing for the Hot Path", age: 40, rate: 11, refs: social, expired: true, lastAgo: 9 * 24 * time.Hour},
@@ -52,6 +101,41 @@ var demos = []demo{
 	{slug: "", url: "https://news.ycombinator.com/item?id=41234567", title: "", age: 3, rate: 7, refs: map[string]float64{"": 0.3, "news.ycombinator.com": 0.7}, lastAgo: 40 * time.Minute},
 	{slug: "rfc", url: "https://www.rfc-editor.org/rfc/rfc9110.html#name-redirection-3xx", title: "RFC 9110: HTTP Semantics", age: 21, rate: 1.2, refs: map[string]float64{"": 0.6, "google.com": 0.4}, lastAgo: 30 * time.Hour},
 	{slug: "", url: "https://www.bilibili.com/video/BV1xK4y1m7aB", title: "【开发者日常】我为什么又写了一个短链接服务", age: 1, rate: 30, refs: map[string]float64{"": 0.5, "bilibili.com": 0.3, "weibo.com": 0.2}, lastAgo: time.Minute},
+}
+
+// share turns l into a text or file link when the demo is one, writing the
+// file where the server keeps uploads.
+func share(l *store.Link, d demo, dataDir string) error {
+	switch {
+	case d.text != "":
+		l.Kind = store.KindText
+		l.Content = &store.Content{Name: links.TextPreview(d.text), Size: int64(len(d.text)), Lines: links.TextLines(d.text), Text: d.text}
+		if d.code {
+			l.Content.Format = store.FormatCode
+		}
+	case d.file != "":
+		data := d.fileOf()
+		var id [16]byte
+		crand.Read(id[:])
+		name := hex.EncodeToString(id[:])
+		dir := filepath.Join(dataDir, "files")
+		if err := os.MkdirAll(dir, 0o750); err != nil {
+			return err
+		}
+		if err := os.WriteFile(filepath.Join(dir, name), data, 0o640); err != nil {
+			return err
+		}
+		sum := sha256.Sum256(data)
+		l.Kind = store.KindFile
+		l.Content = &store.Content{Name: d.file, Type: mime.TypeByExtension(filepath.Ext(d.file)), Size: int64(len(data)), SHA256: sum[:], File: name}
+	default:
+		return nil
+	}
+	l.Meta = store.MetaManual
+	if d.slug == "" {
+		l.Slug = links.Generate(10)
+	}
+	return nil
 }
 
 // poisson draws a count with mean lambda.
@@ -130,10 +214,15 @@ func main() {
 		if l.Slug == "" {
 			l.Slug = links.Generate(5)
 		}
+		if err := share(l, d, *dataDir); err != nil {
+			log.Fatal(err)
+		}
 		if err := st.CreateLink(ctx, l, true); err != nil {
 			log.Fatalf("create %s: %v", d.url, err)
 		}
-		hosts[l.Host] = d.url
+		if l.Host != "" {
+			hosts[l.Host] = d.url
+		}
 
 		batch := &store.ClickBatch{Links: map[int64]store.LinkDelta{}, Days: map[store.DayKey]int64{}, Refs: map[store.RefKey]int64{}}
 		var total int64

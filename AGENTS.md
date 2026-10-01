@@ -26,7 +26,7 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 ## Layout
 
 - `cmd/sani`: entry point and subcommands (`serve`, `passwd`, `backup`, `healthcheck`, `version`).
-- `internal/server`: routes, redirect hot path, JSON API, embedded app, visitor pages.
+- `internal/server`: routes, redirect hot path, JSON API, embedded app, visitor pages, shared texts and files (`share.go`, `sharepage.go`).
 - `internal/cache`, `internal/clicks`: the in-memory redirect cache and click aggregation.
 - `internal/store`: SQLite schema, migrations (`PRAGMA user_version`) and queries.
 - `internal/links`: pure rules for slugs and URLs. `internal/meta`: the title/icon fetcher.
@@ -53,7 +53,7 @@ Update both languages; the check names what's missing. Anything else the docs cl
 
 - **Redirects never touch the database** when the slug is cached, and never wait on a write. Clicks are counted in memory and flushed in batches. Check `make bench` before and after changing `redirect.go`, `cache` or `clicks`.
 - **No cgo.** SQLite is `modernc.org/sqlite`; the image is `FROM scratch`.
-- **Security boundaries stay in place:** the SSRF guard in `internal/meta` (pre-resolve and dial-time checks), blocked URL schemes in `internal/links`, the setup code for the first password, session cookies scoped to `/api/`, `http.CrossOriginProtection`, and the admin CSP (inline scripts only by hash; `web.go` computes the hashes).
+- **Security boundaries stay in place:** the SSRF guard in `internal/meta` (pre-resolve and dial-time checks), blocked URL schemes in `internal/links`, the setup code for the first password, session cookies scoped to `/api/`, `http.CrossOriginProtection`, the admin CSP (inline scripts only by hash; `web.go` computes the hashes), and shared bytes served only from the files origin (`SANI_FILES_URL`, a separate host) with sandboxing headers.
 - **Untrusted input is bounded:** referrer hosts per link, limiter keys, request bodies, fetched pages and icons all have caps. New maps keyed by client input need one too.
 - **Every UI string exists in both `zh` and `en`** in `web/src/lib/i18n.svelte.ts`; `zh` defines the keys and the type of `en` requires all of them. Chinese copy is written for Chinese readers, not translated word for word. The same goes for the docs: every page exists in both languages.
 - **No UI or icon libraries.** Icons are hand-drawn paths in `components/Icon.svelte`; menus use the Popover API and dialogs use `<dialog>`. The docs theme copies the icons it needs into its own `Icon.vue`.

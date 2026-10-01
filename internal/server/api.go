@@ -37,6 +37,9 @@ func (s *Server) routes() http.Handler {
 	mux.Handle("POST /api/links/{id}/restore", a(s.restoreLink))
 	mux.Handle("POST /api/links/{id}/refresh", a(s.refreshLink))
 	mux.Handle("GET /api/links/{id}/stats", a(s.linkStats))
+	mux.Handle("GET /api/links/{id}/text", a(s.linkText))
+	mux.Handle("POST /api/texts", a(s.createText))
+	mux.Handle("POST /api/files", a(s.createFile))
 	mux.Handle("GET /api/slugs/{slug}", a(s.checkSlug))
 
 	mux.Handle("GET /api/tokens", a(s.listTokens))
@@ -89,8 +92,21 @@ func (s *Server) internalError(w http.ResponseWriter, r *http.Request, err error
 }
 
 func decodeJSON(w http.ResponseWriter, r *http.Request, v any) bool {
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	return decodeJSONMax(w, r, v, 1<<20)
+}
+
+// maxTextBody leaves room for a text at its limit even when JSON escapes
+// many of its characters.
+const maxTextBody = 8 << 20
+
+func decodeJSONMax(w http.ResponseWriter, r *http.Request, v any, limit int64) bool {
+	r.Body = http.MaxBytesReader(w, r.Body, limit)
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
+		var tooBig *http.MaxBytesError
+		if errors.As(err, &tooBig) {
+			writeError(w, http.StatusRequestEntityTooLarge, "too_large", "the request body is too large")
+			return false
+		}
 		writeError(w, http.StatusBadRequest, "bad_json", "request body must be a JSON object")
 		return false
 	}

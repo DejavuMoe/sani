@@ -1,6 +1,6 @@
 # Operations
 
-<p class="lead">All of Sani’s data is in one SQLite file, so there isn’t much to do day to day: back up regularly, upgrade now and then, and reset the password if you forget it.</p>
+<p class="lead">All of Sani’s data is in one SQLite file, plus a directory of shared files, so there isn’t much to do day to day: back up regularly, upgrade now and then, and reset the password if you forget it.</p>
 
 ## Backups {#backup}
 
@@ -33,7 +33,26 @@ A daily backup with cron that keeps the last 14:
 15 4 * * * docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
 ```
 
-For a list of links you can import elsewhere, use Settings → Data → Export (see [Import and export](./import-export)). An export leaves out daily statistics, referrers and tokens, so it doesn’t replace a backup.
+For a list of links you can import elsewhere, use Settings → Data → Export (see [Import and export](./import-export)). An export leaves out daily statistics, referrers, tokens, texts and files, so it doesn’t replace a backup.
+
+### Shared files {#backup-files}
+
+Texts are in the database, but [shared files](./usage#shares) are kept next to it in `files/`, and `sani backup` reminds you of that. Copy the directory after the database: files never change once uploaded, so a copy taken after the database has every file the database refers to.
+
+::: code-group
+
+```sh [Docker]
+docker run --rm --volumes-from sani -v "$PWD":/backup alpine \
+  tar -czf /backup/sani-files-$(date +%F).tar.gz -C /data files
+```
+
+```sh [systemd]
+sudo tar -czf /root/sani-files-$(date +%F).tar.gz -C /var/lib/sani files
+```
+
+:::
+
+With many files, `rsync` to the same place each time only copies the new ones. A file whose link is gone is removed from `files/` an hour or so after the link is deleted.
 
 ## Restoring
 
@@ -58,7 +77,7 @@ sudo systemctl start sani
 
 :::
 
-The image has no shell, so with Docker a throwaway `alpine` container copies the file and hands it to the user Sani runs as.
+The image has no shell, so with Docker a throwaway `alpine` container copies the file and hands it to the user Sani runs as. To bring back shared files too, unpack their archive into the data directory in the same step, as in `tar -xzf /backup/sani-files-2026-09-29.tar.gz -C /data && chown -R 65532:65532 /data/files`. Files the restored database doesn’t know are removed on their own.
 
 Moving to another server is the same: back up on the old one, restore on the new one, then point DNS at it.
 
@@ -138,5 +157,9 @@ Clicks are written every 2 seconds. If the process is killed outright or the mac
 **Titles and icons never show up.** The server may not reach the internet, the site may refuse the fetch, or the destination may resolve to a private address, which Sani never fetches. If the server reaches the internet through a proxy, set `HTTPS_PROXY`. `SANI_LOG_LEVEL=debug` logs the reason for each failure.
 
 **Fewer clicks than expected.** Crawlers, link previews and your own clicks from the admin app don’t count. Browsers cache permanent (301) redirects, so repeat visits from the same browser skip Sani. See [Statistics](./statistics).
+
+**The File tab says sharing files needs a domain of its own.** Set up a [files domain](./deploy#files-domain) and `SANI_FILES_URL`.
+
+**Uploads fail with “too large”, though the file is under the limit.** The reverse proxy refuses the body before Sani sees it: raise nginx’s `client_max_body_size`, or the equivalent in your proxy.
 
 **The admin app only says “The admin app is not part of this build”.** The binary was built with plain `go build`, without the frontend. Rebuild with `make build`.

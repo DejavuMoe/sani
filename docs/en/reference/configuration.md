@@ -17,6 +17,8 @@
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | Fetch titles and icons automatically |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | Pass query strings on to destinations |
 | [`SANI_CACHE_SIZE`](#sani-cache-size) | `100000` | Redirect targets kept in memory |
+| [`SANI_FILES_URL`](#sani-files-url) | — | Domain that serves files and raw text |
+| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `64` | Size limit for one file, in MB |
 | [`SANI_LOG_LEVEL`](#sani-log-level) | `info` | Log level |
 | [`SANI_LOG_FORMAT`](#sani-log-format) | `text` | Log format |
 | [`TZ`](#tz) | system | Time zone for daily statistics |
@@ -31,7 +33,7 @@ Default `:8080`. The address and port to listen on; `:8080` means every interfac
 
 ### `SANI_DATA_DIR`
 
-Default `data`, relative to the working directory. The database file `sani.db` lives here; the directory is created if it doesn’t exist. It’s `/data` in the Docker image and `/var/lib/sani` in the systemd example.
+Default `data`, relative to the working directory. The database file `sani.db` lives here and shared files in its `files` directory; the directory is created if it doesn’t exist. It’s `/data` in the Docker image and `/var/lib/sani` in the systemd example.
 
 You’ll also see `sani.db-wal` and `sani.db-shm` there. They belong to SQLite’s WAL mode; don’t delete them on their own. To copy the database, use [`sani backup`](./cli#sani-backup).
 
@@ -107,6 +109,22 @@ If the destination already has a query, the two are joined with `&`, and a `#` f
 Default `100000`, from 64 to 100,000,000. How many redirect targets to keep in memory. Sani also caches up to a quarter as many unknown slugs, so a scan for random slugs neither keeps hitting the database nor pushes real links out of the cache.
 
 When the cache is full, a random entry makes room. With far fewer links than this, every link that has been visited stays in memory.
+
+## Sharing
+
+### `SANI_FILES_URL`
+
+No default. The origin that serves the raw content of texts and files, such as `https://f.example.com`. Like `SANI_BASE_URL` it’s a scheme and a host, optionally with a port, and it **must be a different host**: another port isn’t enough, because browsers share cookies across the ports of one host.
+
+Without it you can still share texts, which visitors read and copy on their `/p/` page, but you can’t upload files, and text pages have no Raw and Download buttons.
+
+The domain points at the same Sani process; nothing else needs deploying. Sani tells the two apart by the request’s `Host` (or `X-Forwarded-Host` with [`SANI_TRUST_PROXY`](#sani-trust-proxy)). The files domain serves shared content and a `robots.txt` that turns every crawler away, and answers 404 to everything else. Why it needs a domain of its own is explained under [Security](../internals/security#shares).
+
+### `SANI_MAX_FILE_MB`
+
+Default `64`, from 1 to 4096. The largest file you can share, in MB (1 MB = 1,048,576 bytes). A larger upload is refused, and whatever arrived of it is deleted.
+
+Reverse proxies usually limit request bodies too; raise that limit as well, as shown under [Deployment](../guide/deploy#files-domain). Texts are limited to 1 MB, whatever this is set to.
 
 ## Logging
 

@@ -208,10 +208,16 @@ function checkBenchmark(): Check {
 
 function checkBuilder(): Check {
   const problems: string[] = [];
-  const input: BuilderInput = { domain: 'go.example.org', tz: 'Europe/Berlin', password: 'x'.repeat(20), rootRedirect: 'https://example.org' };
+  const input: BuilderInput = {
+    domain: 'go.example.org',
+    tz: 'Europe/Berlin',
+    password: 'x'.repeat(20),
+    rootRedirect: 'https://example.org',
+    filesDomain: 'files.example.org',
+  };
   const runs: [string, () => { filled: number[] }, number][] = [
-    ['compose.yaml', () => buildCompose(read('compose.yaml'), input), 4],
-    ['deploy/sani.service', () => buildService(read('deploy/sani.service'), input), 4],
+    ['compose.yaml', () => buildCompose(read('compose.yaml'), input), 5],
+    ['deploy/sani.service', () => buildService(read('deploy/sani.service'), input), 5],
     ['deploy/Caddyfile', () => buildProxy(read('deploy/Caddyfile'), input, 'deploy/Caddyfile'), 1],
     ['deploy/nginx.conf', () => buildProxy(read('deploy/nginx.conf'), input, 'deploy/nginx.conf'), 1],
   ];

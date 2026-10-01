@@ -90,6 +90,7 @@ export function errorCodes(): Map<string, Set<number>> {
       add(m[2], httpStatus[m[1]]);
     }
     for (const m of src.matchAll(/\bbadInput\("([a-z_]+)"/g)) add(m[1], 400);
+    for (const m of src.matchAll(/\btooLarge\("([a-z_]+)"/g)) add(m[1], 413);
     // Slug and URL rule violations reach the client through badInput.
     const table = /var linkErrors = map\[error\]string\{([^}]*)\}/.exec(src);
     if (table) for (const m of table[1].matchAll(/"([a-z_]+)"/g)) add(m[1], 400);

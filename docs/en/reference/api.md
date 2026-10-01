@@ -8,7 +8,7 @@
 - **Authentication.** Everything except sign-in and first-run setup needs it. Scripts use an API token, sent as `Authorization: Bearer sani_…` or `X-Api-Key: sani_…`; the admin app uses a session cookie. Create tokens in Settings → API tokens; they have full access.
 - **Cross-site requests.** Requests a browser sends from another site are refused, based on the `Sec-Fetch-Site` and `Origin` headers browsers add. Scripts and command-line tools don’t send those headers and are unaffected.
 - **Times.** RFC 3339 in UTC, such as `2026-09-28T09:30:00Z`.
-- **Sizes.** Request bodies are limited to 1 MB, and to 32 MB for imports.
+- **Sizes.** Request bodies are limited to 1 MB; to 8 MB when they create or update a link, so a text at its 1 MB limit fits even with JSON escapes; to 32 MB for imports; and for uploads to the [file size limit](./configuration#sani-max-file-mb) plus 1 MB for the form around it.
 - **Caching.** Every response has `Cache-Control: no-store`.
 - **Errors.** A failed request gets a matching HTTP status and the body below. `code` is stable and meant for programs; `message` is an English explanation for people and may change. The full list is under [Error codes](#errors).
 
@@ -38,6 +38,9 @@ curl https://s.example.com/api/links \
 | `POST` | `/api/links/{id}/restore` | [Restore a deleted link](#restore) |
 | `POST` | `/api/links/{id}/refresh` | [Fetch the title and icon again](#refresh) |
 | `GET` | `/api/links/{id}/stats` | [A link’s statistics](#stats) |
+| `POST` | `/api/texts` | [Share a text](#create-text) |
+| `POST` | `/api/files` | [Share a file](#create-file) |
+| `GET` | `/api/links/{id}/text` | [Read a shared text](#read-text) |
 | `GET` | `/api/slugs/{slug}` | [Check whether a slug is free](#slug-check) |
 | `GET` | `/api/overview` | [Totals across all links](#overview) |
 | `GET` | `/api/favicons/{host}` | [Site icons](#favicons) |
@@ -62,6 +65,8 @@ curl https://s.example.com/api/links \
 ```json
 {
   "id": 12,
+  "kind": "url",
+  "content": null,
   "slug": "gh",
   "shortUrl": "https://s.example.com/gh",
   "url": "https://github.com/DejavuMoe/sani",
@@ -83,9 +88,11 @@ curl https://s.example.com/api/links \
 
 | Field | Meaning |
 |---|---|
+| `kind` | `url` for a short link, `text` or `file` for a [share](#shares). |
+| `content` | What a text or file shares, described [below](#shares); `null` for short links. |
 | `slug` | The slug, with the capitalization it was created with. Lookups ignore case. |
-| `shortUrl` | The full short link; where its domain comes from is explained under [Deployment](../guide/deploy#domain). |
-| `url` | The normalized destination. |
+| `shortUrl` | The full short link, with `/p/` before the slug of a text or file; where its domain comes from is explained under [Deployment](../guide/deploy#domain). |
+| `url` | The normalized destination; empty for texts and files. |
 | `host` | The destination’s host without `www.`. Empty for addresses without a host, like `mailto:`. |
 | `title` | The title, or an empty string. |
 | `meta` | Where the title came from: `pending` while fetching, `ok` fetched from the page, `failed` nothing found, `manual` set by you and never replaced automatically. |
@@ -121,7 +128,8 @@ Returns `201` with the new [link](#link-object).
 
 | Parameter | Meaning |
 |---|---|
-| `q` | Search slugs, titles and destinations. A full short link works too. |
+| `q` | Search slugs, titles, destinations, file names and the first line of texts. A full short link works too. |
+| `kind` | Only links of this [kind](#link-object): `url`, `text` or `file`. |
 | `sort` | `created` (default, newest first), `clicks` (most clicked) or `visited` (last visited). |
 | `limit` | Links per page, 1 to 200, default 50. |
 | `cursor` | The `next` value from the previous page. |
@@ -149,9 +157,10 @@ Takes every field of *Create* except `reuse`, and changes only the fields presen
 - `null` for `expiresAt` or `maxClicks` clears it;
 - an empty `title` fetches a new one;
 - a new `url` fetches a new title if the old one was fetched automatically;
-- after a `slug` change, the old slug stops working immediately.
+- after a `slug` change, the old slug stops working immediately;
+- for a text, `text` and `format` replace its body and its format.
 
-Changes apply from the next visit. Returns the updated [link](#link-object).
+`url` and `redirect` don’t apply to texts and files, and `text` and `format` only apply to texts; sending one to a link of another kind gets `kind_mismatch`. A file’s bytes can’t be replaced: share a new one. Changes apply from the next visit. Returns the updated [link](#link-object).
 
 ### Delete a link {#delete}
 
@@ -183,7 +192,7 @@ Turns links on or off, deletes or restores them, in one transaction:
 
 `POST /api/links/{id}/refresh`
 
-Fetches the destination’s title and icon again, waits for the result and returns the [link](#link-object). This can take a few seconds. A title you set yourself is kept.
+Fetches the destination’s title and icon again, waits for the result and returns the [link](#link-object). This can take a few seconds. A title you set yourself is kept. Texts and files have no page to fetch, and get `kind_mismatch`.
 
 ### Statistics {#stats}
 
@@ -217,6 +226,76 @@ Tells whether a slug can be used:
 ```
 
 `reason` is `slug_taken`, `slug_reserved`, `slug_invalid` or `slug_too_long`, and absent when the slug is free.
+
+## Texts and files {#shares}
+
+A share is a link that shows something instead of redirecting: visitors open it at `/p/{slug}`, and its bytes come from the [files domain](./configuration#sani-files-url). Shares and short links have one slug namespace, so `gh` can’t be both. They have the same `title`, `enabled`, `expiresAt` and `maxClicks`, and the same [statistics](#stats); the list, delete, restore and bulk endpoints treat them like any link. Generated slugs for shares are at least 10 characters long, because nothing else keeps them private.
+
+A share’s `content`:
+
+```json
+{
+  "format": "code",
+  "preview": "server {",
+  "lines": 11,
+  "size": 286,
+  "rawUrl": "https://f.example.com/nginx-conf"
+}
+```
+
+```json
+{
+  "name": "Design review v3.pdf",
+  "type": "application/pdf",
+  "sha256": "67b21479e9f0cda26f49fe72be530b79adb35d2040cb207f61f0cc7bd2847f6e",
+  "size": 597,
+  "rawUrl": "https://f.example.com/tn5ya24hh6/Design%20review%20v3.pdf"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `format` | Texts: `plain`, shown as running text, or `code`, monospace with line numbers. |
+| `preview` | Texts: the first line that isn’t blank, up to 120 characters. |
+| `lines` | Texts: the number of lines. |
+| `name`, `type` | Files: the file name and its media type, from the extension or, without one, the first bytes. |
+| `sha256` | Files: the SHA-256 of the bytes, in hex. |
+| `size` | The size in bytes. |
+| `rawUrl` | The bytes on the files domain, or `null` when there is none. Opening it counts as a visit. |
+
+### Share a text {#create-text}
+
+`POST /api/texts`
+
+```json
+{ "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
+```
+
+`text` is required: at most 1 MB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
+
+### Share a file {#create-file}
+
+`POST /api/files`
+
+The body is `multipart/form-data` with one `file` part and, optionally, the fields `slug`, `title`, `expiresAt`, `maxClicks` and `enabled`, as text and with the same meaning as for [a link](#create):
+
+```sh
+curl https://s.example.com/api/files \
+  -H "Authorization: Bearer $SANI_TOKEN" \
+  -F file=@report.pdf -F maxClicks=10
+```
+
+- The file must not be empty and is limited by [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb). It’s written to disk as it arrives, never held in memory.
+- The file name is kept, without its path, control characters or invisible direction marks.
+- Sharing files needs a files domain; without one this answers `409 files_disabled`.
+
+Returns `201` with the new [link](#link-object).
+
+### Read a shared text {#read-text}
+
+`GET /api/links/{id}/text`
+
+Returns `{"text": "…"}`, the whole body, which listings leave out. It doesn’t count as a visit. Links that aren’t texts get `404`.
 
 ## Overview {#overview}
 
@@ -274,11 +353,14 @@ curl https://s.example.com/api/import \
   "fetchMeta": true,
   "forwardQuery": true,
   "passwordFromEnv": false,
-  "timezone": "Europe/Berlin"
+  "timezone": "Europe/Berlin",
+  "filesUrl": "https://f.example.com",
+  "maxFileSize": 67108864,
+  "maxTextSize": 1048576
 }
 ```
 
-`baseUrlSource` says where the short domain comes from: `env` for `SANI_BASE_URL`, `setting` for Settings, `request` for the current request’s address.
+`baseUrlSource` says where the short domain comes from: `env` for `SANI_BASE_URL`, `setting` for Settings, `request` for the current request’s address. `filesUrl` is the [files domain](./configuration#sani-files-url), or `null` without one; `maxFileSize` and `maxTextSize` are the limits for a file and a text, in bytes.
 
 `PATCH /api/config`
 
@@ -288,7 +370,7 @@ Changes the short domain stored in Settings:
 { "baseUrl": "https://s.example.com" }
 ```
 
-`null` or an empty string clears it. Returns `409` when `SANI_BASE_URL` is set, and the updated settings on success.
+`null` or an empty string clears it. The files domain can’t be the short domain too. Returns `409` when `SANI_BASE_URL` is set, and the updated settings on success.
 
 ## API tokens {#tokens}
 
@@ -348,6 +430,20 @@ These paths are outside `/api/` and need no authentication.
 - Temporary redirects (302, 307) send `Cache-Control: private, max-age=0`, so every visit reaches Sani; permanent ones (301, 308) send `Cache-Control: public, max-age=86400`, so browsers cache them for up to a day.
 - Unknown slugs get `404`, and turned off, expired or used-up links `410`, both as small HTML pages in the visitor’s language.
 - Only `GET` and `HEAD` are accepted; other methods get `405`.
+- A text or file at this path gets `404`: shares live under `/p/`.
+
+`GET /p/{slug}`
+
+- A page that shows a text, escaped and in the visitor’s language, or describes a file with a download button. `404` and `410` work as for redirects.
+- Opening a text’s page counts as a visit; a file’s page doesn’t, its download does.
+- The page’s only script is its copy button, allowed by hash in the Content Security Policy.
+
+On the files domain:
+
+- `GET /{slug}` returns a text as `text/plain` or a file as an attachment; `GET /{slug}/{name}` downloads either, a text as `{slug}.txt`. Files support `Range` requests and carry their SHA-256 as `ETag`.
+- Every response is sandboxed, can’t be framed or embedded by other sites, and isn’t cached or indexed. `robots.txt` turns every crawler away; every other path is `404`.
+- Every fetch counts as a visit, `curl` and `wget` included, unless it resumes a partial download, comes from a crawler or a link preview, or is a `HEAD` request. A link at its visit limit gets `410`.
+- When 32 downloads are already running, another one gets `503` with `Retry-After`, and isn’t counted.
 
 `GET /healthz`
 
@@ -357,7 +453,7 @@ Returns `200` with `ok`, for health checks.
 
 | Code | Status | Meaning |
 |---|---|---|
-| `bad_json` | 400 | The body isn’t a valid JSON object, or is over 1 MB |
+| `bad_json` | 400 | The body isn’t a valid JSON object |
 | `cursor_invalid` | 400 | The pagination cursor is invalid |
 | `url_required` | 400 | The destination is missing |
 | `url_invalid` | 400 | The destination isn’t a valid URL |
@@ -371,6 +467,11 @@ Returns `200` with `ok`, for health checks.
 | `expires_past` | 400 | `expiresAt` is in the past |
 | `max_clicks_invalid` | 400 | `maxClicks` isn’t a whole number from 0 to 10¹² |
 | `redirect_invalid` | 400 | `redirect` isn’t 301, 302, 307 or 308 |
+| `text_required` | 400 | A text is missing or only whitespace |
+| `format_invalid` | 400 | `format` isn’t `plain` or `code` |
+| `kind_mismatch` | 400 | A field that doesn’t apply to this kind of link, like a `url` for a text, or a refresh of a share |
+| `file_required` | 400 | The upload has no `file` part, or the file is empty |
+| `upload_invalid` | 400 | The upload isn’t well-formed `multipart/form-data`, has more than one file, or a field over 4 KB |
 | `bulk_invalid` | 400 | A bulk change with an unknown `action`, or without 1 to 500 `ids` |
 | `base_url_invalid` | 400 | The domain should look like `https://s.example.com` |
 | `name_invalid` | 400 | The token name is empty or over 60 characters |
@@ -388,6 +489,9 @@ Returns `200` with `ok`, for health checks.
 | `needs_setup` | 409 | No password yet, so there’s nothing to sign in with |
 | `password_env` | 409 | `SANI_PASSWORD` manages the password, so the API can’t change it |
 | `base_url_env` | 409 | `SANI_BASE_URL` fixes the short domain, so the API can’t change it |
-| `too_large` | 413 | The import file is over 32 MB |
+| `files_disabled` | 409 | No files domain is set, so files can’t be shared |
+| `too_large` | 413 | The request body is over its [limit](#conventions), such as an import file over 32 MB |
+| `text_too_large` | 413 | The text is over 1 MB |
+| `file_too_large` | 413 | The file is over the limit set by `SANI_MAX_FILE_MB` |
 | `rate_limited` | 429 | Too many failures; wait for `Retry-After` |
 | `internal` | 500 | Something failed on the server; its log has the details |

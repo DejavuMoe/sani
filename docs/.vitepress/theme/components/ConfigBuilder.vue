@@ -23,6 +23,7 @@ const tzInput = ref('Asia/Shanghai');
 const fixedPassword = ref(false);
 const password = ref('');
 const rootRedirect = ref('');
+const filesInput = ref('');
 const zones = ref<string[]>([]);
 
 onMounted(() => {
@@ -75,8 +76,8 @@ function arrows(e: KeyboardEvent, values: string[], current: string, select: (v:
 }
 
 /** Accepts "https://S.Example.com/admin/" and returns "s.example.com". */
-const domain = computed(() => {
-  const raw = domainInput.value.trim();
+function hostOf(input: string) {
+  const raw = input.trim();
   if (!raw) return '';
   try {
     const host = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`).hostname;
@@ -84,7 +85,15 @@ const domain = computed(() => {
   } catch {
     return '';
   }
+}
+const domain = computed(() => hostOf(domainInput.value));
+
+/** The files domain has to differ from the short one; empty is fine. */
+const filesDomain = computed(() => {
+  const host = hostOf(filesInput.value);
+  return host && host !== (domain.value || EXAMPLE_DOMAIN) ? host : '';
 });
+const filesOK = computed(() => !filesInput.value.trim() || !!filesDomain.value);
 
 const tz = computed(() => {
   try {
@@ -102,6 +111,7 @@ const input = computed(() => ({
   tz: tz.value || 'Asia/Shanghai',
   password: fixedPassword.value ? password.value : '',
   rootRedirect: redirectOK.value ? rootRedirect.value.trim() : '',
+  filesDomain: filesDomain.value,
 }));
 
 interface File {
@@ -213,6 +223,12 @@ const steps = computed(() => {
       code: 'sudo systemctl reload caddy',
     });
   } else if (proxy.value === 'nginx') {
+    if (input.value.filesDomain) {
+      list.push({
+        text: pick('两个域名用同一张证书，比如用 certbot 签发：', 'Get one certificate for both domains, for example with certbot:'),
+        code: `sudo certbot certonly --nginx -d ${host.value} -d ${input.value.filesDomain}`,
+      });
+    }
     list.push({
       text: pick(
         '保存 sani.conf，按你的实际情况修改证书路径（示例是 Let’s Encrypt 的默认位置），检查后重新加载：',
@@ -228,7 +244,12 @@ const steps = computed(() => {
       ),
     });
   }
-  list.push({ text: pick(`把 ${host.value} 的 DNS 记录指向这台服务器。`, `Point the DNS records of ${host.value} at the server.`) });
+  const files = input.value.filesDomain;
+  list.push({
+    text: files
+      ? pick(`把 ${host.value} 和 ${files} 的 DNS 记录都指向这台服务器。`, `Point the DNS records of ${host.value} and ${files} at the server.`)
+      : pick(`把 ${host.value} 的 DNS 记录指向这台服务器。`, `Point the DNS records of ${host.value} at the server.`),
+  });
   if (fixedPassword.value) {
     list.push({ text: pick(`打开 https://${host.value}/admin/，用写进配置的密码登录。`, `Open https://${host.value}/admin/ and sign in with the password from the configuration.`) });
   } else {
@@ -356,6 +377,21 @@ const steps = computed(() => {
         />
         <span class="hint" :class="{ bad: !redirectOK }">
           {{ redirectOK ? pick('访问裸域名时去哪里；不填则进入管理界面', 'Where the bare domain sends visitors; empty opens the admin app') : pick('需要以 http:// 或 https:// 开头的完整地址', 'Use a full http:// or https:// address') }}
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="k">{{ pick('文件域名（可选）', 'Files domain (optional)') }}</span>
+        <input
+          v-model="filesInput"
+          class="input mono"
+          placeholder="f.example.com"
+          spellcheck="false"
+          autocomplete="off"
+          :aria-invalid="!filesOK ? true : undefined"
+        />
+        <span class="hint" :class="{ bad: !filesOK }">
+          {{ filesOK ? pick('分享文件需要第二个域名，指向同一个 Sani；不填则只能分享文本', 'Sharing files needs a second domain for the same Sani; empty allows texts only') : pick('请填写一个与短链接域名不同的域名', 'Enter a domain other than the short domain') }}
         </span>
       </label>
     </div>

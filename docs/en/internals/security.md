@@ -43,6 +43,17 @@ The admin app loads nothing from third parties; its fonts and icons are part of 
 - **Short links on the same server** are refused as destinations, which rules out redirect loops and chains of short links hiding the real target.
 - **The `Location` header** has every non-ASCII character encoded: international domain names become Punycode and everything else is percent-encoded. Line breaks and other control characters are removed when a destination is saved, so no extra headers can be injected. Percent-encoded hosts are refused, because they hide the real destination.
 
+## Texts and files {#shares}
+
+[Shared files](../guide/usage#shares) can be anything, an HTML page or an SVG with a script in it included, so Sani never serves their bytes from the domain the admin app lives on:
+
+- **A domain of its own.** Raw text and file downloads only come from the [files domain](../reference/configuration#sani-files-url). That host never receives the session cookie, which is host-only and scoped to `/api/`, and serves nothing but shares: no admin app, no API, no redirects. The two must be different hosts, since cookies don’t keep ports apart; Sani refuses the same host for both.
+- **Inert responses.** Everything from the files domain is sent with `Content-Security-Policy: default-src 'none'; sandbox`, `X-Content-Type-Options: nosniff`, `Cross-Origin-Resource-Policy: same-origin` and `X-Frame-Options: DENY`. Files are always attachments, never shown in place; a text is `text/plain`. Even a browser that opened one in a tab would run no script and load nothing.
+- **Escaped pages.** The page at `/p/{slug}` on the short domain shows a text through Go’s `html/template`, so markup appears as written. Its Content Security Policy allows no script except the copy button’s, by hash, and the page loads nothing from anywhere.
+- **Only you create them.** Texts and files are created through the API like links, so they need the password or a token. Visitors can’t upload.
+- **Guessing.** Shares aren’t listed anywhere. Generated slugs for them are 10 characters from 31, about 8 × 10¹⁴ combinations; scanning for them is as slow as scanning for any slug, and `robots.txt` keeps crawlers away from `/p/` and the whole files domain.
+- **On disk.** Uploads stream to a temporary file in `files/` and get a random 128-bit name once complete; the name a visitor sees is only kept in the database, without its path, control characters or bidirectional overrides. A stored name is checked before a file is opened, so a damaged row can’t reach outside the directory. Unreferenced files are swept every 10 minutes.
+
 ## Fetching titles and icons {#fetching}
 
 A server that fetches arbitrary URLs for its users is the classic entry point for server-side request forgery (SSRF): someone could create a link to `http://169.254.169.254/` or `http://192.168.1.1/` and have the server talk to a cloud metadata endpoint or a device on the local network. Sani’s fetcher guards against it twice:
@@ -69,9 +80,13 @@ Everything whose size someone outside controls has an explicit limit:
 | Input | Limit |
 |---|---|
 | Request headers | 32 KB, read within 5 seconds |
-| Whole requests | 60 seconds each to read and write, 120 seconds idle |
-| JSON request bodies | 1 MB |
+| Whole requests | 60 seconds each to read and write, 120 seconds idle; uploads and downloads a minute plus the time a 64 KB/s connection needs |
+| JSON request bodies | 1 MB; 8 MB to create or update a link |
 | Import files | 32 MB, 100,000 links |
+| Texts | 1 MB |
+| Files | `SANI_MAX_FILE_MB`, 64 MB by default; other upload fields 4 KB each |
+| File names | 255 bytes |
+| Downloads at once | 32 |
 | Destinations | 8,192 bytes |
 | Slugs | 64 characters |
 | Titles | 300 characters |
@@ -84,7 +99,7 @@ Everything whose size someone outside controls has an explicit limit:
 
 ## Visitor privacy {#privacy}
 
-Sani doesn’t store visitors’ IP addresses or User-Agents, sets no cookies and keeps only aggregated counts; see [Statistics](../guide/statistics). The 404 and 410 pages visitors may see load nothing from elsewhere, carry a Content Security Policy that blocks all scripts, and ask search engines not to index them.
+Sani doesn’t store visitors’ IP addresses or User-Agents, sets no cookies and keeps only aggregated counts; see [Statistics](../guide/statistics). The 404 and 410 pages visitors may see load nothing from elsewhere, carry a Content Security Policy that blocks all scripts, and ask search engines not to index them. Share pages do the same, apart from their one copy script, and send no `Referer` onwards.
 
 ## Release files {#releases}
 

@@ -5,6 +5,7 @@
   import { formatCompact, formatDateTime, formatNumber, formatRelative, t, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
   import { toasts } from '../lib/toast.svelte';
+  import { formatSize, mediaType } from '../lib/size';
   import { displayParts, stripScheme } from '../lib/url';
   import Favicon from './Favicon.svelte';
   import Icon, { type IconName } from './Icon.svelte';
@@ -21,6 +22,18 @@
   const spark = $derived(link.spark ?? new Array(14).fill(0));
   const sparkTotal = $derived(spark.reduce((a, b) => a + b, 0));
   const timeKey = $derived(links.sort === 'visited' ? link.lastClickAt : link.createdAt);
+  const shared = $derived(link.kind !== 'url' && link.content ? link.content : null);
+  const sharedTitle = $derived(link.title || shared?.preview || shared?.name || link.slug);
+  /** What a text or file is, in place of a destination. */
+  const sharedInfo = $derived.by(() => {
+    const c = shared;
+    if (!c) return '';
+    if (link.kind === 'text') {
+      const kind = c.format === 'code' ? t('format.code') : t('format.plain');
+      return [kind, t('share.lines', { n: c.lines ?? 0 }), formatSize(c.size)].join(' · ');
+    }
+    return [link.title ? c.name : mediaType(c.type), formatSize(c.size)].filter(Boolean).join(' · ');
+  });
 
   const statusIcon: Record<string, IconName> = { disabled: 'pause', expired: 'clock', exhausted: 'gauge' };
 
@@ -82,24 +95,31 @@
       onfocus={() => (links.selectedId = link.id)}
     >
       <span class="slug">
-        <span class="slash">/</span>{link.slug}
+        <span class={['slash', shared && 'shared']}>{shared ? '/p/' : '/'}</span>{link.slug}
       </span>
       <span class="target">
         <span class="title-line">
-          <Favicon host={link.host} icon={link.icon} size={14} />
-          {#if link.title}
-            <span class="title">{link.title}</span>
-          {:else if link.meta === 'pending'}
-            <span class="title pending" aria-label={t('detail.fetching')}></span>
+          {#if shared}
+            <span class="kind"><Icon name={link.kind === 'text' ? 'text' : 'file'} size={14} /></span>
+            <span class={['title', !link.title && link.kind === 'text' && 'excerpt']}>{sharedTitle}</span>
           {:else}
-            <span class="title untitled">{parts.host || link.url}</span>
+            <Favicon host={link.host} icon={link.icon} size={14} />
+            {#if link.title}
+              <span class="title">{link.title}</span>
+            {:else if link.meta === 'pending'}
+              <span class="title pending" aria-label={t('detail.fetching')}></span>
+            {:else}
+              <span class="title untitled">{parts.host || link.url}</span>
+            {/if}
           {/if}
           {#if link.status !== 'active'}
             <span class="badge"><Icon name={statusIcon[link.status]} size={12} />{t(`status.${link.status}` as MessageKey)}</span>
           {/if}
         </span>
         <span class="dest">
-          {#if link.title || link.meta === 'pending'}
+          {#if shared}
+            {sharedInfo}
+          {:else if link.title || link.meta === 'pending'}
             <span class="host">{parts.host}</span><span class="rest">{parts.rest}</span>
           {:else if parts.host}
             <span class="rest">{parts.rest || '/'}</span>
@@ -245,6 +265,11 @@
     font-weight: 400;
   }
 
+  /* "/p/" carries a letter, so it needs text contrast, not a separator's. */
+  .slash.shared {
+    color: var(--text-3);
+  }
+
   .target {
     display: flex;
     flex: 1;
@@ -270,6 +295,20 @@
 
   .untitled {
     color: var(--text-2);
+  }
+
+  .excerpt {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .kind {
+    display: grid;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    place-items: center;
+    color: var(--text-3);
   }
 
   .pending {
@@ -326,6 +365,7 @@
   }
 
   .inactive .spark,
+  .inactive .title-line > .kind,
   .inactive .title-line > :global(.fav),
   .inactive .title-line > :global(.letter) {
     opacity: 0.5;

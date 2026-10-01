@@ -213,6 +213,8 @@ const (
 	pageNotFound pageKind = iota
 	pageGone
 	pageError
+	pageShareNotFound
+	pageShareGone
 )
 
 type pageText struct {
@@ -224,18 +226,26 @@ var pageCopy = map[string]map[pageKind]pageText{
 		pageNotFound: {"链接不存在", "这个短链接不存在", "请检查链接是否完整，或联系把它发给你的人。"},
 		pageGone:     {"链接已失效", "这个短链接已失效", "它可能已过期、被停用，或已达到访问次数上限。"},
 		pageError:    {"暂时无法打开", "暂时无法打开这个链接", "服务出了点问题，请稍后再试。"},
+
+		pageShareNotFound: {"内容不存在", "这里没有分享的内容", "请检查链接是否完整，或联系把它发给你的人。"},
+		pageShareGone:     {"内容已失效", "这份分享已失效", "它可能已过期、被停用，或已达到查看次数上限。"},
 	},
 	"en": {
 		pageNotFound: {"Link not found", "This short link doesn’t exist", "Check that the link is complete, or ask the person who sent it."},
 		pageGone:     {"Link unavailable", "This short link is no longer available", "It may have expired, been turned off, or reached its visit limit."},
 		pageError:    {"Link unavailable", "This link can’t be opened right now", "Something went wrong on our side. Try again in a moment."},
+
+		pageShareNotFound: {"Not found", "Nothing is shared here", "Check that the link is complete, or ask the person who sent it."},
+		pageShareGone:     {"No longer shared", "This share is no longer available", "It may have expired, been turned off, or reached its view limit."},
 	},
 }
 
 var pageStatus = map[pageKind]int{
-	pageNotFound: http.StatusNotFound,
-	pageGone:     http.StatusGone,
-	pageError:    http.StatusInternalServerError,
+	pageNotFound:      http.StatusNotFound,
+	pageGone:          http.StatusGone,
+	pageError:         http.StatusInternalServerError,
+	pageShareNotFound: http.StatusNotFound,
+	pageShareGone:     http.StatusGone,
 }
 
 const pageTemplate = `<!doctype html>

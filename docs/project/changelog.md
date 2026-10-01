@@ -2,6 +2,29 @@
 
 <p class="lead">每个版本的变化都记录在这里。版本号遵循[语义化版本](./versioning)；在 1.0 之前，次版本号的变化也可能包含不兼容的修改，届时会在这里写明升级方法。</p>
 
+## Unreleased
+
+文本和文件：在同一个控制台里分享一段文字、一段代码或一个文件。用 API 令牌写脚本的，请先看“不兼容的修改”。
+
+### 新功能
+
+- **文本和文件**：链接输入框上方新增“文本”和“文件”两个标签页，可以分享纯文本、带行号的等宽代码，或者不超过 64 MB 的文件。在页面任意位置粘贴一段文字或一个文件也能直接开始。访问者在 `/p/{短码}` 页面上阅读、复制或下载；有效期、访问上限、停用和统计都和链接一样。见[日常使用](../guide/usage#shares)。
+- **文件域名**：原始文本和文件下载由 [`SANI_FILES_URL`](../reference/configuration#sani-files-url) 设置的第二个域名提供。它指向同一个 Sani，只提供分享的内容，也没有任何登录会话。分享文件必须设置它，分享文本不需要。大小上限由 [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) 设置。反向代理的配置见[部署](../guide/deploy#files-domain)。
+- 从文件域名下载时，`curl` 和 `wget` 也计入访问，因为人们本来就常用它们下载文件；续传、爬虫和链接预览不计入。见[统计](../guide/statistics#shares)。
+- 列表可以只看链接、文本或文件；搜索也会匹配文件名和文本的第一行。
+- 新接口 `POST /api/texts`、`POST /api/files` 和 `GET /api/links/{id}/text`；链接对象新增 `kind` 和 `content` 字段，`GET /api/links` 支持按 `kind` 筛选。见 [HTTP API](../reference/api#shares)。
+- 分享的文件放在数据目录下的 `files/` 里，`sani backup` 会提醒你一并复制。
+
+### 不兼容的修改
+
+- `GET /api/links` 和批量接口现在也包含文本和文件，它们的 `url` 为空。只处理短链接的脚本，请加上 `?kind=url`。
+- `p` 成为保留短码，因为 `/p/` 下放的是分享。已经存在的 `/p` 链接照常跳转，但不能再新建这个短码。
+- JSON 请求体超过大小上限时，现在返回 `413 too_large`，而不是 `400 bad_json`。
+
+### 升级
+
+启动时会自动升级数据库结构。要分享文件，需要为文件域名添加 DNS 记录，在反向代理里加上这个域名并调大请求体上限，再设置 `SANI_FILES_URL`，每一步见[部署](../guide/deploy#files-domain)。从此以后，备份时除了 `sani.db`，还要备份 `files/`。
+
 ## v0.2.0
 
 2026-10-01 · 批量操作，以及为 1.0 做的准备。用 API 令牌写脚本的，请先看“不兼容的修改”。
