@@ -53,4 +53,4 @@ docker exec sani /sani backup - > sani-2026-09-29.db
 
 ## `sani version`
 
-显示版本号，比如 `sani v0.2.0`。从源码构建时，版本号来自 `git describe`，没有 Git 信息时为 `dev`。`sani -v` 和 `sani --version` 效果相同。
+显示版本号，比如 `sani v0.3.0`。从源码构建时，版本号来自 `git describe`，没有 Git 信息时为 `dev`。`sani -v` 和 `sani --version` 效果相同。

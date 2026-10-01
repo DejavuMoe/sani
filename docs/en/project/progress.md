@@ -1,6 +1,6 @@
 # Status
 
-<p class="lead">Sani is at v0.2.0: feature-complete, tested and load-tested, with ready-made images and binaries. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
+<p class="lead">Sani is at v0.3.0: feature-complete, tested and load-tested, with ready-made images and binaries. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
 
 ## Where things stand {#current}
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | Redirects and statistics | <span class="sn-status done">Done</span> | In-memory cache, click aggregation, crawler and preview filtering, expiry, visit limits |
 | Admin app | <span class="sn-status done">Done</span> | English and Chinese, light and dark, keyboard control, bulk actions, QR codes, bookmarklet, phone share menu |
-| Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own; in the next release |
+| Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own, since v0.3.0 |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
 | Import and export | <span class="sn-status done">Done</span> | Sani, Shlink, Sink and all kinds of CSV |
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |

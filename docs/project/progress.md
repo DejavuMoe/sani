@@ -1,6 +1,6 @@
 # 进度
 
-<p class="lead">Sani 目前的版本是 v0.2.0：功能完整，经过了测试和压测，有现成的镜像和二进制文件。这一页记录做到了哪里、接下来做什么，以及哪些事情刻意不做。页面上的核对结果和数字，都是在构建文档时从源码中得出的。</p>
+<p class="lead">Sani 目前的版本是 v0.3.0：功能完整，经过了测试和压测，有现成的镜像和二进制文件。这一页记录做到了哪里、接下来做什么，以及哪些事情刻意不做。页面上的核对结果和数字，都是在构建文档时从源码中得出的。</p>
 
 ## 现状 {#current}
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | 跳转与统计 | <span class="sn-status done">已完成</span> | 内存缓存、点击聚合、爬虫和预览过滤、有效期、访问上限 |
 | 管理界面 | <span class="sn-status done">已完成</span> | 中英文、深浅主题、键盘操作、批量操作、二维码、书签小工具、手机分享菜单 |
-| 文本和文件 | <span class="sn-status done">已完成</span> | `/p/` 下的纯文本和代码，从单独域名下载的文件；随下一个版本发布 |
+| 文本和文件 | <span class="sn-status done">已完成</span> | `/p/` 下的纯文本和代码，从单独域名下载的文件，v0.3.0 起 |
 | HTTP API | <span class="sn-status done">已完成</span> | 全部功能都有接口，API 令牌 |
 | 导入与导出 | <span class="sn-status done">已完成</span> | Sani、Shlink、Sink 和各种 CSV |
 | 部署 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的 Docker 镜像，systemd、Caddy 和 nginx 示例 |

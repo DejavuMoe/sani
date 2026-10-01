@@ -28,8 +28,8 @@ The image has these tags:
 | Tag | Points at |
 |---|---|
 | `latest` | The newest release |
-| `0.2` | The newest patch release of 0.2, which only fixes things |
-| `0.2.0` | That one version, for good |
+| `0.3` | The newest patch release of 0.3, which only fixes things |
+| `0.3.0` | That one version, for good |
 
 `compose.yaml` uses `latest`. To decide for yourself when to upgrade, put a version number there instead. To upgrade, [back up](./operations#backup) first, then pull the new image:
 
@@ -75,7 +75,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-`latest/download` always points at the newest release; to pin one, use a path like `download/v0.2.0` instead.
+`latest/download` always points at the newest release; to pin one, use a path like `download/v0.3.0` instead.
 
 ### Checking where a build came from {#verify}
 
