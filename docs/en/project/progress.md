@@ -1,6 +1,6 @@
 # Status
 
-<p class="lead">Sani is at v0.1.0, its first public release: feature-complete, tested and load-tested, with ready-made images and binaries. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
+<p class="lead">Sani is at v0.2.0: feature-complete, tested and load-tested, with ready-made images and binaries. This page tracks what’s done, what comes next and what Sani deliberately won’t do. The checks and numbers below are computed from the source whenever the docs are built.</p>
 
 ## Where things stand {#current}
 
@@ -35,7 +35,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 
 ## Next {#next}
 
-1. **Listening.** v0.1.0 is the first public release; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
+1. **Listening.** Sani is out in public; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
 2. **Settling for 1.0.** The API, the settings and the database schema are fixed at 1.0; after that, incompatible changes only come with a new major version. [Versioning](./versioning) spells out the promise.
 3. **Hosted docs.** Publish this site as a static website.
 

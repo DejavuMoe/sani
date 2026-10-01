@@ -2,7 +2,9 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased {#unreleased}
+## v0.2.0
+
+2026-10-01 · Bulk actions, and groundwork for 1.0. If you script against the API, read “Breaking changes” first.
 
 ### New
 

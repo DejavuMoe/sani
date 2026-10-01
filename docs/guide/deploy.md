@@ -28,8 +28,8 @@ docker compose up -d
 | 标签 | 指向 |
 |---|---|
 | `latest` | 最新的正式版本 |
-| `0.1` | 0.1 系列最新的修订版本，只包含修复 |
-| `0.1.0` | 固定的某一个版本 |
+| `0.2` | 0.2 系列最新的修订版本，只包含修复 |
+| `0.2.0` | 固定的某一个版本 |
 
 `compose.yaml` 默认使用 `latest`。想自己决定什么时候升级，就把标签换成具体的版本号。升级时先[备份](./operations#backup)，再拉取新镜像：
 
@@ -75,7 +75,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-`latest/download` 总是指向最新版本；要固定版本，把它换成 `download/v0.1.0` 这样的路径。
+`latest/download` 总是指向最新版本；要固定版本，把它换成 `download/v0.2.0` 这样的路径。
 
 ### 核对来源 {#verify}
 

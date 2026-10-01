@@ -6,16 +6,19 @@ set -euo pipefail
 
 tag=${1:?usage: scripts/release-notes.sh vX.Y.Z}
 changelog=docs/en/project/changelog.md
+docs=https://github.com/DejavuMoe/sani/blob/main/docs
 # The section without its heading, and without the date the release page
-# shows anyway.
+# shows anyway. The changelog's links are relative to the docs site; on the
+# release page they point at the pages in the repository instead, without
+# anchors, which GitHub names differently.
 notes=$(awk -v heading="## $tag" '$0 == heading { on = 1; next } on && /^## / { exit } on' "$changelog" |
-  sed -E '1,/[^[:space:]]/ s/^[0-9]{4}-[0-9]{2}-[0-9]{2} · //')
+  sed -E '1,/[^[:space:]]/ s/^[0-9]{4}-[0-9]{2}-[0-9]{2} · //' |
+  sed -E "s#\]\(\.\./([a-z-]+/[a-z-]+)(\#[a-z-]+)?\)#]($docs/en/\1.md)#g; s#\]\(\./([a-z-]+)(\#[a-z-]+)?\)#]($docs/en/project/\1.md)#g")
 if [ -z "$(tr -d '[:space:]' <<<"$notes")" ]; then
   echo "release-notes: $changelog has no section \"## $tag\"" >&2
   exit 1
 fi
 
-docs=https://github.com/DejavuMoe/sani/blob/main/docs
 cat <<NOTES
 $notes
 
