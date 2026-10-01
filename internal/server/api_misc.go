@@ -104,7 +104,7 @@ func (s *Server) listTokens(w http.ResponseWriter, r *http.Request) {
 	for i, t := range ts {
 		out[i] = toTokenDTO(t)
 	}
-	writeJSON(w, http.StatusOK, out)
+	writeJSON(w, http.StatusOK, map[string]any{"items": out})
 }
 
 func (s *Server) createToken(w http.ResponseWriter, r *http.Request) {

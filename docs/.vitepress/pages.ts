@@ -60,6 +60,7 @@ export const groups: PageGroup[] = [
     pages: [
       { path: 'project/progress', zh: '进度', en: 'Status' },
       { path: 'project/changelog', zh: '更新日志', en: 'Changelog' },
+      { path: 'project/versioning', zh: '版本与兼容', en: 'Versioning' },
       { path: 'project/development', zh: '参与开发', en: 'Development' },
     ],
   },

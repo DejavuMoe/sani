@@ -1,6 +1,16 @@
 # Changelog
 
-<p class="lead">Every release’s changes are recorded here. Versions follow semantic versioning; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
+<p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
+
+## Unreleased {#unreleased}
+
+### Breaking changes
+
+- `GET /api/tokens` now returns `{"items": [...]}`, like the list of links, so fields can be added later without breaking scripts. Scripts that read the response as an array should read its `items` instead.
+
+### Documentation
+
+- A new [Versioning](./versioning) page says what version numbers promise, and what’s different before 1.0.
 
 ## v0.1.0
 

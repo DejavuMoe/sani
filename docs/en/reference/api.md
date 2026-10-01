@@ -279,7 +279,7 @@ Changes the short domain stored in Settings:
 
 `GET /api/tokens`
 
-Lists the tokens, each like `{"id": 3, "name": "iPhone Shortcuts", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`. `hint` is the start of the token, to tell tokens apart; `usedAt` is when it was last used, to the minute, or `null`.
+Returns `{"items": [...]}`, the tokens, each like `{"id": 3, "name": "iPhone Shortcuts", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`. `hint` is the start of the token, to tell tokens apart; `usedAt` is when it was last used, to the minute, or `null`.
 
 `POST /api/tokens`
 

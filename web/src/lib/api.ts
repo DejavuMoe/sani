@@ -156,7 +156,7 @@ export const api = {
   checkSlug: (slug: string, signal?: AbortSignal) =>
     request<{ available: boolean; reason?: string }>('GET', `/slugs/${encodeURIComponent(slug)}`, undefined, { signal }),
 
-  tokens: () => request<Token[]>('GET', '/tokens'),
+  tokens: () => request<{ items: Token[] }>('GET', '/tokens'),
   createToken: (name: string) => request<Token>('POST', '/tokens', { name }),
   deleteToken: (id: number) => request<void>('DELETE', `/tokens/${id}`),
 

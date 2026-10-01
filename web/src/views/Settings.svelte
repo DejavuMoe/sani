@@ -49,7 +49,7 @@
 
   onMount(async () => {
     try {
-      tokens = await api.tokens();
+      tokens = (await api.tokens()).items;
     } catch {
       tokens = [];
     }
