@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Sani</title>
+    <script src="src/gen/visitor.js"></script>
+    <script src="src/fixtures.js"></script>
+  </head>
+  <body>
+    <script>
+      /*
+       * The pages the Go server renders for visitors, not the admin app:
+       * web.go pageTemplate (404 / 410 / 500, links and shares) and
+       * sharepage.go sharePage (texts and files at /p/). Styles and copy are
+       * copied verbatim by tools/sync.mjs; the markup below follows the two
+       * templates line for line, so the HTML parser sees the same document.
+       *
+       *   ?page=notfound|gone|error|share-notfound|share-gone
+       *        |share-code|share-text|share-file|share-file-off
+       *   &lang=zh|en  &theme=light|dark (default: the system's)  &until=1
+       */
+      (function () {
+        var V = window.SANI_VISITOR;
+        var F = window.SANI_FIXTURES;
+        var p = new URLSearchParams(location.search);
+        var page = p.get('page') || 'notfound';
+        var lang = p.get('lang') === 'en' ? 'en' : 'zh';
+        var theme = p.get('theme');
+        var host = p.get('host') || new URL(F.config.baseUrl).host;
+        var htmlLang = { zh: 'zh-CN', en: 'en' }[lang];
+        var esc = function (s) {
+          return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&#34;', "'": '&#39;' }[c];
+          });
+        };
+
+        // Production follows prefers-color-scheme; a board can pin either theme.
+        function themed(css) {
+          var media = /@media \(prefers-color-scheme:dark\)\{(:root\{[^}]*\})\}/;
+          if (theme === 'dark') return css.replace(media, '$1') + '\n:root{color-scheme:dark}';
+          if (theme === 'light') return css.replace(media, '') + '\n:root{color-scheme:light}';
+          return css;
+        }
+
+        // sharepage.go formatSize / groupDigits / formatWhen, in the instance's zone.
+        function formatSize(n) {
+          var units = ['B', 'KB', 'MB', 'GB'];
+          var v = n;
+          var u = 0;
+          while (v >= 1024 && u < units.length - 1) {
+            v /= 1024;
+            u++;
+          }
+          if (u === 0) return n + ' B';
+          return (v < 10 ? v.toFixed(1) : Math.round(v).toString()) + ' ' + units[u];
+        }
+        var groupDigits = function (n) {
+          return String(n).replace(/\B(?=(\d{3})+$)/g, ',');
+        };
+        function formatWhen(ms) {
+          var parts = {};
+          new Intl.DateTimeFormat('en-US', {
+            timeZone: F.config.timezone,
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23',
+          })
+            .formatToParts(new Date(ms))
+            .forEach(function (x) {
+              parts[x.type] = x.value;
+            });
+          var monthNum = new Intl.DateTimeFormat('en-US', { timeZone: F.config.timezone, month: 'numeric' }).format(new Date(ms));
+          if (lang === 'zh') return parts.year + '年' + monthNum + '月' + parts.day + '日 ' + parts.hour + ':' + parts.minute;
+          return parts.month + ' ' + parts.day + ', ' + parts.year + ', ' + parts.hour + ':' + parts.minute;
+        }
+        var fmt = function (s, v) {
+          return s.replace('%s', v);
+        };
+
+        function statusPage(kind, link) {
+          var t = V.pageCopy[lang][kind];
+          return (
+            '<!doctype html>\n<html lang="' + htmlLang + '">\n<head>\n<meta charset="utf-8">\n' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta name="robots" content="noindex">\n' +
+            '<title>' + esc(t.title) + '</title>\n<style>\n' + themed(V.pageCss) + '</style>\n</head>\n<body>\n<main>\n' +
+            '<div class="code">' + V.pageStatus[kind] + '</div>\n<h1>' + esc(t.heading) + '</h1>\n<p>' + esc(t.body) + '</p>\n' +
+            '<div class="link">' + esc(link) + '</div>\n</main>\n</body>\n</html>\n'
+          );
+        }
+
+        function sharePage(l, format, rawUrl) {
+          var L = V.shareCopy[lang];
+          var c = l.content;
+          var isText = l.kind === 'text';
+          var code = isText && format === 'code';
+          var meta = [];
+          var heading;
+          var body = '';
+          var numbers = '';
+          if (isText) {
+            heading = l.title || c.name || l.slug;
+            body = F.texts[String(l.id)];
+            var kind = L.Text;
+            if (code) {
+              kind = L.Code;
+              if (c.lines > 1 && c.lines <= 50000) numbers = Array.from({ length: c.lines }, (_, i) => i + 1).join('\n');
+            }
+            meta.push(kind, fmt(c.lines === 1 ? L.Line : L.Lines, groupDigits(c.lines)), formatSize(c.size));
+          } else {
+            heading = l.title || c.name;
+            meta.push(L.File, formatSize(c.size));
+          }
+          var until = p.get('until') ? fmt(L.Until, formatWhen(Date.parse(F.capturedAt) + 7 * 864e5)) : '';
+          var s = '';
+          s += '<!doctype html>\n<html lang="' + htmlLang + '">\n<head>\n<meta charset="utf-8">\n';
+          s += '<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta name="robots" content="noindex">\n<meta name="referrer" content="no-referrer">\n';
+          s += '<title>' + esc(heading) + '</title>\n<style>\n' + themed(V.shareCss.replace(/\{\{if \.Code\}\}(\w+)\{\{else\}\}(\w+)\{\{end\}\}/, code ? '$1' : '$2')) + '</style>\n</head>\n<body>\n<main>\n';
+          s += '<div class="bar">\n<div>\n<h1>' + esc(heading) + '</h1>\n<p class="meta">' + esc(meta.join(' · ')) + '</p>\n</div>\n';
+          if (isText) {
+            s += '<div class="actions">\n<button class="btn" type="button" data-copy data-label="' + esc(L.Copy) + '" data-done="' + esc(L.Copied) + '" hidden>' + esc(L.Copy) + '</button>\n';
+            if (rawUrl) s += '<a class="btn" href="' + esc(rawUrl) + '">' + esc(L.Raw) + '</a>\n<a class="btn" href="' + esc(rawUrl + '/' + encodeURIComponent(l.slug) + '.txt') + '">' + esc(L.Download) + '</a>';
+            s += '\n</div>';
+          }
+          s += '\n</div>\n';
+          if (isText) {
+            if (code) {
+              s += '<div class="sheet code" tabindex="0" role="region" aria-label="' + esc(L.Code) + '">';
+              if (numbers) s += '<pre class="ln" aria-hidden="true">\n' + numbers + '</pre>';
+              s += '<pre class="src" id="text">\n' + esc(body) + '</pre></div>';
+            } else s += '<div class="sheet plain"><pre id="text">\n' + esc(body) + '</pre></div>';
+          } else {
+            s += '<div class="sheet file">\n' + V.fileIcon + '\n<div class="name">' + esc(c.name) + '</div>\n';
+            s += '<div class="type">' + esc(c.type.split(';')[0] + ' · ' + formatSize(c.size)) + '</div>\n';
+            s += rawUrl ? '<a class="btn primary" href="' + esc(rawUrl) + '">' + esc(L.DownloadFile) + '</a>' : '<p class="note">' + esc(L.Unavailable) + '</p>';
+            s += '\n<div class="sum">SHA-256 ' + esc(c.sha256) + '</div>\n</div>';
+          }
+          s += '\n' + (until ? '<p class="note">' + esc(until) + '</p>' : '') + '\n</main>\n';
+          // sharepage.go copyScript: the copy button needs script, so script unhides it.
+          s +=
+            '<script>for(const b of document.querySelectorAll("[data-copy]")){b.hidden=false;' +
+            'b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(document.getElementById("text").textContent);' +
+            'b.textContent=b.dataset.done;setTimeout(()=>b.textContent=b.dataset.label,1600)}catch(e){}})}<\/script>\n</body>\n</html>\n';
+          return s;
+        }
+
+        var text = F.links.find(function (l) {
+          return l.kind === 'text';
+        });
+        var file = F.links.find(function (l) {
+          return l.kind === 'file';
+        });
+        var html;
+        if (page === 'share-code') html = sharePage(text, 'code', text.content.rawUrl);
+        else if (page === 'share-text') html = sharePage(text, 'plain', text.content.rawUrl);
+        else if (page === 'share-file') html = sharePage(file, null, file.content.rawUrl);
+        else if (page === 'share-file-off') html = sharePage(file, null, '');
+        else {
+          var kind = V.pageCopy[lang][page] ? page : 'notfound';
+          var slug = p.get('slug') || { notfound: 'k3x9p', gone: 'talk', error: 'gh', 'share-notfound': 'p/k3x9p', 'share-gone': 'p/nginx-conf' }[kind];
+          html = statusPage(kind, host + '/' + slug);
+        }
+        document.open();
+        document.write(html);
+        document.close();
+      })();
+    </script>
+  </body>
+</html>

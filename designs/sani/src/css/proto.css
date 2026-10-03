@@ -1,0 +1,40 @@
+/* Prototype chrome only (Tweaks). Never part of the product; hidden by ?chrome=0. */
+.tweaks {
+  position: fixed;
+  z-index: 100;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font: 12px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.tweaks-toggle,
+.tweaks-panel {
+  border: 1px solid #c9c6bf;
+  border-radius: 8px;
+  background: #fffef9;
+  color: #1c1b19;
+  box-shadow: 0 6px 20px -8px rgb(0 0 0 / 0.35);
+}
+.tweaks-toggle {
+  height: 28px;
+  padding: 0 10px;
+  font: inherit;
+}
+.tweaks-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+.tweaks-panel label {
+  display: grid;
+  gap: 3px;
+}
+.tweaks-panel select {
+  font: inherit;
+}
+.tweaks-panel a {
+  color: #2d4be0;
+}

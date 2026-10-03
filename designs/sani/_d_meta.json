@@ -1,0 +1,84 @@
+{
+  "type": "design",
+  "designSystems": [],
+  "primaryDesignSystem": null,
+  "assets": {
+    "Admin app": {
+      "versions": [
+        {
+          "path": "prototype.html",
+          "createdAt": "2026-10-03T19:40:00.704Z",
+          "status": "needs-review",
+          "subtitle": "Clickable admin app, 42 scenes (L4 screens + L5 app)",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "section": "Screens"
+        }
+      ]
+    },
+    "Visitor pages": {
+      "versions": [
+        {
+          "path": "visitor.html",
+          "createdAt": "2026-10-03T19:40:01.015Z",
+          "status": "needs-review",
+          "subtitle": "Server-rendered 404/410/500 and share pages",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "section": "Screens"
+        }
+      ]
+    },
+    "L1 Foundations": {
+      "versions": [
+        {
+          "path": "foundations.html",
+          "createdAt": "2026-10-03T19:40:01.338Z",
+          "status": "needs-review",
+          "subtitle": "Tokens, type, radius, motion, icons, logo",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "section": "Layers"
+        }
+      ]
+    },
+    "L2 Components": {
+      "versions": [
+        {
+          "path": "components.html",
+          "createdAt": "2026-10-03T19:40:01.634Z",
+          "status": "needs-review",
+          "subtitle": "Primitives in every state",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "section": "Layers"
+        }
+      ]
+    },
+    "L3 Patterns": {
+      "versions": [
+        {
+          "path": "patterns.html",
+          "createdAt": "2026-10-03T19:40:01.932Z",
+          "status": "needs-review",
+          "subtitle": "Composites in every state",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "section": "Layers"
+        }
+      ]
+    }
+  },
+  "createdAt": "2026-10-03T19:40:00.705Z",
+  "updatedAt": "2026-10-03T19:40:01.933Z"
+}

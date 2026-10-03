@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "admin-app-source",
+      "type": "code",
+      "location": "web/src (v0.3.0, c10cfd1)",
+      "roles": ["functional-truth", "visual-reference", "interaction-reference"],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source (repository license)",
+      "localCopies": ["src/gen/tokens.css", "src/gen/icons.js"],
+      "observations": [
+        "Svelte 5 components, views and lib modules were ported one file at a time; prototype class names carry a per-component prefix because there is no style scoping.",
+        "Tokens and icon paths are copied by tools/sync.mjs, and sync.mjs --check reports drift."
+      ],
+      "inferences": [],
+      "limitations": ["Ported by hand outside the copied files; drift in components shows up only through tools/compare.mjs."]
+    },
+    {
+      "id": "ui-strings",
+      "type": "code",
+      "location": "web/src/lib/i18n.svelte.ts; internal/server/web.go pageCopy; internal/server/sharepage.go shareCopy",
+      "roles": ["functional-truth", "content-authority"],
+      "trust": "authoritative-content-source",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source (repository license)",
+      "localCopies": ["src/gen/i18n.js", "src/gen/visitor.js"],
+      "observations": ["Both languages are copied verbatim by tools/sync.mjs; the prototype never retypes product copy."],
+      "inferences": [],
+      "limitations": []
+    },
+    {
+      "id": "server-source",
+      "type": "code",
+      "location": "internal/server (api.go, web.go, sharepage.go, redirect.go), internal/links",
+      "roles": ["functional-truth", "visual-reference"],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source (repository license)",
+      "localCopies": ["src/gen/visitor.js"],
+      "observations": ["API routes and error codes define the mock store's behavior; the visitor page styles are copied verbatim.", "The reserved slugs in components.jsx come from internal/links."],
+      "inferences": [],
+      "limitations": []
+    },
+    {
+      "id": "seeded-runtime",
+      "type": "runtime",
+      "location": "./bin/sani v0.3.0 (dev build) seeded by scripts/seed on 127.0.0.1:18080; a fresh instance on 127.0.0.1:18081",
+      "roles": ["functional-truth", "visual-reference"],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Demo data from scripts/seed only. tools/capture.mjs rewrites http://127.0.0.1:PORT to https://s.example.com and http://localhost:PORT to https://files.example.com, and pins the time zone to Asia/Shanghai. Token secrets are never captured (only their hints).",
+      "licenseOrPermission": "Project's own demo data",
+      "localCopies": ["src/fixtures.js", "screenshots/compare/report.json"],
+      "observations": [
+        "tools/compare.mjs screenshots production and the prototype in the same state: 26 cases in 4 theme × language combinations.",
+        "All captures round to 0.00% differing pixels except settings (sanitized values) and shortcuts (subpixel glyph positioning)."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Compared at 1280-wide desktop and 390×844 phone viewports in Chromium only.",
+        "Hover, focus and animation states are not pixel-compared."
+      ]
+    },
+    {
+      "id": "e2e-tests",
+      "type": "test",
+      "location": "web/e2e/app.spec.ts",
+      "roles": ["functional-truth"],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source (repository license)",
+      "localCopies": [],
+      "observations": ["Each flow the prototype mocks (setup, create, slug check, edit, toggle, delete with undo, search, keyboard, bulk, text and file shares, tokens, sign-in, visitor pages) has a production e2e test."],
+      "inferences": [],
+      "limitations": []
+    },
+    {
+      "id": "bundled-third-party",
+      "type": "other",
+      "location": "web/node_modules: @fontsource-variable/inter, @fontsource/ibm-plex-mono, uqr",
+      "roles": ["visual-reference"],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Inter and IBM Plex Mono: SIL OFL 1.1; uqr: MIT. These are the same files production bundles.",
+      "localCopies": ["src/fonts", "src/gen/uqr.js"],
+      "observations": [],
+      "inferences": [],
+      "limitations": []
+    },
+    {
+      "id": "captured-favicons",
+      "type": "image",
+      "location": "Favicons of the seeded links' sites, fetched through /api/favicons",
+      "roles": ["visual-reference"],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Third-party site icons, shown in the prototype exactly as production shows them for the same demo links; not redistributed outside designs/",
+      "localCopies": ["src/assets/favicons"],
+      "observations": [],
+      "inferences": [],
+      "limitations": ["Used only to reproduce the list's appearance; not product assets."]
+    },
+    {
+      "id": "prototype-runtime-cdn",
+      "type": "other",
+      "location": "https://unpkg.com/react@18.3.1, react-dom@18.3.1, @babel/standalone@7.29.0 (subresource integrity pinned)",
+      "roles": ["inspiration-only"],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "MIT",
+      "localCopies": [],
+      "observations": ["The prototype's preview runtime only; never part of the product."],
+      "inferences": [],
+      "limitations": ["The prototype needs network access to these three files."]
+    }
+  ]
+}

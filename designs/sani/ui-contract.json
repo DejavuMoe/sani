@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "project": {
+    "name": "Sani",
+    "slug": "sani",
+    "surfaceType": "operational"
+  },
+  "content": {
+    "defaultProfile": "operational-strict",
+    "inventory": "content-inventory.json",
+    "approvedCopySources": [
+      "web/src/lib/i18n.svelte.ts",
+      "internal/server/web.go#pageCopy",
+      "internal/server/sharepage.go#shareCopy"
+    ]
+  },
+  "designSources": "design-sources.json",
+  "surfaces": [
+    {
+      "id": "foundations",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "foundations.html",
+        "assetPath": "foundations.html",
+        "files": ["src/gen/tokens.css", "src/fonts.css", "src/gen/icons.js", "src/components.jsx", "src/boards/foundations.jsx"],
+        "states": ["light", "dark"],
+        "stableIds": ["colors", "type", "shape", "motion", "fields", "icons", "logo"]
+      },
+      "production": {
+        "routeOrWindow": null,
+        "files": ["web/src/app.css", "web/src/components/Icon.svelte", "web/src/components/Logo.svelte", "web/index.html"],
+        "interfaces": [],
+        "tests": []
+      },
+      "status": "needs-review"
+    },
+    {
+      "id": "components",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "components.html",
+        "assetPath": "components.html",
+        "files": ["src/components.jsx", "src/css/components.css", "src/lib.jsx", "src/boards/components.jsx"],
+        "states": [
+          "button-variants-sizes-loading-disabled",
+          "segmented",
+          "switch-on-off-disabled",
+          "menu-open",
+          "dialog",
+          "toasts-success-action-error",
+          "slug-idle-checking-available-taken-reserved-invalid-toolong",
+          "expiry-preset-custom-open",
+          "favicon-icon-letter-blank",
+          "charts-active-empty",
+          "qr"
+        ],
+        "stableIds": ["button", "segmented", "switch", "menu", "dialog", "toaster", "slug", "expiry", "favicon", "charts", "qr"]
+      },
+      "production": {
+        "routeOrWindow": null,
+        "files": [
+          "web/src/components/Button.svelte",
+          "web/src/components/Segmented.svelte",
+          "web/src/components/Switch.svelte",
+          "web/src/components/Menu.svelte",
+          "web/src/components/MenuItem.svelte",
+          "web/src/components/Dialog.svelte",
+          "web/src/components/Toaster.svelte",
+          "web/src/components/SlugField.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/components/Favicon.svelte",
+          "web/src/components/Sparkline.svelte",
+          "web/src/components/MiniBars.svelte",
+          "web/src/components/BarChart.svelte",
+          "web/src/components/QRCode.svelte",
+          "web/src/lib/toast.svelte.ts",
+          "web/src/lib/qr.ts"
+        ],
+        "interfaces": ["GET /api/slugs/{slug}", "GET /api/favicons/{host}"],
+        "tests": ["web/e2e/app.spec.ts"]
+      },
+      "status": "needs-review"
+    },
+    {
+      "id": "patterns",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "patterns.html",
+        "assetPath": "patterns.html",
+        "files": ["src/patterns.jsx", "src/css/patterns.css", "src/store.jsx", "src/fixtures.js", "src/boards/patterns.jsx"],
+        "states": [
+          "composer-url-idle",
+          "composer-url-more",
+          "composer-url-error",
+          "composer-url-pasted",
+          "composer-text-code",
+          "composer-file-picked",
+          "composer-file-uploading",
+          "composer-file-disabled",
+          "summary-ready",
+          "summary-loading",
+          "row-titled",
+          "row-pending",
+          "row-untitled",
+          "row-text",
+          "row-file",
+          "row-disabled",
+          "row-expired",
+          "row-exhausted",
+          "row-selected",
+          "row-fresh",
+          "picking",
+          "detail-url",
+          "detail-text",
+          "detail-file",
+          "detail-expired",
+          "detail-limit",
+          "editor-url",
+          "editor-text",
+          "list-loading",
+          "list-blank",
+          "list-noresults",
+          "list-kind",
+          "list-failed",
+          "header-top",
+          "header-scrolled",
+          "header-settings"
+        ],
+        "stableIds": ["creator", "summary", "rows", "picking", "detail", "editor", "list", "header"]
+      },
+      "production": {
+        "routeOrWindow": "/admin/",
+        "files": [
+          "web/src/components/Creator.svelte",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/Summary.svelte",
+          "web/src/components/LinkList.svelte",
+          "web/src/components/LinkRow.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/components/LinkEditor.svelte",
+          "web/src/components/AppHeader.svelte",
+          "web/src/components/AuthShell.svelte",
+          "web/src/components/ShortcutsDialog.svelte",
+          "web/src/lib/links.svelte.ts"
+        ],
+        "interfaces": [
+          "GET /api/links",
+          "POST /api/links",
+          "POST /api/links/bulk",
+          "PATCH /api/links/{id}",
+          "DELETE /api/links/{id}",
+          "POST /api/links/{id}/restore",
+          "POST /api/links/{id}/refresh",
+          "GET /api/links/{id}/stats",
+          "GET /api/links/{id}/text",
+          "POST /api/texts",
+          "POST /api/files",
+          "GET /api/overview"
+        ],
+        "tests": ["web/e2e/app.spec.ts"]
+      },
+      "status": "needs-review"
+    },
+    {
+      "id": "admin-app",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype.html",
+        "assetPath": "prototype.html",
+        "files": ["src/app.jsx", "src/scenes.jsx", "src/screens.jsx", "src/css/screens.css", "src/patterns.jsx", "src/store.jsx", "src/lib.jsx", "src/fixtures.js"],
+        "states": ["setup","setup-filled","setup-error","login","login-expired","login-wrong","login-rate","offline","dashboard","dashboard-empty","dashboard-loading","dashboard-error","dashboard-search","dashboard-noresults","dashboard-texts","dashboard-sort-clicks","dashboard-picking","dashboard-selected","detail-url","detail-text","detail-file","detail-expired","detail-limit","edit-url","edit-text","composer-more","composer-error","composer-pasted","composer-text","composer-code","composer-file","composer-file-picked","composer-file-uploading","composer-file-off","shortcuts","toasts","settings","settings-token","settings-import","settings-env","new","new-result"],
+        "stableIds": ["setup", "login", "offline", "dashboard", "link-detail", "link-editor", "shortcuts", "settings", "new-link"]
+      },
+      "production": {
+        "routeOrWindow": "/admin/, /admin/settings, /admin/new",
+        "files": [
+          "web/src/App.svelte",
+          "web/src/views/Dashboard.svelte",
+          "web/src/views/Login.svelte",
+          "web/src/views/Setup.svelte",
+          "web/src/views/Settings.svelte",
+          "web/src/views/NewLink.svelte",
+          "web/src/lib/session.svelte.ts",
+          "web/src/lib/router.svelte.ts",
+          "web/src/lib/i18n.svelte.ts"
+        ],
+        "interfaces": [
+          "GET /api/session",
+          "POST /api/session",
+          "DELETE /api/session",
+          "POST /api/setup",
+          "PUT /api/password",
+          "POST /api/sessions/revoke",
+          "GET /api/config",
+          "PATCH /api/config",
+          "GET /api/tokens",
+          "POST /api/tokens",
+          "DELETE /api/tokens/{id}",
+          "GET /api/export",
+          "POST /api/import"
+        ],
+        "tests": ["web/e2e/app.spec.ts", "web/src/lib/i18n.test.ts", "web/src/lib/url.test.ts", "web/src/lib/size.test.ts"]
+      },
+      "status": "needs-review"
+    },
+    {
+      "id": "visitor-pages",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "visitor.html",
+        "assetPath": "visitor.html",
+        "files": ["visitor.html", "src/gen/visitor.js", "src/fixtures.js"],
+        "states": ["notfound", "gone", "error", "share-notfound", "share-gone", "share-code", "share-text", "share-code-until", "share-file", "share-file-off"],
+        "stableIds": ["visitor-error", "share-page"]
+      },
+      "production": {
+        "routeOrWindow": "/{slug}, /p/{slug}",
+        "files": ["internal/server/web.go", "internal/server/sharepage.go", "internal/server/redirect.go"],
+        "interfaces": ["GET /{slug}", "GET /p/{slug}"],
+        "tests": ["web/e2e/app.spec.ts", "internal/server/server_test.go", "internal/server/share_test.go"]
+      },
+      "status": "needs-review"
+    }
+  ]
+}
