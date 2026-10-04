@@ -34,7 +34,7 @@ The documentation, in English and Chinese, lives in [docs/](docs/): guides for [
 
 ```sh
 mkdir sani && cd sani
-curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/main/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml
 # Set SANI_BASE_URL (and TZ) in compose.yaml, then:
 docker compose up -d
 ```

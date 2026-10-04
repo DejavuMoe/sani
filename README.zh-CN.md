@@ -34,7 +34,7 @@
 
 ```sh
 mkdir sani && cd sani
-curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/main/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml
 # 在 compose.yaml 里设置 SANI_BASE_URL（以及 TZ），然后：
 docker compose up -d
 ```

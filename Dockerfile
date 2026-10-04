@@ -34,7 +34,7 @@ FROM scratch
 LABEL org.opencontainers.image.title="Sani" \
       org.opencontainers.image.description="A small, fast link shortener you host yourself: one binary, one SQLite file." \
       org.opencontainers.image.source="https://github.com/DejavuMoe/sani" \
-      org.opencontainers.image.documentation="https://github.com/DejavuMoe/sani/tree/main/docs/en" \
+      org.opencontainers.image.documentation="https://github.com/DejavuMoe/sani/tree/master/docs/en" \
       org.opencontainers.image.licenses="MIT"
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /out/sani /sani

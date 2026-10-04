@@ -79,7 +79,7 @@ const steps = computed<{ title: string; note: string; lines: Line[]; copy: boole
   {
     title: pick('下载 compose.yaml', 'Download compose.yaml'),
     note: pick('镜像来自 GHCR，支持 amd64、arm64 和 armv7。', 'The image comes from GHCR, for amd64, arm64 and armv7.'),
-    lines: [{ text: 'mkdir sani && cd sani' }, { text: 'curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/main/compose.yaml' }],
+    lines: [{ text: 'mkdir sani && cd sani' }, { text: 'curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml' }],
     copy: true,
   },
   {

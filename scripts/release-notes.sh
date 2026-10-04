@@ -6,7 +6,7 @@ set -euo pipefail
 
 tag=${1:?usage: scripts/release-notes.sh vX.Y.Z}
 changelog=docs/en/project/changelog.md
-docs=https://github.com/DejavuMoe/sani/blob/main/docs
+docs=https://github.com/DejavuMoe/sani/blob/master/docs
 # The section without its heading, and without the date the release page
 # shows anyway. The changelog's links are relative to the docs site; on the
 # release page they point at the pages in the repository instead, without

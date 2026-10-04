@@ -5,8 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Sani stays small on purpose. Before you write, have a look at what it [deliberately won’t do](https://github.com/DejavuMoe/sani/blob/main/docs/en/project/progress.md).
-        Sani 刻意保持简单。提建议之前，可以先看看[不做什么](https://github.com/DejavuMoe/sani/blob/main/docs/project/progress.md)。
+        Sani stays small on purpose. Before you write, have a look at what it [deliberately won’t do](https://github.com/DejavuMoe/sani/blob/master/docs/en/project/progress.md).
+        Sani 刻意保持简单。提建议之前，可以先看看[不做什么](https://github.com/DejavuMoe/sani/blob/master/docs/project/progress.md)。
   - type: textarea
     id: problem
     attributes:

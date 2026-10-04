@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation · 文档
-    url: https://github.com/DejavuMoe/sani/blob/main/docs/en/guide/introduction.md
+    url: https://github.com/DejavuMoe/sani/blob/master/docs/en/guide/introduction.md
     about: Setup, configuration, the API and how things work. 部署、配置、API 和原理。
   - name: Report a vulnerability · 报告安全问题
     url: https://github.com/DejavuMoe/sani/security/advisories/new
