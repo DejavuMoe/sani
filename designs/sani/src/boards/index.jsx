@@ -66,7 +66,7 @@ function Index() {
       intro={
         <p>
           A layered reconstruction of the current admin app and visitor pages. The baseline (<code>f01fe22</code>) matches production pixel for pixel; revisions change a
-          layer here, get reviewed, then get implemented. Status: <strong>revision 1 needs review</strong> (<code>_d_meta.json</code>).
+          layer here, get reviewed, then get implemented. Status: <strong>revision 1 approved</strong> (<code>_d_meta.json</code>).
         </p>
       }
     >

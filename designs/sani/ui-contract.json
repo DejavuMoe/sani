@@ -79,7 +79,7 @@
         "interfaces": ["GET /api/slugs/{slug}", "GET /api/favicons/{host}"],
         "tests": ["web/e2e/app.spec.ts"]
       },
-      "status": "needs-review"
+      "status": "approved"
     },
     {
       "id": "patterns",
@@ -160,7 +160,7 @@
         ],
         "tests": ["web/e2e/app.spec.ts"]
       },
-      "status": "needs-review"
+      "status": "approved"
     },
     {
       "id": "admin-app",
@@ -202,7 +202,7 @@
         ],
         "tests": ["web/e2e/app.spec.ts", "web/src/lib/i18n.test.ts", "web/src/lib/url.test.ts", "web/src/lib/size.test.ts"]
       },
-      "status": "needs-review"
+      "status": "approved"
     },
     {
       "id": "visitor-pages",

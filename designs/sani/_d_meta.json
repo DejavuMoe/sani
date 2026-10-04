@@ -8,7 +8,7 @@
         {
           "path": "prototype.html",
           "createdAt": "2026-10-03T19:40:00.704Z",
-          "status": "needs-review",
+          "status": "approved",
           "subtitle": "Revision 1: detail polish (10 items, see changes.html)",
           "viewport": {
             "width": 1280,
@@ -53,7 +53,7 @@
         {
           "path": "components.html",
           "createdAt": "2026-10-03T19:40:01.634Z",
-          "status": "needs-review",
+          "status": "approved",
           "subtitle": "Revision 1: slug field, segmented field size, chart today, toasts",
           "viewport": {
             "width": 1440,
@@ -68,7 +68,7 @@
         {
           "path": "patterns.html",
           "createdAt": "2026-10-03T19:40:01.932Z",
-          "status": "needs-review",
+          "status": "approved",
           "subtitle": "Revision 1: editor rhythm, toolbar, figures, empty state",
           "viewport": {
             "width": 1440,
@@ -80,5 +80,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-04T00:40:17.993Z"
+  "updatedAt": "2026-10-04T01:31:11.274Z"
 }

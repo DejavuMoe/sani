@@ -8,13 +8,13 @@ Change a layer here, get it reviewed, then implement it in `web/`.
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
-(`_d_meta.json`). The current status is **needs-review**, for revision 1.
+(`_d_meta.json`). Revision 1 is **approved** and being implemented in `web/`.
 
 ## Revisions
 
 | Revision | Base | Items | Status |
 |---|---|---|---|
-| r1 — detail polish | `f01fe22` | 10 | needs-review |
+| r1 — detail polish | `f01fe22` | 10 | approved |
 
 <http://127.0.0.1:4311/sani/changes.html> lists every item with its reason,
 the prototype files it touched, the production files it would change, and

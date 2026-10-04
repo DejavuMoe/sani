@@ -9,7 +9,7 @@ window.SANI_REVISIONS = [
     id: 'r1',
     title: 'Revision 1 — detail polish',
     base: 'f01fe22 (design: prototype current UI baseline)',
-    status: 'needs-review',
+    status: 'approved',
     items: [
       {
         id: 'editor-rhythm',
