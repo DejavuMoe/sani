@@ -2,7 +2,9 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.3.1
+
+2026-10-05 · Fixes to the admin app's layout, feedback and accessibility.
 
 ### Improved
 
@@ -14,6 +16,15 @@
 - Several toasts line up in one column.
 - When creating a link, the custom slug field grows with what you type, so long slugs stay visible.
 - Accessibility: the “available” slug status meets AA contrast, the offline and new-link pages have a top-level heading, screen readers announce the list while it loads, and the curl example in Settings can be scrolled by keyboard on phones.
+
+### Maintenance
+
+- The repository's default branch is now `master`. CI and links to source and deployment files in the documentation follow it. If you follow updates from source, switch to `master`.
+
+### Upgrading
+
+Upgrading from v0.3.0 requires no configuration changes. The database schema and HTTP API are unchanged.
+
 ## v0.3.0
 
 2026-10-01 · Texts and files: share a note, a piece of code or a file from the same dashboard. If you script against the API, read “Breaking changes” first.

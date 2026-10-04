@@ -38,7 +38,7 @@ sha256sum --ignore-missing -c SHA256SUMS
 gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
 \`\`\`
 
-Back up before upgrading: the database schema is upgraded on start, and older
-versions cannot open it afterwards. See [deployment]($docs/en/guide/deploy.md) and
+Back up before upgrading. If an upgrade changes the database schema, older
+versions may no longer open it. See [deployment]($docs/en/guide/deploy.md) and
 [operations]($docs/en/guide/operations.md) · [中文更新日志]($docs/project/changelog.md)
 NOTES
