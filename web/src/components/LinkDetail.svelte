@@ -440,7 +440,8 @@
   }
 
   .figs dd.soft {
-    padding-top: 5px;
+    /* Puts the 14px text on the 22px figures' baseline. */
+    padding-top: 8px;
     color: var(--text-2);
     font-size: 14px;
     font-weight: 500;
@@ -570,7 +571,9 @@
     color: var(--warning);
   }
 
-  .code {
+  /* The redirect status code. Scoped to the meta list: a bare .code would
+     also match the code preview and dim it. */
+  .meta .code {
     color: var(--text-3);
     font-family: var(--font-mono);
     font-size: 11.5px;
@@ -624,6 +627,10 @@
 
     .figs dd {
       font-size: 19px;
+    }
+
+    .figs dd.soft {
+      padding-top: 5px;
     }
 
     .actions kbd {

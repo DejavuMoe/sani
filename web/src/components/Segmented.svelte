@@ -12,7 +12,8 @@
     options: { value: T; label: string; icon?: IconName }[];
     onchange: (v: T) => void;
     label: string;
-    size?: 'sm' | 'md';
+    /** `lg` matches the 36px text fields of a form. */
+    size?: 'sm' | 'md' | 'lg';
   } = $props();
 
   let root = $state<HTMLDivElement>();
@@ -75,6 +76,10 @@
     height: 24px;
     padding: 0 9px;
     font-size: 12.5px;
+  }
+
+  .lg button {
+    height: 32px;
   }
 
   button:hover {

@@ -103,7 +103,7 @@
         {#if d.count > 0}
           {@const h = Math.max(2, (d.count / top) * plotH)}
           <path
-            class={['bar', active === i && 'on', active !== null && active !== i && 'off']}
+            class={['bar', i === days.length - 1 && 'today', active === i && 'on', active !== null && active !== i && 'off']}
             d={barPath(LEFT + i * slot + (slot - bar) / 2, TOP + plotH - h, bar, h)}
           />
         {/if}
@@ -177,6 +177,12 @@
 
   .bar.off {
     opacity: 0.35;
+  }
+
+  /* Today is still counting, so its bar is a lighter step of the accent
+     (above 3:1 on the surface in both themes); the axis already says today. */
+  .bar.today {
+    fill: color-mix(in oklab, var(--accent) 70%, var(--surface));
   }
 
   .tick {

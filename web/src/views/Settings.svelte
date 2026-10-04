@@ -259,7 +259,9 @@
           </div>
           <p class="k small">{t('settings.tokenExample')}</p>
           <div class="code">
-            <pre>{curl}</pre>
+            <!-- It scrolls sideways on phones, so it takes focus. -->
+            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+            <pre tabindex="0" role="region" aria-label={t('settings.tokenExample')}>{curl}</pre>
             <button class="code-copy" aria-label={t('act.copy')} onclick={() => copy(curl)}>
               <Icon name="copy" size={14} />
             </button>

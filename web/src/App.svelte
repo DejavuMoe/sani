@@ -20,7 +20,7 @@
   <Login />
 {:else if session.state === 'offline'}
   <main class="offline">
-    <p>{t('err.network')}</p>
+    <h1 class="message">{t('err.network')}</h1>
     <Button onclick={() => session.boot()}>{t('act.retry')}</Button>
   </main>
 {:else if session.state === 'ready'}
@@ -44,5 +44,10 @@
     gap: 14px;
     color: var(--text-2);
     text-align: center;
+  }
+
+  .message {
+    font-size: inherit;
+    font-weight: inherit;
   }
 </style>

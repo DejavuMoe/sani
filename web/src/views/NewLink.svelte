@@ -41,7 +41,7 @@
 <main class="new">
   <header>
     <Logo size={18} />
-    <span class="title">{t('new.title')}</span>
+    <h1 class="title">{t('new.title')}</h1>
   </header>
 
   {#if created}
@@ -90,6 +90,7 @@
   .title {
     color: var(--text-3);
     font-size: 13px;
+    font-weight: 400;
   }
 
   .result {

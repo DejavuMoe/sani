@@ -62,6 +62,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    /* A shared minimum keeps a stack of toasts in one column. */
+    min-width: min(320px, 100%);
     max-width: min(520px, 100%);
     min-height: 40px;
     padding: 6px 6px 6px 14px;

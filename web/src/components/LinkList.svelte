@@ -181,6 +181,9 @@
 
   {#if blank}
     <div class="blank">
+      <div class="blank-art" aria-hidden="true">
+        {#each [0, 1, 2] as i (i)}<span><i></i><i></i><i></i></span>{/each}
+      </div>
       <h2>{t('list.emptyTitle')}</h2>
       <p>
         {#each withKeys(t('list.emptyBody'), { enter: ['↵'] }) as part, i (i)}
@@ -210,7 +213,7 @@
     </div>
   {:else if !links.loaded}
     {#if slowLoad}
-      <div class="card" aria-busy="true" aria-label={t('list.loading')}>
+      <div class="card" role="status" aria-busy="true" aria-label={t('list.loading')}>
         {#each [0, 1, 2, 3] as i (i)}
           <div class="ghost-row" style:--d="{i * 90}ms">
             <span class="g g1"></span><span class="g g2"></span><span class="g g3"></span>
@@ -227,6 +230,7 @@
         <span class="h-spark">{t('list.col.activity')}</span>
         <button class={['h-clicks', links.sort === 'clicks' && 'on']} tabindex="-1" onclick={() => links.setSort('clicks')}>
           {t('list.col.clicks')}
+          {#if links.sort === 'clicks'}<Icon name="chevronDown" size={12} />{/if}
         </button>
         <button
           class={['h-age', links.sort !== 'clicks' && 'on']}
@@ -234,6 +238,7 @@
           onclick={() => links.setSort(links.sort === 'created' ? 'visited' : 'created')}
         >
           {links.sort === 'visited' ? t('sort.visited') : t('list.col.created')}
+          {#if links.sort !== 'clicks'}<Icon name="chevronDown" size={12} />{/if}
         </button>
         <span class="h-copy"></span>
       </div>
@@ -267,7 +272,7 @@
   .toolbar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
     margin-bottom: 10px;
   }
 
@@ -344,6 +349,7 @@
   }
 
   .count {
+    margin-left: 6px;
     color: var(--text-3);
     font-size: 12.5px;
     white-space: nowrap;
@@ -354,7 +360,6 @@
     align-items: center;
     gap: 6px;
     height: 32px;
-    margin-left: auto;
     padding: 0 10px;
     border-radius: var(--radius);
     color: var(--text-2);
@@ -368,6 +373,8 @@
     color: var(--text);
   }
 
+  /* Pick, kind and sort sit together at the right edge. (The kind menu's
+     popover sits between kind and sort, so a sibling rule can't group them.) */
   .pick {
     display: inline-flex;
     align-items: center;
@@ -412,10 +419,6 @@
   .toolbar :global(.kind.on) {
     background: var(--accent-soft);
     color: var(--accent);
-  }
-
-  .toolbar :global(.kind) + :global(.sort) {
-    margin-left: 0;
   }
 
   .bulkbar {
@@ -580,8 +583,18 @@
   }
 
   .head button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
     color: var(--text-3);
     font-size: 12px;
+  }
+
+  /* The column that orders the list carries a small descending mark. */
+  .head button :global(.icon) {
+    margin-right: -3px;
+    color: var(--text-3);
   }
 
   .head button:hover {
@@ -608,6 +621,52 @@
     border: 1px dashed transparent;
     color: var(--text-2);
     text-align: center;
+  }
+
+  /* Three outline rows in the list's shape above the first-run message. */
+  .blank-art {
+    display: grid;
+    width: min(100%, 320px);
+    margin: 0 auto 26px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    mask-image: linear-gradient(to bottom, #000 30%, transparent);
+  }
+
+  .blank-art > span {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 14px;
+  }
+
+  .blank-art > span + span {
+    border-top: 1px solid var(--line);
+  }
+
+  .blank-art i {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface-3);
+  }
+
+  .blank-art i:nth-child(1) {
+    width: 48px;
+  }
+
+  .blank-art i:nth-child(2) {
+    flex: 1;
+  }
+
+  .blank-art i:nth-child(3) {
+    width: 22px;
+  }
+
+  .blank-art > span:first-child i:nth-child(1) {
+    background: var(--accent-line);
   }
 
   .blank h2 {

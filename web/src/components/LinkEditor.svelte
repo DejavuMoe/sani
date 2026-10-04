@@ -245,6 +245,7 @@
     <div class="cell">
       <span class="label">{t('composer.redirect')}</span>
       <Segmented
+        size="lg"
         label={t('composer.redirect')}
         value={form.redirect === 308 ? 301 : form.redirect === 307 ? 302 : form.redirect}
         onchange={(v) => (form.redirect = v)}
@@ -258,11 +259,11 @@
   {/if}
 
   <div class="cell switch-row">
-    <Switch id="edit-enabled-{link.id}" checked={form.enabled} onchange={(v) => (form.enabled = v)} label={t('detail.enabled')} />
-    <label for="edit-enabled-{link.id}">
-      <span class="switch-label">{t('detail.enabled')}</span>
-      <span class="hint">{t('detail.enabledHint')}</span>
-    </label>
+    <div class="switch-line">
+      <Switch id="edit-enabled-{link.id}" checked={form.enabled} onchange={(v) => (form.enabled = v)} label={t('detail.enabled')} />
+      <label class="switch-label" for="edit-enabled-{link.id}">{t('detail.enabled')}</label>
+    </div>
+    <p class="hint">{t('detail.enabledHint')}</p>
   </div>
 
   <footer class="wide">
@@ -344,27 +345,24 @@
     color: var(--warning);
   }
 
+  /* The switch sits in the same 36px control row as its neighbor, under a
+     label-height gap, with its hint below like every other field. */
   .switch-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding-top: 22px;
+    padding-top: calc(13px * 1.5 + 6px);
   }
 
-  .switch-row label {
+  .switch-line {
     display: flex;
-    flex-direction: column;
-    cursor: pointer;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
   }
 
   .switch-label {
     font-size: 13px;
     font-weight: 500;
     line-height: 20px;
-  }
-
-  .switch-row .hint {
-    margin-top: 0;
+    cursor: pointer;
   }
 
   footer {

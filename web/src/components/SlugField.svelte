@@ -78,6 +78,14 @@
       tooLong: t('slug.tooLong'),
     }[status],
   );
+
+  // The inline field grows with the slug instead of clipping it; wide
+  // characters take two columns, and the stylesheet caps it at 32ch.
+  const width = $derived.by(() => {
+    if (variant !== 'inline') return undefined;
+    const cols = [...value].reduce((n, ch) => n + (/[ᄀ-ᅟ⺀-꓏가-힣豈-﫿＀-｠]/.test(ch) ? 2 : 1), 0);
+    return `${Math.max(11, cols + 1)}ch`;
+  });
 </script>
 
 <span class={['slug', variant, status !== 'idle' && status]}>
@@ -87,6 +95,7 @@
       {id}
       bind:value
       {placeholder}
+      style:width
       spellcheck="false"
       autocomplete="off"
       autocapitalize="off"
@@ -173,13 +182,16 @@
 
   .inline input {
     width: 11ch;
+    max-width: 32ch;
     height: 100%;
     font-size: 13px;
   }
 
   /* Field: a full text field in forms. */
   .boxed .box {
-    flex: 1;
+    /* Not flex: 1. In this column box that collapses the field to its text
+       height beside the 36px fields around it. */
+    flex: none;
     height: 36px;
     padding: 0 11px;
     border: 1px solid var(--line-2);
@@ -234,7 +246,13 @@
   }
 
 
+  /* --success is 4.39:1 on --surface in the light theme, under AA for text,
+     so the words take --text-2 and the check keeps the color. */
   .available .status {
+    color: var(--text-2);
+  }
+
+  .available .status :global(.icon) {
     color: var(--success);
   }
 
