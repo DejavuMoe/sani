@@ -379,3 +379,82 @@ a.bd-card:hover {
     gap: 4px;
   }
 }
+
+/* Changes board. */
+.chg {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.chg-text h3 {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.chg-text p {
+  margin-top: 8px;
+  color: var(--text-2);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.chg-files {
+  display: grid;
+  gap: 2px;
+  margin: 14px 0 0;
+}
+.chg-files dt {
+  margin-top: 6px;
+  color: var(--text-3);
+  font-size: 12px;
+}
+.chg-files dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.chg-files code {
+  color: var(--text-2);
+  font: 11.5px/1.5 var(--font-mono);
+}
+.chg-shots {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.chg-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.chg-shot {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.chg-shot img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.chg-none {
+  align-self: center;
+}
+@media (max-width: 900px) {
+  .chg {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .chg-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Wide, short crops read better above one another. */
+.chg-pair.stacked {
+  grid-template-columns: minmax(0, 1fr);
+}

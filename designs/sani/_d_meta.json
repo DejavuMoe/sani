@@ -9,7 +9,7 @@
           "path": "prototype.html",
           "createdAt": "2026-10-03T19:40:00.704Z",
           "status": "needs-review",
-          "subtitle": "Clickable admin app, 42 scenes (L4 screens + L5 app)",
+          "subtitle": "Revision 1: detail polish (10 items, see changes.html)",
           "viewport": {
             "width": 1280,
             "height": 800
@@ -54,7 +54,7 @@
           "path": "components.html",
           "createdAt": "2026-10-03T19:40:01.634Z",
           "status": "needs-review",
-          "subtitle": "Primitives in every state",
+          "subtitle": "Revision 1: slug field, segmented field size, chart today, toasts",
           "viewport": {
             "width": 1440,
             "height": 900
@@ -69,7 +69,7 @@
           "path": "patterns.html",
           "createdAt": "2026-10-03T19:40:01.932Z",
           "status": "needs-review",
-          "subtitle": "Composites in every state",
+          "subtitle": "Revision 1: editor rhythm, toolbar, figures, empty state",
           "viewport": {
             "width": 1440,
             "height": 900
@@ -80,5 +80,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-03T19:40:01.933Z"
+  "updatedAt": "2026-10-04T00:40:17.993Z"
 }

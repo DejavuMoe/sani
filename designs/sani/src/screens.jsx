@@ -341,7 +341,8 @@ function Offline({ app }) {
   const { t } = useI18n();
   return (
     <main className="offline" data-screen-label="offline">
-      <p>{t('err.network')}</p>
+      {/* r1: the message is the page's heading. */}
+      <h1 className="offline-msg">{t('err.network')}</h1>
       <Button onClick={app.retry}>{t('act.retry')}</Button>
     </main>
   );
@@ -366,7 +367,8 @@ function NewLink({ app, initial = {} }) {
     <main className="nl" data-screen-label="new">
       <header className="nl-head">
         <Logo size={18} />
-        <span className="nl-title">{t('new.title')}</span>
+        {/* r1: the page's name is its heading. */}
+        <h1 className="nl-title">{t('new.title')}</h1>
       </header>
       {created ? (
         <div className="nl-result">
@@ -573,7 +575,10 @@ function Settings({ app, initial = {} }) {
                 </div>
                 <p className="k small">{t('settings.tokenExample')}</p>
                 <div className="st-code">
-                  <pre>{curl}</pre>
+                  {/* r1: it scrolls sideways on phones, so it takes focus. */}
+                  <pre tabIndex={0} role="region" aria-label={t('settings.tokenExample')}>
+                    {curl}
+                  </pre>
                   <button className="st-code-copy" aria-label={t('act.copy')} onClick={() => copy(curl)}>
                     <Icon name="copy" size={14} />
                   </button>

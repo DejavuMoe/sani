@@ -9,7 +9,7 @@
    "content/dom-visitor-zh.json",
    "content/dom-visitor-en.json"
   ],
-  "capturedAt": "2026-10-03T20:01:37Z",
+  "capturedAt": "2026-10-04T00:37:58Z",
   "surfaces": [
    {
     "source": "content/dom-app-zh.json",
@@ -10897,7 +10897,7 @@
     "text"
    ],
    "locations": [
-    "[offline] … div#app > main.offline > p",
+    "[offline] … div#app > main.offline > h1.offline-msg",
     "[toasts] … div.toaster > div.toast.toast-error:nth-of-type(3) > span.toast-msg"
    ],
    "visibility": [
@@ -13039,10 +13039,11 @@
    "id": "content-d029f87e3d80f8fd",
    "text": "Example",
    "channels": [
+    "aria-label",
     "text"
    ],
    "locations": [
-    "[settings-token] … div.st-body > div.st-reveal > p.k.small:nth-of-type(2)"
+    "[settings-token] … div.st-reveal > div.st-code:nth-of-type(2) > pre"
    ],
    "visibility": [
     "visible"
@@ -16619,7 +16620,7 @@
    ],
    "locations": [
     "[composer-more] … span.cmp-cell > div.seg.seg-sm > button:nth-of-type(2)",
-    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-md > button:nth-of-type(2)"
+    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-field > button:nth-of-type(2)"
    ],
    "visibility": [
     "visible"
@@ -17039,7 +17040,7 @@
     "[detail-expired] … dl.ld-meta > div:nth-of-type(4) > dt",
     "[detail-limit] … dl.ld-meta > div:nth-of-type(4) > dt",
     "[detail-url] … dl.ld-meta > div:nth-of-type(4) > dt",
-    "[edit-url] … form.le > div.le-cell:nth-of-type(6) > div.seg.seg-md"
+    "[edit-url] … form.le > div.le-cell:nth-of-type(6) > div.seg.seg-field"
    ],
    "visibility": [
     "visible"
@@ -17912,8 +17913,8 @@
     "[login-rate] … div.auth-panel > div.auth-brand > span.logo:nth-of-type(1)",
     "[login-wrong] … div.auth-panel > div.auth-brand > span.logo:nth-of-type(1)",
     "[login] … div.auth-panel > div.auth-brand > span.logo:nth-of-type(1)",
-    "[new-result] … main.nl > header.nl-head > span.logo:nth-of-type(1)",
-    "[new] … main.nl > header.nl-head > span.logo:nth-of-type(1)",
+    "[new-result] … main.nl > header.nl-head > span.logo",
+    "[new] … main.nl > header.nl-head > span.logo",
     "[notfound] … html > head > title",
     "[offline] … html > head > title",
     "[settings-env] … div.hd-inner > a.hd-brand > span.logo",
@@ -17990,8 +17991,8 @@
     "[login-rate] … div.auth-brand > span.logo:nth-of-type(1) > span.logo-word",
     "[login-wrong] … div.auth-brand > span.logo:nth-of-type(1) > span.logo-word",
     "[login] … div.auth-brand > span.logo:nth-of-type(1) > span.logo-word",
-    "[new-result] … header.nl-head > span.logo:nth-of-type(1) > span.logo-word",
-    "[new] … header.nl-head > span.logo:nth-of-type(1) > span.logo-word",
+    "[new-result] … header.nl-head > span.logo > span.logo-word",
+    "[new] … header.nl-head > span.logo > span.logo-word",
     "[settings-env] … a.hd-brand > span.logo > span.logo-word",
     "[settings-import] … a.hd-brand > span.logo > span.logo-word",
     "[settings-token] … a.hd-brand > span.logo > span.logo-word",
@@ -19763,8 +19764,8 @@
     "text"
    ],
    "locations": [
-    "[new-result] … main.nl > header.nl-head > span.nl-title:nth-of-type(2)",
-    "[new] … main.nl > header.nl-head > span.nl-title:nth-of-type(2)",
+    "[new-result] … main.nl > header.nl-head > h1.nl-title",
+    "[new] … main.nl > header.nl-head > h1.nl-title",
     "[settings-env] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
     "[settings-import] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
     "[settings-token] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
@@ -20299,7 +20300,7 @@
     "[detail-expired] … dl.ld-meta > div:nth-of-type(4) > dd",
     "[detail-limit] … dl.ld-meta > div:nth-of-type(4) > dd",
     "[detail-url] … dl.ld-meta > div:nth-of-type(4) > dd",
-    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-md > button:nth-of-type(1)"
+    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-field > button:nth-of-type(1)"
    ],
    "visibility": [
     "visible"
@@ -21566,8 +21567,8 @@
     "text"
    ],
    "locations": [
-    "[edit-text] … div.le-cell.le-switch-row:nth-of-type(6) > label > span.hint:nth-of-type(2)",
-    "[edit-url] … div.le-cell.le-switch-row:nth-of-type(7) > label > span.hint:nth-of-type(2)"
+    "[edit-text] … form.le > div.le-cell.le-switch-row:nth-of-type(6) > p.hint",
+    "[edit-url] … form.le > div.le-cell.le-switch-row:nth-of-type(7) > p.hint"
    ],
    "visibility": [
     "visible"
@@ -22277,7 +22278,7 @@
     "[detail-expired] … dl.ld-meta > div:nth-of-type(4) > dd",
     "[detail-limit] … dl.ld-meta > div:nth-of-type(4) > dd",
     "[detail-url] … dl.ld-meta > div:nth-of-type(4) > dd",
-    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-md > button:nth-of-type(1)"
+    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-field > button:nth-of-type(1)"
    ],
    "visibility": [
     "visible"
@@ -22919,8 +22920,8 @@
     "text"
    ],
    "locations": [
-    "[edit-text] … div.le-cell.le-switch-row:nth-of-type(6) > label > span.hint:nth-of-type(2)",
-    "[edit-url] … div.le-cell.le-switch-row:nth-of-type(7) > label > span.hint:nth-of-type(2)"
+    "[edit-text] … form.le > div.le-cell.le-switch-row:nth-of-type(6) > p.hint",
+    "[edit-url] … form.le > div.le-cell.le-switch-row:nth-of-type(7) > p.hint"
    ],
    "visibility": [
     "visible"
@@ -26607,7 +26608,7 @@
    ],
    "locations": [
     "[composer-more] … span.cmp-cell > div.seg.seg-sm > button:nth-of-type(2)",
-    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-md > button:nth-of-type(2)"
+    "[edit-url] … div.le-cell:nth-of-type(6) > div.seg.seg-field > button:nth-of-type(2)"
    ],
    "visibility": [
     "visible"
@@ -26983,10 +26984,11 @@
    "id": "content-ff985fc3d54ce5c9",
    "text": "用法示例",
    "channels": [
+    "aria-label",
     "text"
    ],
    "locations": [
-    "[settings-token] … div.st-body > div.st-reveal > p.k.small:nth-of-type(2)"
+    "[settings-token] … div.st-reveal > div.st-code:nth-of-type(2) > pre"
    ],
    "visibility": [
     "visible"
@@ -27780,8 +27782,8 @@
     "text"
    ],
    "locations": [
-    "[new-result] … main.nl > header.nl-head > span.nl-title:nth-of-type(2)",
-    "[new] … main.nl > header.nl-head > span.nl-title:nth-of-type(2)",
+    "[new-result] … main.nl > header.nl-head > h1.nl-title",
+    "[new] … main.nl > header.nl-head > h1.nl-title",
     "[settings-env] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
     "[settings-import] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
     "[settings-token] … div.st-body > div.st-tool:nth-of-type(1) > a.st-bookmarklet",
@@ -28392,7 +28394,7 @@
     "[detail-expired] … dl.ld-meta > div:nth-of-type(4) > dt",
     "[detail-limit] … dl.ld-meta > div:nth-of-type(4) > dt",
     "[detail-url] … dl.ld-meta > div:nth-of-type(4) > dt",
-    "[edit-url] … form.le > div.le-cell:nth-of-type(6) > div.seg.seg-md"
+    "[edit-url] … form.le > div.le-cell:nth-of-type(6) > div.seg.seg-field"
    ],
    "visibility": [
     "visible"
@@ -29484,7 +29486,7 @@
     "text"
    ],
    "locations": [
-    "[offline] … div#app > main.offline > p",
+    "[offline] … div#app > main.offline > h1.offline-msg",
     "[toasts] … div.toaster > div.toast.toast-error:nth-of-type(3) > span.toast-msg"
    ],
    "visibility": [

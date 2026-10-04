@@ -171,6 +171,10 @@
     color var(--fast) var(--ease),
     box-shadow var(--fast) var(--ease);
 }
+/* r1: inside a form a segmented control matches the 36px fields around it. */
+.seg-field > button {
+  height: 32px;
+}
 .seg-sm > button {
   height: 24px;
   padding: 0 9px;
@@ -405,6 +409,8 @@ dialog.dialog:not([open]) {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* r1: a shared minimum width turns the stack into one column. */
+  min-width: min(320px, 100%);
   max-width: min(520px, 100%);
   min-height: 40px;
   padding: 6px 6px 6px 14px;
@@ -630,6 +636,11 @@ dialog.dialog:not([open]) {
 .chart .bar.off {
   opacity: 0.35;
 }
+/* r1: today is still counting, so its bar is a lighter step of the accent
+   (above 3:1 on the surface in both themes); the axis already says today. */
+.chart .bar.today {
+  fill: color-mix(in oklab, var(--accent) 70%, var(--surface));
+}
 .chart .tick {
   fill: var(--text-3);
   font-size: 11px;
@@ -731,11 +742,14 @@ dialog.dialog:not([open]) {
 }
 .slugf-inline input {
   width: 11ch;
+  max-width: 32ch;
   height: 100%;
   font-size: 13px;
 }
 .slugf-boxed .slugf-box {
-  flex: 1;
+  /* r1: production has flex: 1 here, which in this column box collapses the
+     field to its text height (22px) beside 36px fields. */
+  flex: none;
   height: 36px;
   padding: 0 11px;
   border: 1px solid var(--line-2);
@@ -777,6 +791,11 @@ dialog.dialog:not([open]) {
   white-space: nowrap;
 }
 .slugf.is-available .slugf-status {
+  /* r1: --success is 4.39:1 on --surface in light; the text takes --text-2
+     and the check keeps the color. */
+  color: var(--text-2);
+}
+.slugf.is-available .slugf-status .icon {
   color: var(--success);
 }
 .slugf.is-blocking .slugf-status {

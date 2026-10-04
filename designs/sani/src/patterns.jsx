@@ -1167,6 +1167,7 @@ function LinkEditor({ link, store, toasts }) {
         <div className="le-cell">
           <span className="label">{t('composer.redirect')}</span>
           <Segmented
+            size="field"
             label={t('composer.redirect')}
             value={form.redirect === 308 ? 301 : form.redirect === 307 ? 302 : form.redirect}
             onChange={(v) => upd({ redirect: v })}
@@ -1180,11 +1181,13 @@ function LinkEditor({ link, store, toasts }) {
       )}
 
       <div className="le-cell le-switch-row">
-        <Switch id={`edit-enabled-${link.id}`} checked={form.enabled} onChange={(v) => upd({ enabled: v })} label={t('detail.enabled')} />
-        <label htmlFor={`edit-enabled-${link.id}`}>
-          <span className="le-switch-label">{t('detail.enabled')}</span>
-          <span className="hint">{t('detail.enabledHint')}</span>
-        </label>
+        <div className="le-switch-line">
+          <Switch id={`edit-enabled-${link.id}`} checked={form.enabled} onChange={(v) => upd({ enabled: v })} label={t('detail.enabled')} />
+          <label className="le-switch-label" htmlFor={`edit-enabled-${link.id}`}>
+            {t('detail.enabled')}
+          </label>
+        </div>
+        <p className="hint">{t('detail.enabledHint')}</p>
       </div>
 
       <footer className="le-foot le-wide">
@@ -1380,6 +1383,16 @@ const LinkList = forwardRef(function LinkList({ store, toasts, slowLoad = true }
 
       {blank ? (
         <div className="ll-blank">
+          {/* r1: a quiet outline of the list to come. */}
+          <div className="ll-blank-art" aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <span key={i}>
+                <i></i>
+                <i></i>
+                <i></i>
+              </span>
+            ))}
+          </div>
           <h2>{t('list.emptyTitle')}</h2>
           <p>{keyed(t('list.emptyBody'), { enter: ['↵'] })}</p>
           <p className="soft">{keyed(t('list.emptyPaste'), { key: [mod, 'V'] })}</p>
@@ -1407,7 +1420,7 @@ const LinkList = forwardRef(function LinkList({ store, toasts, slowLoad = true }
         </div>
       ) : !s.loaded ? (
         slowLoad && (
-          <div className="ll-card" aria-busy="true" aria-label={t('list.loading')}>
+          <div className="ll-card" role="status" aria-busy="true" aria-label={t('list.loading')}>
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="ll-ghost-row" style={{ '--d': `${i * 90}ms` }}>
                 <span className="ll-g ll-g1"></span>
@@ -1427,9 +1440,11 @@ const LinkList = forwardRef(function LinkList({ store, toasts, slowLoad = true }
               <span className="ll-h-spark">{t('list.col.activity')}</span>
               <button className={cx('ll-h-clicks', s.sort === 'clicks' && 'on')} tabIndex={-1} onClick={() => s.setSort('clicks')}>
                 {t('list.col.clicks')}
+                {s.sort === 'clicks' && <Icon name="chevronDown" size={12} />}
               </button>
               <button className={cx('ll-h-age', s.sort !== 'clicks' && 'on')} tabIndex={-1} onClick={() => s.setSort(s.sort === 'created' ? 'visited' : 'created')}>
                 {s.sort === 'visited' ? t('sort.visited') : t('list.col.created')}
+                {s.sort !== 'clicks' && <Icon name="chevronDown" size={12} />}
               </button>
               <span className="ll-h-copy"></span>
             </div>

@@ -17,22 +17,19 @@ const filter = process.argv[2] ?? '';
 
 const scenes = [...readFileSync(join(project, 'src/scenes.jsx'), 'utf8').matchAll(/^\s+'?([\w-]+)'?: \{ group/gm)].map((m) => m[1]);
 const visitor = ['notfound', 'gone', 'share-code', 'share-text', 'share-file', 'share-file-off'];
-const boards = ['index.html', 'foundations.html', 'components.html', 'patterns.html', 'visitors.html'];
+const boards = ['index.html', 'foundations.html', 'components.html', 'patterns.html', 'visitors.html', 'changes.html'];
 const pages = [
   ...scenes.map((s) => ({ name: s, url: (theme, lang) => `prototype.html?scene=${s}&theme=${theme}&lang=${lang}&chrome=0&latency=0` })),
   ...visitor.map((v) => ({ name: `visitor-${v}`, url: (theme, lang) => `visitor.html?page=${v}&theme=${theme}&lang=${lang}` })),
   ...boards.map((b) => ({ name: `board-${b}`, board: true, url: (theme, lang) => `${b}?theme=${theme}&lang=${lang}` })),
 ].filter((p) => p.name.includes(filter));
 
-// Findings that production has too, reproduced on purpose and reported in
-// capabilities.md ("Accessibility findings in production"). They are listed,
-// not counted, so a new violation still fails the run.
-const parity = [
-  { rule: 'page-has-heading-one', page: /^(offline|new|new-result)$/, where: 'App.svelte offline state, views/NewLink.svelte' },
-  { rule: 'aria-prohibited-attr', page: /^(dashboard-loading|board-patterns\.html)$/, where: 'LinkList.svelte:213 aria-label on a div without a role' },
-  { rule: 'scrollable-region-focusable', page: /^settings-token$/, where: 'Settings.svelte:262 <pre> scrolls on phones' },
-  { rule: 'color-contrast', page: /^board-components\.html$/, node: /slug-.*-available/, where: 'SlugField.svelte:238 --success text, 4.39:1 on --surface in light' },
-];
+// Findings the prototype keeps on purpose because production has them too
+// (listed, not counted, so a new violation still fails the run). Revision 1
+// fixed the four found so far (capabilities.md, "Accessibility findings in
+// production"), so the list is empty until production and prototype diverge
+// again.
+const parity = [];
 const known = (p, v) => parity.find((k) => k.rule === v.id && k.page.test(p.name) && (!k.node || v.nodes.every((n) => k.node.test(n))));
 
 const browser = await chromium.launch();

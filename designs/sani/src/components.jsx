@@ -479,7 +479,7 @@ function BarChart({ days, height = 148, dim = false, label, empty, initialActive
             {days.map((d, i) => {
               if (d.count <= 0) return null;
               const h = Math.max(2, (d.count / top) * plotH);
-              return <path key={d.date} className={cx('bar', active === i && 'on', active !== null && active !== i && 'off')} d={barPath(LEFT + i * slot + (slot - bar) / 2, TOP + plotH - h, bar, h)} />;
+              return <path key={d.date} className={cx('bar', i === days.length - 1 && 'today', active === i && 'on', active !== null && active !== i && 'off')} d={barPath(LEFT + i * slot + (slot - bar) / 2, TOP + plotH - h, bar, h)} />;
             })}
             <text className="tick" x={LEFT} y={height - 5}>
               {formatDay(days[0].date, false)}
@@ -566,6 +566,10 @@ function SlugField({ value, onChange, status, prefix, placeholder = '', id, vari
     tooLong: t('slug.tooLong'),
   }[status];
   const blocked = blocking.includes(status);
+  // r1: the inline field grows with the slug (wide characters count twice)
+  // instead of clipping it at 11ch; css caps it at 32ch.
+  const chars = [...value].reduce((n, ch) => n + (/[ᄀ-ᅟ⺀-꓏가-힣豈-﫿＀-｠]/.test(ch) ? 2 : 1), 0);
+  const width = variant === 'inline' ? { width: `calc(${Math.max(11, chars + 1)}ch)` } : undefined;
   return (
     <span className={cx('slugf', `slugf-${variant}`, status === 'available' && 'is-available', blocked && 'is-blocking')}>
       <label className="slugf-box" htmlFor={id}>
@@ -575,6 +579,7 @@ function SlugField({ value, onChange, status, prefix, placeholder = '', id, vari
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          style={width}
           spellCheck="false"
           autoComplete="off"
           autoCapitalize="off"

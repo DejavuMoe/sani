@@ -11,6 +11,7 @@ const BOARD_PAGES = [
   ['patterns.html', 'L3 Patterns'],
   ['screens.html', 'L4–5 Screens'],
   ['visitors.html', 'Visitor pages'],
+  ['changes.html', 'Changes'],
   ['prototype.html', 'Prototype ↗'],
 ];
 

@@ -1,0 +1,106 @@
+/*
+ * What each prototype revision changes against production, item by item.
+ * The changes board (changes.html) shows these; tools/revision-shots.mjs
+ * screenshots each item's region in the baseline (identical to production)
+ * and in the current prototype. `clip` is in CSS pixels of a w×h viewport.
+ */
+window.SANI_REVISIONS = [
+  {
+    id: 'r1',
+    title: 'Revision 1 — detail polish',
+    base: 'f01fe22 (design: prototype current UI baseline)',
+    status: 'needs-review',
+    items: [
+      {
+        id: 'editor-rhythm',
+        area: 'LinkEditor',
+        title: 'The edit form keeps one 36px control rhythm',
+        why: 'The slug field collapsed to its text height (22px) next to 36px fields, because the boxed SlugField keeps flex: 1 inside a column. The redirect control was 32px and the enabled switch floated 10px above its row. Now every control in the grid is 36px tall, the switch sits in its control row under a label-height gap, and its hint lines up with the redirect hint.',
+        files: ['src/css/components.css (.slugf-boxed .slugf-box, .seg-field)', 'src/css/patterns.css (.le-switch-row, .le-switch-line)', 'src/patterns.jsx (LinkEditor)'],
+        production: ['web/src/components/SlugField.svelte', 'web/src/components/Segmented.svelte', 'web/src/components/LinkEditor.svelte'],
+        shot: { scene: 'edit-url', w: 1280, h: 860, clip: [174, 140, 920, 390] },
+      },
+      {
+        id: 'toolbar',
+        area: 'LinkList',
+        title: 'Pick, kind and sort sit together; the sorted column is marked',
+        why: 'The three list controls spread across the toolbar: the rule meant to pull sort next to kind never matched, because the kind menu sits between the two buttons. They now form one group at the right edge, 4px apart. The column that orders the list gets a small descending mark, which shows what the order is and that the headers can be clicked.',
+        files: ['src/css/patterns.css (.ll-toolbar, .ll-pick, .ll-head button)', 'src/patterns.jsx (LinkList)'],
+        production: ['web/src/components/LinkList.svelte'],
+        shot: { scene: 'dashboard-sort-clicks', w: 1280, h: 860, clip: [174, 312, 920, 84] },
+      },
+      {
+        id: 'figures',
+        area: 'LinkDetail',
+        title: 'Last visit sits on the figures’ baseline',
+        why: 'The relative time beside the 22px figures sat 3px above their baseline (5px padding where the type needs 8px). The three figures now read as one line.',
+        files: ['src/css/patterns.css (.ld-figs dd.soft)'],
+        production: ['web/src/components/LinkDetail.svelte'],
+        shot: { scene: 'detail-url', w: 1280, h: 860, clip: [174, 215, 420, 64] },
+      },
+      {
+        id: 'today-bar',
+        area: 'BarChart',
+        title: 'Today’s bar is drawn as still counting',
+        why: 'The last bar is a partial day but looked like a complete one, so every chart seemed to end in a drop. It is now a lighter step of the accent (3.4:1 or more against the surface in both themes), and the axis label below already reads “today”.',
+        files: ['src/css/components.css (.chart .bar.today)', 'src/components.jsx (BarChart)'],
+        production: ['web/src/components/BarChart.svelte'],
+        shot: { scene: 'detail-url', w: 1280, h: 860, clip: [580, 286, 270, 150] },
+      },
+      {
+        id: 'code-preview',
+        area: 'LinkDetail',
+        title: 'Code previews read in the text color',
+        why: 'The redirect code’s .code rule also matched <pre class="preview code"> and dimmed shared code to --text-3, so it read as disabled. It now uses --text, like the plain preview and the share page.',
+        files: ['src/css/patterns.css (.ld-preview.code removed)'],
+        production: ['web/src/components/LinkDetail.svelte'],
+        shot: { scene: 'detail-text', w: 1280, h: 860, clip: [174, 215, 680, 270] },
+      },
+      {
+        id: 'empty',
+        area: 'LinkList',
+        title: 'First run shows where links will appear',
+        why: 'The first-run message floated alone in an empty page. Above it there are now three outline rows in the list’s own shape, fading out, with the slug column in the accent tint. No new words.',
+        files: ['src/css/patterns.css (.ll-blank-art)', 'src/patterns.jsx (LinkList)'],
+        production: ['web/src/components/LinkList.svelte'],
+        shot: { scene: 'dashboard-empty', w: 1280, h: 860, clip: [174, 230, 920, 190] },
+      },
+      {
+        id: 'toasts',
+        area: 'Toaster',
+        title: 'Toasts stack as one column',
+        why: 'Each toast was as wide as its text, so a stack of three formed a ragged pyramid. A shared 320px minimum lines the short ones up; a long message still grows.',
+        files: ['src/css/components.css (.toast)'],
+        production: ['web/src/components/Toaster.svelte'],
+        shot: { scene: 'toasts', w: 1280, h: 860, clip: [400, 690, 480, 160] },
+      },
+      {
+        id: 'slug-grows',
+        area: 'SlugField',
+        title: 'A custom slug is never clipped while typing',
+        why: 'The inline slug field in the composer was a fixed 11ch, but slugs run to 64 characters, so anything longer than “launch-202” scrolled out of sight while being typed. The field now grows with its value, counting wide CJK characters twice, up to 32ch, and still shrinks in narrow rows.',
+        files: ['src/components.jsx (SlugField)', 'src/css/components.css (.slugf-inline input)'],
+        production: ['web/src/components/SlugField.svelte'],
+        shot: { scene: 'composer-more', w: 1280, h: 860, clip: [174, 170, 520, 40], type: { selector: '#composer-slug', text: 'gophercon-2026-slides' } },
+      },
+      {
+        id: 'slug-available',
+        area: 'SlugField',
+        title: 'The “available” status passes contrast',
+        why: 'Its text used --success, 4.39:1 on the surface in light (AA needs 4.5:1). The words now take --text-2 and the check keeps the green, so the state still reads at a glance.',
+        files: ['src/css/components.css (.slugf.is-available)'],
+        production: ['web/src/components/SlugField.svelte:238'],
+        shot: { scene: 'composer-more', w: 1280, h: 860, clip: [174, 170, 520, 40], type: { selector: '#composer-slug', text: 'launch-2026' } },
+      },
+      {
+        id: 'a11y',
+        area: 'App, NewLink, LinkList, Settings',
+        title: 'Three findings from axe, fixed without visual change',
+        why: 'The offline message and the new-link page title are now the page’s h1 (they had none). The list’s loading card has role="status", so its label is allowed. The curl example in Settings scrolls on phones and can now be focused and scrolled by keyboard.',
+        files: ['src/screens.jsx (Offline, NewLink, Settings)', 'src/patterns.jsx (LinkList)', 'src/css/screens.css (.offline-msg, .nl-title)'],
+        production: ['web/src/App.svelte', 'web/src/views/NewLink.svelte', 'web/src/components/LinkList.svelte:213', 'web/src/views/Settings.svelte:262'],
+        shot: null,
+      },
+    ],
+  },
+];

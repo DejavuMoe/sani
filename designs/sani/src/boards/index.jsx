@@ -65,11 +65,32 @@ function Index() {
       title="Sani · UI layers"
       intro={
         <p>
-          A layered reconstruction of the current admin app and visitor pages, aligned with production pixel for pixel. It is the baseline for later UI work: change a
-          layer here, review it, then implement. Status: <strong>needs review</strong> (<code>_d_meta.json</code>).
+          A layered reconstruction of the current admin app and visitor pages. The baseline (<code>f01fe22</code>) matches production pixel for pixel; revisions change a
+          layer here, get reviewed, then get implemented. Status: <strong>revision 1 needs review</strong> (<code>_d_meta.json</code>).
         </p>
       }
     >
+      <section className="spec" aria-labelledby="rev-title">
+        <div className="spec-head">
+          <h2 id="rev-title">Revisions</h2>
+          <code>src/revisions.js</code>
+        </div>
+        <div className="bd-cards">
+          {window.SANI_REVISIONS.map((r) => (
+            <a key={r.id} className="bd-card" href={`changes.html${keep}#${r.id}-title`}>
+              <span className="tag">
+                {r.id.toUpperCase()} · {r.status}
+              </span>
+              <h3>{r.title}</h3>
+              <p>
+                {r.items.length} items across {[...new Set(r.items.flatMap((i) => i.area.split(', ')))].join(', ')}.
+              </p>
+              <code>base {r.base.split(' ')[0]}</code>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section className="spec" aria-labelledby="layers-title">
         <div className="spec-head">
           <h2 id="layers-title">Layers</h2>
@@ -103,7 +124,7 @@ function Index() {
           <code>tools/compare.mjs</code>
           <p className="spec-note">
             Production (a seeded instance) and the prototype in the same Chromium, viewport, theme, language and time zone, diffed per pixel (a pixel counts when a channel
-            differs by more than 32). Non-zero cases are explained in README.md.
+            differs by more than 32). Since r1 the non-zero cases are its intended changes; README.md maps each one.
           </p>
         </div>
         <CompareReport />

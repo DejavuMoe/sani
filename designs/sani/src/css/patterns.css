@@ -488,7 +488,7 @@
 .ll-toolbar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   margin-bottom: 10px;
 }
 .ll-search {
@@ -554,6 +554,7 @@
   }
 }
 .ll-count {
+  margin-left: 6px;
   color: var(--text-3);
   font-size: 12.5px;
   white-space: nowrap;
@@ -571,7 +572,9 @@
   font-size: 13px;
   white-space: nowrap;
 }
-.ll-toolbar .sort,
+/* r1: pick, kind and sort sit together at the right edge. In production the
+   kind menu's popover sits between kind and sort, so .kind + .sort never
+   matched and the three spread apart. */
 .ll-pick {
   margin-left: auto;
 }
@@ -587,10 +590,6 @@
 .ll-toolbar .kind.on {
   background: var(--accent-soft);
   color: var(--accent);
-}
-/* As in production: the kind menu's popover sits between the two buttons. */
-.ll-toolbar .kind + .sort {
-  margin-left: 0;
 }
 .ll-bulkbar {
   position: sticky;
@@ -729,8 +728,17 @@
   width: 30px;
 }
 .ll-head button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
   color: var(--text-3);
   font-size: 12px;
+}
+/* r1: the active sort column carries a small descending mark. */
+.ll-head button .icon {
+  margin-right: -3px;
+  color: var(--text-3);
 }
 .ll-head button:hover {
   color: var(--text);
@@ -776,6 +784,45 @@
 }
 .ll-blank kbd + kbd {
   margin-left: 0;
+}
+/* r1: three outline rows above the first-run message, fading out. */
+.ll-blank-art {
+  display: grid;
+  width: min(100%, 320px);
+  margin: 0 auto 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent);
+}
+.ll-blank-art > span {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 14px;
+}
+.ll-blank-art > span + span {
+  border-top: 1px solid var(--line);
+}
+.ll-blank-art i {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+.ll-blank-art i:nth-child(1) {
+  width: 48px;
+}
+.ll-blank-art i:nth-child(2) {
+  flex: 1;
+}
+.ll-blank-art i:nth-child(3) {
+  width: 22px;
+}
+.ll-blank-art > span:first-child i:nth-child(1) {
+  background: var(--accent-line);
 }
 .ll-text-btn {
   margin-top: 10px;
@@ -1282,7 +1329,8 @@
   line-height: 1.2;
 }
 .ld-figs dd.soft {
-  padding-top: 5px;
+  /* r1: 8px puts the 14px text on the 22px figures' baseline (production: 5px). */
+  padding-top: 8px;
   color: var(--text-2);
   font-size: 14px;
   font-weight: 500;
@@ -1396,12 +1444,9 @@
   font-family: var(--font-mono);
   font-size: 11.5px;
 }
-/* In LinkDetail.svelte the redirect code's `.code` rule also matches
-   `<pre class="preview code">`, so production shows code previews in
-   --text-3. Kept for parity; see capabilities.md, "Observed quirks". */
-.ld-preview.code {
-  color: var(--text-3);
-}
+/* r1: code previews read in --text. In production LinkDetail's .code rule
+   for the redirect code also matches <pre class="preview code"> and dims
+   them to --text-3. */
 .ld-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1442,6 +1487,10 @@
   }
   .ld-figs dd {
     font-size: 19px;
+  }
+  .ld-figs dd.soft {
+    /* r1: the 19px figures need 5px for the same baseline. */
+    padding-top: 5px;
   }
   .ld-actions kbd {
     display: none;
@@ -1506,24 +1555,24 @@
 .le .warn {
   color: var(--warning);
 }
+/* r1: the switch sits in the same 36px control row as its neighbor, under a
+   label-height gap, with its hint below like every other field. */
 .le-switch-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding-top: 22px;
+  padding-top: calc(13px * 1.5 + 6px);
 }
-.le-switch-row label {
+.le-switch-line {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+}
+.le-switch-line label {
   cursor: pointer;
 }
 .le-switch-label {
   font-size: 13px;
   font-weight: 500;
   line-height: 20px;
-}
-.le-switch-row .hint {
-  margin-top: 0;
 }
 .le-foot {
   display: flex;

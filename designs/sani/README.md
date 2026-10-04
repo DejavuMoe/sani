@@ -1,15 +1,34 @@
 # Sani UI prototype
 
 A layered reconstruction of the current Sani UI: the admin app (`web/src`) and
-the visitor pages the Go server renders (`internal/server`). It matches
-production pixel for pixel in the compared states and is the baseline for
-later UI work. Change a layer here, get it reviewed, then implement it in
-`web/`.
+the visitor pages the Go server renders (`internal/server`). The baseline
+(commit `f01fe22`) matches production pixel for pixel in the compared states.
+Change a layer here, get it reviewed, then implement it in `web/`.
 
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
-(`_d_meta.json`). The current status is **needs-review**.
+(`_d_meta.json`). The current status is **needs-review**, for revision 1.
+
+## Revisions
+
+| Revision | Base | Items | Status |
+|---|---|---|---|
+| r1 — detail polish | `f01fe22` | 10 | needs-review |
+
+<http://127.0.0.1:4311/sani/changes.html> lists every item with its reason,
+the prototype files it touched, the production files it would change, and
+before/after crops in both themes. Items live in `src/revisions.js`. To
+regenerate the crops, serve the baseline next to the current prototype:
+
+```sh
+git worktree add "$TMP/sani-r0" f01fe22        # or git archive f01fe22 designs | tar -x -C "$TMP/sani-r0"
+python -m http.server 4312 --bind 127.0.0.1 --directory "$TMP/sani-r0/designs"
+node designs/sani/tools/revision-shots.mjs r1  # BEFORE_URL and PROTO_URL override the two origins
+```
+
+Once a revision is approved and implemented, production catches up and
+`compare.mjs` goes back to measuring parity.
 
 ## Open it
 
@@ -87,7 +106,8 @@ names.
 | `tools/probe.mjs` | Prints element boxes on both sides, to find where a layout difference starts. |
 | `tools/smoke.mjs` | Loads every scene (and the pages in `PAGES`) and fails on console errors, failed requests or empty renders. |
 | `tools/shot.mjs` | Screenshots one page, or one element with `--sel=`, for review. |
-| `tools/a11y.mjs` | axe over every state, the visitor pages and the boards, in both themes at desktop and phone width. Findings that production shares are listed separately (`capabilities.md`); anything else fails. |
+| `tools/a11y.mjs` | axe over every state, the visitor pages and the boards, in both themes at desktop and phone width. A `parity` list can excuse findings production shares; it is empty since r1, so any finding fails. |
+| `tools/revision-shots.mjs <rev>` | Crops each item of a revision (`src/revisions.js`) from the baseline and the current prototype, in light/zh and dark/en, into `screenshots/revisions/<rev>/` for `changes.html`. |
 | `tools/content.mjs` | Collects every rendered string (`collect`) and classifies the content inventory by origin (`classify`), around the skill's `content_audit.py`. |
 
 To set up production for capture and comparison, run from the repository root:
@@ -106,10 +126,17 @@ seed restores it.
 
 ### Current comparison
 
-All 26 cases are captured in all four theme and language combinations (104
-captures; by default `compare.mjs` runs light/zh and dark/en, and
-`VARIANTS=light-en,dark-zh` runs the other two). Every capture rounds to
-0.00% except:
+With r1 in the prototype, the comparison measures the intended changes
+against production rather than parity: the dashboard states differ by about
+0.13% (toolbar, sort mark), `edit-url` by about 2.9% (form rhythm),
+`detail-text` by 0.3–0.7% (code color), `picking` by 0.15–0.55% (toolbar).
+Login, setup, new link, offline, the phone detail and every visitor page
+still round to 0.00%. Each difference maps to an item in `changes.html`.
+
+At the baseline (`f01fe22`), all 26 cases are captured in all four theme and
+language combinations (104 captures; by default `compare.mjs` runs light/zh
+and dark/en, and `VARIANTS=light-en,dark-zh` runs the other two). Every
+capture rounds to 0.00% except:
 
 - **settings** (0.08–0.10% on desktop, 0.20–0.24% on phone): expected. The
   prototype shows sanitized fixture data (request origin, files domain, time
@@ -142,17 +169,19 @@ exception is the sample file name `design-review.pdf` used for the upload
 states. The 25 warnings are `data-*` attribute values (link ids, theme, screen
 labels), which the checker always asks a person to look at.
 
-### Observed quirks kept for parity
+### Production quirks found at the baseline
+
+The baseline reproduced these on purpose; r1 resolves each of them:
 
 - In `LinkDetail.svelte`, the `.code` rule meant for the redirect code also
   matches `<pre class="preview code">`, so code previews render in `--text-3`
-  instead of `--text`. The prototype reproduces it (`.ld-preview.code` in
-  `css/patterns.css`). Whether that is intended is a question for review.
+  instead of `--text` (r1 `code-preview`).
 - In `LinkList.svelte`, `.kind + .sort` never matches, because the kind
-  menu's popover sits between the two buttons. The toolbar gap is therefore
-  wider there than the rule suggests. Both sides render the same.
-- Four accessibility findings that production shares, from states its own
-  axe run doesn't reach, are listed in `capabilities.md`.
+  menu's popover sits between the two buttons (r1 `toolbar`).
+- In `LinkEditor`, the boxed SlugField keeps `flex: 1` in a column and
+  collapses to 22px (r1 `editor-rhythm`).
+- Four accessibility findings, from states production's own axe run doesn't
+  reach, are listed in `capabilities.md` (r1 `slug-available`, `a11y`).
 
 ## Records
 

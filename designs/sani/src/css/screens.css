@@ -12,6 +12,10 @@
   color: var(--text-2);
   text-align: center;
 }
+.offline-msg {
+  font-size: inherit;
+  font-weight: inherit;
+}
 
 /* Dashboard.svelte */
 .dash {
@@ -121,6 +125,7 @@
 .nl-title {
   color: var(--text-3);
   font-size: 13px;
+  font-weight: 400;
 }
 .nl-result {
   display: flex;
