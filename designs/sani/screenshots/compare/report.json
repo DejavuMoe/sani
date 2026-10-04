@@ -1,9 +1,9 @@
 {
-  "at": "2026-10-04T00:31:07.632Z",
+  "at": "2026-10-04T02:26:05.730Z",
   "cases": [
     {
       "case": "dashboard-light-zh",
-      "diff": 0.151,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -16,7 +16,7 @@
     },
     {
       "case": "dashboard-dark-en",
-      "diff": 0.133,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -29,7 +29,7 @@
     },
     {
       "case": "dashboard-phone-light-zh",
-      "diff": 0.115,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         390,
@@ -42,7 +42,7 @@
     },
     {
       "case": "dashboard-phone-dark-en",
-      "diff": 0.098,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         390,
@@ -55,7 +55,7 @@
     },
     {
       "case": "detail-url-light-zh",
-      "diff": 0.03,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -68,7 +68,7 @@
     },
     {
       "case": "detail-url-dark-en",
-      "diff": 0.029,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -81,7 +81,7 @@
     },
     {
       "case": "detail-text-light-zh",
-      "diff": 0.342,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -94,7 +94,7 @@
     },
     {
       "case": "detail-text-dark-en",
-      "diff": 0.685,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -107,7 +107,7 @@
     },
     {
       "case": "detail-file-light-zh",
-      "diff": 0.03,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -120,7 +120,7 @@
     },
     {
       "case": "detail-file-dark-en",
-      "diff": 0.029,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -132,34 +132,34 @@
       ]
     },
     {
-      "case": "edit-url-light-zh",
-      "diff": 2.825,
+      "case": "detail-phone-light-zh",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        1280,
-        860
+        390,
+        844
       ],
       "proto": [
-        1280,
-        860
+        390,
+        844
       ]
     },
     {
-      "case": "edit-url-dark-en",
-      "diff": 2.972,
+      "case": "detail-phone-dark-en",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        1280,
-        860
+        390,
+        844
       ],
       "proto": [
-        1280,
-        860
+        390,
+        844
       ]
     },
     {
       "case": "picking-light-zh",
-      "diff": 0.152,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -172,7 +172,7 @@
     },
     {
       "case": "picking-dark-en",
-      "diff": 0.548,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -185,7 +185,7 @@
     },
     {
       "case": "search-light-zh",
-      "diff": 0.14,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -198,7 +198,7 @@
     },
     {
       "case": "search-dark-en",
-      "diff": 0.123,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -211,7 +211,7 @@
     },
     {
       "case": "sort-clicks-light-zh",
-      "diff": 0.144,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -224,7 +224,7 @@
     },
     {
       "case": "sort-clicks-dark-en",
-      "diff": 0.127,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -237,7 +237,7 @@
     },
     {
       "case": "composer-text-light-zh",
-      "diff": 0.151,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -250,7 +250,7 @@
     },
     {
       "case": "composer-text-dark-en",
-      "diff": 0.135,
+      "diff": 0.003,
       "sameSize": true,
       "prod": [
         1280,
@@ -263,7 +263,7 @@
     },
     {
       "case": "composer-file-light-zh",
-      "diff": 0.151,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -276,7 +276,33 @@
     },
     {
       "case": "composer-file-dark-en",
-      "diff": 0.133,
+      "diff": 0,
+      "sameSize": true,
+      "prod": [
+        1280,
+        800
+      ],
+      "proto": [
+        1280,
+        800
+      ]
+    },
+    {
+      "case": "composer-more-light-zh",
+      "diff": 0,
+      "sameSize": true,
+      "prod": [
+        1280,
+        800
+      ],
+      "proto": [
+        1280,
+        800
+      ]
+    },
+    {
+      "case": "composer-more-dark-en",
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -289,7 +315,7 @@
     },
     {
       "case": "shortcuts-light-zh",
-      "diff": 0.576,
+      "diff": 0.494,
       "sameSize": true,
       "prod": [
         1280,
@@ -302,7 +328,7 @@
     },
     {
       "case": "shortcuts-dark-en",
-      "diff": 0.568,
+      "diff": 0.509,
       "sameSize": true,
       "prod": [
         1280,
@@ -627,7 +653,7 @@
     },
     {
       "case": "dashboard-light-en",
-      "diff": 0.125,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -640,7 +666,7 @@
     },
     {
       "case": "dashboard-dark-zh",
-      "diff": 0.15,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -653,7 +679,7 @@
     },
     {
       "case": "dashboard-phone-light-en",
-      "diff": 0.098,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         390,
@@ -666,7 +692,7 @@
     },
     {
       "case": "dashboard-phone-dark-zh",
-      "diff": 0.115,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         390,
@@ -679,7 +705,7 @@
     },
     {
       "case": "detail-url-light-en",
-      "diff": 0.028,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -692,7 +718,7 @@
     },
     {
       "case": "detail-url-dark-zh",
-      "diff": 0.029,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -705,7 +731,7 @@
     },
     {
       "case": "detail-text-light-en",
-      "diff": 0.34,
+      "diff": 0.001,
       "sameSize": true,
       "prod": [
         1280,
@@ -718,7 +744,7 @@
     },
     {
       "case": "detail-text-dark-zh",
-      "diff": 0.686,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -731,7 +757,7 @@
     },
     {
       "case": "detail-file-light-en",
-      "diff": 0.028,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -744,7 +770,7 @@
     },
     {
       "case": "detail-file-dark-zh",
-      "diff": 0.03,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -756,34 +782,34 @@
       ]
     },
     {
-      "case": "edit-url-light-en",
-      "diff": 2.951,
+      "case": "detail-phone-light-en",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        1280,
-        860
+        390,
+        844
       ],
       "proto": [
-        1280,
-        860
+        390,
+        844
       ]
     },
     {
-      "case": "edit-url-dark-zh",
-      "diff": 2.83,
+      "case": "detail-phone-dark-zh",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        1280,
-        860
+        390,
+        844
       ],
       "proto": [
-        1280,
-        860
+        390,
+        844
       ]
     },
     {
       "case": "picking-light-en",
-      "diff": 0.129,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -796,7 +822,7 @@
     },
     {
       "case": "picking-dark-zh",
-      "diff": 0.496,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -809,7 +835,7 @@
     },
     {
       "case": "search-light-en",
-      "diff": 0.117,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -822,7 +848,7 @@
     },
     {
       "case": "search-dark-zh",
-      "diff": 0.139,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -835,7 +861,7 @@
     },
     {
       "case": "sort-clicks-light-en",
-      "diff": 0.121,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -848,7 +874,7 @@
     },
     {
       "case": "sort-clicks-dark-zh",
-      "diff": 0.144,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -861,7 +887,7 @@
     },
     {
       "case": "composer-text-light-en",
-      "diff": 0.127,
+      "diff": 0.002,
       "sameSize": true,
       "prod": [
         1280,
@@ -874,7 +900,7 @@
     },
     {
       "case": "composer-text-dark-zh",
-      "diff": 0.15,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -887,7 +913,7 @@
     },
     {
       "case": "composer-file-light-en",
-      "diff": 0.125,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -900,7 +926,33 @@
     },
     {
       "case": "composer-file-dark-zh",
-      "diff": 0.15,
+      "diff": 0,
+      "sameSize": true,
+      "prod": [
+        1280,
+        800
+      ],
+      "proto": [
+        1280,
+        800
+      ]
+    },
+    {
+      "case": "composer-more-light-en",
+      "diff": 0,
+      "sameSize": true,
+      "prod": [
+        1280,
+        800
+      ],
+      "proto": [
+        1280,
+        800
+      ]
+    },
+    {
+      "case": "composer-more-dark-zh",
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -913,7 +965,7 @@
     },
     {
       "case": "shortcuts-light-en",
-      "diff": 0.579,
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
@@ -926,7 +978,7 @@
     },
     {
       "case": "shortcuts-dark-zh",
-      "diff": 0.532,
+      "diff": 0.454,
       "sameSize": true,
       "prod": [
         1280,
@@ -1250,107 +1302,55 @@
       ]
     },
     {
-      "case": "detail-phone-light-zh",
-      "diff": 0.003,
+      "case": "edit-url-light-zh",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        390,
-        844
+        1280,
+        860
       ],
       "proto": [
-        390,
-        844
+        1280,
+        860
       ]
     },
     {
-      "case": "detail-phone-dark-en",
-      "diff": 0.003,
+      "case": "edit-url-dark-en",
+      "diff": 0,
       "sameSize": true,
       "prod": [
-        390,
-        844
+        1280,
+        860
       ],
       "proto": [
-        390,
-        844
+        1280,
+        860
       ]
     },
     {
-      "case": "composer-more-light-zh",
-      "diff": 0.151,
+      "case": "edit-url-light-en",
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
-        800
+        860
       ],
       "proto": [
         1280,
-        800
+        860
       ]
     },
     {
-      "case": "composer-more-dark-en",
-      "diff": 0.133,
+      "case": "edit-url-dark-zh",
+      "diff": 0,
       "sameSize": true,
       "prod": [
         1280,
-        800
+        860
       ],
       "proto": [
         1280,
-        800
-      ]
-    },
-    {
-      "case": "detail-phone-light-en",
-      "diff": 0.003,
-      "sameSize": true,
-      "prod": [
-        390,
-        844
-      ],
-      "proto": [
-        390,
-        844
-      ]
-    },
-    {
-      "case": "detail-phone-dark-zh",
-      "diff": 0.003,
-      "sameSize": true,
-      "prod": [
-        390,
-        844
-      ],
-      "proto": [
-        390,
-        844
-      ]
-    },
-    {
-      "case": "composer-more-light-en",
-      "diff": 0.125,
-      "sameSize": true,
-      "prod": [
-        1280,
-        800
-      ],
-      "proto": [
-        1280,
-        800
-      ]
-    },
-    {
-      "case": "composer-more-dark-zh",
-      "diff": 0.15,
-      "sameSize": true,
-      "prod": [
-        1280,
-        800
-      ],
-      "proto": [
-        1280,
-        800
+        860
       ]
     }
   ]

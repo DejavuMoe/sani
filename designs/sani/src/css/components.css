@@ -747,7 +747,7 @@ dialog.dialog:not([open]) {
   font-size: 13px;
 }
 .slugf-boxed .slugf-box {
-  /* r1: production has flex: 1 here, which in this column box collapses the
+  /* r1: not flex: 1 (the baseline's), which in this column box collapses the
      field to its text height (22px) beside 36px fields. */
   flex: none;
   height: 36px;

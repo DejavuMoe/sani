@@ -65,8 +65,8 @@ function Index() {
       title="Sani · UI layers"
       intro={
         <p>
-          A layered reconstruction of the current admin app and visitor pages. The baseline (<code>f01fe22</code>) matches production pixel for pixel; revisions change a
-          layer here, get reviewed, then get implemented. Status: <strong>revision 1 approved</strong> (<code>_d_meta.json</code>).
+          A layered reconstruction of the current admin app and visitor pages. It matches production pixel for pixel; revisions change a
+          layer here, get reviewed, then get implemented. Status: <strong>revision 1 implemented</strong>, production matches again (<code>_d_meta.json</code>).
         </p>
       }
     >

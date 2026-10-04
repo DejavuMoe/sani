@@ -1,6 +1,6 @@
 /*
- * Changes: each revision's items, with the baseline (identical to
- * production) beside the revised prototype. Images come from
+ * Changes: each revision's items, with the prototype it started from
+ * (identical to production at the time) beside the revised one. Images come from
  * tools/revision-shots.mjs; light captures are in Chinese, dark in English.
  */
 function Shot({ src, label }) {
@@ -20,8 +20,9 @@ function Changes() {
       title="Changes"
       intro={
         <p>
-          What each revision changes against production. “Before” is the baseline prototype, which matches production pixel for pixel; “after” is the current prototype,
-          in the same state and region. Light captures are in Chinese and dark ones in English. Approve or send back each revision as a whole.
+          What each revision changes. “Before” is the prototype the revision started from, which matched production at the time; “after” is the revised prototype, in
+          the same state and region. Light captures are in Chinese and dark ones in English. Approve or send back each revision as a whole; once implemented, production
+          matches “after”.
         </p>
       }
       toc={revs.flatMap((r) => r.items.map((i) => [`${r.id}-${i.id}`, i.title]))}
@@ -34,6 +35,7 @@ function Changes() {
             </h2>
             <code>
               base {rev.base} · {rev.items.length} items · {rev.status}
+              {rev.implemented && ` in ${rev.implemented.split(' ')[0]}`}
             </code>
           </div>
           {rev.items.map((item, n) => (
@@ -51,7 +53,7 @@ function Changes() {
                       <code>{f}</code>
                     </dd>
                   ))}
-                  <dt>Production to change</dt>
+                  <dt>Production</dt>
                   {item.production.map((f) => (
                     <dd key={f}>
                       <code>{f}</code>

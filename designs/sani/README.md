@@ -1,23 +1,23 @@
 # Sani UI prototype
 
 A layered reconstruction of the current Sani UI: the admin app (`web/src`) and
-the visitor pages the Go server renders (`internal/server`). The baseline
-(commit `f01fe22`) matches production pixel for pixel in the compared states.
-Change a layer here, get it reviewed, then implement it in `web/`.
+the visitor pages the Go server renders (`internal/server`). It matches
+production pixel for pixel in the compared states. Change a layer here, get it
+reviewed, then implement it in `web/`.
 
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
-(`_d_meta.json`). Revision 1 is **approved** and being implemented in `web/`.
+(`_d_meta.json`). Revision 1 is approved and implemented (`0ea9e05`).
 
 ## Revisions
 
-| Revision | Base | Items | Status |
-|---|---|---|---|
-| r1 — detail polish | `f01fe22` | 10 | approved |
+| Revision | Base | Items | Approved | Implemented |
+|---|---|---|---|---|
+| r1 — detail polish | `f01fe22` | 10 | `c28d7ef` | `0ea9e05` |
 
 <http://127.0.0.1:4311/sani/changes.html> lists every item with its reason,
-the prototype files it touched, the production files it would change, and
+the prototype files it touched, the production files it changes, and
 before/after crops in both themes. Items live in `src/revisions.js`. To
 regenerate the crops, serve the baseline next to the current prototype:
 
@@ -126,17 +126,10 @@ seed restores it.
 
 ### Current comparison
 
-With r1 in the prototype, the comparison measures the intended changes
-against production rather than parity: the dashboard states differ by about
-0.13% (toolbar, sort mark), `edit-url` by about 2.9% (form rhythm),
-`detail-text` by 0.3–0.7% (code color), `picking` by 0.15–0.55% (toolbar).
-Login, setup, new link, offline, the phone detail and every visitor page
-still round to 0.00%. Each difference maps to an item in `changes.html`.
-
-At the baseline (`f01fe22`), all 26 cases are captured in all four theme and
-language combinations (104 captures; by default `compare.mjs` runs light/zh
-and dark/en, and `VARIANTS=light-en,dark-zh` runs the other two). Every
-capture rounds to 0.00% except:
+With r1 implemented (`0ea9e05`), all 26 cases are captured in all four theme
+and language combinations (104 captures; by default `compare.mjs` runs
+light/zh and dark/en, and `VARIANTS=light-en,dark-zh` runs the other two).
+Every capture rounds to 0.00% except:
 
 - **settings** (0.08–0.10% on desktop, 0.20–0.24% on phone): expected. The
   prototype shows sanitized fixture data (request origin, files domain, time
@@ -171,7 +164,8 @@ labels), which the checker always asks a person to look at.
 
 ### Production quirks found at the baseline
 
-The baseline reproduced these on purpose; r1 resolves each of them:
+The baseline reproduced these on purpose; r1 resolves each of them, in the
+prototype and in production:
 
 - In `LinkDetail.svelte`, the `.code` rule meant for the redirect code also
   matches `<pre class="preview code">`, so code previews render in `--text-3`

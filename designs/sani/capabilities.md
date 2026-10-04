@@ -104,9 +104,9 @@ Error envelope: `{"error": {"code", "message"}}`, with `code` mapped to
 `tools/a11y.mjs` runs axe over every prototype state, including states that
 `pnpm --dir web a11y` does not reach. Since the prototype reproduces
 production, these findings apply to production as well. Each was checked in
-the source. Revision 1 fixes all four in the prototype (`changes.html`, item
-`a11y` and `slug-available`); production still has them until r1 is approved
-and implemented.
+the source. Revision 1 fixed all four (`changes.html`, items `a11y` and
+`slug-available`), in production since `0ea9e05`; axe is clean in these
+states on both sides. The table records where they were.
 
 | Rule (impact) | Where | State that shows it |
 |---|---|---|
