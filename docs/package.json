@@ -24,6 +24,6 @@
     "@types/node": "catalog:",
     "axe-core": "catalog:",
     "typescript": "catalog:",
-    "vue-tsc": "3.3.11"
+    "vue-tsc": "3.3.12"
   }
 }
