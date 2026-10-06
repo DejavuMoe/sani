@@ -214,8 +214,8 @@ func TestFileShare(t *testing.T) {
 	if part := e.files("GET", "/"+slug, "Range", "bytes=9-"); part.status != 206 || !bytes.Equal(part.body, data[9:]) {
 		t.Fatalf("resumed download = %d", part.status)
 	}
-	if n := e.clicksOf(l["id"]); n != 1 {
-		t.Errorf("downloads = %v; the page and the resumed part don't count", n)
+	if n := e.clicksOf(l["id"]); n != 2 {
+		t.Errorf("downloads = %v; both successful content requests count", n)
 	}
 
 	// Names lose their directories and control characters.

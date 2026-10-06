@@ -520,8 +520,11 @@ func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error)
 	}
 
 	res := &ListResult{Links: []*Link{}}
-	if err := s.r.QueryRowContext(ctx, `SELECT count(*) FROM links l LEFT JOIN contents c ON c.link_id = l.id
-		WHERE `+strings.Join(where, " AND "), args...).Scan(&res.Total); err != nil {
+	countFrom := "links l"
+	if q.Search != "" {
+		countFrom += " LEFT JOIN contents c ON c.link_id = l.id"
+	}
+	if err := s.r.QueryRowContext(ctx, `SELECT count(*) FROM `+countFrom+` WHERE `+strings.Join(where, " AND "), args...).Scan(&res.Total); err != nil {
 		return nil, err
 	}
 

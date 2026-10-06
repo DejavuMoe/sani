@@ -64,6 +64,7 @@ type Server struct {
 	ctx      context.Context // canceled on shutdown; parents background jobs
 	cancel   context.CancelFunc
 	jobs     sync.WaitGroup
+	requests sync.WaitGroup
 	jobSlots chan struct{}
 
 	filesHost string        // host[:port] of FilesURL
@@ -110,6 +111,7 @@ func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetch
 }
 
 func (s *Server) loadTarget(ctx context.Context, key string) (*cache.Entry, error) {
+	defer s.clicks.Snapshot()()
 	t, err := s.store.Resolve(ctx, key)
 	if errors.Is(err, store.ErrNotFound) {
 		return nil, nil
@@ -126,11 +128,13 @@ func (s *Server) loadTarget(ctx context.Context, key string) (*cache.Entry, erro
 		ExpiresAt: t.ExpiresAt,
 		MaxClicks: t.MaxClicks,
 	}
-	e.Clicks.Store(t.Clicks + s.clicks.Pending(t.ID))
+	e.Clicks = s.clicks.Counter(t.ID, t.Clicks)
 	return e, nil
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.requests.Add(1)
+	defer s.requests.Done()
 	if s.filesHost != "" && s.onFilesOrigin(r) {
 		s.serveFiles(w, r)
 		return
@@ -170,16 +174,19 @@ func (s *Server) serveRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 // Shutdown stops background jobs and waits for them to finish.
-func (s *Server) Shutdown(ctx context.Context) {
+func (s *Server) Shutdown(ctx context.Context) error {
 	s.cancel()
 	done := make(chan struct{})
 	go func() {
+		s.requests.Wait()
 		s.jobs.Wait()
 		close(done)
 	}()
 	select {
 	case <-done:
+		return nil
 	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
 

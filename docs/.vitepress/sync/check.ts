@@ -12,10 +12,10 @@ import { fileURLToPath } from 'node:url';
 import { benchmark } from '../data/benchmark.ts';
 import { groups } from '../pages.ts';
 import { buildCompose, buildProxy, buildService, type BuilderInput } from './builder.ts';
-import { apiRoutes, commands, docsRoot, envVars, errorCodes, read, release, reservedSlugs } from './source.ts';
+import { apiRoutes, commands, docsRoot, envVars, errorCodes, latestVersion, read, release, reservedSlugs } from './source.ts';
 
 export interface Check {
-  id: 'pages' | 'config' | 'readme' | 'api' | 'errors' | 'cli' | 'reserved' | 'benchmark' | 'builder' | 'release' | 'assets';
+  id: 'pages' | 'config' | 'readme' | 'api' | 'errors' | 'cli' | 'reserved' | 'benchmark' | 'builder' | 'release' | 'assets' | 'behavior';
   /** How many facts were compared. */
   count: number;
   problems: string[];
@@ -40,7 +40,7 @@ function tableRows(md: string): string[][] {
 
 /** The text of a section, from its heading to the next heading of any level. */
 function section(md: string, heading: RegExp): string | undefined {
-  const lines = md.split('\n');
+  const lines = md.split(/\r?\n/);
   const start = lines.findIndex((l) => heading.test(l));
   if (start < 0) return undefined;
   const end = lines.findIndex((l, i) => i > start && /^#{1,6} /.test(l));
@@ -250,7 +250,39 @@ function checkRelease(): Check {
   }
   const composeImage = /^\s+image: (\S+?)(:\S+)?(\s|$)/m.exec(read('compose.yaml'))?.[1];
   if (composeImage !== image) problems.push(`compose.yaml: the image is ${composeImage}, but releases push ${image}`);
+
+  const zh = [...doc('', 'project/changelog').matchAll(/^## (v\S+)/gm)].map(m => m[1]);
+  const en = [...doc('en/', 'project/changelog').matchAll(/^## (v\S+)/gm)].map(m => m[1]);
+  if (JSON.stringify(zh) !== JSON.stringify(en)) problems.push('bilingual changelog release headings differ');
+  if (latestVersion() === 'dev') problems.push('no release heading in the changelog');
+  for (const { dir } of locales) {
+    if (!doc(dir, 'project/progress').includes('{{ status.latestVersion }}')) problems.push(`${dir}project/progress.md must use the shared release version`);
+  }
+  if (read('docs/.vitepress/config.ts').includes('/edit/main/')) problems.push('docs edit links still target the retired main branch');
   return { id: 'release', count: archives.length + platforms.length + 1, problems };
+}
+
+/** Guard the specific promises that previously drifted; this is not a
+ * substitute for reviewing prose against behavior tests. */
+export function behaviorProblems(statistics: string, operations: string, interval: number, downloads: number): string[] {
+  const problems: string[] = [];
+  if (!new RegExp(`(?:每 ?${interval} 秒|every ${interval} seconds)`).test(statistics)) problems.push('statistics: flush interval differs from source');
+  if (!new RegExp(`\\b${downloads}\\b`).test(statistics)) problems.push('statistics: concurrent download bound differs from source');
+  for (const status of ['200', '206', '304', '412', '416']) {
+    if (!statistics.includes('`' + status + '`')) problems.push(`statistics: missing content/conditional status ${status}`);
+  }
+  if (/最多丢失最后(?:这)?\s*2\s*秒|at most the last 2 seconds/i.test(statistics + operations)) problems.push('durability: the two-second loss guarantee is false');
+  if (/之后复制的目录里，一定有|a copy taken after the database has every file/i.test(operations)) problems.push('backup: online copy order does not guarantee referenced files');
+  if (!operations.includes('synchronous=NORMAL')) problems.push('operations: explain WAL/NORMAL durability');
+  return problems;
+}
+
+function checkBehavior(): Check {
+  const interval = Number(/rec\.Run\(bg, (\d+)\*time.Second/.exec(read('cmd/sani/main.go'))?.[1]);
+  const downloads = Number(/const maxDownloads = (\d+)/.exec(read('internal/server/share.go'))?.[1]);
+  if (!interval || !downloads) throw new Error('cannot extract counting limits from source');
+  const problems = locales.flatMap(({ dir }) => behaviorProblems(doc(dir, 'guide/statistics'), doc(dir, 'guide/operations'), interval, downloads).map(p => dir + p));
+  return { id: 'behavior', count: 10, problems };
 }
 
 function checkAssets(): Check {
@@ -259,7 +291,7 @@ function checkAssets(): Check {
 }
 
 export function runChecks(): Check[] {
-  const checks = [checkPages, checkConfig, checkReadme, checkApi, checkErrors, checkCli, checkReserved, checkBenchmark, checkBuilder, checkRelease, checkAssets];
+  const checks = [checkPages, checkConfig, checkReadme, checkApi, checkErrors, checkCli, checkReserved, checkBenchmark, checkBuilder, checkRelease, checkAssets, checkBehavior];
   return checks.map((check) => {
     try {
       return check();

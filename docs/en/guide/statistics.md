@@ -35,7 +35,7 @@ For a [text or file](./usage#shares), a visit is someone getting the content, an
 
 - **A text** counts when its page at `/p/{slug}` opens, and again for each fetch of its raw text or download from the files domain.
 - **A file** counts when it’s downloaded from the files domain, not when its page opens; the details call these Downloads.
-- **On the files domain, curl and wget count.** They are how people download files, so there they’re treated as visitors; crawlers, previews, prefetches and `HEAD` requests still don’t count. A download that resumes a partial one with a `Range` header counts only once, for its first part.
+- **On the files domain, curl and wget count.** They are how people download files, so there they’re treated as visitors; crawlers, previews, prefetches and `HEAD` requests still don’t count. Each GET that starts a successful `200` or `206` content response counts, including later ranges and suffix ranges. `304`, `412`, `416` and file-open failures do not count. Once a successful response starts, a disconnected client does not refund the visit; the count does not prove the client saved the complete file.
 
 The referrer of a raw text or a download is usually “Direct”, since the share page sends no `Referer`.
 
@@ -43,15 +43,15 @@ The referrer of a raw text or a download is usually “Direct”, since the shar
 
 On a link with a visit limit, only visits that count toward the statistics use it up, so crawlers and link previews can’t exhaust it. Once it’s used up, every request, counted or not, gets the 410 page.
 
-The count is incremented atomically in memory, so even with many simultaneous visitors the link stops exactly at its limit.
+Concurrent requests and cache replacements share an atomic counter for each link, so one running instance stops at the limit. Crawler detection relies on forgeable headers: visit limits are a counting rule, not authentication or a confidentiality control. Do not use them to protect secrets or run multiple writers against the same data directory.
 
 For a text, opening its page and fetching the raw text are separate visits: a text limited to one visit can be read on its page, but its Raw button then gets a 410. A file limited to 3 visits can be downloaded 3 times; when 32 downloads are already running, a new one is turned away with a 503 before it uses up a visit.
 
 ## How current the numbers are
 
-Clicks are added up in memory and written to the database every 2 seconds. The admin app and the API add the clicks still in memory, so what you see is always current. Opening a link’s statistics first writes all pending clicks.
+Clicks accumulate in memory and normally flush every 2 seconds. Link totals use a live counter or a committed database snapshot, without adding the same batch twice. List sparklines, daily counts, referrers and the last-visit time use committed data and may lag. Statistics, overview and export first attempt a flush; a failure is logged and the response can still contain older statistics. Separate requests or queries under concurrent traffic do not promise one shared point-in-time snapshot.
 
-When Sani stops normally, it writes the remaining clicks before exiting. If the process is killed outright or the machine loses power, at most the last 2 seconds of clicks are lost.
+Normal shutdown attempts a final flush within a deadline and exits nonzero on failure. A forced exit after persistent write failures loses the whole backlog; power loss can also affect recently committed SQLite WAL/NORMAL transactions. Two seconds is a scheduling interval, not a maximum loss window. See [Operations](./operations).
 
 ## Time zone
 

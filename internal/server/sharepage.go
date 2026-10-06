@@ -151,7 +151,7 @@ func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	now := time.Now()
-	if !s.admit(e, store.Kind(e.Kind) == store.KindText && s.countable(r), r, now) {
+	if !s.admit(e, false, r, now) {
 		s.pages.render(w, r, pageShareGone, shown)
 		return
 	}
@@ -218,6 +218,10 @@ func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
 	if err := s.share.Execute(&buf, d); err != nil {
 		s.logShareError(r, err)
 		s.pages.render(w, r, pageError, shown)
+		return
+	}
+	if !s.admit(e, store.Kind(e.Kind) == store.KindText && s.countable(r), r, now) {
+		s.pages.render(w, r, pageShareGone, shown)
 		return
 	}
 	h := w.Header()

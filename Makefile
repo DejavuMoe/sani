@@ -1,4 +1,4 @@
-.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e bench load docker docs docs-dev clean
+.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e bench load capacity docker docs docs-dev clean
 
 # Run through mise when it is installed, so the pinned toolchain is used.
 RUN     ?= $(shell command -v mise >/dev/null 2>&1 && echo "mise exec --")
@@ -57,6 +57,10 @@ bench:
 # Redirect throughput and latency against a local release build.
 load: binary
 	$(RUN) ./scripts/load.sh
+
+# Disposable 1k/10k/100k databases; JSON results go to stdout.
+capacity:
+	$(RUN) go run ./scripts/capacity
 
 docker:
 	docker build --build-arg VERSION=$(VERSION) -t sani:$(VERSION) -t sani:latest .

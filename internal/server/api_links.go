@@ -88,7 +88,7 @@ func (s *Server) contentDTO(l *store.Link) *contentDTO {
 }
 
 func (s *Server) toDTO(base string, l *store.Link, now int64) linkDTO {
-	clicks := l.Clicks + s.clicks.Pending(l.ID)
+	clicks := s.clicks.Total(l.ID, l.Clicks)
 	d := linkDTO{
 		ID:          l.ID,
 		Kind:        kindNames[l.Kind],
@@ -327,11 +327,6 @@ func (s *Server) listLinks(w http.ResponseWriter, r *http.Request) {
 	for i, l := range res.Links {
 		items[i] = s.toDTO(base, l, now.UnixMilli())
 		if sp := sparks[l.ID]; sp != nil {
-			sp[len(sp)-1] += s.clicks.Pending(l.ID)
-			items[i].Spark = sp
-		} else if n := s.clicks.Pending(l.ID); n > 0 {
-			sp := make([]int64, 14)
-			sp[13] = n
 			items[i].Spark = sp
 		}
 	}

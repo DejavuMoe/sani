@@ -26,7 +26,7 @@ type Entry struct {
 	Kind      uint8 // 0 redirects; other kinds share content and have no Location
 	ExpiresAt int64 // unix ms, 0 = never
 	MaxClicks int64 // 0 = unlimited
-	Clicks    atomic.Int64
+	Clicks    *atomic.Int64
 }
 
 // LoadFunc fetches the entry for a key; it returns (nil, nil) when the key

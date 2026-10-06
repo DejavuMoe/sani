@@ -20,7 +20,7 @@ docker compose up -d
 
 - **只监听本机**：端口映射为 `127.0.0.1:8080:8080`，外面的访问都要经过反向代理。
 - **数据在卷里**：数据库和分享的文件保存在 `sani-data` 卷中，挂载到容器里的 `/data`。删除或重建容器不会丢数据。
-- **镜像很小**：镜像基于 `scratch`，大约 24 MB，里面只有 `sani` 程序和 CA 证书，以 65532 号非特权用户运行，没有 shell。要在容器里执行命令，直接运行 `/sani`，比如 `docker exec -it sani /sani passwd`。
+- **镜像很小**：镜像基于 `scratch`，大约 25 MB，里面只有 `sani` 程序和 CA 证书，以 65532 号非特权用户运行，没有 shell。要在容器里执行命令，直接运行 `/sani`，比如 `docker exec -it sani /sani passwd`。
 - **自带健康检查**：镜像定义了 `HEALTHCHECK`，`docker ps` 里能看到 `healthy`。
 
 镜像有这几种标签：

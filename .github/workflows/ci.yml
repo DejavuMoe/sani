@@ -27,6 +27,16 @@ jobs:
       # gofmt, go vet, svelte-check, the docs sync check and vue-tsc.
       - run: make check
       - run: make test
+      - name: Capacity and count consistency
+        run: |
+          sizes=1000
+          if [ "${{ github.event_name }}" = schedule ]; then sizes=1000,10000,100000; fi
+          go run ./scripts/capacity -sizes "$sizes" > capacity.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capacity-${{ github.sha }}
+          path: capacity.json
+          retention-days: 7
 
   go:
     name: Go tests on ${{ matrix.os }}
@@ -76,6 +86,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       - run: make docs
+      - name: Verify docs output and atomic publishing
+        run: |
+          sh scripts/verify-docs-output.sh docs/.vitepress/dist
+          sh scripts/test-publish-docs.sh
       - run: pnpm --dir docs exec playwright install --with-deps chromium
       - name: axe over every page, both languages and themes
         run: |
@@ -110,6 +124,8 @@ jobs:
         run: |
           docker image inspect -f 'image size: {{.Size}} bytes' sani:ci
           docker run -d --name sani -p 127.0.0.1:8080:8080 sani:ci
+          # The inner shell expands this command.
+          # shellcheck disable=SC2016
           timeout 60 sh -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" sani)" = healthy ]; do sleep 1; done'
           docker exec sani /sani version
           docker logs sani 2>&1 | grep -q setup_code
@@ -134,6 +150,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: Audit web, docs and tracked design tools
+        run: |
+          pnpm audit --audit-level=moderate
+          for tool in gen-pptx gen-video; do
+            npm --prefix ".agents/skills/baoyu-design/agents/$tool" audit --audit-level=moderate
+          done
       - uses: golang/govulncheck-action@032d45514ae346b1db93c04b0c90b841c370344f # v1.1.0
         with:
           # The action defaults to "stable", which would win over the file.

@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -438,16 +439,27 @@ func (s *Server) admit(e *cache.Entry, count bool, r *http.Request, now time.Tim
 	}
 	if e.MaxClicks > 0 {
 		if count {
-			if e.Clicks.Add(1) > e.MaxClicks {
-				e.Clicks.Add(-1)
-				return false
+			for {
+				n := e.Clicks.Load()
+				if n >= e.MaxClicks {
+					return false
+				}
+				if e.Clicks.CompareAndSwap(n, n+1) {
+					break
+				}
 			}
 		} else if e.Clicks.Load() >= e.MaxClicks {
 			return false
 		}
 	}
 	if count {
+		if e.MaxClicks == 0 {
+			e.Clicks.Add(1)
+		}
 		s.clicks.Record(e.ID, referrerHost(r.Header.Get("Referer")), now)
+		// Even an evicted entry owns its shared counter until Record has
+		// retained it in the pending batch.
+		runtime.KeepAlive(e)
 	}
 	return true
 }
@@ -539,7 +551,7 @@ func (s *Server) serveFiles(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	now := time.Now()
-	if !s.admit(e, downloadCountable(r), r, now) {
+	if !s.admit(e, false, r, now) {
 		plainStatus(w, http.StatusGone, "no longer shared")
 		return
 	}
@@ -561,6 +573,11 @@ func (s *Server) serveFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	modified := time.UnixMilli(l.UpdatedAt)
+	// ServeContent decides conditional/range errors first. Admit only a
+	// successful content response, before any bytes can leave the server.
+	w = &downloadWriter{ResponseWriter: w, allow: func() bool {
+		return s.admit(e, downloadCountable(r), r, time.Now())
+	}}
 
 	if l.Kind == store.KindText {
 		h.Set("Content-Type", "text/plain; charset=utf-8")
@@ -597,13 +614,11 @@ func (s *Server) openStored(name string) (*os.File, error) {
 
 // downloadCountable reports whether a request on the files origin fetches
 // the content for someone: link previews and prefetches don't count, nor do
-// the later parts of a download that resumes. Command-line tools do count;
-// they are how people download files.
+// failed and conditional responses. Every successful range counts: a Range
+// header is not proof that this client already paid for a download.
+// Command-line tools count; they are how people download files.
 func downloadCountable(r *http.Request) bool {
 	if r.Method != http.MethodGet {
-		return false
-	}
-	if rg := r.Header.Get("Range"); rg != "" && !strings.HasPrefix(strings.TrimSpace(rg), "bytes=0-") {
 		return false
 	}
 	h := r.Header
@@ -612,6 +627,40 @@ func downloadCountable(r *http.Request) bool {
 	}
 	ua := strings.ToLower(r.UserAgent())
 	return strings.HasPrefix(ua, "curl/") || strings.HasPrefix(ua, "wget/") || !isBot(ua)
+}
+
+type downloadWriter struct {
+	http.ResponseWriter
+	allow         func() bool
+	wrote, denied bool
+}
+
+func (w *downloadWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
+
+func (w *downloadWriter) WriteHeader(code int) {
+	if w.wrote {
+		return
+	}
+	w.wrote = true
+	if (code == http.StatusOK || code == http.StatusPartialContent) && !w.allow() {
+		w.denied = true
+		for _, key := range []string{"Content-Length", "Content-Range", "Content-Disposition", "ETag", "Last-Modified"} {
+			w.Header().Del(key)
+		}
+		plainStatus(w.ResponseWriter, http.StatusGone, "no longer shared")
+		return
+	}
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *downloadWriter) Write(p []byte) (int, error) {
+	if !w.wrote {
+		w.WriteHeader(http.StatusOK)
+	}
+	if w.denied {
+		return 0, http.ErrBodyNotAllowed
+	}
+	return w.ResponseWriter.Write(p)
 }
 
 // disposition makes an attachment header that names the file, with an ASCII

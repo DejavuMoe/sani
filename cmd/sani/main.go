@@ -14,6 +14,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 	_ "time/tzdata" // TZ works in minimal containers without zoneinfo
@@ -171,31 +172,52 @@ func serve() error {
 
 	bg, stopBackground := context.WithCancel(context.Background())
 	defer stopBackground()
-	go rec.Run(bg, 2*time.Second, log)
-	go srv.RunMaintenance(bg)
+	var background sync.WaitGroup
+	background.Go(func() { rec.Run(bg, 2*time.Second, log) })
+	background.Go(func() { srv.RunMaintenance(bg) })
+	backgroundDone := make(chan struct{})
+	go func() { background.Wait(); close(backgroundDone) }()
 
 	errc := make(chan error, 1)
 	go func() { errc <- hs.Serve(ln) }()
 	select {
 	case <-ctx.Done():
-	case err := <-errc:
-		if !errors.Is(err, http.ErrServerClosed) {
-			return err
+	case err = <-errc:
+		if errors.Is(err, http.ErrServerClosed) {
+			err = nil
 		}
 	}
 
 	log.Info("shutting down")
 	shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := hs.Shutdown(shutdown); err != nil {
-		log.Warn("http shutdown", "err", err)
+	return errors.Join(err, finish(shutdown, hs, srv, rec, stopBackground, backgroundDone))
+}
+
+// finish drains HTTP before the last click batch, and gives canceled jobs
+// time to leave the database before it is closed. Failures reach the exit code.
+func finish(grace context.Context, hs *http.Server, srv *server.Server, rec *clicks.Recorder,
+	stopBackground context.CancelFunc, backgroundDone <-chan struct{}) error {
+	httpErr := hs.Shutdown(grace)
+	if httpErr != nil {
+		hs.Close()
 	}
-	srv.Shutdown(shutdown)
 	stopBackground()
-	if err := rec.Flush(context.Background()); err != nil {
-		log.Error("final click flush", "err", err)
+	drain, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	jobErr := srv.Shutdown(drain)
+	select {
+	case <-backgroundDone:
+	case <-drain.Done():
+		jobErr = errors.Join(jobErr, drain.Err())
 	}
-	return nil
+	// Flush has its own five-second deadline; it must not inherit an
+	// expired HTTP grace period.
+	flushErr := rec.Flush(context.Background())
+	if flushErr != nil {
+		flushErr = fmt.Errorf("final click flush: %w", flushErr)
+	}
+	return errors.Join(httpErr, jobErr, flushErr)
 }
 
 // syncEnvPassword makes SANI_PASSWORD the password, signing out sessions
@@ -284,11 +306,11 @@ func backup() error {
 	}
 	ctx := context.Background()
 	src := filepath.Join(cfg.DataDir, "sani.db")
-	// Shared files stay out of the copy: they never change once uploaded, so
-	// copying the directory after the database is enough.
+	// Garbage collection can remove an old snapshot's files while copying.
+	// A full database + files backup needs the service stopped for both.
 	files := filepath.Join(cfg.DataDir, "files")
 	if entries, err := os.ReadDir(files); err == nil && len(entries) > 0 {
-		defer fmt.Fprintf(os.Stderr, "Shared files are not in the database; copy %s as well.\n", files)
+		defer fmt.Fprintf(os.Stderr, "Database only: shared files in %s are excluded. For a complete backup, stop Sani before taking BOTH the database backup and the files copy.\n", files)
 	}
 	if dst := os.Args[2]; dst != "-" {
 		if err := store.Backup(ctx, src, dst); err != nil {

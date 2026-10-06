@@ -5,9 +5,11 @@ package clicks
 import (
 	"context"
 	"log/slog"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
+	"weak"
 
 	"github.com/DejavuMoe/sani/internal/store"
 )
@@ -27,15 +29,17 @@ type Sink interface {
 }
 
 type pending struct {
-	total int64
-	last  int64
-	days  map[int32]int64
-	refs  map[string]int64
+	counter *atomic.Int64 // keep the live total until this batch has been stored
+	total   int64
+	last    int64
+	days    map[int32]int64
+	refs    map[string]int64
 }
 
 type shard struct {
-	mu    sync.Mutex
-	links map[int64]*pending
+	mu       sync.Mutex
+	links    map[int64]*pending
+	counters map[int64]weak.Pointer[atomic.Int64]
 }
 
 type Recorder struct {
@@ -44,16 +48,17 @@ type Recorder struct {
 	loc    *time.Location
 	window atomic.Pointer[dayWindow]
 
-	flushMu sync.Mutex // one flush at a time
-
-	inflightMu sync.RWMutex
-	inflight   map[int64]int64 // totals taken out of the shards but not yet stored
+	// ponytail: one snapshot lock; use versioned snapshots if measured
+	// cold-load contention becomes a bottleneck.
+	flushMu   sync.RWMutex  // cold loads pair a stored total with pending clicks
+	flushSlot chan struct{} // waiting flushes can honor cancellation
 }
 
 func New(sink Sink, loc *time.Location) *Recorder {
-	r := &Recorder{sink: sink, loc: loc}
+	r := &Recorder{sink: sink, loc: loc, flushSlot: make(chan struct{}, 1)}
 	for i := range r.shards {
 		r.shards[i].links = map[int64]*pending{}
+		r.shards[i].counters = map[int64]weak.Pointer[atomic.Int64]{}
 	}
 	return r
 }
@@ -67,6 +72,7 @@ func (r *Recorder) Record(id int64, ref string, now time.Time) {
 	p := s.links[id]
 	if p == nil {
 		p = &pending{days: make(map[int32]int64, 1), refs: make(map[string]int64, 2)}
+		p.counter = s.counters[id].Value()
 		s.links[id] = p
 	}
 	p.total++
@@ -74,14 +80,65 @@ func (r *Recorder) Record(id int64, ref string, now time.Time) {
 		p.last = ms
 	}
 	p.days[day]++
-	if _, known := p.refs[ref]; !known && len(p.refs) >= maxPendingRefs {
-		ref = OtherReferrer
-	}
-	p.refs[ref]++
+	p.addRef(ref, 1)
 	s.mu.Unlock()
 }
 
-// Pending returns clicks on id that are not yet in the store.
+// Snapshot prevents a flush between reading the stored and pending totals.
+// Cached redirects and Record never take this lock.
+func (r *Recorder) Snapshot() func() {
+	r.flushMu.RLock()
+	return r.flushMu.RUnlock
+}
+
+// Counter is called inside Snapshot, after reading stored from the database.
+// Cache replacements share a counter with requests still using the old entry.
+// Weak references let cache eviction release it once its pending batch is stored.
+func (r *Recorder) Counter(id, stored int64) *atomic.Int64 {
+	s := &r.shards[uint64(id)%shardCount]
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if c := s.counters[id].Value(); c != nil {
+		return c
+	}
+	// Avoid the tiny allocator: a batched 8-byte object can stay alive with
+	// its neighbours, which would retain otherwise dead weak-map entries.
+	box := new(struct {
+		value atomic.Int64
+		_     [8]byte
+	})
+	c := &box.value
+	if p := s.links[id]; p != nil {
+		stored += p.total
+		p.counter = c
+	}
+	c.Store(stored)
+	w := weak.Make(c)
+	s.counters[id] = w
+	runtime.AddCleanup(c, func(w weak.Pointer[atomic.Int64]) {
+		s.mu.Lock()
+		if s.counters[id] == w {
+			delete(s.counters, id)
+		}
+		s.mu.Unlock()
+	}, w)
+	return c
+}
+
+// Total returns one live total, or the database snapshot if the link is cold.
+// Never add a pending batch to a database row read at a different instant.
+func (r *Recorder) Total(id, stored int64) int64 {
+	s := &r.shards[uint64(id)%shardCount]
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if c := s.counters[id].Value(); c != nil {
+		return max(stored, c.Load())
+	}
+	return stored
+}
+
+// Pending returns clicks on id that are not yet in the store. Call within
+// Snapshot when combining this with a database read.
 func (r *Recorder) Pending(id int64) int64 {
 	s := &r.shards[uint64(id)%shardCount]
 	s.mu.Lock()
@@ -90,35 +147,36 @@ func (r *Recorder) Pending(id int64) int64 {
 		n = p.total
 	}
 	s.mu.Unlock()
-	r.inflightMu.RLock()
-	n += r.inflight[id]
-	r.inflightMu.RUnlock()
 	return n
 }
 
 // Flush writes everything recorded so far. On failure the clicks are put
 // back and retried by the next flush.
 func (r *Recorder) Flush(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	select {
+	case r.flushSlot <- struct{}{}:
+		defer func() { <-r.flushSlot }()
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 	r.flushMu.Lock()
 	defer r.flushMu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 
 	taken := make([]map[int64]*pending, 0, shardCount)
-	inflight := map[int64]int64{}
-	r.inflightMu.Lock()
 	for i := range r.shards {
 		s := &r.shards[i]
 		s.mu.Lock()
 		if len(s.links) > 0 {
 			taken = append(taken, s.links)
-			for id, p := range s.links {
-				inflight[id] += p.total
-			}
 			s.links = map[int64]*pending{}
 		}
 		s.mu.Unlock()
 	}
-	r.inflight = inflight
-	r.inflightMu.Unlock()
 	if len(taken) == 0 {
 		return nil
 	}
@@ -145,9 +203,6 @@ func (r *Recorder) Flush(ctx context.Context) error {
 			r.restore(m)
 		}
 	}
-	r.inflightMu.Lock()
-	r.inflight = nil
-	r.inflightMu.Unlock()
 	return err
 }
 
@@ -165,11 +220,18 @@ func (r *Recorder) restore(m map[int64]*pending) {
 				cur.days[d] += n
 			}
 			for h, n := range p.refs {
-				cur.refs[h] += n
+				cur.addRef(h, n)
 			}
 		}
 		s.mu.Unlock()
 	}
+}
+
+func (p *pending) addRef(host string, n int64) {
+	if _, known := p.refs[host]; !known && len(p.refs) >= maxPendingRefs {
+		host = OtherReferrer
+	}
+	p.refs[host] += n
 }
 
 // Run flushes every interval until ctx is done. The final flush is left to

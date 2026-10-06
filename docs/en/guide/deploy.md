@@ -20,7 +20,7 @@ A few things worth knowing about `compose.yaml`:
 
 - **Localhost only.** The port is published as `127.0.0.1:8080:8080`, so outside traffic has to come through the reverse proxy.
 - **Data in a volume.** The database and shared files live in the `sani-data` volume, mounted at `/data`. Removing or recreating the container keeps it.
-- **A tiny image.** It’s built `FROM scratch`, about 24 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
+- **A tiny image.** It’s built `FROM scratch`, about 25 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
 The image has these tags:

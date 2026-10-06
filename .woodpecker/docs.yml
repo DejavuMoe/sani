@@ -1,0 +1,37 @@
+# Builds and publishes only the documentation site. Application checks and
+# versioned releases remain in GitHub Actions.
+labels:
+  platform: linux/amd64
+  backend: docker
+  role: netcup-nano
+  server: netcup-nano
+
+when:
+  - event: push
+    branch: master
+
+steps:
+  - name: build-docs
+    image: node:24.21.0-alpine3.24
+    commands:
+      - apk add --no-cache git
+      - npm install --global pnpm@12.5.1
+      - pnpm install --frozen-lockfile --prefer-offline
+      - pnpm docs:check
+      - pnpm docs:build
+      - sh scripts/verify-docs-output.sh docs/.vitepress/dist
+
+  - name: publish-docs
+    image: alpine:3.24.1
+    volumes:
+      - /var/www/sani.zsh.moe:/deploy
+    commands:
+      - apk add --no-cache coreutils util-linux
+      - sh scripts/test-publish-docs.sh
+      # Escape dollars so expansion (including the first-run default) happens
+      # inside the step, not while Woodpecker reads the YAML.
+      - sh scripts/publish-docs.sh docs/.vitepress/dist "$${CI_COMMIT_SHA}-$${CI_PIPELINE_NUMBER}-$${CI_PIPELINE_RERUNS:-0}"
+
+concurrency:
+  limit: 1
+  group: sani-docs-production

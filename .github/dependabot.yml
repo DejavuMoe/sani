@@ -13,7 +13,10 @@ updates:
         patterns: ['*']
 
   - package-ecosystem: npm
-    directory: /
+    directories:
+      - /
+      - /.agents/skills/baoyu-design/agents/gen-pptx
+      - /.agents/skills/baoyu-design/agents/gen-video
     schedule:
       interval: monthly
     groups:

@@ -3,13 +3,14 @@
 // the page updates as soon as a watched file changes.
 
 import { runChecks, type Check } from '../sync/check.ts';
-import { stats, versions, type Stats, type Versions } from '../sync/source.ts';
+import { latestVersion, stats, versions, type Stats, type Versions } from '../sync/source.ts';
 
 export interface Status {
   checks: Check[];
   stats: Stats;
   versions: Versions;
   builtAt: string;
+  latestVersion: string;
 }
 
 declare const data: Status;
@@ -32,6 +33,6 @@ export default {
     '../../**/*.md',
   ],
   load(): Status {
-    return { checks: runChecks(), stats: stats(), versions: versions(), builtAt: new Date().toISOString() };
+    return { checks: runChecks(), stats: stats(), versions: versions(), builtAt: new Date().toISOString(), latestVersion: latestVersion() };
   },
 };

@@ -35,51 +35,47 @@ sani backup ~/backups/sani-$(date +%F).db
 
 只想要一份可以导入别处的链接清单，用设置 → 数据 → 导出（见[导入与导出](./import-export)）。导出文件不包含每日统计、来源、令牌、文本和文件，不能代替备份。
 
-### 分享的文件 {#backup-files}
+### 数据库与文件一起备份 {#backup-files}
 
-文本保存在数据库里，但[分享的文件](./usage#shares)放在数据库旁边的 `files/` 目录里，`sani backup` 也会提醒你这一点。请在备份数据库**之后**复制这个目录：文件上传后就不会再变，所以之后复制的目录里，一定有数据库提到的每一个文件。
+文本保存在数据库里，分享文件在 `files/` 中。**完整备份必须先停止所有 Sani 实例和其他数据库写入者，再复制整个数据目录。** 单独的 `sani backup` 只包含已经提交的数据库数据，不包含内存中的点击或文件字节。
 
-::: code-group
+即使上传后文件不会修改，在线清理仍会删除已取消分享的文件。先在线备份数据库、稍后再复制 `files/`，不能保证数据库引用的文件仍然存在。短码被重新占用时，旧文件也可能提前成为待清理对象。
 
-```sh [Docker]
-docker run --rm --volumes-from sani -v "$PWD":/backup alpine \
-  tar -czf /backup/sani-files-$(date +%F).tar.gz -C /data files
-```
-
-```sh [systemd]
-sudo tar -czf /root/sani-files-$(date +%F).tar.gz -C /var/lib/sani files
-```
-
-:::
-
-文件很多时，每次用 `rsync` 同步到同一个位置，只会复制新增的文件。链接删除后大约一小时，它的文件会从 `files/` 里自动删除。
-
-## 恢复
-
-先停止 Sani，用备份替换 `sani.db`，同时删除旁边的 `sani.db-wal` 和 `sani.db-shm`（如果有），再启动。
+下面的命令先确认服务正常退出，再复制数据库、可能存在的 WAL 和文件。复制失败时保持停机，处理错误后再启动；不要把失败或强制退出当作最后一批点击已保存的证明。
 
 ::: code-group
 
 ```sh [Docker]
-docker compose stop
-docker run --rm --volumes-from sani -v "$PWD":/backup alpine sh -c \
-  'cp /backup/sani-2026-09-29.db /data/sani.db && rm -f /data/sani.db-wal /data/sani.db-shm && chown 65532:65532 /data/sani.db'
-docker compose start
+set -eu
+backup="$PWD/sani-full-$(date +%Y%m%d-%H%M%S)"
+test ! -e "$backup"
+docker stop --time 30 sani
+test "$(docker inspect -f '{{.State.ExitCode}}' sani)" = 0
+docker cp sani:/data "$backup"
+docker start sani
 ```
 
 ```sh [systemd]
+set -eu
+backup="/root/sani-full-$(date +%Y%m%d-%H%M%S)"
+sudo test ! -e "$backup"
 sudo systemctl stop sani
-sudo cp sani-2026-09-29.db /var/lib/sani/sani.db
-sudo rm -f /var/lib/sani/sani.db-wal /var/lib/sani/sani.db-shm
-sudo chown --reference=/var/lib/sani /var/lib/sani/sani.db
+test "$(systemctl show sani -p ExecMainStatus --value)" = 0
+sudo cp -a /var/lib/sani "$backup"
 sudo systemctl start sani
 ```
 
 :::
+将这个目录作为一套备份保存，并记录 Sani 版本、时间和配置。数据库及配置可能含有敏感数据，应限制访问；复制到另一台机器后校验文件大小和 SHA-256。需要在线的完整备份时，应采用能对数据库与文件目录同时取快照的存储方案，并单独验证恢复，不要按复制先后顺序推断一致性。
 
-镜像里没有 shell，所以 Docker 下借一个临时的 `alpine` 容器来复制文件，并把文件的所有者改成 Sani 运行时的用户。分享的文件也要恢复时，在同一步里把压缩包解到数据目录，比如 `tar -xzf /backup/sani-files-2026-09-29.tar.gz -C /data && chown -R 65532:65532 /data/files`。恢复后的数据库不认识的文件会被自动清理。
+## 恢复
 
-迁移到另一台服务器也是同样的步骤：在旧服务器上备份，在新服务器上恢复，最后把 DNS 指过去。
+恢复前先保留当前数据，停止全部写入者，再选择对应方式：
+
+1. **完整目录备份**：恢复到新的空目录或空数据卷，保持同一份备份中的 `sani.db`、可能存在的 `sani.db-wal`/`sani.db-shm` 和 `files/` 配套；不要混入原运行目录的文件。把 `SANI_DATA_DIR` 或 Compose 卷改为新位置，并恢复所有者权限（镜像用户为 `65532:65532`）。
+2. **`sani backup` 的数据库副本**：恢复到空目录中的 `sani.db`，不携带旧实例的 WAL/SHM。只分享网址和文本时就已完整；有文件分享时，还需要在同一次停机期间取得的 `files/`。只有在线数据库副本时，无法保证旧文件仍可下载。
+
+先在隔离的本地实例上检查 `/healthz`、登录、网址跳转、文本正文、文件下载及 SHA-256，再切换正式实例或 DNS。升级后回退需要升级前的整套备份；不要用旧程序强行打开已迁移的数据库。仓库的 `go test ./cmd/sani -run TestStoppedBackup` 会演练停机、刷盘、数据库副本、文件复制、恢复和哈希校验。
 
 ## 升级 {#upgrade}
 
@@ -144,9 +140,11 @@ Sani 不记录访问日志，跳转请求不会出现在日志里。需要访问
 
 ## 停止与重启
 
-收到 `SIGTERM` 或 `SIGINT` 时，Sani 不再接受新请求，最多等 10 秒让进行中的请求完成，再把内存里还没写入的点击写进数据库，然后退出。`docker stop` 和 `systemctl stop` 发送的都是 `SIGTERM`。
+收到 `SIGTERM` 或 `SIGINT` 时，Sani 先停止接受请求，给进行中的请求 10 秒，超时后关闭连接；随后取消并等待后台任务和剩余处理器（最多 10 秒），最后为点击刷盘再留 5 秒。失败会以非零退出码报告。Compose 和 systemd 示例留出 30 秒停止时间。`docker stop` 手动执行时也请加 `--time 30`。
 
-点击每 2 秒写入一次。如果进程被强制杀掉或者机器断电，最多丢失最后这 2 秒里的点击。
+点击通常每 2 秒尝试写入。磁盘满、锁等待或持续写入失败会延长积压时间，强制结束时可能丢失全部尚未写入的点击。SQLite 使用 WAL 和 `synchronous=NORMAL`：数据库保持一致，但断电时最近已经提交的事务也可能丢失。因此“最多丢失 2 秒”不是持久性保证。
+
+SQLite 对外部写锁的单次等待上限为 1 秒；Go 上下文取消不能立即打断驱动内部的忙等待。请关注 `flush clicks` 和 `final click flush` 错误，排查磁盘容量、权限及其他数据库写入者。`/healthz` 是进程存活检查，不能证明磁盘可写。
 
 ## 常见问题
 

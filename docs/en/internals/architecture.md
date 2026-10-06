@@ -28,8 +28,8 @@ A request for the [files domain](../reference/configuration#sani-files-url) is t
 1. **Request checks.** Only `GET` and `HEAD` are accepted. A trailing `/` is dropped, and paths that can’t be a slug get a 404 without even touching the cache.
 2. **The lookup key.** Unicode normalization (NFC) and lowercasing, so `/GitHub` matches `/github`, and the same word typed with different input methods matches too.
 3. **The cache.** It’s split into 64 shards with a read-write lock each. A hit is one map lookup under a read lock. Slugs known not to exist are cached too and get a 404 right away.
-4. **A cache miss.** One query on the reader pool, and the result goes into the cache. Concurrent misses for the same slug share that one query. If an edit invalidated the cache while the query ran, the result is still served but not cached, so stale data never sticks.
-5. **Link state.** Turned off, expired, visit limit used up? The visit count is an atomic counter on the cache entry.
+4. **A cache miss.** A reader-pool query pairs committed and pending counts before caching the result. Cold loads coordinate with flushing for that snapshot; cache hits never wait for it. Concurrent misses for the same slug share that one query. If an edit invalidated the cache while the query ran, the result is still served but not cached, so stale data never sticks.
+5. **Link state.** Turned off, expired, visit limit used up? Different cache entries for the same link share an atomic counter, so invalidation or eviction does not reset the allowance of in-flight requests.
 6. **Counting.** A request that [counts as a click](../guide/statistics#counted) hands it to the click aggregator: an in-memory increment that never waits for a write.
 7. **The response.** Append the query string, set `Location` and `Cache-Control`, and send the redirect status.
 
@@ -41,13 +41,13 @@ The 404 and 410 pages are rendered for each language at startup and split where 
 
 Every 2 seconds the aggregator takes everything out of the shards and writes it to SQLite as one batch in **one transaction**: link totals and last-visit times in `links`, and additions to `clicks_daily` and `referrers`. If the write fails, the batch goes back into memory for the next attempt.
 
-Between taking the clicks out and the commit, they still count in the numbers the API returns, so the admin app never shows a dip. When Sani stops, the HTTP server stops accepting requests first, then the last batch is written.
+Live totals use a shared counter instead of adding a database value and a committing batch read at different times. Daily charts and other aggregates use committed data. Only the cache, in-flight requests and pending batches retain counters; weak registrations are removed on collection. Pending referrers stay bounded at 64 plus “Other” per link, including failed-batch merges. See [Operations](../guide/operations) for shutdown ordering and failures.
 
 ## The database
 
 SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure Go implementation. Without cgo the binary links statically, and the image can be `FROM scratch`.
 
-- **WAL mode**, so reads never wait for writes.
+- **WAL mode** permits normal reads alongside writes, though pool and lock waits remain possible. It uses `synchronous=NORMAL`; see [Operations](../guide/operations) for power-loss durability.
 - **One writer connection**: writes queue up instead of fighting over locks, and transactions start with `BEGIN IMMEDIATE`.
 - **A pool of readers**, one per CPU core, at least 4.
 
@@ -64,7 +64,7 @@ SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure 
 
 Shared files themselves are not in the database but in `files/` in the data directory, each under a random name; texts and files share the cache and click counting with links.
 
-The schema version is kept in `PRAGMA user_version`. At startup, any upgrades not yet applied run in order, each in its own transaction.
+The schema version is kept in `PRAGMA user_version`; startup runs outstanding migrations in order, each in a transaction. The current working tree uses schema 3: `links.id` becomes `AUTOINCREMENT`, preserving IDs and child rows with a foreign-key check, so deleted IDs cannot inherit queued clicks. Take a complete backup first; downgrades need that backup.
 
 ## Background work
 

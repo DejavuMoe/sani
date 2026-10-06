@@ -28,7 +28,8 @@ web/                the admin app: Svelte 5 + TypeScript, built with Vite
 docs/               this site: VitePress
 scripts/            demo data, the load test and release scripts
 deploy/             systemd, Caddy and nginx examples
-.github/            workflows for CI, releases and the docs site; issue forms
+.github/            CI, application release workflows and issue forms
+.woodpecker/        documentation build and atomic deployment workflow
 ```
 
 The Go module is at the repository root. `web` and `docs` are two packages of one pnpm workspace sharing a lockfile, and shared dependencies such as the fonts get their versions from the `catalog` in `pnpm-workspace.yaml`.
@@ -45,6 +46,7 @@ The Go module is at the repository root. `web` and `docs` are two packages of on
 | `make e2e` | End-to-end tests with Playwright against a fresh instance |
 | `make bench` | Benchmarks for redirects, the cache and click counting |
 | `make load` | The load test, including the click count check |
+| `make capacity` | List, search, cold redirects, flushing and mixed I/O at 1k/10k/100k links; JSON output |
 | `make build` | Build the admin app, then `bin/sani` |
 | `make dist` | Build the release archives for every platform, and `SHA256SUMS`, in `dist/` |
 | `make docker` | Build the Docker image |
@@ -86,6 +88,27 @@ When you change the code, update the matching docs:
 
 Update both languages; if you miss one, the check names exactly what’s missing.
 
+### Documentation deployment {#docs-deployment}
+
+The production docs domain is `https://sani.zsh.moe`. `.woodpecker/docs.yml` runs only on `push` events to `master`, selecting an agent with `platform=linux/amd64`, `backend=docker`, `role=netcup-nano` and `server=netcup-nano`. Application checks and versioned releases stay in GitHub Actions; the docs workflow neither requires a tag nor waits for GitHub Actions.
+
+The build uses Node 24.21.0 and pnpm 12.5.1, matching `mise.toml` and the root `package.json`. It installs with a frozen lockfile, runs `pnpm docs:check` and `pnpm docs:build`, then verifies every Chinese and English page, the 404 page, assets and sitemap. Update the workflow when changing the pinned toolchain.
+
+The publish step mounts the server’s `/var/www/sani.zsh.moe` at `/deploy`, with this layout:
+
+```text
+/var/www/sani.zsh.moe/
+  .deploy.lock
+  releases/<commit-sha>-<pipeline-number>-<reruns>/
+  html -> releases/<commit-sha>-<pipeline-number>-<reruns>
+```
+
+`scripts/publish-docs.sh` copies and verifies output in a separate directory, sets directory/file permissions to `0755`/`0644`, and atomically replaces the `html` symlink. Both a workflow concurrency group and `flock` serialize publishing. Older pipelines or the same rerun number cannot replace a newer deployment. Failed local activation checks restore the previous link; successful activation retains the current and previous release. Unrelated directories and symlinks are not pruned. An existing real `html` directory, invalid link or occupied candidate path causes a failure instead of being overwritten.
+
+Before enabling the workflow, inspect agent labels, repository volume permissions and the existing server directories without changing them. Host mounts require the repository’s [Volumes](https://woodpecker-ci.org/docs/usage/volumes) permission. The mount root must be a separate real directory, with parent and release directories traversable by the Nginx user. The workflow installs `coreutils` and `util-linux` for publishing. `sh scripts/test-publish-docs.sh` exercises initial deployment, reruns, out-of-order and concurrent jobs, invalid output and rollback in temporary directories, without accessing production paths.
+
+The agreed Nginx document root is `/var/www/sani.zsh.moe/html`. VitePress generates prerendered HTML; extensionless addresses from `cleanUrls: true` need the static server to resolve the corresponding `.html` files, and missing pages must return 404. Inspect the existing virtual hosts, `zsh.moe` TLS snippet, Origin CA, AOP, Cloudflare proxy status and SSL mode before configuring and accepting the server separately. This workflow mounts neither `/etc/nginx` nor certificates and does not reload Nginx. File activation does not prove public HTTPS/AOP readiness.
+
 ### Screenshots
 
 The screenshots in the docs and READMEs come from `web/scripts/screenshots.mjs`, in both languages and both themes:
@@ -109,7 +132,7 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 - a docs build, with axe over every page;
 - a build of the image for every release platform, which is then started and has to pass its health check;
 - the release archives for every platform;
-- `govulncheck` for known vulnerabilities. It also runs every Monday, so a new advisory doesn’t wait for a commit.
+- `govulncheck`, workspace `pnpm audit --audit-level=moderate`, and npm audit for both tracked design tools. It also runs every Monday, so a new advisory doesn’t wait for a commit.
 
 To release a new version:
 

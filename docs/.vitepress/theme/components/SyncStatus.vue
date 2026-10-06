@@ -59,6 +59,10 @@ const checkCopy: Record<Check['id'], { zh: [string, string, string]; en: [string
     zh: ['图标', '文档站的图标与管理界面相同', '个文件'],
     en: ['Icon', 'The site’s icon is the admin app’s', 'file'],
   },
+  behavior: {
+    zh: ['统计与备份', '核对计数间隔、下载上限及已知的持久性和备份错误承诺；其余行为仍需代码审查', '项'],
+    en: ['Counting and backups', 'Checks timing, download bounds and known incorrect durability/backup promises; other behavior still needs review', 'items'],
+  },
 };
 
 const checks = computed(() =>

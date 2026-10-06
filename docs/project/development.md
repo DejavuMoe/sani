@@ -28,7 +28,8 @@ web/                管理界面：Svelte 5 + TypeScript，Vite 构建
 docs/               本文档站：VitePress
 scripts/            演示数据、压测和发布脚本
 deploy/             systemd、Caddy 和 nginx 的示例配置
-.github/            CI、发布和文档部署的工作流，issue 模板
+.github/            CI、应用发布工作流和 issue 模板
+.woodpecker/        文档站构建与原子发布流水线
 ```
 
 Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的两个包，共用一份锁文件，字体等共同依赖的版本写在 `pnpm-workspace.yaml` 的 `catalog` 里。
@@ -45,6 +46,7 @@ Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的
 | `make e2e` | 用 Playwright 对一个全新的实例做端到端测试 |
 | `make bench` | 跳转、缓存和点击计数的基准测试 |
 | `make load` | 压测，并核对点击数 |
+| `make capacity` | 1千、1万、10万链接的列表、搜索、冷加载、刷盘与混合读写，输出 JSON |
 | `make build` | 构建管理界面，再构建 `bin/sani` |
 | `make dist` | 构建全部平台的发布压缩包和 `SHA256SUMS`，输出到 `dist/` |
 | `make docker` | 构建 Docker 镜像 |
@@ -86,6 +88,27 @@ Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的
 
 中文和英文两个版本都要更新；漏掉的话，核对会指出具体是哪一项。
 
+### 文档站发布 {#docs-deployment}
+
+生产文档域名为 `https://sani.zsh.moe`。`.woodpecker/docs.yml` 只在 `master` 的 `push` 事件运行，按 `platform=linux/amd64`、`backend=docker`、`role=netcup-nano`、`server=netcup-nano` 选择执行器。应用的测试和版本发布仍由 GitHub Actions 执行；文档流水线不依赖标签，也不会等待 GitHub Actions。
+
+构建步骤使用与 `mise.toml`、根 `package.json` 一致的 Node 24.21.0 和 pnpm 12.5.1，冻结安装依赖，运行 `pnpm docs:check`、`pnpm docs:build`，再检查所有中英文页面、404、静态资源与 sitemap。修改工具链版本时同步更新流水线。
+
+发布步骤把服务器的 `/var/www/sani.zsh.moe` 挂载到 `/deploy`，布局如下：
+
+```text
+/var/www/sani.zsh.moe/
+  .deploy.lock
+  releases/<commit-sha>-<pipeline-number>-<reruns>/
+  html -> releases/<commit-sha>-<pipeline-number>-<reruns>
+```
+
+`scripts/publish-docs.sh` 在独立目录复制并校验产物，将目录和文件权限分别设为 `0755`、`0644`，再原子替换 `html` 符号链接。流水线并发组与 `flock` 两层串行；旧流水线或相同重跑序号不会覆盖较新的发布。激活后的本地校验失败会恢复原链接，成功后只保留当前版和上一版，其他命名的目录和符号链接不清理。已有实体 `html` 目录、异常链接或重复候选目录会导致失败，不会直接覆盖。
+
+首次启用前，应先只读检查执行器标签、Woodpecker 的仓库 volume 权限和服务器目录现状。宿主机卷要求仓库允许 [Volumes](https://woodpecker-ci.org/docs/usage/volumes)；目录必须是独立的真实目录，父目录与发布目录应允许 Nginx 用户遍历。发布步骤需要 `coreutils` 和 `util-linux`，流水线会安装它们。`sh scripts/test-publish-docs.sh` 使用临时目录验证首发、重跑、乱序、并发、拒绝不完整产物和失败回滚，不访问生产目录。
+
+Nginx 的静态根目录约定为 `/var/www/sani.zsh.moe/html`。本站生成预渲染 HTML，`cleanUrls: true` 的无扩展名地址需要由静态服务解析到对应的 `.html` 文件；不存在的页面应返回 404。Nginx 虚拟主机、已有 `zsh.moe` TLS snippet、Origin CA、AOP、Cloudflare 代理状态和 SSL 模式必须先核对服务器现状，再单独配置和验收。此流水线不挂载 `/etc/nginx` 或证书目录，也不执行 Nginx reload。文件激活成功不代表公网 HTTPS/AOP 已验收。
+
 ### 截图
 
 文档和 README 里的截图由 `web/scripts/screenshots.mjs` 生成，覆盖两种语言、两种主题：
@@ -109,7 +132,7 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 - 构建文档站，对每一页做 axe 检查；
 - 为每个发布平台试构建镜像，启动它，等健康检查通过；
 - 构建全部二进制文件的压缩包；
-- 用 `govulncheck` 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
+- 用 `govulncheck`、工作区 `pnpm audit --audit-level=moderate` 和两个受跟踪设计工具的 npm audit 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
 
 发布一个新版本：
 
