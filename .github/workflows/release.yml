@@ -21,7 +21,7 @@ env:
 jobs:
   notes:
     name: Release notes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -36,7 +36,7 @@ jobs:
   archives:
     name: Archives
     needs: notes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -58,7 +58,7 @@ jobs:
   image:
     name: Image
     needs: notes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: read
@@ -105,7 +105,7 @@ jobs:
   publish:
     name: Publish
     needs: [archives, image]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:

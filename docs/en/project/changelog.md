@@ -2,11 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.4.0
+
+2026-10-06 · Correct visit counting, persistence and shutdown behavior, and improve backup guidance and the documentation. Read “Breaking changes” first if you use file visit limits.
 
 ### Breaking changes
 
-- Each successful `200`/`206` content GET that meets the [counting rules](../guide/statistics#counted) counts as a visit for files and raw text, including resumed, nonzero-start and suffix ranges. `304`, `412`, `416` and file-open failures do not consume visits. Raise or disable the visit limit for clients that use multiple ranges; retries after disconnects consume a new visit too. Ship this behavior change in the next minor release.
+- Each successful `200`/`206` content GET that meets the [counting rules](../guide/statistics#counted) counts as a visit for files and raw text, including resumed, nonzero-start and suffix ranges. `304`, `412`, `416` and file-open failures do not consume visits. Raise or disable the visit limit for clients that use multiple ranges; retries after disconnects consume a new visit too.
 - The database migrates to schema 3 with non-reused link IDs. Back up the database and files before first start. Downgrading requires the complete pre-upgrade backup; old binaries cannot open schema 3.
 
 ### Fixed
@@ -15,6 +17,7 @@
 - API totals do not double-count a committing batch; concurrent requests and replaced cache entries share the same allowance.
 - Failed-batch merges keep referrers bounded while preserving accumulated clicks.
 - Shutdown waits for requests and background work, gives the final flush its own deadline, and exits nonzero on failure. Deployment examples allow 30 seconds to stop.
+- The demo seed script no longer prints passwords; design comparison scripts match literal slugs without interpreting them as regular expressions.
 
 ### Verification and documentation
 
@@ -24,6 +27,14 @@
 - Update docs and design-tool build dependencies and audit JavaScript dependencies in CI.
 - Normalize spaces around prose links, emphasis and inline code, wrap long inline code on small screens, and match thin scrollbars to both themes; simplify the home page and mark the hosted docs as live.
 - Fix the `source-map-js` build dependency vulnerability, update SQLite and build tools, and add CodeQL checks for Go, JavaScript/TypeScript, Python and GitHub Actions.
+- Use Ubuntu 24.04 for CI, code scanning and releases; pin mise and remove warnings caused by stale toolchain caches and duplicate Go cache restoration.
+
+### Upgrading
+
+1. Before upgrading from v0.3.1 or earlier, stop every Sani instance and confirm a clean exit, then back up the full data directory and current configuration. With file shares, the database and `files/` must come from the same stopped-service interval; see [paired backups](../guide/operations#backup-files).
+2. Review visit limits for files and raw text. Resumed downloads, multiple ranges and retries after disconnects can consume several visits; raise or disable the limit as appropriate.
+3. Update the binary or image and start Sani. The database migrates automatically to schema 3. Configuration options and HTTP API data structures are unchanged; check health, login, existing short links, file downloads and statistics.
+4. To downgrade, stop the new version, restore the complete pre-upgrade backup into an empty directory or new volume, and then run the old version. Do not open the migrated database with an old binary or mix database and file snapshots taken at different times.
 
 ## v0.3.1
 

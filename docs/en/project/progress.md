@@ -4,7 +4,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 # Status
 
-<p class="lead">The latest release is {{ status.latestVersion }}. Subsequent working-tree changes appear under “Unreleased” in the changelog. This page distinguishes implemented capabilities from changes awaiting release and remaining work; a docs build does not prove remote CI or production acceptance.</p>
+<p class="lead">This documentation covers {{ status.latestVersion }}; the changelog records each version’s changes. This page lists implemented capabilities, verification entry points and remaining work.</p>
 
 ## Where things stand {#current}
 
@@ -22,9 +22,9 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Continuous integration | <span class="sn-status done">Done</span> | Every commit runs the checks and tests (Linux, macOS, Windows), the end-to-end tests, axe and a vulnerability scan, and builds the image and every binary |
 | Hosted docs | <span class="sn-status done">Done</span> | Chinese and English documentation is live at [sani.zsh.moe](https://sani.zsh.moe) |
 
-## Current five batches {#acceptance}
+## v0.4.0 implementation and verification {#acceptance}
 
-These changes are Unreleased. The local acceptance entry points below do not replace remote CI for the release commit.
+These five batches are included in v0.4.0. Verification entry points are listed below; remote results are available in [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) and [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml).
 
 | Batch | Implementation | Acceptance entry point |
 |---|---|---|
@@ -32,7 +32,7 @@ These changes are Unreleased. The local acceptance entry points below do not rep
 | 2 · Backups and docs | Stopped-service paired backups, restore/hash drill, statistics and durability wording, shared version | `TestStoppedBackup`, semantic docs checks |
 | 3 · Recovery | Bounded retry referrers, one-second external lock waits, shutdown and final-flush failures | Go race tests, lock and shutdown regressions |
 | 4 · Capacity and automation | Three dataset sizes, simpler list counts, dependency audits, CI capacity checks | `make capacity`, `make bench load`, dependency audits |
-| 5 · Docs and compatibility | Bilingual Unreleased notes, 1.0 gates, docs builds and accessibility | `make check test e2e docs`, axe on both sites |
+| 5 · Docs and compatibility | Bilingual release notes and upgrade steps, 1.0 gates, docs builds and accessibility | `make check test e2e docs`, axe on both sites |
 
 ## Build-time checks {#checks}
 

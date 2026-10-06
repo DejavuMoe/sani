@@ -4,7 +4,7 @@ import { data as status } from '../.vitepress/data/status.data'
 
 # 进度
 
-<p class="lead">最近发布的版本是 {{ status.latestVersion }}。当前工作区的后续改动记录在更新日志的“未发布”中。这一页说明已实现的能力、待发布的改动和仍需完成的工作；文档构建检查不等于远程 CI 或生产验收。</p>
+<p class="lead">本文档对应 {{ status.latestVersion }}，各版本变化见更新日志。这一页说明已实现的能力、验证入口和仍需完成的工作。</p>
 
 ## 现状 {#current}
 
@@ -22,9 +22,9 @@ import { data as status } from '../.vitepress/data/status.data'
 | 持续集成 | <span class="sn-status done">已完成</span> | 每次提交都运行检查和测试（Linux、macOS、Windows）、端到端测试、axe 检查、漏洞扫描，并试构建镜像和全部二进制文件 |
 | 文档站上线 | <span class="sn-status done">已完成</span> | 中英文文档已上线：[sani.zsh.moe](https://sani.zsh.moe) |
 
-## 当前五批工作 {#acceptance}
+## v0.4.0 实施与验证 {#acceptance}
 
-以下实现均归入“未发布”，本地验收入口如下；发布前仍需同一提交的远程 CI。
+以下五批实现纳入 v0.4.0，验证入口如下；远程检查结果见 [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) 与 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml)。
 
 | 批次 | 实现内容 | 验收入口 |
 |---|---|---|
@@ -32,7 +32,7 @@ import { data as status } from '../.vitepress/data/status.data'
 | 2 · 备份与文档 | 配套停机备份、恢复与哈希校验、统计和持久性口径、统一版本 | `TestStoppedBackup`、文档语义核对 |
 | 3 · 故障恢复 | 重试来源上限、外部锁等待上限 1 秒、停机与最终刷盘失败 | Go 竞态测试、锁与停机回归 |
 | 4 · 容量与自动检查 | 三档容量数据、列表查询精简、依赖审计、CI 容量检查 | `make capacity`、`make bench load`、依赖审计 |
-| 5 · 文档与兼容收尾 | 双语未发布日志、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、两站 axe |
+| 5 · 文档与兼容收尾 | 双语更新日志与升级步骤、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、两站 axe |
 
 ## 构建时核对 {#checks}
 
