@@ -7,7 +7,6 @@ import { computed, ref } from 'vue';
 import compose from '../../../../compose.yaml?raw';
 import { data as app } from '../../data/app.data';
 import { benchmark } from '../../data/benchmark';
-import { data as status } from '../../data/status.data';
 import { compact, useLang } from '../i18n';
 import Icon from './Icon.vue';
 import Screenshot from './Screenshot.vue';
@@ -107,8 +106,6 @@ async function copy(i: number) {
   }
 }
 
-const passed = status.checks.every((c) => c.problems.length === 0);
-const facts = status.checks.reduce((n, c) => n + c.count, 0);
 </script>
 
 <template>
@@ -333,21 +330,6 @@ const facts = status.checks.reduce((n, c) => n + c.count, 0);
         </p>
       </section>
 
-      <section class="sync">
-        <span class="dot" :class="{ bad: !passed }" aria-hidden="true" />
-        <p>
-          <strong>{{ pick('这份文档与代码同步', 'These docs keep up with the code') }}</strong>
-          <span>
-            {{
-              pick(
-                `每次构建前，配置项、API、错误码、命令行和压测数据都会与源码逐项核对，对不上就构建失败。这一版比对了 ${num(facts)} 处，全部一致。`,
-                `Before every build, the settings, API, error codes, commands and benchmark figures are checked against the source, and any mismatch fails the build. This build compared ${num(facts)} facts; all of them match.`,
-              )
-            }}
-          </span>
-        </p>
-        <a :href="href('project/progress')">{{ pick('查看进度', 'Project status') }}<Icon name="chevronRight" :size="13" /></a>
-      </section>
     </main>
 
     <footer>
@@ -991,59 +973,6 @@ section h2 {
   margin: 22px 0 0;
   color: var(--sn-text-2);
   font-size: 14.5px;
-}
-
-/* Sync */
-.sync {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 14px 18px;
-  margin-top: 112px;
-  padding: 22px 24px;
-  border: 1px solid var(--sn-line);
-  border-radius: 14px;
-  background: var(--sn-canvas);
-}
-
-.sync .dot {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  margin-top: 7px;
-  border-radius: 50%;
-  background: var(--sn-success);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--sn-success) 16%, transparent);
-}
-
-.sync .dot.bad {
-  background: var(--sn-danger);
-}
-
-.sync p {
-  display: grid;
-  flex: 1;
-  gap: 4px;
-  min-width: min(100%, 20em);
-  margin: 0;
-}
-
-.sync strong {
-  color: var(--sn-text);
-  font-size: 15.5px;
-  font-weight: 600;
-}
-
-.sync p span {
-  max-width: 46em;
-  color: var(--sn-text-2);
-  font-size: 14.5px;
-  line-height: 1.7;
-}
-
-.sync a {
-  align-self: center;
-  white-space: nowrap;
 }
 
 footer {

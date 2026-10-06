@@ -35,51 +35,47 @@ A daily backup with cron that keeps the last 14:
 
 For a list of links you can import elsewhere, use Settings → Data → Export (see [Import and export](./import-export)). An export leaves out daily statistics, referrers, tokens, texts and files, so it doesn’t replace a backup.
 
-### Shared files {#backup-files}
+### Back up the database and files together {#backup-files}
 
-Texts are in the database, but [shared files](./usage#shares) are kept next to it in `files/`, and `sani backup` reminds you of that. Copy the directory after the database: files never change once uploaded, so a copy taken after the database has every file the database refers to.
+Texts live in SQLite; uploaded bytes live in `files/`. **For a complete backup, stop every Sani instance and any other database writers before copying the whole data directory.** A standalone `sani backup` contains committed database data only, excluding in-memory clicks and file bytes.
 
-::: code-group
+Although uploaded files are immutable, online garbage collection can remove files no longer referenced by a link. Taking an online database snapshot and copying `files/` later does not ensure all referenced bytes survive. Reclaiming a slug can make its old file eligible for cleanup earlier too.
 
-```sh [Docker]
-docker run --rm --volumes-from sani -v "$PWD":/backup alpine \
-  tar -czf /backup/sani-files-$(date +%F).tar.gz -C /data files
-```
-
-```sh [systemd]
-sudo tar -czf /root/sani-files-$(date +%F).tar.gz -C /var/lib/sani files
-```
-
-:::
-
-With many files, `rsync` to the same place each time only copies the new ones. A file whose link is gone is removed from `files/` an hour or so after the link is deleted.
-
-## Restoring
-
-Stop Sani, replace `sani.db` with the backup, delete the `sani.db-wal` and `sani.db-shm` next to it if they exist, and start Sani again.
+These commands check for a successful shutdown before copying the database, any remaining WAL, and files. Leave the service stopped if copying fails, fix the error, then start it. A failed or forced shutdown does not prove the final click batch was saved.
 
 ::: code-group
 
 ```sh [Docker]
-docker compose stop
-docker run --rm --volumes-from sani -v "$PWD":/backup alpine sh -c \
-  'cp /backup/sani-2026-09-29.db /data/sani.db && rm -f /data/sani.db-wal /data/sani.db-shm && chown 65532:65532 /data/sani.db'
-docker compose start
+set -eu
+backup="$PWD/sani-full-$(date +%Y%m%d-%H%M%S)"
+test ! -e "$backup"
+docker stop --time 30 sani
+test "$(docker inspect -f '{{.State.ExitCode}}' sani)" = 0
+docker cp sani:/data "$backup"
+docker start sani
 ```
 
 ```sh [systemd]
+set -eu
+backup="/root/sani-full-$(date +%Y%m%d-%H%M%S)"
+sudo test ! -e "$backup"
 sudo systemctl stop sani
-sudo cp sani-2026-09-29.db /var/lib/sani/sani.db
-sudo rm -f /var/lib/sani/sani.db-wal /var/lib/sani/sani.db-shm
-sudo chown --reference=/var/lib/sani /var/lib/sani/sani.db
+test "$(systemctl show sani -p ExecMainStatus --value)" = 0
+sudo cp -a /var/lib/sani "$backup"
 sudo systemctl start sani
 ```
 
 :::
+Keep this directory as one backup set, with the Sani version, time and configuration. Restrict access to the database and configuration; verify sizes and SHA-256 hashes after copying to another machine. If a full online backup is necessary, use storage that snapshots the database and files together and test its restore procedure. Copy order alone is not a consistency guarantee.
 
-The image has no shell, so with Docker a throwaway `alpine` container copies the file and hands it to the user Sani runs as. To bring back shared files too, unpack their archive into the data directory in the same step, as in `tar -xzf /backup/sani-files-2026-09-29.tar.gz -C /data && chown -R 65532:65532 /data/files`. Files the restored database doesn’t know are removed on their own.
+## Restoring
 
-Moving to another server is the same: back up on the old one, restore on the new one, then point DNS at it.
+Preserve the current data first, stop all writers, then choose the matching procedure:
+
+1. **Full directory backup:** restore into a new empty directory or volume, keeping `sani.db`, any `sani.db-wal`/`sani.db-shm`, and `files/` from the same snapshot. Do not mix in files from the old running instance. Point `SANI_DATA_DIR` or the Compose volume at the restored location and restore ownership (`65532:65532` in the image).
+2. **Database made by `sani backup`:** restore it as `sani.db` in an empty directory, without the old instance’s WAL/SHM. This is complete for URL and text links. File shares also need `files/` copied during the same stopped-service interval. An online database snapshot alone cannot guarantee old downloads remain available.
+
+In an isolated local instance, check `/healthz`, login, URL redirects, text bodies, file downloads and SHA-256 before switching the live instance or DNS. Downgrades after a schema migration need the complete pre-upgrade backup; do not force an older binary to open the migrated database. The repository’s `go test ./cmd/sani -run TestStoppedBackup` exercises shutdown, flushing, the database snapshot, file copy, restore and hash verification.
 
 ## Upgrading {#upgrade}
 
@@ -144,9 +140,11 @@ There’s no access log: redirects don’t show up in Sani’s logs. If you need
 
 ## Stopping and restarting
 
-On `SIGTERM` or `SIGINT`, Sani stops accepting requests, gives the ones in flight up to 10 seconds to finish, writes the clicks still in memory to the database and exits. Both `docker stop` and `systemctl stop` send `SIGTERM`.
+On `SIGTERM` or `SIGINT`, Sani stops accepting requests and gives active requests 10 seconds before closing their connections. It then cancels background work and waits up to 10 seconds for jobs and remaining handlers, followed by a final click flush with its own 5-second deadline. Failures produce a nonzero exit code. The Compose and systemd examples allow 30 seconds; use `docker stop --time 30` when stopping manually.
 
-Clicks are written every 2 seconds. If the process is killed outright or the machine loses power, at most the last 2 seconds of clicks are lost.
+Clicks normally attempt to flush every 2 seconds. Disk exhaustion, lock waits or persistent write failures extend the backlog; a forced exit can lose all unflushed clicks. SQLite uses WAL with `synchronous=NORMAL`: the database stays consistent, but a power loss may also lose recently committed transactions. Two seconds is not a durability guarantee.
+
+SQLite waits at most 1 second per external write-lock attempt; cancellation of a Go context cannot immediately interrupt the driver’s busy handler. Investigate `flush clicks` and `final click flush` errors for disk space, permissions and other writers. `/healthz` is a liveness check, not proof that storage is writable.
 
 ## Troubleshooting
 

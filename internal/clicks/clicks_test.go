@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -137,5 +138,117 @@ func TestReferrersAreBounded(t *testing.T) {
 	if b.Refs[store.RefKey{LinkID: 7, Host: OtherReferrer}] != 500-maxPendingRefs ||
 		b.Refs[store.RefKey{LinkID: 7, Host: "spam3.example"}] != 2 {
 		t.Errorf("refs = %v", b.Refs)
+	}
+}
+
+type sinkFunc func(context.Context, *store.ClickBatch) error
+
+func (f sinkFunc) ApplyClicks(ctx context.Context, b *store.ClickBatch) error { return f(ctx, b) }
+
+func TestRepeatedFailedFlushBoundsMergedReferrers(t *testing.T) {
+	var r *Recorder
+	round := 0
+	now := time.Now()
+	r = New(sinkFunc(func(_ context.Context, b *store.ClickBatch) error {
+		if round == 4 {
+			if len(b.Refs) > maxPendingRefs+1 {
+				t.Fatalf("unbounded restore: %d hosts", len(b.Refs))
+			}
+			var sum int64
+			for _, n := range b.Refs {
+				sum += n
+			}
+			if sum != 256 || b.Links[1].Count != 256 {
+				t.Fatalf("lost clicks: refs=%d links=%d", sum, b.Links[1].Count)
+			}
+			return nil
+		}
+		for i := range maxPendingRefs {
+			r.Record(1, fmt.Sprintf("%d-%d.example", round, i), now)
+		}
+		round++
+		return errors.New("disk full")
+	}), time.UTC)
+	for i := range maxPendingRefs {
+		r.Record(1, fmt.Sprintf("0-%d.example", i), now)
+	}
+	round = 1
+	for range 3 {
+		if err := r.Flush(context.Background()); err == nil {
+			t.Fatal("expected failure")
+		}
+	}
+	if err := r.Flush(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWaitingFlushCanBeCanceled(t *testing.T) {
+	entered, release := make(chan struct{}), make(chan struct{})
+	r := New(sinkFunc(func(ctx context.Context, _ *store.ClickBatch) error {
+		close(entered)
+		select {
+		case <-release:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}), time.UTC)
+	r.Record(1, "", time.Now())
+	done := make(chan error, 1)
+	go func() { done <- r.Flush(context.Background()) }()
+	<-entered
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	if err := r.Flush(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("waiting flush: %v", err)
+	}
+	// Recording must remain available while the writer is blocked.
+	r.Record(1, "", time.Now())
+	close(release)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	if n := r.Pending(1); n != 1 {
+		t.Fatalf("new pending = %d", n)
+	}
+}
+
+func TestCountersReleaseAfterCacheAndBatch(t *testing.T) {
+	r := New(&sink{}, time.UTC)
+	func() {
+		defer r.Snapshot()()
+		for id := int64(1); id <= 2000; id++ {
+			r.Counter(id, 0)
+		}
+		c := r.Counter(3000, 4)
+		c.Add(1)
+		r.Record(3000, "", time.Now())
+		runtime.KeepAlive(c)
+	}()
+	runtime.GC()
+	if got := r.Total(3000, 4); got != 5 {
+		t.Fatalf("pending counter lost: %d", got)
+	}
+	if err := r.Flush(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		runtime.GC()
+		n := 0
+		for i := range r.shards {
+			s := &r.shards[i]
+			s.mu.Lock()
+			n += len(s.counters)
+			s.mu.Unlock()
+		}
+		if n == 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("%d counters survived eviction and flush", n)
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }

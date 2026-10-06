@@ -45,6 +45,8 @@ docker exec sani /sani backup - > sani-2026-09-29.db
 - An existing file is never overwritten.
 - It only reads the database and never upgrades its schema, so any version of `sani` can back up a running instance.
 
+- Only committed database data is included; uploaded files and in-memory clicks are excluded. For a complete backup, stop the service and follow the [paired backup procedure](../guide/operations#backup-files).
+
 How to restore is described under [Operations](../guide/operations#backup).
 
 ## `sani healthcheck`

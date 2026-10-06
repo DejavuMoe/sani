@@ -162,6 +162,36 @@ body {
   font-feature-settings: "cv11", "ss01";
 }
 
+/* One quiet scrollbar for the page, navigation, tables and code panes. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sn-text-3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--sn-text-3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sn-text-2);
+}
+
+@media (forced-colors: active) {
+  * {
+    scrollbar-color: auto;
+  }
+}
+
 /* Nav: a solid bar with one hairline, like the app's header. */
 .VPNavBar,
 .VPNavBar.has-sidebar .content-body,
@@ -334,7 +364,8 @@ body {
 .vp-doc :not(pre) > code {
   padding: 0.14em 0.4em;
   border-radius: 5px;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .vp-doc a > code {

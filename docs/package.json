@@ -10,7 +10,7 @@
     "dev": "vitepress dev --host 127.0.0.1 --port 5174",
     "build": "node .vitepress/sync/check.ts && vitepress build",
     "preview": "vitepress preview --host 127.0.0.1 --port 4174",
-    "check": "node .vitepress/sync/check.ts && vue-tsc --noEmit",
+    "check": "node .vitepress/sync/check.ts && node --test .vitepress/sync/check.test.ts .vitepress/markdown.test.ts && vue-tsc --noEmit",
     "a11y": "node scripts/a11y.mjs"
   },
   "dependencies": {
@@ -24,6 +24,6 @@
     "@types/node": "catalog:",
     "axe-core": "catalog:",
     "typescript": "catalog:",
-    "vue-tsc": "3.3.11"
+    "vue-tsc": "3.3.12"
   }
 }

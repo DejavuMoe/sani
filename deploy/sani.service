@@ -19,6 +19,7 @@ Environment=TZ=Asia/Shanghai
 ExecStart=/usr/local/bin/sani
 Restart=on-failure
 RestartSec=2s
+TimeoutStopSec=30s
 
 NoNewPrivileges=yes
 ProtectSystem=strict

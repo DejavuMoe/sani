@@ -1,8 +1,8 @@
 // Package store persists links, click aggregates and credentials in SQLite.
 //
 // Writes go through a single connection so SQLite never has to arbitrate
-// between writers; reads use a separate pool and, thanks to WAL, never wait
-// for a write to finish.
+// between writers; reads use a separate pool and WAL permits them alongside
+// normal writes. Pool contention and external database locks can still wait.
 package store
 
 import (
@@ -31,7 +31,9 @@ type Store struct {
 func dsn(path string, writer bool) string {
 	q := url.Values{}
 	for _, p := range []string{
-		"busy_timeout(10000)",
+		// SQLite's busy handler can outlive a canceled Go context. Keep
+		// each external-lock wait below the five-second flush budget.
+		"busy_timeout(1000)",
 		"journal_mode(WAL)",
 		"synchronous(NORMAL)",
 		"foreign_keys(1)",
@@ -79,6 +81,9 @@ func Open(ctx context.Context, path string) (*Store, error) {
 func (s *Store) Close() error {
 	return errors.Join(s.r.Close(), s.w.Close())
 }
+
+// PoolStats exposes standard database/sql counters for local capacity tests.
+func (s *Store) PoolStats() (read, write sql.DBStats) { return s.r.Stats(), s.w.Stats() }
 
 // Backup writes a consistent, compacted copy of the database at path to
 // dst. It opens its own connection and never migrates, so it is safe while a
@@ -184,9 +189,39 @@ var migrations = []string{
 		file    TEXT    NOT NULL DEFAULT '',
 		body    TEXT
 	);`,
+
+	// 3: a reclaimed/purged row must never inherit clicks still queued for
+	// its old ID. Rebuild with foreign keys disabled by migrate; child rows
+	// and their references to links are preserved and checked before commit.
+	`CREATE TABLE links_new (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		slug TEXT NOT NULL,
+		slug_key TEXT NOT NULL UNIQUE,
+		url TEXT NOT NULL,
+		host TEXT NOT NULL DEFAULT '',
+		title TEXT NOT NULL DEFAULT '',
+		meta INTEGER NOT NULL DEFAULT 0,
+		redirect INTEGER NOT NULL DEFAULT 302,
+		enabled INTEGER NOT NULL DEFAULT 1,
+		expires_at INTEGER NOT NULL DEFAULT 0,
+		max_clicks INTEGER NOT NULL DEFAULT 0,
+		clicks INTEGER NOT NULL DEFAULT 0,
+		last_click_at INTEGER NOT NULL DEFAULT 0,
+		created_at INTEGER NOT NULL,
+		updated_at INTEGER NOT NULL,
+		deleted_at INTEGER NOT NULL DEFAULT 0,
+		kind INTEGER NOT NULL DEFAULT 0
+	);
+	INSERT INTO links_new SELECT * FROM links;
+	DROP TABLE links;
+	ALTER TABLE links_new RENAME TO links;
+	CREATE INDEX links_by_created ON links (created_at DESC, id DESC) WHERE deleted_at = 0;
+	CREATE INDEX links_by_clicks ON links (clicks DESC, id DESC) WHERE deleted_at = 0;
+	CREATE INDEX links_by_visited ON links (last_click_at DESC, id DESC) WHERE deleted_at = 0;
+	CREATE INDEX links_deleted ON links (deleted_at) WHERE deleted_at != 0;`,
 }
 
-func migrate(ctx context.Context, db *sql.DB) error {
+func migrate(ctx context.Context, db *sql.DB) (result error) {
 	var version int
 	if err := db.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
 		return fmt.Errorf("read schema version: %w", err)
@@ -194,6 +229,15 @@ func migrate(ctx context.Context, db *sql.DB) error {
 	if version > len(migrations) {
 		return fmt.Errorf("database schema version %d is newer than this build supports (%d)", version, len(migrations))
 	}
+	// The writer pool has exactly one connection. SQLite requires this
+	// outside the transaction when rebuilding a referenced parent table.
+	if _, err := db.ExecContext(ctx, "PRAGMA foreign_keys = OFF"); err != nil {
+		return err
+	}
+	defer func() {
+		_, err := db.ExecContext(context.Background(), "PRAGMA foreign_keys = ON")
+		result = errors.Join(result, err)
+	}()
 	for i := version; i < len(migrations); i++ {
 		tx, err := db.BeginTx(ctx, nil)
 		if err != nil {
@@ -202,6 +246,18 @@ func migrate(ctx context.Context, db *sql.DB) error {
 		if _, err := tx.ExecContext(ctx, migrations[i]); err != nil {
 			tx.Rollback()
 			return fmt.Errorf("migration %d: %w", i+1, err)
+		}
+		rows, err := tx.QueryContext(ctx, "PRAGMA foreign_key_check")
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		broken := rows.Next()
+		err = rows.Err()
+		rows.Close()
+		if broken || err != nil {
+			tx.Rollback()
+			return fmt.Errorf("migration %d: foreign key check failed: %v", i+1, err)
 		}
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("PRAGMA user_version = %d", i+1)); err != nil {
 			tx.Rollback()

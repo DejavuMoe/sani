@@ -41,7 +41,7 @@ docker compose up -d
 
 Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first visit also asks for the setup code Sani prints to its log (`docker logs sani`), so nobody else can claim a fresh instance; when `SANI_BASE_URL` is set, the log line includes a link with the code already filled in. Set `SANI_PASSWORD` instead to skip this step. Put a TLS reverse proxy in front of it; [deploy/](deploy/) has Caddy, nginx and systemd examples.
 
-The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 24 MB, running as an unprivileged user, with the data in the `/data` volume.
+The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
 ### A single binary
 
@@ -109,17 +109,17 @@ The [API reference](docs/en/reference/api.md) covers every endpoint and error co
 
 | Path | Requests/s | p50 | p99 |
 |---|---|---|---|
-| Cached redirect, click counted | 131,075 | 0.80 ms | 3.43 ms |
-| Redirect with a visit limit | 129,448 | 0.81 ms | 3.44 ms |
-| Unknown slug (404 page) | 83,746 | 1.24 ms | 5.29 ms |
+| Cached redirect, click counted | 137,958 | 0.77 ms | 3.06 ms |
+| Redirect with a visit limit | 141,450 | 0.73 ms | 3.10 ms |
+| Unknown slug (404 page) | 104,176 | 1.00 ms | 4.05 ms |
 
-The script then checks the stored click total against the redirects served: in the run above, 1,965,880 redirects and 1,965,880 clicks. The handler alone costs about 0.42 µs per redirect (`make bench`). Numbers on a laptop move by 10% or so between runs; the click totals always match.
+The script then checks the stored click total against the redirects served: in the run above, 2,069,251 redirects and 2,069,251 clicks. The handler alone costs about 0.38 µs per redirect (`make bench`). Numbers on a laptop move by 10% or so between runs; the click totals always match.
 
 How it gets there:
 
 - Redirect targets live in a sharded in-memory cache in front of SQLite. Misses are cached separately and bounded, so a scan for random slugs can't evict real links, and concurrent misses for the same slug share one database read.
 - Counting a click is an in-memory increment. Aggregated counts reach SQLite every two seconds in one transaction, and are flushed on shutdown.
-- SQLite runs in WAL mode with a single writer connection and a pool of readers, so reads never wait for writes.
+- SQLite WAL allows ordinary reads alongside writes, with one writer and a reader pool. Pool contention and external locks can still wait; cached redirects do not wait for database writes.
 - The admin app is embedded in the binary and precompressed with Brotli and gzip at build time.
 
 [Performance](docs/en/internals/performance.md) in the docs has the method and the microbenchmarks.
@@ -166,13 +166,13 @@ make load             # the benchmark above
 
 ## Data and backups
 
-Links and texts live in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL mode; shared files are in `files/` next to it, so back that directory up as well. `sani backup FILE` writes a consistent copy while Sani keeps running; with `-` as the file name the copy goes to standard output, which is how it works with Docker, since the image has no shell:
+Links and texts live in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL mode; shared files are in `files/` next to it. `sani backup FILE` writes a consistent database-only copy while Sani keeps running; it excludes file bytes and pending in-memory clicks. With `-` as the file name the copy goes to standard output, which is how it works with Docker, since the image has no shell:
 
 ```sh
 docker exec sani /sani backup - > sani-backup.db
 ```
 
-To restore, stop Sani and put the copy in place of `sani.db`; [Operations](docs/en/guide/operations.md) has the steps, a cron example and upgrades. For a portable list of your links, use Settings → Data → Export (it leaves texts and files out).
+For a complete backup including files, stop all writers before copying the database and `files/` together. Restore into an empty directory, without mixing in the old instance’s WAL or files; [Operations](docs/en/guide/operations.md) has the paired backup, restore and upgrade steps. For a portable list of your links, use Settings → Data → Export (it leaves texts and files out).
 
 ## License
 

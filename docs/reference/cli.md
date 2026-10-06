@@ -45,6 +45,8 @@ docker exec sani /sani backup - > sani-2026-09-29.db
 - 目标文件已经存在时拒绝覆盖。
 - 只读取数据库，不会升级数据库结构，所以可以用任何版本的 `sani` 备份正在运行的实例。
 
+- 只备份已提交的数据库；分享文件和内存点击不在副本内。完整备份请先停机，按[配套备份步骤](../guide/operations#backup-files)操作。
+
 恢复方法见[运维](../guide/operations#backup)。
 
 ## `sani healthcheck`

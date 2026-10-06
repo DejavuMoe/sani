@@ -11,7 +11,7 @@
 - **Enough statistics.** Total and daily clicks, referring sites and the last visit. Crawlers, link previews, browser prefetches and your own clicks don’t count.
 - **Control over every link.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. A new destination applies from the very next visit.
 - **Texts and files too.** Share a note, a snippet of code or a file at `/p/…`, with the same expiry, visit limit and statistics as a link. See [Everyday use](./usage#shares).
-- **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 24 MB, and there’s no Redis, PostgreSQL or anything else to run next to it.
+- **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 25 MB, and there’s no Redis, PostgreSQL or anything else to run next to it.
 - **Any language.** A slug like `s.example.com/简历` just works, and both the admin app and the pages visitors see come in English and Chinese.
 
 ## Who it’s for

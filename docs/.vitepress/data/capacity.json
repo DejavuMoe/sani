@@ -1,0 +1,255 @@
+{
+  "at": "2026-10-05T20:17:27Z",
+  "go": "go1.27.1",
+  "os": "linux",
+  "cpus": 8,
+  "workers": 8,
+  "datasets": [
+    {
+      "links": 1000,
+      "import_ms": 15.667,
+      "peak_rss_kib": 26972,
+      "sqlite_busy": 0,
+      "recorded_clicks": 40200,
+      "stored_clicks": 40200,
+      "runs": [
+        {
+          "name": "list",
+          "samples": 200,
+          "p50_ms": 0.213,
+          "p95_ms": 0.348,
+          "p99_ms": 0.713,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 304912
+        },
+        {
+          "name": "search",
+          "samples": 200,
+          "p50_ms": 0.56,
+          "p95_ms": 1.118,
+          "p99_ms": 1.953,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 304912
+        },
+        {
+          "name": "click-sort",
+          "samples": 200,
+          "p50_ms": 0.211,
+          "p95_ms": 0.295,
+          "p99_ms": 0.539,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 304912
+        },
+        {
+          "name": "cold-redirect",
+          "samples": 200,
+          "p50_ms": 0.03,
+          "p95_ms": 0.089,
+          "p99_ms": 0.148,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 304912
+        },
+        {
+          "name": "flush",
+          "samples": 200,
+          "p50_ms": 1.501,
+          "p95_ms": 2.129,
+          "p99_ms": 2.555,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 4148872
+        },
+        {
+          "name": "mixed",
+          "samples": 1600,
+          "p50_ms": 0.566,
+          "p95_ms": 1.29,
+          "p99_ms": 1.756,
+          "read_waits": 0,
+          "write_waits": 399,
+          "read_wait_ms": 0,
+          "write_wait_ms": 85.378995,
+          "wal_bytes": 4820432
+        }
+      ]
+    },
+    {
+      "links": 10000,
+      "import_ms": 177.276,
+      "peak_rss_kib": 32740,
+      "sqlite_busy": 0,
+      "recorded_clicks": 40200,
+      "stored_clicks": 40200,
+      "runs": [
+        {
+          "name": "list",
+          "samples": 200,
+          "p50_ms": 0.295,
+          "p95_ms": 0.535,
+          "p99_ms": 0.917,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 2060032
+        },
+        {
+          "name": "search",
+          "samples": 200,
+          "p50_ms": 6.775,
+          "p95_ms": 9.78,
+          "p99_ms": 10.882,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 2060032
+        },
+        {
+          "name": "click-sort",
+          "samples": 200,
+          "p50_ms": 0.279,
+          "p95_ms": 0.354,
+          "p99_ms": 0.575,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 2060032
+        },
+        {
+          "name": "cold-redirect",
+          "samples": 200,
+          "p50_ms": 0.012,
+          "p95_ms": 0.019,
+          "p99_ms": 0.037,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 2060032
+        },
+        {
+          "name": "flush",
+          "samples": 200,
+          "p50_ms": 1.497,
+          "p95_ms": 2.171,
+          "p99_ms": 3.459,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 4136512
+        },
+        {
+          "name": "mixed",
+          "samples": 1600,
+          "p50_ms": 0.649,
+          "p95_ms": 1.923,
+          "p99_ms": 2.612,
+          "read_waits": 0,
+          "write_waits": 399,
+          "read_wait_ms": 0,
+          "write_wait_ms": 111.589462,
+          "wal_bytes": 9381272
+        }
+      ]
+    },
+    {
+      "links": 100000,
+      "import_ms": 1683.09,
+      "peak_rss_kib": 108900,
+      "sqlite_busy": 0,
+      "recorded_clicks": 40200,
+      "stored_clicks": 40200,
+      "runs": [
+        {
+          "name": "list",
+          "samples": 200,
+          "p50_ms": 1.085,
+          "p95_ms": 2.572,
+          "p99_ms": 3.45,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 21139752
+        },
+        {
+          "name": "search",
+          "samples": 200,
+          "p50_ms": 76.985,
+          "p95_ms": 82.17,
+          "p99_ms": 86.925,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 21139752
+        },
+        {
+          "name": "click-sort",
+          "samples": 200,
+          "p50_ms": 1.051,
+          "p95_ms": 1.316,
+          "p99_ms": 3.313,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 21139752
+        },
+        {
+          "name": "cold-redirect",
+          "samples": 200,
+          "p50_ms": 0.013,
+          "p95_ms": 0.017,
+          "p99_ms": 0.026,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 21139752
+        },
+        {
+          "name": "flush",
+          "samples": 200,
+          "p50_ms": 2.573,
+          "p95_ms": 3.451,
+          "p99_ms": 5.098,
+          "read_waits": 0,
+          "write_waits": 0,
+          "read_wait_ms": 0,
+          "write_wait_ms": 0,
+          "wal_bytes": 21139752
+        },
+        {
+          "name": "mixed",
+          "samples": 1600,
+          "p50_ms": 1.868,
+          "p95_ms": 5.867,
+          "p99_ms": 7.85,
+          "read_waits": 0,
+          "write_waits": 399,
+          "read_wait_ms": 0,
+          "write_wait_ms": 149.814716,
+          "wal_bytes": 21139752
+        }
+      ]
+    }
+  ]
+}

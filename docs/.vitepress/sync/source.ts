@@ -12,6 +12,11 @@ export const docsRoot = fileURLToPath(new URL('../../', import.meta.url));
 export const read = (path: string) => readFileSync(join(repoRoot, path), 'utf8');
 export const exists = (path: string) => existsSync(join(repoRoot, path));
 
+/** The latest release recorded in the changelog; Unreleased is not a tag. */
+export function latestVersion(): string {
+  return /^## (v\d+\.\d+\.\d+(?:-[\w.]+)?)\s*$/m.exec(read('docs/project/changelog.md'))?.[1] ?? 'dev';
+}
+
 function walk(dir: string, keep: (file: string) => boolean): string[] {
   const out: string[] = [];
   for (const name of readdirSync(join(repoRoot, dir))) {

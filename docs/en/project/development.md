@@ -28,7 +28,7 @@ web/                the admin app: Svelte 5 + TypeScript, built with Vite
 docs/               this site: VitePress
 scripts/            demo data, the load test and release scripts
 deploy/             systemd, Caddy and nginx examples
-.github/            workflows for CI, releases and the docs site; issue forms
+.github/            CI, application release workflows and issue forms
 ```
 
 The Go module is at the repository root. `web` and `docs` are two packages of one pnpm workspace sharing a lockfile, and shared dependencies such as the fonts get their versions from the `catalog` in `pnpm-workspace.yaml`.
@@ -45,6 +45,7 @@ The Go module is at the repository root. `web` and `docs` are two packages of on
 | `make e2e` | End-to-end tests with Playwright against a fresh instance |
 | `make bench` | Benchmarks for redirects, the cache and click counting |
 | `make load` | The load test, including the click count check |
+| `make capacity` | List, search, cold redirects, flushing and mixed I/O at 1k/10k/100k links; JSON output |
 | `make build` | Build the admin app, then `bin/sani` |
 | `make dist` | Build the release archives for every platform, and `SHA256SUMS`, in `dist/` |
 | `make docker` | Build the Docker image |
@@ -109,7 +110,9 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 - a docs build, with axe over every page;
 - a build of the image for every release platform, which is then started and has to pass its health check;
 - the release archives for every platform;
-- `govulncheck` for known vulnerabilities. It also runs every Monday, so a new advisory doesn’t wait for a commit.
+- `govulncheck`, workspace `pnpm audit --audit-level=moderate`, and npm audit for both tracked design tools. It also runs every Monday, so a new advisory doesn’t wait for a commit.
+
+[CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) scans Go, JavaScript/TypeScript, Python and GitHub Actions on pushes, pull requests and a weekly schedule. Go is built with the pinned project toolchain; the other languages are analyzed directly from source.
 
 To release a new version:
 

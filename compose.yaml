@@ -5,6 +5,7 @@ services:
     image: ghcr.io/dejavumoe/sani:latest
     container_name: sani
     restart: unless-stopped
+    stop_grace_period: 30s
     # Localhost only: put a TLS reverse proxy in front (see deploy/).
     ports:
       - "127.0.0.1:8080:8080"

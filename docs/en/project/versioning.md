@@ -6,7 +6,7 @@
 
 Sani follows [semantic versioning](https://semver.org). A version looks like `major.minor.patch`:
 
-- **Patch releases** (0.1.0 → 0.1.1) only fix things; upgrade without a second thought.
+- **Patch releases** (0.1.0 → 0.1.1) only fix things; still back up and read the changelog before upgrading.
 - **Minor releases** (1.1 → 1.2) add things without breaking what exists.
 - **Major releases** (1.x → 2.0) are the only ones with breaking changes, and the [changelog](./changelog) says how to upgrade.
 
@@ -40,7 +40,7 @@ Every `SANI_*` [environment variable](../reference/configuration) keeps its name
 ### Data
 
 - **The database.** A new version opens the database of any earlier version with the same major number and upgrades its schema on start. Not the other way round: an older version can’t open an upgraded database, so [back up](../guide/operations#backup) before upgrading, and restore the backup to go back.
-- **Backups.** `sani backup` writes a plain SQLite file that can be restored as is.
+- **Backups.** `sani backup` writes a plain SQLite file. Restoring file shares also requires `files/` copied during the same stopped-service interval; see [paired backups](../guide/operations#backup-files).
 - **Exports.** A JSON or CSV export from any version can be imported by later versions. `"version": 1` in a JSON export is the version of the file format, which changes only if the format changes incompatibly.
 
 ### Release files
@@ -58,3 +58,15 @@ The image name `ghcr.io/dejavumoe/sani`, the scheme of its tags and the names of
 ## Deprecation {#deprecation}
 
 Something that is going away is first marked deprecated in the changelog and the docs, and keeps working for the rest of that major version. It’s only removed in the next major version.
+
+## Acceptance before 1.0 {#before-1}
+
+These gates precede the formal compatibility promise; Sani is still in 0.x:
+
+- Settle the public API, configuration defaults, CLI, reserved paths, export formats and release filenames, with bilingual references checked against the source.
+- Exercise incremental database upgrades, preserving URLs, texts, files, statistics and credentials. Roll back failed migrations, reject newer schemas in older binaries, and rehearse a complete restore.
+- Complete tests on Linux, Windows and macOS, build every release platform, and pass E2E, accessibility and dependency checks. Release decisions use remote CI for the exact commit.
+- Record reproducible capacity measurements for latency, memory, SQLite waits and count consistency. Those measurements are not an SLA.
+- List changes to documented behavior, such as resumed-download counting, under “Breaking changes” with migration steps. During 0.x, ship them in a minor release instead of silently including them in a patch.
+
+Database tables remain internal implementation details after 1.0.

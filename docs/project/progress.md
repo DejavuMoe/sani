@@ -1,6 +1,10 @@
+<script setup>
+import { data as status } from '../.vitepress/data/status.data'
+</script>
+
 # 进度
 
-<p class="lead">Sani 目前的版本是 v0.3.0：功能完整，经过了测试和压测，有现成的镜像和二进制文件。这一页记录做到了哪里、接下来做什么，以及哪些事情刻意不做。页面上的核对结果和数字，都是在构建文档时从源码中得出的。</p>
+<p class="lead">最近发布的版本是 {{ status.latestVersion }}。当前工作区的后续改动记录在更新日志的“未发布”中。这一页说明已实现的能力、待发布的改动和仍需完成的工作；文档构建检查不等于远程 CI 或生产验收。</p>
 
 ## 现状 {#current}
 
@@ -12,11 +16,23 @@
 | HTTP API | <span class="sn-status done">已完成</span> | 全部功能都有接口，API 令牌 |
 | 导入与导出 | <span class="sn-status done">已完成</span> | Sani、Shlink、Sink 和各种 CSV |
 | 部署 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的 Docker 镜像，systemd、Caddy 和 nginx 示例 |
-| 运维 | <span class="sn-status done">已完成</span> | 在线备份、重设密码、健康检查 |
+| 运维 | <span class="sn-status done">已完成</span> | 在线数据库备份、停机后的数据库与文件配套备份、重设密码、健康检查 |
 | 文档 | <span class="sn-status done">已完成</span> | 本站：中英双语，构建时与源码核对 |
 | 发布 | <span class="sn-status done">已完成</span> | 打标签即发布：GHCR 上的多平台镜像，Linux、macOS、Windows 和 FreeBSD 的二进制文件，附校验和与构建来源证明 |
 | 持续集成 | <span class="sn-status done">已完成</span> | 每次提交都运行检查和测试（Linux、macOS、Windows）、端到端测试、axe 检查、漏洞扫描，并试构建镜像和全部二进制文件 |
-| 文档站上线 | <span class="sn-status planned">计划中</span> | 目前在本地用 `make docs-dev` 浏览 |
+| 文档站上线 | <span class="sn-status done">已完成</span> | 中英文文档已上线：[sani.zsh.moe](https://sani.zsh.moe) |
+
+## 当前五批工作 {#acceptance}
+
+以下实现均归入“未发布”，本地验收入口如下；发布前仍需同一提交的远程 CI。
+
+| 批次 | 实现内容 | 验收入口 |
+|---|---|---|
+| 1 · 计数正确性 | Range 与条件响应、共享额度、不可重用 ID、刷盘一致性 | `counting_test.go`、迁移与并发测试 |
+| 2 · 备份与文档 | 配套停机备份、恢复与哈希校验、统计和持久性口径、统一版本 | `TestStoppedBackup`、文档语义核对 |
+| 3 · 故障恢复 | 重试来源上限、外部锁等待上限 1 秒、停机与最终刷盘失败 | Go 竞态测试、锁与停机回归 |
+| 4 · 容量与自动检查 | 三档容量数据、列表查询精简、依赖审计、CI 容量检查 | `make capacity`、`make bench load`、依赖审计 |
+| 5 · 文档与兼容收尾 | 双语未发布日志、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、两站 axe |
 
 ## 构建时核对 {#checks}
 
@@ -37,8 +53,7 @@
 ## 接下来 {#next}
 
 1. **听取反馈**：Sani 已经公开发布，接下来以修复问题、打磨细节为主。有问题欢迎在 [GitHub](https://github.com/DejavuMoe/sani/issues) 上反馈。
-2. **为 1.0 定型**：API、配置项和数据库结构在 1.0 时固定下来，之后只有主版本号变化时才会有不兼容的修改。具体承诺见[版本与兼容](./versioning)。
-3. **文档站上线**：把本站部署为静态网站。
+2. **为 1.0 定型**：稳定对外 API、配置和升级路径，数据库内部结构仍可迁移。发布前完成兼容清单和恢复演练；具体边界见[版本与兼容](./versioning)。
 
 还在考虑、没有决定的功能：
 

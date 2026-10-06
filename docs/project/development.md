@@ -28,7 +28,7 @@ web/                管理界面：Svelte 5 + TypeScript，Vite 构建
 docs/               本文档站：VitePress
 scripts/            演示数据、压测和发布脚本
 deploy/             systemd、Caddy 和 nginx 的示例配置
-.github/            CI、发布和文档部署的工作流，issue 模板
+.github/            CI、应用发布工作流和 issue 模板
 ```
 
 Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的两个包，共用一份锁文件，字体等共同依赖的版本写在 `pnpm-workspace.yaml` 的 `catalog` 里。
@@ -45,6 +45,7 @@ Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的
 | `make e2e` | 用 Playwright 对一个全新的实例做端到端测试 |
 | `make bench` | 跳转、缓存和点击计数的基准测试 |
 | `make load` | 压测，并核对点击数 |
+| `make capacity` | 1千、1万、10万链接的列表、搜索、冷加载、刷盘与混合读写，输出 JSON |
 | `make build` | 构建管理界面，再构建 `bin/sani` |
 | `make dist` | 构建全部平台的发布压缩包和 `SHA256SUMS`，输出到 `dist/` |
 | `make docker` | 构建 Docker 镜像 |
@@ -109,7 +110,9 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 - 构建文档站，对每一页做 axe 检查；
 - 为每个发布平台试构建镜像，启动它，等健康检查通过；
 - 构建全部二进制文件的压缩包；
-- 用 `govulncheck` 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
+- 用 `govulncheck`、工作区 `pnpm audit --audit-level=moderate` 和两个受跟踪设计工具的 npm audit 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
+
+[CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) 在推送、拉取请求和每周定时任务中扫描 Go、JavaScript/TypeScript、Python 与 GitHub Actions。Go 使用项目固定的工具链构建，其余语言直接分析源码。
 
 发布一个新版本：
 

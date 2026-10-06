@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { defineConfig, type DefaultTheme } from 'vitepress';
 import { readableTokens } from './contrast';
 import { saniMarkdown } from './markdown';
 import { groups, prefix, type Lang } from './pages';
+import { latestVersion } from './sync/source';
 
 const repo = 'https://github.com/DejavuMoe/sani';
 
@@ -12,8 +13,7 @@ const git = existsSync(new URL('../../.git', import.meta.url));
 
 // The version in the nav is the newest entry of the changelog, so the two
 // cannot disagree.
-const changelog = readFileSync(new URL('../project/changelog.md', import.meta.url), 'utf8');
-const version = /^## (v\d+\.\d+\.\d+)/m.exec(changelog)?.[1] ?? 'dev';
+const version = latestVersion();
 
 function sidebar(lang: Lang): DefaultTheme.SidebarItem[] {
   return groups.map((g) => ({
@@ -45,7 +45,7 @@ const zhTheme: DefaultTheme.Config = {
   sidebar: sidebar('zh'),
   outline: { level: [2, 3], label: '本页内容' },
   docFooter: { prev: '上一页', next: '下一页' },
-  editLink: { pattern: `${repo}/edit/main/docs/:path`, text: '在 GitHub 上修改此页' },
+  editLink: { pattern: `${repo}/edit/master/docs/:path`, text: '在 GitHub 上修改此页' },
   lastUpdated: { text: '最后更新', formatOptions: { dateStyle: 'medium' } },
   darkModeSwitchLabel: '外观',
   lightModeSwitchTitle: '切换到浅色',
@@ -68,7 +68,7 @@ const enTheme: DefaultTheme.Config = {
   nav: nav('en'),
   sidebar: sidebar('en'),
   outline: { level: [2, 3], label: 'On this page' },
-  editLink: { pattern: `${repo}/edit/main/docs/:path`, text: 'Edit this page on GitHub' },
+  editLink: { pattern: `${repo}/edit/master/docs/:path`, text: 'Edit this page on GitHub' },
   lastUpdated: { text: 'Last updated', formatOptions: { dateStyle: 'medium' } },
   externalLinkIcon: true,
   notFound: {
@@ -83,6 +83,7 @@ const enTheme: DefaultTheme.Config = {
 export default defineConfig({
   title: 'Sani',
   cleanUrls: true,
+  sitemap: { hostname: 'https://sani.zsh.moe' },
   lastUpdated: git,
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],

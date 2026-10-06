@@ -43,25 +43,9 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
-	if !e.Enabled || (e.ExpiresAt != 0 && now.UnixMilli() >= e.ExpiresAt) {
+	if !s.admit(e, s.countable(r), r, now) {
 		s.pages.render(w, r, pageGone, slug)
 		return
-	}
-	count := s.countable(r)
-	if e.MaxClicks > 0 {
-		if count {
-			if n := e.Clicks.Add(1); n > e.MaxClicks {
-				e.Clicks.Add(-1)
-				s.pages.render(w, r, pageGone, slug)
-				return
-			}
-		} else if e.Clicks.Load() >= e.MaxClicks {
-			s.pages.render(w, r, pageGone, slug)
-			return
-		}
-	}
-	if count {
-		s.clicks.Record(e.ID, referrerHost(r.Header.Get("Referer")), now)
 	}
 
 	loc := e.Location

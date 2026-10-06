@@ -2,6 +2,29 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+### Breaking changes
+
+- Each successful `200`/`206` content GET that meets the [counting rules](../guide/statistics#counted) counts as a visit for files and raw text, including resumed, nonzero-start and suffix ranges. `304`, `412`, `416` and file-open failures do not consume visits. Raise or disable the visit limit for clients that use multiple ranges; retries after disconnects consume a new visit too. Ship this behavior change in the next minor release.
+- The database migrates to schema 3 with non-reused link IDs. Back up the database and files before first start. Downgrading requires the complete pre-upgrade backup; old binaries cannot open schema 3.
+
+### Fixed
+
+- Recreated links cannot inherit pending clicks from a deleted link’s reused ID.
+- API totals do not double-count a committing batch; concurrent requests and replaced cache entries share the same allowance.
+- Failed-batch merges keep referrers bounded while preserving accumulated clicks.
+- Shutdown waits for requests and background work, gives the final flush its own deadline, and exits nonzero on failure. Deployment examples allow 30 seconds to stop.
+
+### Verification and documentation
+
+- Add regressions for counting, conditional requests, migration, retries, shutdown and full backup restoration.
+- Add a 1k/10k/100k capacity tool measuring latency percentiles, memory, SQLite waits, flushing and WAL; remove an unnecessary content-table join from unfiltered list counts.
+- Correct online file-backup and two-second loss promises, distinguish live totals from committed aggregates, and check version consistency and critical documentation semantics.
+- Update docs and design-tool build dependencies and audit JavaScript dependencies in CI.
+- Normalize spaces around prose links, emphasis and inline code, wrap long inline code on small screens, and match thin scrollbars to both themes; simplify the home page and mark the hosted docs as live.
+- Fix the `source-map-js` build dependency vulnerability, update SQLite and build tools, and add CodeQL checks for Go, JavaScript/TypeScript, Python and GitHub Actions.
+
 ## v0.3.1
 
 2026-10-05 · Fixes to the admin app's layout, feedback and accessibility.

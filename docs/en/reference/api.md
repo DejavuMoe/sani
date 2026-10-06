@@ -442,7 +442,7 @@ On the files domain:
 
 - `GET /{slug}` returns a text as `text/plain` or a file as an attachment; `GET /{slug}/{name}` downloads either, a text as `{slug}.txt`. Files support `Range` requests and carry their SHA-256 as `ETag`.
 - Every response is sandboxed, can’t be framed or embedded by other sites, and isn’t cached or indexed. `robots.txt` turns every crawler away; every other path is `404`.
-- Every fetch counts as a visit, `curl` and `wget` included, unless it resumes a partial download, comes from a crawler or a link preview, or is a `HEAD` request. A link at its visit limit gets `410`.
+- Every GET that starts a successful `200`/`206` content response counts, including all ranges, resumed downloads, curl and wget. Crawlers, previews, prefetches, `HEAD`, `304`/`412`/`416` and read failures do not count. Exhausted links return `410`; disconnecting does not refund a visit.
 - When 32 downloads are already running, another one gets `503` with `Retry-After`, and isn’t counted.
 
 `GET /healthz`

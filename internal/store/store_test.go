@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/DejavuMoe/sani/internal/links"
 )
@@ -58,6 +59,184 @@ func TestBackup(t *testing.T) {
 	if _, err := b.Resolve(ctx, "kept"); err != nil {
 		t.Fatalf("link missing from the backup: %v", err)
 	}
+}
+
+func TestMigrationPreservesChildrenAndNeverReusesIDs(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "v2.db")
+	db, err := sql.Open("sqlite", dsn(path, true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, migration := range migrations[:2] {
+		if _, err := db.ExecContext(ctx, migration); err != nil {
+			t.Fatal(err)
+		}
+	}
+	_, err = db.Exec(`PRAGMA user_version=2;
+		INSERT INTO links (id, slug, slug_key, url, created_at, updated_at, kind, clicks) VALUES (42,'note','note','',1,1,1,3);
+		INSERT INTO contents (link_id,size,body) VALUES (42,5,'hello');
+		INSERT INTO clicks_daily VALUES (42,20000,3);
+		INSERT INTO referrers VALUES (42,'example.com',3);`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+	s, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	if text, err := s.TextBody(ctx, 42); err != nil || text != "hello" {
+		t.Fatalf("migrated body=%q err=%v", text, err)
+	}
+	var daily, refs, foreignKeys int
+	if err := s.r.QueryRow(`SELECT (SELECT count FROM clicks_daily WHERE link_id=42), (SELECT count FROM referrers WHERE link_id=42)`).Scan(&daily, &refs); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.w.QueryRow(`PRAGMA foreign_keys`).Scan(&foreignKeys); err != nil {
+		t.Fatal(err)
+	}
+	if daily != 3 || refs != 3 || foreignKeys != 1 {
+		t.Fatalf("daily=%d refs=%d FK=%d", daily, refs, foreignKeys)
+	}
+	if _, err := s.DeleteLink(ctx, 42, 2); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.PurgeDeleted(ctx, 3); err != nil {
+		t.Fatal(err)
+	}
+	l := newLink("new", "https://example.com", 4)
+	if err := s.CreateLink(ctx, l, true); err != nil {
+		t.Fatal(err)
+	}
+	if l.ID <= 42 {
+		t.Fatalf("reused ID %d", l.ID)
+	}
+	var children int
+	if err := s.r.QueryRow(`SELECT (SELECT count(*) FROM contents)+(SELECT count(*) FROM clicks_daily)+(SELECT count(*) FROM referrers)`).Scan(&children); err != nil {
+		t.Fatal(err)
+	}
+	if children != 0 {
+		t.Fatalf("cascade left %d children", children)
+	}
+	// The sequence survives a compacted backup and a restart.
+	backup := filepath.Join(t.TempDir(), "copy.db")
+	if err := Backup(ctx, path, backup); err != nil {
+		t.Fatal(err)
+	}
+	b, err := Open(ctx, backup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer b.Close()
+	if _, err := b.DeleteLink(ctx, l.ID, 5); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := b.PurgeDeleted(ctx, 6); err != nil {
+		t.Fatal(err)
+	}
+	next := newLink("new", "https://example.com/next", 7)
+	if err := b.CreateLink(ctx, next, true); err != nil {
+		t.Fatal(err)
+	}
+	if next.ID <= l.ID {
+		t.Fatalf("backup reused %d after %d", next.ID, l.ID)
+	}
+}
+
+func TestWritePoolWaitHonorsDeadline(t *testing.T) {
+	s := open(t)
+	conn, err := s.w.Conn(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	err = s.CreateLink(ctx, newLink("waiting", "https://example.com", 1), false)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("blocked writer: %v", err)
+	}
+	if stats := s.w.Stats(); stats.WaitCount == 0 || stats.WaitDuration == 0 {
+		t.Fatalf("missing pool wait: %+v", stats)
+	}
+}
+
+func TestDatabaseLockWaitIsBounded(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "locked.db")
+	first, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer first.Close()
+	second, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer second.Close()
+	tx, err := first.w.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	deadline, cancel := context.WithTimeout(ctx, 20*time.Millisecond)
+	defer cancel()
+	start := time.Now()
+	err = second.CreateLink(deadline, newLink("blocked", "https://example.com", 1), false)
+	if err == nil {
+		t.Fatal("write passed an external write lock")
+	}
+	if elapsed := time.Since(start); elapsed > 2*time.Second {
+		t.Fatalf("canceled SQLite lock wait took %v: %v", elapsed, err)
+	}
+}
+
+func TestFailedMigrationRollsBack(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "broken-v2.db")
+	db, err := sql.Open("sqlite", dsn(path, true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, m := range migrations[:2] {
+		if _, err := db.Exec(m); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := db.Exec(`PRAGMA foreign_keys=OFF; PRAGMA user_version=2; INSERT INTO contents(link_id,size,body) VALUES(999,4,'lost');`); err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+	if s, err := Open(ctx, path); err == nil {
+		s.Close()
+		t.Fatal("accepted an orphaned child during migration")
+	}
+	db, err = sql.Open("sqlite", dsn(path, true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var version, children int
+	if err := db.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.QueryRow("SELECT count(*) FROM contents").Scan(&children); err != nil {
+		t.Fatal(err)
+	}
+	if version != 2 || children != 1 {
+		t.Fatalf("failed migration changed source: schema=%d children=%d", version, children)
+	}
+	if _, err := db.Exec("DELETE FROM contents"); err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+	s, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.Close()
 }
 
 func TestLinkLifecycle(t *testing.T) {

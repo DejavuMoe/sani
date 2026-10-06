@@ -1,5 +1,5 @@
 import type { MarkdownRenderer } from 'vitepress';
-import { groupOf } from './pages';
+import { groupOf } from './pages.ts';
 
 const METHOD = /^(GET|HEAD|POST|PUT|PATCH|DELETE)$/;
 const ENDPOINT = /^(GET|HEAD|POST|PUT|PATCH|DELETE) (\/\S*)$/;
@@ -19,6 +19,28 @@ const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
  *   overflowing the page.
  */
 export function saniMarkdown(md: MarkdownRenderer) {
+  // Real spaces keep copied prose readable too; punctuation stays attached.
+  md.core.ruler.after('inline', 'sani-inline-spacing', (state) => {
+    for (const block of state.tokens) {
+      if (block.type !== 'inline' || !block.children) continue;
+      const tokens = block.children.filter((t) => t.type !== 'text' || t.content !== '');
+      block.children = tokens;
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const before = tokens[i - 1];
+        const after = tokens[i + 1];
+        if (/^(link_open|strong_open|em_open|code_inline)$/.test(token.type) &&
+            before?.type === 'text' && /[\p{L}\p{N}]$/u.test(before.content)) {
+          before.content += ' ';
+        }
+        if (/^(link_close|strong_close|em_close|code_inline)$/.test(token.type) &&
+            after?.type === 'text' && /^[\p{L}\p{N}]/u.test(after.content)) {
+          after.content = ' ' + after.content;
+        }
+      }
+    }
+  });
+
   md.core.ruler.push('sani-eyebrow', (state) => {
     const path: string = state.env?.relativePath ?? '';
     const group = groupOf(path);
