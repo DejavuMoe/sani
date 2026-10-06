@@ -1,6 +1,6 @@
 # 快速开始
 
-<p class="lead">先在自己的电脑上试一试，几分钟就够了。准备放到服务器上时，再看“部署”一页。</p>
+<p class="lead">只需数分钟即可在本地启动并体验 Sani。准备正式上线时，请参阅“部署”文档。</p>
 
 ## 启动 Sani
 
@@ -17,23 +17,23 @@ SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 
 ```sh [从源码构建]
 git clone https://github.com/DejavuMoe/sani && cd sani
-make install build                      # 需要 Go 1.27+、Node 24 和 pnpm
+make install build                      # 需 Go 1.27+、Node 24 和 pnpm
 SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # 数据保存在 ./data 目录
 ```
 
 :::
 
-其他系统和架构的二进制文件见[部署](./deploy#binaries)一页。仓库里的 `compose.yaml` 是为正式部署准备的，写好了域名和反向代理的设置；在本机试用，直接 `docker run` 更省事。
+其他平台架构的预编译文件请见[部署](./deploy#binaries)。仓库中的 `compose.yaml` 面向生产部署（已预设域名与反代）；本地体验直接使用 `docker run` 更快捷。
 
 ## 设置管理员密码
 
-打开 `http://127.0.0.1:8080/admin/`，第一次访问时需要设置管理员密码。除了密码，还要填写 Sani 启动时打印在日志里的**设置码**：
+访问 `http://127.0.0.1:8080/admin/`。初次使用需设定管理员密码，并填入启动时输出至日志的**设置码**：
 
 ```sh
 docker logs sani 2>&1 | grep setup_code
 ```
 
-直接运行二进制文件时，设置码就在终端的输出里。那一行大致是这样的：
+直接运行二进制时，设置码会输出在终端控制台中，格式如下：
 
 ```log
 time=2026-09-29T14:03:12.418+08:00 level=WARN msg="no admin password yet: open /admin/ and enter this setup code, or set SANI_PASSWORD" setup_code=k7m2-p9x4-hq3d
@@ -42,29 +42,29 @@ time=2026-09-29T14:03:12.418+08:00 level=WARN msg="no admin password yet: open /
 <Screenshot name="setup" alt="首次设置页面：先填写设置码，再输入两次新密码。" />
 
 ::: tip 为什么需要设置码
-一个刚部署好、还没有密码的实例，谁先打开谁就能设置密码。设置码只出现在服务器日志里，所以只有能看到日志的人才能完成首次设置。如果想跳过这一步，可以用 [`SANI_PASSWORD`](../reference/configuration#sani-password) 事先指定密码。
+未设密码的新建实例容易被抢先初始化。设置码仅输出在服务日志中，确保只有具备宿主机权限的管理员可完成初始化。若需跳过此步骤，可通过环境变量 [`SANI_PASSWORD`](../reference/configuration#sani-password) 预先指定密码。
 :::
 
 ## 缩短第一条链接
 
-1. 在浏览器里复制任意一个长链接。
-2. 回到 Sani，直接按 <kbd>Ctrl</kbd> <kbd>V</kbd>（Mac 上是 <kbd>⌘</kbd> <kbd>V</kbd>），不需要先点输入框。
+1. 复制任意长链接。
+2. 切回 Sani 界面，直接按 <kbd>Ctrl</kbd> <kbd>V</kbd>（Mac 为 <kbd>⌘</kbd> <kbd>V</kbd>），无需聚焦输入框。
 3. 按 <kbd>回车</kbd>。
 
-短链接已经复制到剪贴板，列表最上面多了一行。过几秒，网页标题和网站图标也会补上。
+短链接生成后会自动复制到剪贴板，并置顶显示在列表中。数秒后，后台会自动补全网页标题与图标。
 
-在本机试用时，短链接形如 `http://127.0.0.1:8080/k7m2p`：没有设置 [`SANI_BASE_URL`](../reference/configuration#sani-base-url) 时，Sani 使用你访问管理界面时的地址。
+本地试用时短链接格式如 `http://127.0.0.1:8080/k7m2p`：未配置 [`SANI_BASE_URL`](../reference/configuration#sani-base-url) 时，将默认采用访问管理后台时的地址。
 
-## 看看统计
+## 查看统计
 
-点开列表中的一行，或者用 <kbd>J</kbd> <kbd>K</kbd> 选中后按 <kbd>回车</kbd>，就能看到每日点击、来源网站和二维码，也可以编辑、停用或删除这条链接。
+点击列表条目，或使用键盘 <kbd>J</kbd> / <kbd>K</kbd> 选中后按 <kbd>回车</kbd>，可查看每日点击、来源域名与二维码，并支持编辑、停用或删除链接。
 
 <Screenshot name="detail" alt="链接详情：每日点击柱状图、来源网站排行和二维码，旁边是编辑、停用和删除等操作。" />
 
-从管理界面里点开的短链接不算点击，你自己测试不会影响数字。想看计数变化，可以把短链接粘贴到另一个浏览器的地址栏里打开。
+管理后台中点击链接不会计入统计，自测不污染数据。如需验证计数，可在无痕窗口或外部浏览器中打开短链接。
 
 ## 下一步
 
-- [部署](./deploy)：放到服务器上，配好域名和 HTTPS。
-- [日常使用](./usage)：快捷键、书签小工具、手机上的分享菜单。
-- [HTTP API](../reference/api)：在脚本里创建和管理链接。
+- [部署](./deploy)：生产服务器部署、域名解析与 HTTPS 配置。
+- [日常使用](./usage)：快捷键、书签脚本及移动端快捷分享。
+- [HTTP API](../reference/api)：通过接口自动化创建与管理链接。

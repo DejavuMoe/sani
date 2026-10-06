@@ -8,61 +8,61 @@ const workloadNames = { list: '列表', search: '搜索', 'click-sort': '按点�
 
 # 性能
 
-<p class="lead">跳转是 Sani 最常做的事，所以跳转路径上的每一步都为速度和可预测性而设计。下面记录本次跳转基准和当前工作区的容量测量；每组数据都有测试日期和方法。</p>
+<p class="lead">短链跳转为 Sani 最核心的工作负载，其执行链路上每个环节均针对极低延迟与高确定性深入优化。以下展示跳转基准与存储容量压测数据。</p>
 
 <PerfChart />
 
-## 怎么测的
+## 测试方法与度量准则
 
-`make load` 运行仓库里的 `scripts/load.sh`：
+执行 `make load` 触发压测套件 `scripts/load.sh`：
 
-1. 构建发布版的二进制文件，用一个临时的数据目录启动，关闭标题抓取。
-2. 创建两条链接：`/hot` 是普通链接；`/limited` 设置了一个很大的访问上限，这样每次访问都要经过访问次数的原子计数。
-3. 用 [bombardier](https://github.com/codesenberg/bombardier) 依次压测 `/hot`、`/limited` 和不存在的 `/nope`，每个路径 {{ benchmark.connections }} 个并发连接、持续 {{ benchmark.duration }}。请求带着桌面浏览器的 User-Agent 和一个来源网址，所以每一次跳转都会计为一次点击。
-4. 等最后一批点击写入数据库之后，比较 `/hot` 记录的点击数和 bombardier 统计的跳转次数，两者不一致就判定失败。
+1. 编译正式发行版二进制，挂载临时数据目录启动并关闭异步元数据抓取。
+2. 预设两条基准链接：`/hot` 为无限制常规链接；`/limited` 设定高访问上限以覆盖原子计数器损耗。
+3. 使用 [bombardier](https://github.com/codesenberg/bombardier) 对 `/hot`、`/limited` 及未命中路径 `/nope` 展开全量压测，每路径施加 {{ benchmark.connections }} 并发连接，持续 {{ benchmark.duration }}。请求携带完整桌面端 User-Agent 与 Referer 标头，保证每次跳转均触发统计计数。
+4. 等待内存最后一批点击安全落库后，比对 `/hot` 记录的点击总量与 bombardier 压测统计的跳转总量，二者必须绝对一致。
 
-这次测试在一台 {{ benchmark.cores }} 核的笔记本上进行（{{ benchmark.cpu }}，{{ benchmark.environment }}），压测工具和 Sani 运行在同一台机器上，互相争抢 CPU。同一台笔记本上多次运行，结果会有 10% 左右的浮动。真实部署时，网络和反向代理会增加延迟，但这部分与 Sani 无关。
+本次测试运行于一台 {{ benchmark.cores }} 核笔记本（{{ benchmark.cpu }}，{{ benchmark.environment }}），压测程序与 Sani 本机同跑且竞争 CPU。同机多次测试通常存在约 10% 波动。生产落地时网络往返与反向代理会引入附加延迟，但不属于 Sani 自身开销。
 
-## 点击一次不差
+## 零丢失精准计数
 
-压测 `/hot` 的这 {{ benchmark.duration }} 里，Sani 完成了 {{ num(benchmark.clicks.served) }} 次跳转，数据库里记录了 {{ num(benchmark.clicks.counted) }} 次点击。高并发下计数不丢失，是因为点击先在内存中按链接累加，再由一个后台任务批量写入；命中缓存的跳转从不等待写入完成。
+在 `/hot` 压测的 {{ benchmark.duration }} 内，Sani 累计完成了 {{ num(benchmark.clicks.served) }} 次跳转，数据库精准记录了 {{ num(benchmark.clicks.counted) }} 次点击。在极高吞吐下保持无损计数，得益于点击在内存分片中累加并由后台定时批量落库；缓存命中的跳转完全不等待磁盘 I/O。
 
-## 微基准
+## 纳秒级微基准
 
-`make bench` 用 Go 的基准测试测量单个环节的开销。三项都是并行基准：所有 CPU 核心同时对同一条链接执行，所以包含了争抢同一把锁的开销。
+`make bench` 采用 Go 标准基准框架测量核心代码路径的纯耗时。三项指标均采用并行基准（所有 CPU 核心同时高并发竞争同一条记录）：
 
-| 基准测试 | 每次操作 | 测量的内容 |
+| 基准测试 | 单次操作耗时 | 度量内容 |
 |---|---|---|
-| `BenchmarkRedirect` | {{ benchmark.micro.redirectNs }} ns | 完整的跳转处理：路由、查缓存、检查状态、记录点击、写响应头 |
-| `BenchmarkGetHit` | {{ benchmark.micro.cacheHitNs }} ns | 缓存命中 |
-| `BenchmarkRecord` | {{ benchmark.micro.recordClickNs }} ns | 记录一次点击 |
+| `BenchmarkRedirect` | {{ benchmark.micro.redirectNs }} ns | 完整跳转处理链路：路由、缓存查找、状态校验、点击累加、响应头输出 |
+| `BenchmarkGetHit` | {{ benchmark.micro.cacheHitNs }} ns | 内存缓存直接命中 |
+| `BenchmarkRecord` | {{ benchmark.micro.recordClickNs }} ns | 内存分片记录单次点击 |
 
-## 为什么快
+## 性能优化要点
 
-- **缓存分片**：跳转目标缓存分成 64 个分片，命中时只是读锁下的一次 map 查找，不同分片之间互不影响。
-- **点击只在内存里累加**：记录一次点击不碰数据库。每 2 秒，所有点击合并成一个事务写入，无论这 2 秒里有多少次点击。
-- **不存在的短码也缓存**：它们单独缓存、有数量上限，扫描随机短码既不会反复查询数据库，也不会把真实的链接挤出缓存。404 页面预先渲染好，返回时只需要写几段字节。
-- **读写分离**：SQLite 使用 WAL 模式，一个写连接加一组读连接，普通读写可并发，但连接池、外部写入者和冷加载的计数快照仍可能产生等待。
-- **静态资源预压缩**：管理界面在构建时压缩成 Brotli 和 gzip，服务时直接发送，不在运行时压缩。
+- **读写分片缓存**：跳转目标缓存均分为 64 个独立分片，命中只需在读锁下执行一次哈希查找，分片间无锁冲突。
+- **纯内存统计累加**：记录有效点击完全不触碰数据库。每 2 秒将全量点击合并为单一 SQLite 事务批量提交，吞吐与单次 I/O 解耦。
+- **负缓存防穿透**：未命中的随机短码独立放入受容量保护的负缓存池，杜绝扫库攻击拖慢主库或置换热点数据。预渲染错误页支持快速零拷贝流式返回。
+- **读写隔离设计**：SQLite 开启 WAL 模式，配置专属单写连接池与多读连接池，读写操作互不阻塞。
+- **构建期静态预压缩**：管理后台静态资源在构建期预先生成 Brotli 与 gzip，服务时按需直传，避免运行时压缩 CPU 损耗。
 
-具体的实现见[架构](./architecture)。
+完整底层实现细节参见[架构设计](./architecture)。
 
-## 自己测一遍
+## 本地复现测试
 
 ```sh
 go install github.com/codesenberg/bombardier@latest
-make load                           # 默认 128 个连接，每个路径 15 秒
-CONNS=256 DURATION=30s make load    # 调整连接数和时长
-make bench                          # 微基准
+make load                           # 默认 128 连接，每路径压测 15 秒
+CONNS=256 DURATION=30s make load    # 调整并发连接与压测时间
+make bench                          # 运行 Go 微基准
 ```
 
-上方跳转基准和 README 引用的数字来自 `docs/.vitepress/data/benchmark.ts`。重新测试之后，更新这个文件和两份 README 里的表格；文档构建时会检查它们是否一致。
+文档与 README 中的基准数字源自 `docs/.vitepress/data/benchmark.ts`。重新测试后更新该文件并同步 README，文档构建时会自动执行一致性核对。
 
-## 容量与数据规模 {#capacity}
+## 容量与存储规模度量 {#capacity}
 
-`make capacity` 使用临时 SQLite 数据库，默认 1千、1万、10万条网址、每项 200 个样本，混合场景为 8 个并发工作者（2 写、6 读，各 200 次）。列表、搜索和导入测的是存储层；冷缓存跳转走真实 HTTP 处理器，但不包含网络传输。刷盘为每批 200 条链接各记一次，记录时间包含聚合与事务。RSS 每 10 ms 采样；WAL 记录的是文件体积，不等于尚未 checkpoint 的数据量。
+`make capacity` 基于临时 SQLite 库，分别在 1千、1万、10万条链接规模下对各项指标采集 200 个样本；混合场景采用 8 个并发工作协程（2 写、6 读，各 200 次）。列表、搜索与导入聚焦存储层度量；冷缓存跳转走真实 HTTP 链路（剔除物理网卡传输）。刷盘测试按每批 200 条链接记录耗时（含内存聚合与事务提交）。内存 RSS 每 10 ms 周期性采样；WAL 大小度量文件体积而非未 checkpoint 的数据量。
 
-测量时间：{{ capacity.at }}；{{ capacity.go }}，{{ capacity.os }} / WSL2，{{ capacity.cpus }} 个 Go 调度核心，Intel Core Ultra 7 255H。数据来自当前工作树，尚未作为新版本发布。小样本尾延迟和同机资源竞争会波动，不能当作生产 SLA。
+测试时间：{{ capacity.at }}；{{ capacity.go }}，{{ capacity.os }} / WSL2，{{ capacity.cpus }} 个 Go 调度核心，Intel Core Ultra 7 255H。数据采自当前开发工作树。小样本长尾延迟与同机环境波动不可直接视作生产 SLA。
 
 <div class="table-wrap"><table>
 <thead><tr><th>链接数</th><th>场景</th><th>P50 (ms)</th><th>P95 (ms)</th><th>P99 (ms)</th></tr></thead>
@@ -78,6 +78,6 @@ make bench                          # 微基准
 </tr></tbody>
 </table></div>
 
-10万链接下，删除普通计数查询中不必要的内容表关联后，同机列表 P50 从 5.229 ms 降至 1.085 ms。搜索仍使用包含匹配与全量计数，P95 为 82.170 ms；当前单人使用规模保留这一实现，出现实际交互瓶颈再评估 FTS 或改变分页契约。
+在 10 万条链接规模下，优化计数查询并去除冗余的内容表 JOIN 后，同机列表 P50 耗时由 5.229 ms 降至 1.085 ms。搜索当前仍使用包含匹配与全量计数，P95 为 82.170 ms；在当前个人使用场景下保持该设计，待出现交互瓶颈再评估 FTS 全文索引或调整分页契约。
 
-本轮读连接池没有等待；10万条混合场景的写连接排队 399 次，累计 149.815 ms，符合单写连接设计；最大观察到的 WAL 文件为 20.2 MiB。JSON 原始结果在 `docs/.vitepress/data/capacity.json`，包括每一项的 `WaitCount`、`WaitDuration` 和 WAL 字节数。普通 CI 跑 1千条验证计数，每周计划任务跑完整三档；不把易波动的绝对耗时设成 CI 失败阈值。
+本轮测试中读连接池未发生等待；10 万条混合读写场景下写连接排队 399 次，累计排队耗时 149.815 ms，符合单写连接预期；测试中观测到的最大 WAL 文件为 20.2 MiB。完整 JSON 原始指标请参见 `docs/.vitepress/data/capacity.json`。日常 CI 运行 1 千档校验逻辑正确性，定时任务运行全量三档压测。

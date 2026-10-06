@@ -2,71 +2,71 @@
 import { data as status } from '../.vitepress/data/status.data'
 </script>
 
-# 进度
+# 研发进度
 
-<p class="lead">本文档对应 {{ status.latestVersion }}，各版本变化见更新日志。这一页说明已实现的能力、验证入口和仍需完成的工作。</p>
+<p class="lead">本文档对应 {{ status.latestVersion }}，各版本变更明细见更新日志。本页系统化梳理已交付能力、验收入口与后续演进路线。</p>
 
-## 现状 {#current}
+## 功能现状 {#current}
 
-| 部分 | 状态 | 包括 |
+| 核心模块 | 交付状态 | 覆盖特性 |
 |---|---|---|
-| 跳转与统计 | <span class="sn-status done">已完成</span> | 内存缓存、点击聚合、爬虫和预览过滤、有效期、访问上限 |
-| 管理界面 | <span class="sn-status done">已完成</span> | 中英文、深浅主题、键盘操作、批量操作、二维码、书签小工具、手机分享菜单 |
-| 文本和文件 | <span class="sn-status done">已完成</span> | `/p/` 下的纯文本和代码，从单独域名下载的文件，v0.3.0 起 |
-| HTTP API | <span class="sn-status done">已完成</span> | 全部功能都有接口，API 令牌 |
-| 导入与导出 | <span class="sn-status done">已完成</span> | Sani、Shlink、Sink 和各种 CSV |
-| 部署 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的 Docker 镜像，systemd、Caddy 和 nginx 示例 |
-| 运维 | <span class="sn-status done">已完成</span> | 在线数据库备份、停机后的数据库与文件配套备份、重设密码、健康检查 |
-| 文档 | <span class="sn-status done">已完成</span> | 本站：中英双语，构建时与源码核对 |
-| 发布 | <span class="sn-status done">已完成</span> | 打标签即发布：GHCR 上的多平台镜像，Linux、macOS、Windows 和 FreeBSD 的二进制文件，附校验和与构建来源证明 |
-| 持续集成 | <span class="sn-status done">已完成</span> | 每次提交都运行检查和测试（Linux、macOS、Windows）、端到端测试、axe 检查、漏洞扫描，并试构建镜像和全部二进制文件 |
-| 文档站上线 | <span class="sn-status done">已完成</span> | 中英文文档已上线：[sani.zsh.moe](https://sani.zsh.moe) |
+| 跳转与统计 | <span class="sn-status done">已完成</span> | 内存分片缓存、点击批量聚合、爬虫与预取过滤、有效期、访问配额 |
+| 管理界面 | <span class="sn-status done">已完成</span> | 中英双语、深浅主题、键盘快捷键、批量操作、二维码、书签小脚本、PWA 分享菜单 |
+| 文本与文件分享 | <span class="sn-status done">已完成</span> | `/p/` 路由下的纯文本与代码展示、独立文件域名安全下载（v0.3.0 起） |
+| HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
+| 导入与导出 | <span class="sn-status done">已完成</span> | Sani 原生、Shlink、Sink 及各类 CSV 格式导入导出 |
+| 部署生态 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的极简 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
+| 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
+| 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期与源码规则强一致性核对 |
+| 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |
+| 持续集成（CI） | <span class="sn-status done">已完成</span> | 全平台交叉编译测试（Linux/macOS/Windows）、E2E 回归、axe 无障碍核查、CVE 漏洞扫描 |
+| 线上文档站点 | <span class="sn-status done">已完成</span> | 官方中英双语文档已部署：[sani.zsh.moe](https://sani.zsh.moe) |
 
-## v0.4.0 实施与验证 {#acceptance}
+## v0.4.0 关键实施与验收入口 {#acceptance}
 
-以下五批实现纳入 v0.4.0，验证入口如下；远程检查结果见 [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) 与 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml)。
+以下五批次特性均已纳入 v0.4.0 并落地，验收入口如下；远端流水线状态可查阅 [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) 与 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml)。
 
-| 批次 | 实现内容 | 验收入口 |
+| 实施批次 | 交付内容 | 验收入口 |
 |---|---|---|
-| 1 · 计数正确性 | Range 与条件响应、共享额度、不可重用 ID、刷盘一致性 | `counting_test.go`、迁移与并发测试 |
-| 2 · 备份与文档 | 配套停机备份、恢复与哈希校验、统计和持久性口径、统一版本 | `TestStoppedBackup`、文档语义核对 |
-| 3 · 故障恢复 | 重试来源上限、外部锁等待上限 1 秒、停机与最终刷盘失败 | Go 竞态测试、锁与停机回归 |
+| 1 · 计数正确性 | Range 与条件响应、共享额度、不可复用 ID、刷盘一致性 | `counting_test.go`、表结构迁移与并发测试 |
+| 2 · 备份与文档 | 配套停机备份、恢复与哈希校验、统计和持久性口径、统一版本 | `TestStoppedBackup`、文档语义自动化核对 |
+| 3 · 故障恢复 | 重试来源上限、外部锁等待上限 1 秒、停机与最终刷盘失败 | Go 竞态测试、锁与停机回归测试 |
 | 4 · 容量与自动检查 | 三档容量数据、列表查询精简、依赖审计、CI 容量检查 | `make capacity`、`make bench load`、依赖审计 |
-| 5 · 文档与兼容收尾 | 双语更新日志与升级步骤、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、两站 axe |
+| 5 · 文档与兼容收尾 | 双语更新日志与升级步骤、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、axe 全站无障碍核验 |
 
-## 构建时核对 {#checks}
+## 构建期一致性校验 {#checks}
 
-每次构建文档之前，都会把文档与源码逐项比对，任何一项对不上，构建就会失败。所以你在这里看到的，就是这一版文档实际通过的检查。
+每次编译文档站点前，脚本会自动将文档中的配置、接口、错误码及参数与代码进行双向断言比对；任何偏差均会立刻阻断构建。
 
 <SyncStatus part="checks" />
 
-## 项目规模 {#size}
+## 代码与规模统计 {#size}
 
 <SyncStatus part="stats" />
 
-## 工具链 {#toolchain}
+## 工具链版本锁定 {#toolchain}
 
-版本固定在 `mise.toml`、`go.mod` 和 `pnpm-workspace.yaml` 中：
+工具链版本受控于 `mise.toml`、`go.mod` 与 `pnpm-workspace.yaml`：
 
 <SyncStatus part="versions" />
 
-## 接下来 {#next}
+## 后续演进规划 {#next}
 
-1. **听取反馈**：Sani 已经公开发布，接下来以修复问题、打磨细节为主。有问题欢迎在 [GitHub](https://github.com/DejavuMoe/sani/issues) 上反馈。
-2. **为 1.0 定型**：稳定对外 API、配置和升级路径，数据库内部结构仍可迁移。发布前完成兼容清单和恢复演练；具体边界见[版本与兼容](./versioning)。
+1. **收集社区反馈**：Sani 已完成核心能力建设，后续重点进行稳定维护与体验打磨。欢迎在 [GitHub Issues](https://github.com/DejavuMoe/sani/issues) 提交建议。
+2. **面向 1.0 版本定型**：冻结对外 HTTP API、环境变量规范与升级契约（数据库内部表结构仍保留迁移弹性）。发布前完成跨版本兼容测试与灾难恢复演练；演化准则参见[版本与兼容](./versioning)。
 
-还在考虑、没有决定的功能：
+待评估功能（视复杂度而定）：
 
-- **按标签整理链接**：链接多了之后方便分组查找，但要找到不增加复杂度的做法。
-- **Markdown**：把用 Markdown 写的文本渲染成排版后的样子；目前只有纯文本和代码两种格式。
+- **短链接标签管理**：在大规模链接场景下支持按标签检索，需权衡存储和接口复杂度。
+- **Markdown 内容渲染**：支持在文本分享页面安全渲染 Markdown（当前仅支持纯文本与代码）。
 
-## 不做什么 {#non-goals}
+## 明确不做的事（Non-Goals） {#non-goals}
 
-Sani 的定位是一个人用的、简单的短链接服务。下面这些功能会让它变成另一种东西，所以不在计划里：
+Sani 的核心定位是极简、自托管的个人短链接服务。以下特性会显著增加系统复杂度并偏离轻量定位，明确不在规划中：
 
-- 多用户、团队和权限管理；
-- 访客追踪：地理位置、设备、浏览器、UTM 汇总；
-- 按设备、地区或比例把访问者分流到不同的地址；
-- 跳转前的中间页和广告；
-- 访问者上传，以及分享内容的端到端加密；
-- 依赖 PostgreSQL、Redis 这类外部服务。
+- 多租户、用户团队划分与细粒度 RBAC 权限系统；
+- 侵入式访客追踪（地理位置、设备指纹、浏览器版本、UTM 链路报表）；
+- 复杂分流引擎（按地域、客户端或流量比例路由）；
+- 跳转前置中间页、强制等待与广告注入；
+- 开放访客上传及端到端加密分发；
+- 强绑定 PostgreSQL、Redis 等重型外部中间件。

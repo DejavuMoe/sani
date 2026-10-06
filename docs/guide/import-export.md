@@ -1,12 +1,12 @@
 # 导入与导出
 
-<p class="lead">链接是你的：可以随时全部导出，也可以从其他短链接服务搬过来。导入不会覆盖任何已有的短码，没能导入的每一行都会告诉你原因。</p>
+<p class="lead">短链接数据完全自主可控：支持一键完整导出，或从其他平台平滑迁入。导入过程安全可靠，不覆盖现有短码，跳过的数据均会明确标注原因。</p>
 
-## 导出 {#export}
+## 导出数据 {#export}
 
-在设置 → 数据里选择“导出全部链接”，可以得到 JSON 或 CSV 文件。也可以用 API：[`GET /api/export`](../reference/api#export)，加上 `?format=csv` 得到 CSV。导出只包含短链接，不包含分享的文本和文件；它们要靠[备份](./operations#backup)保存。
+在后台 设置 → 数据 中选择“导出全部链接”，可导出 JSON 或 CSV 文件。亦可通过 API 调用：[`GET /api/export`](../reference/api#export)（加 `?format=csv` 导出 CSV）。注意：导出仅涵盖短链接，不含文本与分享文件（二进制内容需通过[完整备份](./operations#backup)留存）。
 
-JSON 文件的结构如下，没有值的字段会省略：
+导出的 JSON 数据结构如下（空字段自动省略）：
 
 ```json
 {
@@ -29,55 +29,55 @@ JSON 文件的结构如下，没有值的字段会省略：
 }
 ```
 
-CSV 文件的列依次是 `slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks` 和 `created_at`。
+CSV 格式的列头依次为：`slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks` 和 `created_at`。
 
-导出文件包含每条链接的设置和总点击数，**不包含**每日统计、来源网站、已删除的链接、API 令牌和密码。它适合迁移链接，不能代替[备份](./operations#backup)。
+导出文件包含各项配置与累计点击总量，**不包含**每日细分走势、来源排行、已删除历史、API 令牌与管理员密码。该文件专为跨平台迁移设计，不可替代[系统备份](./operations#backup)。
 
-## 导入 {#import}
+## 导入数据 {#import}
 
-在设置 → 数据里把文件拖进“导入链接”区域，或者点击选择文件。也可以用 API：[`POST /api/import`](../reference/api#import)，请求体就是文件本身。
+在后台 设置 → 数据 区域拖入或点击选取文件。亦可通过 API 调用：[`POST /api/import`](../reference/api#import)（请求体直传文件二进制流）。
 
-Sani 根据文件内容判断格式，能识别这些文件：
+系统自动识别文件内容格式，兼容以下数据源：
 
-| 来源 | 格式 |
+| 来源平台 | 格式规范 |
 |---|---|
-| Sani | 自己导出的 JSON 或 CSV |
-| Shlink | 短链接列表接口返回的 JSON：`{"shortUrls": {"data": [...]}}` |
-| Sink | 导出的 JSON：`{"links": [...]}` |
-| YOURLS、Kutt 等 | 带表头的 CSV，其中一列是目标网址 |
-| 其他 | 由对象组成的 JSON 数组，或者把这样的数组放在 `links`、`data`、`items`、`urls` 字段里的 JSON 对象 |
+| Sani | 原生导出的 JSON 或 CSV |
+| Shlink | 列表接口返回的 JSON（形如 `{"shortUrls": {"data": [...]}}`） |
+| Sink | 导出的 JSON（形如 `{"links": [...]}`） |
+| YOURLS、Kutt 等 | 带表头的 CSV（包含目标网址列） |
+| 通用结构 | 标准 JSON 对象数组，或包含 `links`、`data`、`items`、`urls` 键的对象 |
 
-### 字段对照
+### 字段映射规则
 
-Sani 按列名（或 JSON 字段名）识别每个字段。列名不区分大小写，空格等同于下划线。
+根据列名（或 JSON 字段名）自动适配字段，不区分大小写，空格与下划线等效：
 
-| 字段 | 可以使用的列名 |
+| 映射字段 | 支持的字段名别名 |
 |---|---|
-| 目标网址（必需） | `url`、`longUrl`、`long_url`、`target`、`destination`、`original_url`、`link` |
+| 目标网址（必填） | `url`、`longUrl`、`long_url`、`target`、`destination`、`original_url`、`link` |
 | 短码 | `slug`、`shortCode`、`short_code`、`code`、`keyword`、`key`、`alias`、`address`、`custom_slug` |
 | 标题 | `title`、`name`、`description` |
 | 创建时间 | `createdAt`、`created_at`、`dateCreated`、`date_created`、`timestamp`、`created` |
-| 点击数 | `clicks`、`visits`、`visitsCount`、`visits_count`、`visit_count`、`count` |
+| 点击量 | `clicks`、`visits`、`visitsCount`、`visits_count`、`visit_count`、`count` |
 | 过期时间 | `expiresAt`、`expires_at`、`validUntil`、`valid_until`、`expiration`、`expires` |
 | 访问上限 | `maxClicks`、`max_clicks`、`maxVisits`、`max_visits` |
-| 跳转方式 | `redirect`（301、302、307 或 308） |
-| 是否启用 | `enabled`（`true` 或 `false`） |
+| 重定向类型 | `redirect`（301、302、307 或 308） |
+| 启用状态 | `enabled`（`true` 或 `false`） |
 
-Shlink 把一些数据放在嵌套的对象里，`visitsSummary.total`、`meta.validUntil` 和 `meta.maxVisits` 也会被识别。
+Shlink 的嵌套字段亦可自动提取，包括 `visitsSummary.total`、`meta.validUntil` 及 `meta.maxVisits`。
 
-时间可以是 RFC 3339（`2026-09-29T08:00:00Z`）、`2026-09-29 08:00:00`、`2026-09-29`，或者 Unix 时间戳（秒或毫秒）。没有写时区的时间按 UTC 处理。
+时间字段支持 RFC 3339（`2026-09-29T08:00:00Z`）、标准格式（`2026-09-29 08:00:00`、`2026-09-29`）及 Unix 时间戳（秒或毫秒）。未显式标注时区时按 UTC 解析。
 
-### 导入规则
+### 导入校验规则
 
-- **不覆盖**：短码已经被占用的行会跳过，并列在结果里。
-- **逐行检查**：网址或短码不合规的行会跳过，结果里注明行号和原因。
-- **没有短码的行**：自动生成一个，比平时的长度多一位。
-- **标题**：文件里有标题就用它，以后不会被自动覆盖。没有标题的链接不会自动去抓取，免得一次导入就向几千个网站发请求；需要的话，在详情里点“重新获取标题”。
-- **点击数**：导入的点击数计入总点击，但没有每日分布和来源信息，所以不会出现在每日图表里。
-- **创建时间**：晚于当前时间的创建时间会被忽略。
-- **限制**：文件不超过 32 MB，一次最多导入 100,000 条链接。
+- **不覆盖现有短码**：与当前有效短码冲突的条目自动跳过，并列入跳过清单。
+- **逐行合规校验**：网址或短码不合规的数据行自动跳过，明确提示行号及原因。
+- **缺失短码自动生成**：未提供短码的记录会自动生成一个随机短码（长度比默认规则多 1 位以防碰撞）。
+- **标题保护**：文件内若有标题则直接持久化且不再自动覆盖。无标题项导入时不会自动发起网络抓取（避免瞬时向外发出海量请求）；如需获取，可在详情页手动点击“重新获取标题”。
+- **历史点击处理**：导入的点击量直接累加至总点击数；因无历史日期与来源细分，不体现在每日走势图表中。
+- **时间合法性**：晚于当前时间的创建时间会被自动忽略。
+- **规格限制**：文件上限 32 MB，单次最多导入 100,000 条记录。
 
-导入完成后，会显示成功导入的数量和跳过的行。通过 API 导入时，返回的结果是这样的：
+导入执行完毕后，界面将反馈成功导入数与跳过行明细。通过 API 导入时的响应结构如下：
 
 ```json
 {
@@ -89,4 +89,4 @@ Shlink 把一些数据放在嵌套的对象里，`visitsSummary.total`、`meta.v
 }
 ```
 
-`reason` 的含义见 [API 错误码](../reference/api#errors)。
+错误标识 `reason` 详见 [API 错误码](../reference/api#errors)。

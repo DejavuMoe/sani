@@ -1,95 +1,95 @@
 # 参与开发
 
-<p class="lead">Sani 的仓库里有三样东西：Go 写的服务端、Svelte 写的管理界面，以及这个文档站。这一页介绍开发环境、常用命令，以及修改代码时需要守住的几条约定。</p>
+<p class="lead">Sani 代码仓库包含三大模块：Go 服务端核心、Svelte 管理后台与 VitePress 双语文档站。本页介绍本地开发环境搭建、常用工程脚本与核心设计不变量。</p>
 
-## 准备环境
+## 环境准备
 
-需要 Go、Node.js 和 pnpm，版本固定在 `mise.toml` 里。装了 [mise](https://mise.jdx.dev) 的话，一条命令就能装好对应的版本，`make` 也会自动使用它们：
+依赖 Go、Node.js 与 pnpm 工具链，版本均锁定于 `mise.toml`。使用 [mise](https://mise.jdx.dev) 可一键配置运行环境：
 
 ```sh
 mise install
-make install      # 安装 web 和 docs 的依赖（pnpm 工作区）
+make install      # 安装 web 与 docs 依赖（pnpm workspace 统一管理）
 ```
 
-## 仓库结构
+## 目录结构
 
 ```
-cmd/sani            程序入口和子命令
-internal/server     路由、跳转、JSON API、内嵌的管理界面、访问者页面
-internal/cache      跳转目标缓存
-internal/clicks     点击聚合与批量写入
-internal/store      SQLite：表结构、迁移和查询
-internal/links      短码和网址的规则
-internal/meta       标题和图标抓取，以及 SSRF 防护
-internal/auth       密码哈希、随机凭据、登录限流
-internal/config     读取环境变量
-internal/webui      嵌入构建好的管理界面
-web/                管理界面：Svelte 5 + TypeScript，Vite 构建
-docs/               本文档站：VitePress
-scripts/            演示数据、压测和发布脚本
-deploy/             systemd、Caddy 和 nginx 的示例配置
-.github/            CI、应用发布工作流和 issue 模板
+cmd/sani            程序入口与 CLI 子命令
+internal/server     路由、跳转热路径、JSON API、内嵌资源、访客公开页
+internal/cache      跳转目标分片内存缓存
+internal/clicks     点击量内存聚合与批量入库
+internal/store      SQLite 表结构、无感迁移与查询层
+internal/links      短码与 URL 规范化过滤规则
+internal/meta       元数据与 Favicon 抓取及 SSRF 阻断
+internal/auth       密码 argon2id 哈希、会话管理与登录频控
+internal/config     环境变量解析与校验
+internal/webui      前端构建产物 Go embed 封装
+web/                管理端前端：Svelte 5 (Runes) + TypeScript + Vite
+docs/               双语技术文档：VitePress
+scripts/            测试种子数据、基准压测与发版脚本
+deploy/             systemd、Caddy 与 nginx 生产配置模板
+.github/            CI/CD、发布流水线与 Issue 模板
 ```
 
-Go 模块在仓库根目录；`web` 和 `docs` 是同一个 pnpm 工作区里的两个包，共用一份锁文件，字体等共同依赖的版本写在 `pnpm-workspace.yaml` 的 `catalog` 里。
+根目录为 Go 模块；`web` 与 `docs` 组织为单一 pnpm 工作区，依赖版本通过 `pnpm-workspace.yaml` 中的 `catalog` 统一约束。
 
-## 常用命令
+## 常用开发命令
 
-| 命令 | 作用 |
+| 命令 | 用途说明 |
 |---|---|
-| `make dev-backend` | 启动后端，监听 `127.0.0.1:8080` |
-| `make dev-frontend` | 启动 Vite，打开 `127.0.0.1:5173/admin/`，`/api` 转发给后端 |
-| `make demo` | 构建并启动一个带演示数据的实例，密码是 `sani-demo` |
-| `make check` | gofmt、go vet、svelte-check，以及文档与源码的核对和类型检查 |
-| `make test` | Go 测试（带 `-race`）和前端单元测试 |
-| `make e2e` | 用 Playwright 对一个全新的实例做端到端测试 |
-| `make bench` | 跳转、缓存和点击计数的基准测试 |
-| `make load` | 压测，并核对点击数 |
-| `make capacity` | 1千、1万、10万链接的列表、搜索、冷加载、刷盘与混合读写，输出 JSON |
-| `make build` | 构建管理界面，再构建 `bin/sani` |
-| `make dist` | 构建全部平台的发布压缩包和 `SHA256SUMS`，输出到 `dist/` |
-| `make docker` | 构建 Docker 镜像 |
-| `make docs-dev` | 启动文档站，打开 `127.0.0.1:5174` |
-| `make docs` | 构建静态文档站，输出到 `docs/.vitepress/dist` |
+| `make dev-backend` | 运行 Go 后端服务，监听 `127.0.0.1:8080` |
+| `make dev-frontend` | 启动 Vite 热更新服务器（`127.0.0.1:5173/admin/`），API 自动代理至后端 |
+| `make demo` | 编译并拉起内置演示数据的沙箱实例（预设密码 `sani-demo`） |
+| `make check` | 静态质量检查：gofmt、go vet、svelte-check、文档与源码核对、vue-tsc |
+| `make test` | 单元测试套件：Go 竞态检测（`-race`）与前端测试 |
+| `make e2e` | 启动全新实例并运行 Playwright 端到端全链路测试 |
+| `make bench` | 核心跳转、缓存查找与点击累加基准性能测试 |
+| `make load` | 高并发轰炸压测（自动校验重定向与落库计数绝对一致） |
+| `make capacity` | 阶梯容量压测（1千/1万/10万级），输出结构化 JSON |
+| `make build` | 编译前端资产并注入，输出二进制 `./bin/sani` |
+| `make dist` | 打包全平台多架构发布压缩包及 `SHA256SUMS`（输出至 `dist/`） |
+| `make docker` | 构建静态 Docker 镜像 |
+| `make docs-dev` | 启动文档本地预览服务器（`127.0.0.1:5174`） |
+| `make docs` | 构建静态文档站点（输出至 `docs/.vitepress/dist`） |
 
-一个改动完成之前，至少运行 `make check test`；改动涉及管理界面时，再运行 `make e2e`。所有开发服务器都只监听 `127.0.0.1`。
+提交代码前务必通过 `make check test`；涉及管理界面改动必须执行 `make e2e`。本地测试服务严禁对外暴露，一律限定绑定 `127.0.0.1`。
 
-## 约定
+## 架构核心原则（不变量）
 
-- **跳转不碰数据库。** 缓存命中时，跳转不访问数据库，也从不等待写入完成。修改 `redirect.go`、`cache` 或 `clicks` 前后，各跑一次 `make bench` 对比。
-- **不用 cgo。** SQLite 使用纯 Go 的 `modernc.org/sqlite`，镜像基于 `scratch`。
-- **安全边界不能退让。** 抓取器的 SSRF 检查、被拒绝的网址类型、首次设置的设置码、只作用于 `/api/` 的会话 Cookie、跨站请求保护，以及管理界面的内容安全策略。
-- **外部输入都要有上限。** 以客户端输入为键的新 map，同样需要数量上限。
-- **每条界面文案都有中英两个版本**，写在 `web/src/lib/i18n.svelte.ts` 里。中文是写给中文读者的，不逐字翻译英文。
-- **不引入 UI 库和图标库。** 图标是 `Icon.svelte` 里手绘的路径，菜单用 Popover API，对话框用 `<dialog>`。
-- **无障碍。** 两种主题下文字都满足 WCAG AA 对比度，所有操作都能用键盘完成，axe 检查没有问题：管理界面用 `pnpm --dir web a11y`，文档站用 `pnpm --dir docs a11y`。
-- **API 的错误**统一为 `{"error": {"code": "…", "message": "…"}}`，管理界面把 `code` 映射到 `err.*` 文案。
+- **跳转路径零 DB 交互**：缓存命中时绝不触碰 SQLite，更不等待磁盘 I/O。修改 `redirect.go`、`cache` 或 `clicks` 前后必须运行 `make bench` 评估延迟基线。
+- **坚守纯 Go 零 cgo 依赖**：SQLite 采用 `modernc.org/sqlite`，确保全静态链接并支持 `scratch` 裸容器运行。
+- **坚守安全防护边界**：爬虫抓取层预解析与 Dial 拨号双重防 SSRF、危险 URL 协议过滤、首登日志设置码机制、会话 Cookie 严防跨站（Strict + /api/ 限域）、CSRF 拦截与后台强 CSP 策略。
+- **外部输入严格施加容量边界**：任何以客户端输入为 Key 的映射结构必须配置显式容量上限。
+- **UI 文案双语同源**：文案统一维护于 `web/src/lib/i18n.svelte.ts`。中文表达地道自然，拒绝生硬机器直译。
+- **坚决不引入重量级 UI 与图标依赖**：图标采用 `Icon.svelte` 矢量手绘；下拉框使用原生 Popover API，弹窗使用原生 `<dialog>`。
+- **无障碍（A11y）合规**：双主题满足 WCAG AA 文本对比度要求，全功能支持键盘访问，axe 扫描零违规（管理端 `pnpm --dir web a11y`，文档站 `pnpm --dir docs a11y`）。
+- **统一 API 错误协议**：所有异常统一响应 `{"error": {"code": "…", "message": "…"}}`，前端基于 `code` 路由至对应多语言文案。
 
-## 文档
+## 文档同步维护
 
-文档站在 `docs/` 目录，用 `make docs-dev` 在本地预览，修改会立即生效。
+文档站位于 `docs/`，可通过 `make docs-dev` 实时预览改动。
 
-- **页面**：侧边栏里的页面都登记在 `docs/.vitepress/pages.ts` 中。中文页面放在 `docs/` 下，英文页面放在 `docs/en/` 下相同的位置，两种语言的页面必须一一对应。
-- **与源码核对**：`node docs/.vitepress/sync/check.ts` 会把文档和源码逐项比对，`make check` 和文档构建都会运行它。比对的内容和结果见[进度](./progress#checks)。
-- **无障碍检查**：先 `pnpm --dir docs build`，再用 `pnpm --dir docs preview` 启动预览，然后运行 `pnpm --dir docs a11y`。它会用 axe 检查每一页的中英文版本和两种主题。
-- **来自源码的内容**：首页的演示使用管理界面自己的文案和短码规则，部署页的生成器直接修改仓库里的配置文件，性能数据来自 `docs/.vitepress/data/benchmark.ts`。这些内容不需要手动同步。
+- **页面对齐**：侧边栏路由登记于 `docs/.vitepress/pages.ts`。中文源文件位于 `docs/`，英文置于 `docs/en/`，目录层级严格一致。
+- **强类型源码比对**：构建前执行 `node docs/.vitepress/sync/check.ts`，强一致性校验涵盖配置项、接口、错误码及命令行参数。比对规则与状态见[进度清单](./progress#checks)。
+- **无障碍检测**：先构建 `pnpm --dir docs build`，通过 `pnpm --dir docs preview` 启动预览，随后执行 `pnpm --dir docs a11y` 进行全页全主题 axe 审计。
+- **自动化衍生内容**：首页演示组件、部署生成器与性能图表数据均通过模板或共享数据脚本自动挂载，无需手动复制粘贴。
 
-修改代码时，同时更新对应的文档：
+源码变更与文档更新映射清单：
 
-| 修改了 | 需要更新 |
+| 代码改动类型 | 必须同步更新的文档 |
 |---|---|
-| 环境变量 | `reference/configuration.md` 和两份 README 的配置表 |
-| API 接口或错误码 | `reference/api.md` |
-| 子命令 | `reference/cli.md` |
-| 保留的短码 | `guide/usage.md` |
-| 压测结果 | `docs/.vitepress/data/benchmark.ts` 和两份 README |
-| 发布的平台 | `guide/deploy.md` 的下载文件表和镜像平台 |
+| 环境变量配置 | `reference/configuration.md` 及根目录中英双语 README |
+| API 端点或错误代码 | `reference/api.md` |
+| CLI 子命令或标志位 | `reference/cli.md` |
+| 系统保留短码字 | `guide/usage.md` |
+| 压测基准数据 | `docs/.vitepress/data/benchmark.ts` 及双语 README |
+| 官方发布架构平台 | `guide/deploy.md` 下载表格与镜像架构清单 |
 
-中文和英文两个版本都要更新；漏掉的话，核对会指出具体是哪一项。
+变更必须同步维护中文与英文两套文档；若有遗漏，构建检测脚本会精准指出缺失条目。
 
-### 截图
+### 自动化截图生成
 
-文档和 README 里的截图由 `web/scripts/screenshots.mjs` 生成，覆盖两种语言、两种主题：
+文档与 README 中的系统截图由脚本 `web/scripts/screenshots.mjs` 全自动生成（覆盖双语与深浅模式）：
 
 ```sh
 make build

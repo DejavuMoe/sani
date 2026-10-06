@@ -1,22 +1,22 @@
 # HTTP API
 
-<p class="lead">管理界面能做的每一件事，都是通过这套 JSON API 完成的。所以界面能做的，脚本也都能做。</p>
+<p class="lead">Sani 管理界面的全部交互均构建于这套标准 JSON API 之上。界面具备的完整能力，均可通过脚本与自动化程序直接调用。</p>
 
-## 约定 {#conventions}
+## 交互约定 {#conventions}
 
-- **地址**：所有接口都在 `/api/` 下，请求和响应都是 UTF-8 编码的 JSON。
-- **认证**：除了登录和首次设置相关的接口，都需要认证。脚本使用 API 令牌，放在 `Authorization: Bearer sani_…` 或 `X-Api-Key: sani_…` 请求头里；管理界面使用会话 Cookie。令牌在设置 → API 令牌里创建，拥有完整权限。
-- **跨站请求**：浏览器从其他网站发来的请求会被拒绝，判断依据是浏览器自动附带的 `Sec-Fetch-Site` 和 `Origin` 请求头。脚本和命令行工具不带这些请求头，不受影响。
-- **时间**：RFC 3339 格式的 UTC 时间，比如 `2026-09-28T09:30:00Z`。
-- **大小**：请求体最大 1 MB。创建和修改链接的请求最大 8 MB，这样即使 JSON 转义了很多字符，1 MB 上限的文本也放得下；导入接口最大 32 MB；上传文件时，上限是[文件大小上限](./configuration#sani-max-file-mb)再加上 1 MB 的表单开销。
-- **缓存**：所有响应都带 `Cache-Control: no-store`。
-- **错误**：出错时返回对应的 HTTP 状态码和下面这个结构。`code` 是稳定的，程序应该根据它判断；`message` 是给人看的英文说明，以后可能调整。全部错误码见[错误码](#errors)。
+- **统一前缀**：所有 API 均位于 `/api/` 路径下，请求体与响应体均为 UTF-8 编码的 JSON。
+- **身份认证**：除密码登录与首次初始化端点外，其余均需鉴权。自动化调用使用 API 令牌，在请求头中传入 `Authorization: Bearer sani_…` 或 `X-Api-Key: sani_…`；管理前端使用会话 Cookie。令牌可在后台 设置 → API 令牌 中生成，具备完全管理权限。
+- **跨站防护**：浏览器发起的跨站请求会被自动拦截（通过检查浏览器附带的 `Sec-Fetch-Site` 与 `Origin` 头）。脚本与命令行工具不发送此类浏览器标头，不受影响。
+- **时间格式**：统一采用 RFC 3339 格式的 UTC 时间戳，如 `2026-09-28T09:30:00Z`。
+- **请求体积限制**：常规 JSON 请求体上限 1 MB。创建与更新链接接口上限 8 MB（确保可容纳经过大量转义的 1 MB 纯文本）；导入接口上限 32 MB；文件上传上限为 [单文件上限](./configuration#sani-max-file-mb) 额外附加 1 MB 表单开销。
+- **缓存策略**：所有 API 响应默认返回 `Cache-Control: no-store`。
+- **错误响应格式**：出现异常时返回对应 HTTP 状态码与结构化错误体。其中 `code` 为机器可读的持久标识，程序逻辑应以此为准；`message` 为人类可读说明。完整码表见[错误码](#errors)。
 
 ```json
 { "error": { "code": "slug_taken", "message": "this slug is already in use" } }
 ```
 
-一个完整的请求：
+示例请求：
 
 ```sh
 curl https://s.example.com/api/links \
