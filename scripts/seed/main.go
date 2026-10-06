@@ -287,5 +287,5 @@ func main() {
 			cancel()
 		}
 	}
-	fmt.Printf("\nSeeded %d links. Sign in with the password %q.\n", len(demos), *password)
+	fmt.Printf("\nSeeded %d links. Sign in with the configured password.\n", len(demos))
 }

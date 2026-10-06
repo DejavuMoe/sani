@@ -28,7 +28,7 @@ mkdirSync(out, { recursive: true });
 const fixtures = JSON.parse(readFileSync(join(project, 'src/fixtures.js'), 'utf8').replace(/^[\s\S]*?window\.SANI_FIXTURES = /, '').replace(/;\s*$/, ''));
 const fileSlug = fixtures.links.find((l) => l.kind === 'file').slug;
 
-const row = (page, slug) => page.locator('.row', { has: page.locator('.slug', { hasText: new RegExp(`^/(p/)?${slug}$`) }) }).first();
+const row = (page, slug) => page.locator('.row', { has: page.locator('.slug', { hasText: new RegExp(`^/(p/)?${RegExp.escape(slug)}$`) }) }).first();
 async function openDetail(page, slug) {
   const r = row(page, slug);
   await r.locator('.main').click();

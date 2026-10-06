@@ -659,6 +659,53 @@ func TestMetaFetchRefusesPrivateTargets(t *testing.T) {
 	}
 }
 
+func TestSessionCookieTransport(t *testing.T) {
+	for _, tc := range []struct {
+		url, forwarded string
+		trust, secure  bool
+	}{
+		{"http://localhost/api/session", "", false, false},
+		{"https://s.example/api/session", "", false, true},
+		{"http://localhost/api/session", "https", false, false},
+		{"http://localhost/api/session", "https", true, true},
+		{"http://localhost/api/session", "http", true, false},
+	} {
+		s := &Server{opt: Options{TrustProxy: tc.trust}}
+		r := httptest.NewRequest("POST", tc.url, nil)
+		r.Header.Set("X-Forwarded-Proto", tc.forwarded)
+		w := httptest.NewRecorder()
+		s.setSessionCookie(w, r, "test-session", sessionTTL)
+		cookies := w.Result().Cookies()
+		if len(cookies) != 1 {
+			t.Fatalf("cookies = %v", cookies)
+		}
+		c := cookies[0]
+		if c.Secure != tc.secure || !c.HttpOnly || c.Path != "/api/" || c.SameSite != http.SameSiteStrictMode {
+			t.Errorf("%+v: unexpected cookie %s", tc, c)
+		}
+	}
+}
+
+func TestStatsDaysBounds(t *testing.T) {
+	for raw, want := range map[string]int{
+		"": 30, "invalid": 30, "-1": 30, "0": 30, "1": 1,
+		"366": 366, "367": 366,
+	} {
+		r := httptest.NewRequest("GET", "/api/overview?days="+raw, nil)
+		if got := parseDays(r); got != want {
+			t.Errorf("days=%q: got %d, want %d", raw, got, want)
+		}
+	}
+	// Oversized values may parse or overflow depending on the architecture;
+	// either path must stay within the range used by the int32 day arithmetic.
+	for _, raw := range []string{"2147483648", "9223372036854775807", "99999999999999999999"} {
+		r := httptest.NewRequest("GET", "/api/overview?days="+raw, nil)
+		if got := parseDays(r); got < 1 || got > 366 {
+			t.Errorf("days=%q escaped bounds: %d", raw, got)
+		}
+	}
+}
+
 func TestClientIP(t *testing.T) {
 	s := &Server{opt: Options{TrustProxy: true}}
 	r := httptest.NewRequest("GET", "/", nil)
@@ -725,6 +772,8 @@ func TestMergeQuery(t *testing.T) {
 		{"https://a.com/?b=2", "x=1", "https://a.com/?b=2&x=1"},
 		{"https://a.com/#f", "x=1", "https://a.com/?x=1#f"},
 		{"https://a.com/?", "x=1", "https://a.com/?x=1"},
+		{"https://a.com/path", "//evil.example", "https://a.com/path?//evil.example"},
+		{"https://a.com/path?existing=1", "next=https://evil.example/#fragment", "https://a.com/path?existing=1&next=https://evil.example/#fragment"},
 	}
 	for _, c := range cases {
 		if got := mergeQuery(c[0], c[1]); got != c[2] {

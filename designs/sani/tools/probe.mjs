@@ -24,7 +24,7 @@ await a.request.post('http://127.0.0.1:18080/api/session', { data: { password: '
 const pa = await a.newPage();
 await pa.goto('http://127.0.0.1:18080/admin/', { waitUntil: 'networkidle' });
 if (slug) {
-  await pa.locator('.row', { has: pa.locator('.slug', { hasText: new RegExp(`^/(p/)?${slug}$`) }) }).first().locator('.main').click();
+  await pa.locator('.row', { has: pa.locator('.slug', { hasText: new RegExp(`^/(p/)?${RegExp.escape(slug)}$`) }) }).first().locator('.main').click();
   await pa.waitForSelector('.detail');
   await pa.waitForTimeout(400);
 }
