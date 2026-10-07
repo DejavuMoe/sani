@@ -136,7 +136,7 @@ Traefik、Cloudflare Tunnel 等方案同样满足前述三条原则即可。
 
 ## 域名解析 {#domain}
 
-短链接的主机地址按以下优先级确定：
+短链接与文本、文件分享页使用同一个主域名，按以下优先级确定：
 
 1. 环境变量 [`SANI_BASE_URL`](../reference/configuration#sani-base-url)；
 2. 管理后台“设置”页中填写的“短链接域名”；
@@ -146,18 +146,30 @@ Traefik、Cloudflare Tunnel 等方案同样满足前述三条原则即可。
 
 访问根路径 `/` 时默认重定向至后台管理页面 `/admin/`。若需跳往外部主页，可配置 [`SANI_ROOT_REDIRECT`](../reference/configuration#sani-root-redirect)。
 
-## 文件分享独立域名 {#files-domain}
+## 文件下载域名 {#files-domain}
 
-启用[文件分享](./usage#shares)需要配置独立的次级域名（例如 `f.example.com`），用于输出文件下载与原始文本。两个域名由同一 Sani 与反代实例承载，无需部署额外服务。
+文本和文件的 **分享页始终使用主域名的 `/p/短码`**。启用 [文件分享](./usage#shares) 时，还需配置一个不同的主机名（例如 `f.example.com`），仅用于文件下载与原始文本。它可以是主域名的子域名；两个域名指向同一个 Sani 与反代实例，无需部署额外服务。
+
+例如，设置 `SANI_BASE_URL=https://example.com` 和 `SANI_FILES_URL=https://f.example.com` 后：
+
+| 用途 | 地址示例 |
+|---|---|
+| 短链接 | `https://example.com/blog` |
+| 文本分享页 | `https://example.com/p/xxx1` |
+| 文件分享页 | `https://example.com/p/xxx2` |
+| 文件下载 | `https://f.example.com/xxx2/report.pdf` |
+| 原始文本 | `https://f.example.com/xxx1` |
+
+创建分享后复制的链接指向主域名上的分享页。访客点击“下载”或“原始文本”时才访问文件下载域名。配置步骤如下：
 
 1. **DNS 解析**：将文件域名解析指向当前服务器。
-2. **反向代理**：同主域名一样反代并传递请求头。Caddy 仅需在站点列表中追加域名（`s.example.com, f.example.com {`）；nginx 需在两处 `server_name` 中添加该域名并配置覆盖两者的证书。上方配置生成器填入后会自动适配。
-3. **请求体大小**：文件上传上限受 [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) 限制（另加 1 MB 表单开销）。Caddy 默认无限制；nginx 需调高 `client_max_body_size`（示例已设为默认的 64 MB）。若修改了环境变量限制，反代配置也需同步增加。
+2. **反向代理**：同主域名一样反代并传递请求头。Caddy 仅需在站点列表中追加域名（上述例子为 `example.com, f.example.com {`）；nginx 需在两处 `server_name` 中添加该域名并配置覆盖两者的证书。上方配置生成器填入后会自动适配。
+3. **请求体大小**：文件上传上限受 [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) 限制（另加 1 MB 表单开销）。Caddy 默认无限制；nginx 示例设置 `client_max_body_size 65m`，容纳默认的 64 MB 文件与表单开销。若修改了环境变量限制，反代配置也需同步增加。
 4. **环境变量**：将 [`SANI_FILES_URL`](../reference/configuration#sani-files-url) 设为 `https://f.example.com` 并重启 Sani。
 
-文件域名必须为**独立主机名**（不能仅靠区分端口）：浏览器在同主机的不同端口间仍会共享 Cookie，独立域名正是为了将上传文件的上下文与管理后台凭据强行隔离。采用二级子域名完全符合要求，Sani 的管理会话 Cookie 不会跨越到子域名。上传过程经由短链接域名的 API 完成，仅下载动作走文件域名。
+Sani 要求文件下载使用 **不同的主机名**，以隔离上传内容与管理后台。仅换路径不能隔离浏览器来源；仅换端口也不被接受，因为同主机的不同端口仍共享 Cookie。子域名符合要求，Sani 的管理会话 Cookie 不会发送到子域名。上传仍经由主域名的 API 完成。
 
-若未配置独立文件域名，文本分享仍可正常使用（在 `/p/` 页面阅读与复制），但不支持二进制文件上传，亦不提供“原始文本”直链。
+不配置文件下载域名时，短链接与文本分享仍可使用，访客可在主域名的 `/p/` 页面阅读和复制文本；文件上传被禁用，文本页也不提供“原始文本”或“下载”入口。
 
 ## 管理员初始密码 {#first-password}
 

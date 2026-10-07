@@ -97,7 +97,7 @@ export function buildService(src: string, o: BuilderInput): Built {
  */
 export function buildProxy(src: string, o: BuilderInput, file: string): Built {
   if (!src.includes(EXAMPLE_DOMAIN)) throw new Error(`${file}: ${EXAMPLE_DOMAIN} not found`);
-  const names = [new RegExp(`^(${EXAMPLE_DOMAIN})( \\{)$`), new RegExp(`^(\\s*server_name ${EXAMPLE_DOMAIN})(;)$`)];
+  const names = [/^(s\.example\.com)( \{)$/, /^(\s*server_name s\.example\.com)(;)$/];
   const files = o.filesDomain;
   if (files && !src.split('\n').some((l) => names.some((re) => re.test(l)))) {
     throw new Error(`${file}: no site address or server_name line for the files domain`);
@@ -110,11 +110,12 @@ export function buildProxy(src: string, o: BuilderInput, file: string): Built {
     .forEach((line, i) => {
       let next = line;
       if (files) {
-        for (const re of names) next = next.replace(re, (_, head, tail) => `${head}${tail === ';' ? ' ' : ', '}${files}${tail}`);
-        next = next.replaceAll(EXAMPLE_FILES_DOMAIN, files);
+        for (const re of names) next = next.replace(re, (_, head, tail) => `${head}${tail === ';' ? ' ' : ', '}${EXAMPLE_FILES_DOMAIN}${tail}`);
       }
+      // Resolve both placeholders once; never rewrite a host supplied by the reader.
+      next = next.replace(/[sf]\.example\.com/g, (host) => host === EXAMPLE_DOMAIN ? o.domain : files || EXAMPLE_FILES_DOMAIN);
       if (next !== line || line.includes(EXAMPLE_DOMAIN)) filled.push(i);
-      out.push(next.replaceAll(EXAMPLE_DOMAIN, o.domain));
+      out.push(next);
     });
   return { text: out.join('\n') + '\n', filled };
 }

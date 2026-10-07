@@ -6,12 +6,13 @@
 // The progress page shows the same results, so readers can see what is
 // verified rather than take it on trust.
 
+import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { benchmark } from '../data/benchmark.ts';
 import { groups } from '../pages.ts';
-import { buildCompose, buildProxy, buildService, type BuilderInput } from './builder.ts';
+import { buildCompose, buildProxy, buildService, type BuilderInput, type Built } from './builder.ts';
 import { apiRoutes, commands, docsRoot, envVars, errorCodes, latestVersion, read, release, reservedSlugs } from './source.ts';
 
 export interface Check {
@@ -208,28 +209,41 @@ function checkBenchmark(): Check {
 
 function checkBuilder(): Check {
   const problems: string[] = [];
-  const input: BuilderInput = {
-    domain: 'go.example.org',
-    tz: 'Europe/Berlin',
-    password: 'x'.repeat(20),
-    rootRedirect: 'https://example.org',
-    filesDomain: 'files.example.org',
-  };
-  const runs: [string, () => { filled: number[] }, number][] = [
-    ['compose.yaml', () => buildCompose(read('compose.yaml'), input), 5],
-    ['deploy/sani.service', () => buildService(read('deploy/sani.service'), input), 5],
-    ['deploy/Caddyfile', () => buildProxy(read('deploy/Caddyfile'), input, 'deploy/Caddyfile'), 1],
-    ['deploy/nginx.conf', () => buildProxy(read('deploy/nginx.conf'), input, 'deploy/nginx.conf'), 1],
+  // Include hosts containing the template names: replacements must not cascade.
+  const domains = [
+    ['go.example.org', 'files.example.org'],
+    ['example.com', ''],
+    ['example.com', 'f.example.com'],
+    ['example.com', 's.example.com'],
+    ['example.com', 'files.example.com'],
+    ['f.example.com', 's.example.com'],
+    ['links.s.example.com', 'files.f.example.com'],
   ];
-  for (const [file, run, least] of runs) {
-    try {
-      const { filled } = run();
-      if (filled.length < least) problems.push(`${file}: the builder filled in ${filled.length} lines, expected at least ${least}`);
-    } catch (e) {
-      problems.push((e as Error).message);
+  for (const [domain, filesDomain] of domains) {
+    const input: BuilderInput = { domain, filesDomain, tz: 'Europe/Berlin', password: 'x'.repeat(20), rootRedirect: 'https://example.org' };
+    const hosts = [domain, filesDomain].filter(Boolean);
+    const runs: [string, () => Built, RegExp, string[]][] = [
+      ['compose.yaml', () => buildCompose(read('compose.yaml'), input), /^\s*SANI_(?:BASE|FILES)_URL: .+$/gm,
+        [`SANI_BASE_URL: https://${domain}`, ...(filesDomain ? [`SANI_FILES_URL: https://${filesDomain}`] : [])]],
+      ['deploy/sani.service', () => buildService(read('deploy/sani.service'), input), /^Environment=SANI_(?:BASE|FILES)_URL=.+$/gm,
+        [`Environment=SANI_BASE_URL=https://${domain}`, ...(filesDomain ? [`Environment=SANI_FILES_URL=https://${filesDomain}`] : [])]],
+      ['deploy/Caddyfile', () => buildProxy(read('deploy/Caddyfile'), input, 'deploy/Caddyfile'), /^[^#\s].* \{$/gm,
+        [`${hosts.join(', ')} {`]],
+      ['deploy/nginx.conf', () => buildProxy(read('deploy/nginx.conf'), input, 'deploy/nginx.conf'), /^\s*(?:server_name|ssl_certificate|ssl_certificate_key) .+;$/gm,
+        [`server_name ${hosts.join(' ')};`, `server_name ${hosts.join(' ')};`,
+          `ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;`, `ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;`]],
+    ];
+    for (const [file, run, pattern, expected] of runs) {
+      try {
+        const { text } = run();
+        const actual = (text.match(pattern) ?? []).map(line => line.replace(/\s+#.*$/, '').trim().replace(/\s+/g, ' '));
+        assert.deepEqual(actual.sort(), expected.sort());
+      } catch (e) {
+        problems.push(`${file} (${domain}, ${filesDomain || 'no files domain'}): ${(e as Error).message}`);
+      }
     }
   }
-  return { id: 'builder', count: runs.length, problems };
+  return { id: 'builder', count: domains.length * 4, problems };
 }
 
 /**

@@ -116,7 +116,9 @@ When the cache is full, a random entry makes room. With far fewer links than thi
 
 No default. The origin that serves the raw content of texts and files, such as `https://f.example.com`. Like `SANI_BASE_URL` it’s a scheme and a host, optionally with a port, and it **must be a different host**: another port isn’t enough, because browsers share cookies across the ports of one host.
 
-Without it you can still share texts, which visitors read and copy on their `/p/` page, but you can’t upload files, and text pages have no Raw and Download buttons.
+It cannot include a path. A subdomain of the main domain is fine. Setting it does not change share-page addresses: text and file pages stay at `/p/slug` on the main domain; only downloads and raw text use this origin. See the [deployment examples](../guide/deploy#files-domain).
+
+Without it, short links and text shares still work. Visitors can read and copy text on its `/p/` page on the main domain, but file uploads are disabled and text pages have no Raw or Download links.
 
 The domain points at the same Sani process; nothing else needs deploying. Sani tells the two apart by the request’s `Host` (or `X-Forwarded-Host` with [`SANI_TRUST_PROXY`](#sani-trust-proxy)). The files domain serves shared content and a `robots.txt` that turns every crawler away, and answers 404 to everything else. Why it needs a domain of its own is explained under [Security](../internals/security#shares).
 

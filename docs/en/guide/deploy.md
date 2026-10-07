@@ -136,7 +136,7 @@ With a CDN in front, mind the client address: Sani uses the **last** `X-Forwarde
 
 ## Domain {#domain}
 
-Short links use the first of these that is set:
+The main domain serves short links as well as text and file share pages. It comes from the first of these that is set:
 
 1. the [`SANI_BASE_URL`](../reference/configuration#sani-base-url) environment variable;
 2. the short domain entered in Settings;
@@ -146,18 +146,30 @@ Setting `SANI_BASE_URL` in production is a good idea. Short links then don’t d
 
 Someone opening the bare domain `https://s.example.com/` lands on the admin app’s sign-in page. To send them to your home page instead, set [`SANI_ROOT_REDIRECT`](../reference/configuration#sani-root-redirect).
 
-## Files domain {#files-domain}
+## Download domain {#files-domain}
 
-[Sharing files](./usage#shares) needs a second domain, such as `f.example.com`, that serves the files and raw text. It’s the same Sani behind the same proxy; there’s nothing else to run.
+Text and file **share pages stay on the main domain at `/p/slug`**. [Sharing files](./usage#shares) also needs a different hostname, such as `f.example.com`, used only for file downloads and raw text. A subdomain of the main domain works. Both domains point to the same Sani and reverse proxy; there is no extra service to run.
+
+For example, with `SANI_BASE_URL=https://example.com` and `SANI_FILES_URL=https://f.example.com`:
+
+| Purpose | Example address |
+|---|---|
+| Short link | `https://example.com/blog` |
+| Text share page | `https://example.com/p/xxx1` |
+| File share page | `https://example.com/p/xxx2` |
+| File download | `https://f.example.com/xxx2/report.pdf` |
+| Raw text | `https://f.example.com/xxx1` |
+
+The link copied after creating a share opens its page on the main domain. Visitors access the download domain when they follow Download or Raw. To configure it:
 
 1. **DNS.** Point the files domain at the same server.
-2. **The proxy.** Serve it like the short domain, with the same headers: list it in the Caddy site address (`s.example.com, f.example.com {`), or add it to both `server_name` lines in nginx, with a certificate that covers both. The builder above does this when you fill in a files domain.
-3. **Body size.** Uploads can be as large as [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) plus 1 MB. Caddy has no limit by default; in nginx, set `client_max_body_size` to at least that, as the example does for the default 64 MB. If you raise `SANI_MAX_FILE_MB`, raise this too.
+2. **The proxy.** Serve it like the main domain, with the same headers: list it in the Caddy site address (`example.com, f.example.com {` for the example above), or add it to both `server_name` lines in nginx, with a certificate that covers both. The builder above does this when you fill in a download domain.
+3. **Body size.** Uploads can be as large as [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) plus 1 MB. Caddy has no limit by default. The nginx example sets `client_max_body_size 65m` for the default 64 MB file limit plus form overhead. If you raise `SANI_MAX_FILE_MB`, raise the proxy limit too.
 4. **Sani.** Set [`SANI_FILES_URL`](../reference/configuration#sani-files-url) to `https://f.example.com` and restart.
 
-The files domain must be a different host, not just another port: browsers share cookies across the ports of one host, and keeping uploaded files away from the admin app’s cookies is the point. A subdomain of the short domain is fine, since Sani’s session cookie is never sent to subdomains. Uploads go to the short domain’s API; only the downloads come from the files domain.
+Sani requires a **different hostname** for downloads to isolate uploaded content from the admin app. Changing only the path does not isolate browser origins. Another port is not accepted either, because browsers share cookies across the ports of one host. A subdomain works, since Sani’s session cookie is not sent to subdomains. Uploads still go through the main domain’s API.
 
-Without a files domain, texts still work: visitors read and copy them on their page.
+Without a download domain, short links and text shares still work: visitors can read and copy text on its `/p/` page on the main domain. File uploads are disabled, and text pages have no Raw or Download links.
 
 ## The first password {#first-password}
 

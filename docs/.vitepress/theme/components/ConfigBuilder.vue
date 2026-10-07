@@ -313,7 +313,7 @@ const steps = computed(() => {
       </div>
 
       <label class="field">
-        <span class="k">{{ pick('短链接域名', 'Short domain') }}</span>
+        <span class="k">{{ pick('主域名', 'Main domain') }}</span>
         <input
           v-model="domainInput"
           class="input mono"
@@ -323,7 +323,7 @@ const steps = computed(() => {
           aria-describedby="b-domain-hint"
         />
         <span id="b-domain-hint" class="hint" :class="{ bad: domainInput.trim() && !domain }">
-          {{ domainInput.trim() && !domain ? pick('请填写一个域名，例如 s.example.com', 'Enter a domain such as s.example.com') : pick('短链接会是 https://' + host + '/xxxxx', 'Short links will look like https://' + host + '/xxxxx') }}
+          {{ domainInput.trim() && !domain ? pick('请填写一个域名，例如 s.example.com', 'Enter a domain such as s.example.com') : pick(`短链接：https://${host}/xxxxx；文本和文件分享页：https://${host}/p/xxxxx`, `Short links: https://${host}/xxxxx. Text and file pages: https://${host}/p/xxxxx.`) }}
         </span>
       </label>
 
@@ -381,7 +381,7 @@ const steps = computed(() => {
       </label>
 
       <label class="field">
-        <span class="k">{{ pick('文件域名（可选）', 'Files domain (optional)') }}</span>
+        <span class="k">{{ pick('文件下载域名（可选）', 'Download domain (optional)') }}</span>
         <input
           v-model="filesInput"
           class="input mono"
@@ -389,9 +389,10 @@ const steps = computed(() => {
           spellcheck="false"
           autocomplete="off"
           :aria-invalid="!filesOK ? true : undefined"
+          aria-describedby="b-files-hint"
         />
-        <span class="hint" :class="{ bad: !filesOK }">
-          {{ filesOK ? pick('分享文件需要第二个域名，指向同一个 Sani；不填则只能分享文本', 'Sharing files needs a second domain for the same Sani; empty allows texts only') : pick('请填写一个与短链接域名不同的域名', 'Enter a domain other than the short domain') }}
+        <span id="b-files-hint" class="hint" :class="{ bad: !filesOK }">
+          {{ filesOK ? pick('上传文件时必填，仅用于文件下载和原始文本，指向同一个 Sani。留空仍可分享、阅读和复制文本，但没有原始文本和下载入口。', 'Required for file uploads. Serves downloads and raw text from the same Sani. Leave empty to share, read and copy text, without raw or download links.') : pick('请填写一个与主域名不同的主机名，子域名也可以', 'Use a different hostname from the main domain; a subdomain is fine') }}
         </span>
       </label>
     </div>

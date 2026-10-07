@@ -2,6 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Fix the deployment builder rewriting download hostnames in nginx and Caddy configurations. Preserve the full input and check generated hostnames, environment variables and certificate paths during docs builds.
+- Clarify that the main domain serves both short links and `/p/` share pages, while the download domain serves downloads and raw text. Update the builder hints, deployment guide and configuration reference in both languages.
+
 ## v0.4.0
 
 2026-10-06 · Correct visit counting, persistence and shutdown behavior, and improve backup guidance and the documentation. Read “Breaking changes” first if you use file visit limits.
