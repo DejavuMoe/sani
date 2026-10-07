@@ -43,6 +43,7 @@ The Go module is at the repository root. `web` and `docs` are two packages of on
 | `make check` | gofmt, go vet, svelte-check, and the docs check and type check |
 | `make test` | Go tests (with `-race`) and frontend unit tests |
 | `make e2e` | End-to-end tests with Playwright against a fresh instance |
+| `make smoke` | Run the real binary to exercise authentication, URLs/texts/files/tags, SIGTERM shutdown, CLI backup/restore and password reset |
 | `make bench` | Benchmarks for redirects, the cache and click counting |
 | `make load` | The load test, including the click count check |
 | `make capacity` | List, search, cold redirects, flushing and mixed I/O at 1k/10k/100k links; JSON output |
@@ -52,7 +53,7 @@ The Go module is at the repository root. `web` and `docs` are two packages of on
 | `make docs-dev` | Serve the docs on `127.0.0.1:5174` |
 | `make docs` | Build the static docs into `docs/.vitepress/dist` |
 
-Before calling a change done, run at least `make check test`, and `make e2e` when it touches the admin app. Every development server listens on `127.0.0.1` only.
+Before calling a change done, run at least `make check test`, and `make e2e` when it touches the admin app. Release acceptance also runs `make smoke` to verify HTTP, CLI and stopped-service restore paths using real processes. Every development server listens on `127.0.0.1` only.
 
 ## Rules
 
@@ -62,7 +63,7 @@ Before calling a change done, run at least `make check test`, and `make e2e` whe
 - **External input is bounded.** A new map keyed by client input needs a size limit too.
 - **Every UI string exists in English and Chinese**, in `web/src/lib/i18n.svelte.ts`. The Chinese is written for Chinese readers, not translated word for word.
 - **No UI or icon libraries.** Icons are hand-drawn paths in `Icon.svelte`, menus use the Popover API and dialogs use `<dialog>`.
-- **Accessibility.** Text meets WCAG AA contrast in both themes, everything works from the keyboard, and axe reports nothing: `pnpm --dir web a11y` for the admin app, `pnpm --dir docs a11y` for this site.
+- **Accessibility.** Text should meet WCAG AA contrast and controls must work from the keyboard. `pnpm --dir web a11y` scans main admin screens in Chinese/English and light/dark themes; `pnpm --dir docs a11y` scans every docs page in both languages and themes. Axe must report no violations; manually check focus and keyboard interaction too.
 - **API errors** are always `{"error": {"code": "…", "message": "…"}}`, and the admin app maps `code` to its `err.*` strings.
 
 ## Documentation
@@ -72,6 +73,7 @@ The site lives in `docs/`. `make docs-dev` previews it locally, updating as you 
 - **Pages** are listed in `docs/.vitepress/pages.ts`. Chinese pages live under `docs/` and English ones at the same place under `docs/en/`; every page must exist in both languages.
 - **Checks against the source.** `node docs/.vitepress/sync/check.ts` compares the docs with the source; `make check` and every docs build run it. What it compares, and the latest results, are on the [Status](./progress#checks) page.
 - **Accessibility checks.** Run `pnpm --dir docs build`, start a preview with `pnpm --dir docs preview`, then run `pnpm --dir docs a11y`. It runs axe over every page, in both languages and both themes.
+- **SEO regression checks.** `.vitepress/seo.ts` provides per-page summaries, canonical URLs, hreflang, OG, Twitter and JSON-LD, tested by `make check`. After building, `make docs` runs `scripts/check-seo.mjs` against real HTML to check unique titles, summaries and canonicals, the bilingual sitemap, robots and a noindex 404. Add summaries in both languages when adding a page.
 - **Content from the source.** The home page demo uses the admin app’s own strings and slug rules, the deploy page’s builder edits the repository’s configuration files, and the performance figures come from `docs/.vitepress/data/benchmark.ts`. None of that needs syncing by hand.
 
 When you change the code, update the matching docs:

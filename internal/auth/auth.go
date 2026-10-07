@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -25,7 +26,26 @@ const (
 	saltLen      = 16
 )
 
-const MinPasswordLength = 8
+const (
+	MinPasswordLength = 8
+	MaxPasswordBytes  = 1024
+)
+
+var (
+	ErrPasswordShort = fmt.Errorf("use at least %d characters", MinPasswordLength)
+	ErrPasswordLong  = fmt.Errorf("use at most %d bytes", MaxPasswordBytes)
+)
+
+// ValidatePassword is shared by HTTP, CLI and environment configuration.
+func ValidatePassword(password string) error {
+	if utf8.RuneCountInString(password) < MinPasswordLength {
+		return ErrPasswordShort
+	}
+	if len(password) > MaxPasswordBytes {
+		return ErrPasswordLong
+	}
+	return nil
+}
 
 var b64 = base64.RawStdEncoding
 
@@ -45,6 +65,9 @@ func HashPassword(password string) string {
 
 // VerifyPassword checks password against a hash from HashPassword.
 func VerifyPassword(password, encoded string) bool {
+	if len(password) > MaxPasswordBytes {
+		return false
+	}
 	parts := strings.Split(encoded, "$")
 	if len(parts) != 6 || parts[1] != "argon2id" {
 		return false

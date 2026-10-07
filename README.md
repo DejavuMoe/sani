@@ -1,6 +1,6 @@
 # Sani
 
-A small, fast link shortener you host yourself. One binary, one SQLite file, no external services.
+A self-hosted link shortener with text and file sharing, for one administrator. One Go binary with an embedded admin app, SQLite for metadata and text, and local storage for uploaded files. No external database or cache service required.
 
 [![CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml/badge.svg)](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/DejavuMoe/sani?label=release)](https://github.com/DejavuMoe/sani/releases/latest)
@@ -20,12 +20,14 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 - **Simple statistics.** Total and daily clicks, top referrers, last visit. Clicks from crawlers, link previews, prefetches and your own dashboard are not counted.
 - **Tags for organization.** Assign colored tags to links, texts and files while creating or editing them, then filter by a tag or find untagged items. Tags stay private to the administrator.
 - **Per-link controls.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. You can edit the destination and the change applies immediately.
-- **Texts and files, too.** Share a note, a config snippet (monospace, with line numbers) or a file up to 64 MB at `/p/…`, with the same expiry, visit limit and statistics. The raw bytes come from a domain of their own.
+- **Texts and files, too.** Share a note up to 1 MB, a config snippet (monospace, with line numbers) or a file up to 64 MB by default at `/p/…`, with the same expiry, visit limit and statistics. File uploads and raw downloads require a separate files hostname.
 - **Works with what you use.** A bookmarklet, the Android share sheet (install it as an app), API tokens for scripts and Shortcuts, and import from Shlink, Sink, YOURLS or CSV.
 - **Unicode slugs.** `s.example.com/简历` works. Slugs match case-insensitively.
 - **Chinese and English**, with light and dark themes, on desktop and mobile.
 
 ## Documentation
+
+Sani is designed for a single running instance and one administrator, not multi-user hosting or active-active replicas. It is still in 0.x: read the [compatibility policy](docs/en/project/versioning.md) and release notes before upgrading. For public service, configure HTTPS, persistent storage and a separate files domain when needed, then rehearse a complete [backup and restore](docs/en/guide/operations.md). Repository tests and published benchmarks do not certify your deployment’s capacity or availability.
 
 The documentation, in English and Chinese, lives in [docs/](docs/): guides for [deployment](docs/en/guide/deploy.md) and [operations](docs/en/guide/operations.md), the [configuration](docs/en/reference/configuration.md), [HTTP API](docs/en/reference/api.md) and [command line](docs/en/reference/cli.md) references, and how Sani works inside. It's a VitePress site; `make install docs-dev` serves it on `127.0.0.1:5174`, and its deploy page has a config builder that writes the deployment files for your domain. Every build checks the docs against the source, so the settings, endpoints, error codes and commands they list are the ones the code has.
 
@@ -64,7 +66,7 @@ Everything is set through environment variables. See [.env.example](.env.example
 | `SANI_LISTEN` | `:8080` | Address to listen on. |
 | `SANI_DATA_DIR` | `data` | Directory for `sani.db` and shared files (`files/`). |
 | `SANI_BASE_URL` | — | Public origin of your short links, e.g. `https://s.example.com`. Without it, short links use the address you're visiting; you can also set it in Settings. |
-| `SANI_PASSWORD` | — | Fixed admin password (8+ characters). Without it, you choose one on first visit. |
+| `SANI_PASSWORD` | — | Fixed admin password (at least 8 Unicode code points, at most 1,024 UTF-8 bytes). Without it, you choose one on first visit. |
 | `SANI_SETUP_CODE` | random | The code the first visit asks for. By default a new one is generated at each start, until a password exists, and printed to the log. |
 | `SANI_ROOT_REDIRECT` | — | Where the bare domain `/` goes. Defaults to the admin app. |
 | `SANI_TRUST_PROXY` | `false` | Honor `X-Forwarded-*` and `X-Real-IP`; the client address is the last `X-Forwarded-For` entry. Enable only behind a proxy that sets them. |
@@ -83,9 +85,9 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 
 **Keyboard.** `N` new link · `/` search · `J`/`K` move · `Enter` open · `C` copy · `E` edit · `Del` (or `⌘⌫` on a Mac) delete, with undo · `X` check several links to turn them on, off or delete them at once · `Esc` close · `?` all shortcuts. Paste a URL anywhere on the page to start shortening it.
 
-**Bookmarklet.** Settings → Shortcuts → drag “Shorten this page” to your bookmarks bar. Clicking it on any page opens a small window that shortens that page, reusing your existing link if you've shortened it before, and copies the result.
+**Bookmarklet.** Settings → Shortcuts → drag “Shorten this page” to your bookmarks bar. Clicking it opens a small window with the page URL and title filled in. Review them and click “Shorten” to create a link or reuse an existing one, then copy the result.
 
-**Phone.** Add Sani to your home screen. On Android it then appears in the Share menu of other apps.
+**Phone.** Install Sani on Android using a browser that supports Web Share Target. Sharing a URL from another app prefills it for review; click “Shorten” to submit. Support depends on the browser and operating system.
 
 **API.** Create a token in Settings, then:
 
@@ -100,7 +102,7 @@ The [API reference](docs/en/reference/api.md) covers every endpoint and error co
 
 **Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. Generated slugs for shares are 10 characters long, since nothing else keeps them private.
 
-**Import and export.** Settings → Data exports every link as JSON or CSV. Import accepts Sani's own export, Shlink's JSON (`shortCode`, `longUrl`, `visitsSummary`, …), Sink's export, YOURLS or Kutt CSVs, and any CSV with a `url` column. Slugs that already exist are skipped and listed.
+**Import and export.** Settings → Data exports URL links and their tags as JSON or CSV; texts, files and detailed statistics require a database/files backup. Import accepts Sani's own export, Shlink's JSON (`shortCode`, `longUrl`, `visitsSummary`, …), Sink's export, YOURLS or Kutt CSVs, and any CSV with a `url` column. Slugs that already exist are skipped and listed. Use JSON for lossless migration: CSV export adds protective apostrophes to potential spreadsheet formulas, and reimport retains them.
 
 **Visitors.** Unknown slugs get a quiet 404 page, and expired, disabled or used-up links a 410, in Chinese or English depending on the visitor's browser.
 

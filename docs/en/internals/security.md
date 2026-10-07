@@ -1,6 +1,6 @@
 # Security
 
-<p class="lead">Sani sits on the public internet but has a single owner. Its security design starts from two ideas: without the password or a token, nobody can do anything; and even someone who has them can’t use Sani to attack visitors or probe the network your server sits in.</p>
+<p class="lead">Sani has one administrator. Authentication, cross-site request checks, content isolation and fetch-address validation limit its attack surface within specific boundaries. Operators still configure and maintain HTTPS, trusted proxies, host permissions and backups.</p>
 
 ## First-run setup {#setup}
 
@@ -17,7 +17,7 @@ If a fresh instance without a password went to whoever opened it first, it would
 - **Sign-in rate limiting** works per client address: after 8 failures within 15 minutes, the client waits until those 15 minutes are over. The limiter remembers at most 10,000 addresses, so forged addresses can’t blow up memory.
 - **Session secrets** are 256 random bits, and the database only stores their SHA-256 hashes; a leaked database doesn’t let anyone sign in.
 - **The session cookie** is `HttpOnly` and `SameSite=Strict`, only sent to addresses under `/api/`, and `Secure` over HTTPS. It lasts 30 days and is renewed at most once a day as you use it.
-- **Changing the password** signs out every other device; `sani passwd` signs out all of them.
+- **Changing the password** in the admin app keeps the current session and signs out other devices. CLI and environment password replacements revoke all sessions. Password replacement and revocation share one transaction; an in-flight verification against an old password cannot issue a session after the change.
 
 ## API tokens {#tokens}
 
@@ -25,7 +25,7 @@ A token is `sani_` followed by 43 random characters (about 256 bits). The databa
 
 ## Cross-site requests {#cross-origin}
 
-Every `/api/` request passes through the Go standard library’s `http.CrossOriginProtection`: requests a browser sends from another site carry a `Sec-Fetch-Site` or `Origin` header and are refused. Together with the `SameSite=Strict` session cookie, other sites can’t act on your behalf. Scripts and command-line tools don’t send those headers, so token requests are unaffected.
+Every `/api/` request passes through Go’s `http.CrossOriginProtection`, which checks `Sec-Fetch-Site` and `Origin` for cross-origin unsafe methods. This works alongside the `SameSite=Strict` cookie to defend against CSRF. Scripts without those headers still need valid credentials. An external link to `/admin/new` only prefills a URL and title; creation requires confirmation. Origin checks alone cannot prevent actions initiated by scripts on a same-origin page.
 
 ## The admin app {#admin}
 
@@ -59,7 +59,7 @@ The admin app loads nothing from third parties; its fonts and icons are part of 
 A server that fetches arbitrary URLs for its users is the classic entry point for server-side request forgery (SSRF): someone could create a link to `http://169.254.169.254/` or `http://192.168.1.1/` and have the server talk to a cloud metadata endpoint or a device on the local network. Sani’s fetcher guards against it twice:
 
 1. **Before the request.** Only `http` and `https`; no `localhost`, no hostnames without a dot, nothing ending in `.localhost`, `.local`, `.internal`, `.lan` or `.home.arpa`; and the name is resolved, with the fetch refused if any address isn’t public.
-2. **When connecting.** The dialer checks the IP it’s about to connect to once more. Even if a name resolves to a private address the second time (DNS rebinding), the connection can’t be made.
+2. **When connecting directly.** The dialer checks the destination IP again, blocking DNS rebinding to a restricted address. Configured proxy addresses are an exception, with the trust boundary described below.
 
 Not public: loopback, private networks, link-local addresses (including cloud metadata endpoints), carrier-grade NAT (`100.64.0.0/10`), multicast, documentation ranges, `240.0.0.0/4`, NAT64 and 6to4 prefixes, and Azure’s host service address `168.63.129.16`. `198.18.0.0/15` is allowed on purpose: transparent proxies in fake-ip mode resolve every name into it.
 
@@ -67,8 +67,9 @@ More limits:
 
 - every redirect is checked again, and at most 5 are followed;
 - pages are read up to 1 MB and icons up to 256 KB, a single request times out after 12 seconds, and fetching for one link takes 20 seconds at most;
-- at most 3 fetches run at once, so creating many links can’t exhaust outgoing connections;
-- with `HTTPS_PROXY` set, the proxy’s own address may be private, and names the server can’t resolve are left to the proxy;
+- at most 32 HTML icon candidates are retained; base and HTTP(S) icon URLs are limited to 8,192 bytes before and after resolution;
+- background automatic fetching runs at most 3 jobs at once, limiting outgoing requests from bulk link creation; manual refreshes do not use these job slots;
+- the standard library handles `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. Targets still pass through `checkHost`; with a proxy configured, failed local DNS lookups may be left to it, and its own address may be private. Sani’s dial checks do not inspect the proxy’s remote DNS or final outbound connection: use a trusted proxy and restrict reachable addresses there;
 - fetches carry an `X-Sani-Preview` header, so if the destination is a short link on another Sani instance, the fetch isn’t counted as a click.
 
 Fetched icons come from third-party sites. Sani checks from the content that they really are images and serves them with `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` and `nosniff`. Even someone opening an SVG icon directly can’t make it run scripts.
@@ -99,7 +100,7 @@ Everything whose size someone outside controls has an explicit limit:
 
 ## Visitor privacy {#privacy}
 
-Sani doesn’t store visitors’ IP addresses or User-Agents, sets no cookies and keeps only aggregated counts; see [Statistics](../guide/statistics). The 404 and 410 pages visitors may see load nothing from elsewhere, carry a Content Security Policy that blocks all scripts, and ask search engines not to index them. Share pages do the same, apart from their one copy script, and send no `Referer` onwards.
+Visitor statistics keep aggregate counts and referrer hosts, without IP addresses, User-Agents or tracking cookies. Failed sign-in logs may contain client IPs, and reverse proxies may keep access logs separately; see [Statistics](../guide/statistics) and [Logs](../guide/operations#logs). Error and share pages ask search engines not to index them, but `robots.txt` only guides cooperative crawlers and is not access control. Anyone with a valid share URL can read it; a random slug is not authentication for sensitive data.
 
 ## Release files {#releases}
 

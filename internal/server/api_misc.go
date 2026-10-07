@@ -7,11 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/DejavuMoe/sani/internal/auth"
@@ -205,6 +208,22 @@ type exportTag struct {
 	Color string `json:"color"`
 }
 
+// escapeCSVCell keeps spreadsheet formulas inert. The prefix stays in CSV
+// imports; use JSON for a lossless round trip.
+func escapeCSVCell(v string) string {
+	for _, r := range v {
+		switch {
+		case strings.ContainsRune("=+-@＝＋－＠", r), unicode.IsControl(r), unicode.Is(unicode.Cf, r):
+			return "'" + v
+		case unicode.IsSpace(r):
+			continue
+		default:
+			return v
+		}
+	}
+	return v
+}
+
 func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 	if err := s.clicks.Flush(r.Context()); err != nil {
 		s.log.Warn("flush clicks", "err", err)
@@ -247,8 +266,12 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 				max = strconv.FormatInt(l.MaxClicks, 10)
 			}
 			tags, _ := json.Marshal(tagsOf(l))
-			cw.Write([]string{l.Slug, l.URL, l.Title, strconv.Itoa(l.Redirect), strconv.FormatBool(l.Enabled), exp, max,
-				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339), string(tags)})
+			row := []string{l.Slug, l.URL, l.Title, strconv.Itoa(l.Redirect), strconv.FormatBool(l.Enabled), exp, max,
+				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339), string(tags)}
+			for i, v := range row {
+				row[i] = escapeCSVCell(v)
+			}
+			cw.Write(row)
 		}
 		cw.Flush()
 		return
@@ -356,14 +379,17 @@ func parseTime(v string) (int64, bool) {
 		return 0, false
 	}
 	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
-		if n > 1e11 {
-			return n, true
+		if n <= 1e11 {
+			if n < math.MinInt64/1000 || n > math.MaxInt64/1000 {
+				return 0, false
+			}
+			n *= 1000
 		}
-		return n * 1000, true
+		return timestampMillis(time.UnixMilli(n))
 	}
 	for _, layout := range []string{time.RFC3339Nano, time.DateTime, time.DateOnly} {
 		if t, err := time.Parse(layout, v); err == nil {
-			return t.UnixMilli(), true
+			return timestampMillis(t)
 		}
 	}
 	return 0, false
@@ -401,7 +427,11 @@ func (s *Server) recordToLink(r *http.Request, rec map[string]string, now time.T
 	if ms, ok := parseTime(pick(rec, createdFields)); ok && ms > 0 && ms <= now.UnixMilli() {
 		l.CreatedAt = ms
 	}
-	if ms, ok := parseTime(pick(rec, expiresFields)); ok && ms > 0 {
+	if value := pick(rec, expiresFields); value != "" {
+		ms, ok := parseTime(value)
+		if !ok || ms < 0 {
+			return nil, "expires_invalid"
+		}
 		l.ExpiresAt = ms
 	}
 	if v, err := strconv.ParseInt(pick(rec, clicksFields), 10, 64); err == nil && v > 0 {
@@ -455,6 +485,15 @@ func normalizeKey(k string) string {
 
 func parseJSONRecords(data []byte) ([]map[string]string, error) {
 	var raw []map[string]any
+	decode := func(data []byte) error {
+		// UseNumber preserves the full int64 range in Sani's own exports.
+		if !json.Valid(data) {
+			return errors.New("the file is not valid JSON")
+		}
+		d := json.NewDecoder(bytes.NewReader(data))
+		d.UseNumber()
+		return d.Decode(&raw)
+	}
 	if data[0] == '{' {
 		var wrapped map[string]json.RawMessage
 		if err := json.Unmarshal(data, &wrapped); err != nil {
@@ -472,7 +511,7 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 						}
 					}
 				}
-				if err := json.Unmarshal(v, &raw); err != nil {
+				if err := decode(v); err != nil {
 					return nil, fmt.Errorf("%q is not a list of links", key)
 				}
 				found = true
@@ -482,7 +521,7 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 		if !found {
 			return nil, errors.New(`expected a list of links, or an object with a "links" list`)
 		}
-	} else if err := json.Unmarshal(data, &raw); err != nil {
+	} else if err := decode(data); err != nil {
 		return nil, errors.New("the file is not valid JSON")
 	}
 	out := make([]map[string]string, 0, len(raw))
@@ -501,30 +540,54 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 			switch x := v.(type) {
 			case string:
 				rec[normalizeKey(k)] = x
-			case float64:
-				rec[normalizeKey(k)] = strconv.FormatFloat(x, 'f', -1, 64)
+			case json.Number:
+				rec[normalizeKey(k)] = importNumber(x)
 			case bool:
 				rec[normalizeKey(k)] = strconv.FormatBool(x)
+			default:
+				if v != nil && slices.Contains(expiresFields, normalizeKey(k)) {
+					b, _ := json.Marshal(v)
+					rec[normalizeKey(k)] = string(b) // reject malformed expiry instead of clearing it
+				}
 			}
 		}
 		// Shlink nests counters and limits:
 		// "visitsSummary": {"total": n}, "meta": {"validUntil": t, "maxVisits": n}.
 		if m, ok := obj["visitsSummary"].(map[string]any); ok {
-			if t, ok := m["total"].(float64); ok {
-				rec["visits"] = strconv.FormatFloat(t, 'f', -1, 64)
+			if t, ok := m["total"].(json.Number); ok {
+				rec["visits"] = importNumber(t)
 			}
 		}
 		if m, ok := obj["meta"].(map[string]any); ok {
-			if v, ok := m["validUntil"].(string); ok {
-				rec["validuntil"] = v
+			if v := m["validUntil"]; v != nil {
+				switch x := v.(type) {
+				case string:
+					rec["validuntil"] = x
+				case json.Number:
+					rec["validuntil"] = importNumber(x)
+				default:
+					b, _ := json.Marshal(v)
+					rec["validuntil"] = string(b)
+				}
 			}
-			if v, ok := m["maxVisits"].(float64); ok {
-				rec["maxvisits"] = strconv.FormatFloat(v, 'f', -1, 64)
+			if v, ok := m["maxVisits"].(json.Number); ok {
+				rec["maxvisits"] = importNumber(v)
 			}
 		}
 		out = append(out, rec)
 	}
 	return out, nil
+}
+
+func importNumber(n json.Number) string {
+	if _, err := n.Int64(); err == nil {
+		return n.String()
+	}
+	// Keep accepting decimal/exponent notation used by other shorteners.
+	if f, err := n.Float64(); err == nil {
+		return strconv.FormatFloat(f, 'f', -1, 64)
+	}
+	return n.String()
 }
 
 func parseCSVRecords(data []byte) ([]map[string]string, error) {

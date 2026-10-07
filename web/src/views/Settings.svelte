@@ -129,7 +129,7 @@
   function reason(r: string): string {
     const key = `reason.${r}` as MessageKey;
     const s = t(key);
-    return s === key ? r : s;
+    return s === key ? errorText(r) : s;
   }
 
   // Password

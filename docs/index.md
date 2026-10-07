@@ -2,7 +2,7 @@
 layout: home
 markdownStyles: false
 title: Sani
-titleTemplate: 可以自己部署的短链接服务
+titleTemplate: 自托管短链接、文本与文件分享
 ---
 
 <HomePage />

@@ -1,7 +1,7 @@
 <script lang="ts">
   /*
    * The compact "shorten this page" window used by the bookmarklet and the
-   * PWA share target. A shared URL is shortened right away; an existing
+   * PWA share target. Review the shared URL before submitting; an existing
    * plain link to the same page is returned instead of a duplicate.
    */
   import { onMount } from 'svelte';
@@ -28,7 +28,6 @@
   onMount(() => {
     if (!shared) return;
     composer?.fill(shared, 'prefill', pageTitle);
-    composer?.submitNow();
   });
 
   async function copy() {

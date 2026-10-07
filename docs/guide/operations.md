@@ -76,11 +76,11 @@ sudo systemctl start sani
 1. **完整目录恢复**：还原至全新的空目录或空数据卷。必须确保同批次备份中的 `sani.db`、WAL/SHM 文件与 `files/` 目录严格配套，切勿混入旧环境残留文件。调整 `SANI_DATA_DIR` 或 Compose 挂载路径，并修复文件所属权限（镜像内置运行用户为 `65532:65532`）。
 2. **`sani backup` 数据库快照恢复**：还原为空目录下的 `sani.db`，无需携带原实例的 WAL/SHM 文件。若仅使用网址与文本分享，恢复该文件即可；若包含文件分享，仍需搭配同一停机时间点提取的 `files/`。仅凭在线数据库副本无法保证早期文件完整可下。
 
-在切换生产流量或 DNS 前，先在本地隔离实例中验证 `/healthz`、登录鉴权、链接跳转、文本展示、文件下载及 SHA-256 校验。升级后的版本回退依赖升级前的完整备份，禁止用旧版二进制直接运行新版迁移后的数据库。代码仓库中的 `go test ./cmd/sani -run TestStoppedBackup` 已涵盖完整的停机刷盘、备份、复制与恢复校验流程。
+在切换生产流量或 DNS 前，先在本地隔离实例中验证 `/healthz`、登录鉴权、链接跳转、文本展示、文件下载及 SHA-256 校验。升级后的版本回退依赖升级前的完整备份，禁止用旧版二进制直接运行新版迁移后的数据库。`go test ./cmd/sani -run TestStoppedBackup` 验证存储层刷盘、快照和文件复制；`make smoke` 进一步运行真实二进制，覆盖 SIGTERM 停机、CLI 标准输出备份，以及恢复后通过 HTTP 访问网址、文本、文件和标签。两者都不能替代对自己部署的恢复演练。
 
 ## 版本升级 {#upgrade}
 
-完成[数据备份](#backup)后执行更新：
+先阅读目标版本的[更新日志](../project/changelog)，选择并固定版本标签或镜像摘要，并按[制品校验](./deploy#verify)下载、验证二进制。升级前执行[完整停机备份](#backup-files)，保留原版本制品与配置；此次备份完成后暂不执行备份示例末尾的启动命令，直到完成版本替换：
 
 ::: code-group
 
@@ -90,14 +90,16 @@ docker compose up -d
 ```
 
 ```sh [systemd]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
+# sani 为事先下载并校验的目标版本二进制
+sudo systemctl stop sani
 sudo install -m 755 sani /usr/local/bin/sani
-sudo systemctl restart sani
+sudo systemctl start sani
+SANI_LISTEN=127.0.0.1:8080 sani healthcheck
 ```
 
 :::
 
-更新要点与升级指引请参考[更新日志](../project/changelog)。数据库结构在启动时会自动递增迁移；旧版二进制无法打开迁移后的新数据库，如需回滚必须依靠升级前的备份。
+启动后检查日志、`/healthz`，并实际登录、跳转、读取文本和下载文件；健康检查地址需与你的 `SANI_LISTEN` 一致。`/healthz` 只检查进程存活，不能证明数据库可写或备份可恢复。数据库结构在启动时自动迁移；若需要回退，停止新版本，将升级前备份恢复至空目录，再使用原版本与原配置启动。单纯回退镜像或二进制不足以回退已迁移的数据。
 
 ## 重置管理员密码
 

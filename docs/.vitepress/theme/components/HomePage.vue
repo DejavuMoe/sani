@@ -120,8 +120,8 @@ async function copy(i: number) {
           <p class="lead">
             {{
               pick(
-                'Sani 小而快：一个二进制文件，一个 SQLite 数据库，不依赖任何外部服务。跳转直接从内存返回，统计只留下你真正会看的那几项。',
-                'Sani is small and fast: one binary and one SQLite file, with no other services to run. Redirects come straight from memory, and the statistics keep only what you’ll actually look at.',
+                'Sani 面向个人分享短链接、文本与文件：单个二进制内嵌管理界面，SQLite 保存记录，上传内容存于本地目录。缓存命中的跳转从内存返回，统计保持简单。',
+                'Sani shares short links, texts and files for one administrator: one binary, SQLite records and local uploads. Cached redirects come from memory, and statistics stay simple.',
               )
             }}
           </p>
@@ -181,12 +181,12 @@ async function copy(i: number) {
               <p class="dim">Cache-Control: private, max-age=0</p>
               <span class="timing">{{ (benchmark.micro.redirectNs / 1000).toFixed(2) }} µs</span>
             </div>
-            <h3>{{ pick('跳转不碰数据库', 'Redirects never touch the database') }}</h3>
+            <h3>{{ pick('缓存命中不查库', 'Cache hits skip the database') }}</h3>
             <p>
               {{
                 pick(
-                  '短链接的目标放在内存缓存里，命中时只是一次查找。点击在内存里累加，每两秒合并写入一次，所以数据库再忙也拖不慢跳转。',
-                  'Targets live in an in-memory cache, so a hit is one lookup. Clicks are added up in memory and written every two seconds, so a busy database never slows a redirect down.',
+                  '命中缓存的跳转不查询数据库，也不等待统计写入。点击在内存中累加，通常每两秒批量刷盘；未命中的请求仍需查询数据库。',
+                  'Cached redirects do not query the database or wait for statistics writes. Clicks aggregate in memory and normally flush every two seconds; cache misses still query the database.',
                 )
               }}
             </p>
@@ -245,12 +245,12 @@ async function copy(i: number) {
               <p><span class="prompt">$</span> sani backup backup.db</p>
               <p class="dim">Backed up /data/sani.db to backup.db</p>
             </div>
-            <h3>{{ pick('一个文件', 'One file') }}</h3>
+            <h3>{{ pick('本地存储', 'Local storage') }}</h3>
             <p>
               {{
                 pick(
-                  '管理界面内嵌在二进制文件里，数据都在一个 SQLite 文件中。备份是一条命令，服务不用停。',
-                  'The admin app is inside the binary and the data is in one SQLite file. Backing up is one command, and the service keeps running.',
+                  '记录与文本保存在 SQLite，上传文件保存在 files/。在线命令只备份数据库；完整备份需停机复制数据库与文件目录。',
+                  'Records and texts live in SQLite, uploads in files/. Online backup covers the database only; stop the service to copy the database and files together.',
                 )
               }}
             </p>
@@ -270,8 +270,8 @@ async function copy(i: number) {
             <p>
               {{
                 pick(
-                  '从其他短链接服务导入，已有的短码不会被覆盖，出问题的行会逐条列出来。全部链接随时可以导出为 JSON 或 CSV。',
-                  'Import from other shorteners: existing slugs are never overwritten, and every row that couldn’t be imported is listed. Export everything as JSON or CSV at any time.',
+                  '从其他短链接服务导入，已有短码不会被覆盖。网址链接和标签可导出为 JSON 或 CSV；文本、文件和详细统计需通过完整备份保存。',
+                  'Import from other shorteners without overwriting existing slugs. Export URL links and tags as JSON or CSV; texts, files and detailed statistics need a complete backup.',
                 )
               }}
             </p>

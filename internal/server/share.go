@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -200,6 +201,8 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusConflict, "files_disabled", "sharing files needs SANI_FILES_URL")
 		return
 	}
+	s.filesMu.RLock()
+	defer s.filesMu.RUnlock()
 	limit := s.opt.MaxFileBytes
 	rc := http.NewResponseController(w)
 	rc.SetReadDeadline(time.Now().Add(transferTime(limit)))
@@ -399,12 +402,18 @@ func storedName(name string) bool {
 }
 
 // sweepFiles removes files no link refers to any more: those of purged
-// links, and uploads that never became one. A file younger than ten minutes
-// may belong to a link being saved right now, so it stays for the next round.
+// links, and uploads that never became one. Active uploads retain ownership
+// through multipart parsing and the database commit, regardless of file age.
 func (s *Server) sweepFiles(ctx context.Context, now time.Time) {
 	if s.opt.FilesDir == "" {
 		return
 	}
+	// ponytail: defer sweeping while any upload is active; use bounded
+	// per-upload tracking if continuous ingestion needs concurrent cleanup.
+	if !s.filesMu.TryLock() {
+		return
+	}
+	defer s.filesMu.Unlock()
 	entries, err := os.ReadDir(s.opt.FilesDir)
 	if errors.Is(err, fs.ErrNotExist) {
 		return
@@ -466,7 +475,12 @@ func (s *Server) admit(e *cache.Entry, count bool, r *http.Request, now time.Tim
 	}
 	if count {
 		if e.MaxClicks == 0 {
-			e.Clicks.Add(1)
+			// Imported totals may already be at int64's ceiling.
+			for n := e.Clicks.Load(); n < math.MaxInt64; n = e.Clicks.Load() {
+				if e.Clicks.CompareAndSwap(n, n+1) {
+					break
+				}
+			}
 		}
 		s.clicks.Record(e.ID, referrerHost(r.Header.Get("Referer")), now)
 		// Even an evicted entry owns its shared counter until Record has

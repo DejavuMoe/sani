@@ -31,6 +31,8 @@ The JSON looks like this; fields without a value are left out:
 
 The CSV columns are `slug`, `url`, `title`, `redirect`, `enabled`, `expires_at`, `max_clicks`, `clicks`, `created_at` and `tags`.
 
+CSV exports prefix cells that a spreadsheet could interpret as formulas with an apostrophe, including cells starting with `=`, `+`, `-`, `@` or control characters. CSV imports retain that protective prefix as data; choose JSON for lossless exports and migration.
+
 Each JSON link can include `tags: [{"name":"work","color":"blue"}]`; the CSV `tags` cell holds the same JSON array. Import rebuilds assignments by normalized name, not source IDs. Existing tags keep their name and color. Older files without tags still import; JSON name arrays from other services, such as `["work"]`, create blue tags. Records with more than 5 entries or invalid names/colors are skipped with `tags_invalid`. Exceeding the instance catalog limit fails and rolls back the entire import. Unused catalog tags are not exported; a full database backup preserves them.
 
 An export holds each link’s settings and total clicks. It does **not** include daily statistics, referring sites, deleted links, API tokens or the password. It’s for moving links around, not a replacement for a [backup](./operations#backup).
@@ -77,6 +79,8 @@ Times can be RFC 3339 (`2026-09-29T08:00:00Z`), `2026-09-29 08:00:00`, `2026-09-
 - **Titles** from the file are kept and never replaced automatically. Links without a title are not fetched, so one import can’t send requests to thousands of sites; use “Refetch title” in the details where you want one.
 - **Click counts** add to a link’s total, but come without days or referrers, so they don’t appear in the daily chart.
 - **Creation times** in the future are ignored.
+- **Expiry** is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch or exceeds UTC years 0000–9999 skips the row with `expires_invalid`; Unix seconds are also checked for overflow before conversion to milliseconds. Empty values and `0` mean never, and valid past expiry dates are preserved. Check skipped rows, correct the source file and import again.
+- **Counter ceiling:** per-link and overall click totals saturate at `9223372036854775807` (the int64 maximum). Summing large imports or counting later visits cannot overflow these totals. Links without a visit limit continue to work at the ceiling.
 - **Limits:** files up to 32 MB, and at most 100,000 links per import.
 
 Afterwards you see how many links were imported and which rows were skipped. Through the API the result looks like this:

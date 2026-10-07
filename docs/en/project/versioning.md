@@ -39,9 +39,9 @@ Every `SANI_*` [environment variable](../reference/configuration) keeps its name
 
 ### Data
 
-- **The database.** A new version opens the database of any earlier version with the same major number and upgrades its schema on start. Not the other way round: an older version can’t open an upgraded database, so [back up](../guide/operations#backup) before upgrading, and restore the backup to go back.
+- **The database.** Within the compatibility policy, startup applies migrations to older databases in order. Migration writes need sufficient disk space and may extend startup time. Older binaries reject schemas beyond the versions they support: take a [complete backup](../guide/operations#backup-files) before upgrading, and restore it to downgrade.
 - **Backups.** `sani backup` writes a plain SQLite file. Restoring file shares also requires `files/` copied during the same stopped-service interval; see [paired backups](../guide/operations#backup-files).
-- **Exports.** A JSON or CSV export from any version can be imported by later versions. `"version": 1` in a JSON export is the version of the file format, which changes only if the format changes incompatibly.
+- **Exports.** JSON and CSV compatibility follows the version policy above. `"version": 1` identifies the JSON format version. Prefer JSON to preserve field contents; protective CSV formula apostrophes remain on reimport. See [Import and export](../guide/import-export).
 
 ### Release files
 

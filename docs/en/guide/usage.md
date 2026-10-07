@@ -119,11 +119,11 @@ Press <kbd>?</kbd> in the admin app to see them any time.
 
 ## Bookmarklet
 
-In Settings → Shortcuts, drag the “Shorten this page” button to your bookmarks bar. Clicking it on any page opens a small window that shortens the page and copies the link, with a QR code next to it. If you shortened the page before, you get that link again.
+In Settings → Shortcuts, drag the “Shorten this page” button to your bookmarks bar. Clicking it on any page opens a small window with the URL and title filled in. Review them, then click “Shorten” to create and copy the link, with a QR code next to it. If you shortened the page before, you get that link again. Opening the window alone never creates a link.
 
 ## On your phone
 
-Open the admin app in your phone’s browser and add it to your home screen: Sani then sits among your apps. On Android it also shows up in other apps’ Share menu. Share a link to Sani from any app and it’s shortened right away, with a copy button and a QR code.
+Open the admin app in your phone’s browser and add it to your home screen: Sani then sits among your apps. On Android it also shows up in other apps’ Share menu. Sharing to Sani fills in the URL and title for review. Click “Shorten” to create the link and show its copy button and QR code.
 
 ## From scripts
 

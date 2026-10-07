@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"runtime"
 	"sync"
 	"testing"
@@ -16,6 +17,16 @@ type sink struct {
 	mu      sync.Mutex
 	batches []*store.ClickBatch
 	fail    bool
+}
+
+func TestCounterSaturatesImportedClicks(t *testing.T) {
+	r := New(&sink{}, time.UTC)
+	r.Record(1, "", time.Now())
+	done := r.Snapshot()
+	defer done()
+	if got := r.Counter(1, math.MaxInt64).Load(); got != math.MaxInt64 {
+		t.Fatalf("counter = %d, want MaxInt64", got)
+	}
 }
 
 func (s *sink) ApplyClicks(ctx context.Context, b *store.ClickBatch) error {

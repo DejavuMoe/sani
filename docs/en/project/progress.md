@@ -4,7 +4,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 # Status
 
-<p class="lead">This documentation covers {{ status.latestVersion }}; the changelog records each version’s changes. This page lists implemented capabilities, verification entry points and remaining work.</p>
+<p class="lead">The latest release is {{ status.latestVersion }}; unreleased changes appear at the top of the changelog. This page lists implemented capabilities, production acceptance checks and remaining scope. An implemented feature does not mean a particular deployment has passed acceptance.</p>
 
 ## Where things stand {#current}
 
@@ -15,13 +15,31 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Tags | <span class="sn-status done">Done</span> | Colored tags for links, texts and files; assign during creation or editing, filter by tag or Untagged, and transfer through JSON/CSV, since v0.5.0 |
 | Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own, since v0.3.0 |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
-| Import and export | <span class="sn-status done">Done</span> | Sani, Shlink, Sink and all kinds of CSV |
+| Import and export | <span class="sn-status done">Done</span> | Import Sani, Shlink and Sink JSON or compatible CSV; export URL links as Sani JSON or CSV |
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |
 | Operations | <span class="sn-status done">Done</span> | Online database snapshots, stopped-service database and file backups, password reset, health checks |
 | Documentation | <span class="sn-status done">Done</span> | This site: English and Chinese, checked against the source at build time |
 | Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
-| Continuous integration | <span class="sn-status done">Done</span> | Every commit runs the checks and tests (Linux, macOS, Windows), the end-to-end tests, axe and a vulnerability scan, and builds the image and every binary |
+| Continuous integration | <span class="sn-status done">Done</span> | Go tests on Linux, macOS and Windows, cross-compilation for every release target, E2E, axe and known-vulnerability scans; results belong to the specific commit |
 | Hosted docs | <span class="sn-status done">Done</span> | Chinese and English documentation is live at [sani.zsh.moe](https://sani.zsh.moe) |
+
+## Production acceptance scope {#production}
+
+Sani is intended for **one administrator, one server process and a local persistent data directory**. A reverse proxy provides HTTPS, and file sharing uses a separate hostname. The operator owns backups, disk capacity, log monitoring and upgrade recovery. Multiple processes sharing a database do not synchronize their in-memory caches or visit allowances, so replicas are not a supported high-availability setup. A share URL is not visitor authentication, and click statistics do not promise zero loss after a power failure.
+
+Run the following checks for each release candidate commit. A previous release's green checks do not validate a new candidate.
+
+| Layer | Entry point | Acceptance condition |
+|---|---|---|
+| Code and features | `make check test e2e` | Static checks, Go race tests, frontend unit tests and real browser interactions pass |
+| Process and recovery | `make smoke` | The built binary starts and stops cleanly; CLI database backup and paired file restore preserve counts, credentials, tags, texts and file hashes |
+| Storage and failure handling | `internal/store/*_test.go`, `cmd/sani/main_test.go` | Regressions cover historical schema migration, rollback, lock waits, shutdown deadlines and failed flushes |
+| Capacity and counting | `make bench load capacity` | Record the environment; request counts agree with clicks, with no unexplained performance regression |
+| Accessibility | `pnpm --dir web a11y`, `pnpm --dir docs a11y` | Main admin screens and every documentation page pass axe in both languages and themes |
+| Documentation and SEO | `make docs`, docs output and publishing checks | Bilingual descriptions match the code; page summaries, canonical URLs, language alternates and sitemap match the actual pages |
+| Distribution and supply chain | CI, CodeQL and Release workflows for the candidate | Platform tests, archives, containers and dependency scans pass; verify the version, checksums and provenance of published artifacts separately |
+
+Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
 ## v0.5.0 tag verification {#tags-acceptance}
 

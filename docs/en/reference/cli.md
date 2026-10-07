@@ -29,7 +29,7 @@ In a terminal, it asks for the new password twice without echoing it. Otherwise 
 echo 'a-new-password' | sani passwd
 ```
 
-The password needs at least 8 characters. If `SANI_PASSWORD` is set, the next start brings back the password from the environment, and the command reminds you of that. `sani password` is an alias.
+The password needs at least 8 Unicode code points and at most 1,024 UTF-8 bytes. Invalid length is rejected without changing the stored password or sessions. If `SANI_PASSWORD` is set, the next start brings back the password from the environment, and the command reminds you of that. `sani password` is an alias.
 
 ## `sani backup`
 

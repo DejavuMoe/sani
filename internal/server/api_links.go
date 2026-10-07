@@ -221,10 +221,13 @@ func (s *Server) resolveInput(r *http.Request, in *linkInput, now int64) (*store
 		var ms int64
 		if !in.ExpiresAt.Null && in.ExpiresAt.Value != "" {
 			t, err := time.Parse(time.RFC3339, in.ExpiresAt.Value)
-			if err != nil {
-				return nil, badInput("expires_invalid", "expiresAt must be an RFC 3339 timestamp")
+			var valid bool
+			if err == nil {
+				ms, valid = timestampMillis(t)
 			}
-			ms = t.UnixMilli()
+			if !valid {
+				return nil, badInput("expires_invalid", "expiresAt must be an RFC 3339 timestamp with a UTC year from 0000 to 9999")
+			}
 			if ms <= now {
 				return nil, badInput("expires_past", "expiresAt must be in the future")
 			}
@@ -495,28 +498,7 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// An owner-provided title is kept for good; clearing it, or moving an
-	// auto-titled link elsewhere, fetches a fresh one. Texts and files have
-	// nothing to fetch a title from.
-	refetch := false
-	switch {
-	case current.Kind != store.KindURL:
-		if p.Title != nil {
-			m := store.MetaManual
-			p.Meta = &m
-		}
-	case p.Title != nil && *p.Title != "":
-		m := store.MetaManual
-		p.Meta = &m
-	case p.Title != nil || (p.URL != nil && *p.URL != current.URL && current.Meta != store.MetaManual):
-		empty, m := "", store.MetaPending
-		if !s.opt.FetchMeta {
-			m = store.MetaFailed
-		}
-		p.Title, p.Meta = &empty, &m
-		refetch = s.opt.FetchMeta
-	}
-
+	p.FetchMeta = s.opt.FetchMeta
 	before, after, err := s.store.UpdateLink(r.Context(), id, *p, now)
 	if tagError(w, err) {
 		return
@@ -534,7 +516,8 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.cache.Invalidate(links.Key(before.Slug), links.Key(after.Slug))
-	if refetch {
+	if after.Kind == store.KindURL && after.Meta == store.MetaPending &&
+		(p.Title != nil || before.URL != after.URL) {
 		s.fetchMetaLater(after.ID, after.URL, after.Host, r.Header.Get("Accept-Language"))
 	}
 	writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), after, now))
@@ -652,12 +635,9 @@ func (s *Server) refreshLink(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "kind_mismatch", "texts and files have no page to fetch a title from")
 		return
 	}
-	if l.Meta != store.MetaManual {
-		empty, pending := "", store.MetaPending
-		if _, l, err = s.store.UpdateLink(r.Context(), id, store.Patch{Title: &empty, Meta: &pending}, l.UpdatedAt); err != nil {
-			s.internalError(w, r, err)
-			return
-		}
+	if _, l, err = s.store.UpdateLink(r.Context(), id, store.Patch{RefreshMeta: true}, 0); err != nil {
+		s.internalError(w, r, err)
+		return
 	}
 	s.fetchMeta(r.Context(), l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"), true)
 	if l, err = s.store.GetLink(r.Context(), id); err != nil {

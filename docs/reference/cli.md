@@ -29,7 +29,7 @@
 echo 'a-new-password' | sani passwd
 ```
 
-密码长度至少 8 个字符。若当前实例配置了环境变量 `SANI_PASSWORD`，下次重启将再次被环境变量覆盖（命令会输出提示信息）。`sani password` 为其等价别名。
+密码长度至少 8 个 Unicode 码点、最多 1,024 个 UTF-8 字节；长度不合规时拒绝操作，已有密码和会话保持不变。若当前实例配置了环境变量 `SANI_PASSWORD`，下次重启将再次被环境变量覆盖（命令会输出提示信息）。`sani password` 为其等价别名。
 
 ## `sani backup`
 

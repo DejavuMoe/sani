@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-	"unicode/utf8"
 
 	"github.com/DejavuMoe/sani/internal/auth"
 	"github.com/DejavuMoe/sani/internal/store"
@@ -73,25 +72,25 @@ func (s *Server) rateLimited(w http.ResponseWriter, ip string, now time.Time) bo
 }
 
 func validPassword(w http.ResponseWriter, pw string) bool {
-	if utf8.RuneCountInString(pw) < auth.MinPasswordLength {
+	switch auth.ValidatePassword(pw) {
+	case auth.ErrPasswordShort:
 		writeError(w, http.StatusBadRequest, "password_short", "password must be at least 8 characters")
 		return false
-	}
-	if len(pw) > 1024 {
+	case auth.ErrPasswordLong:
 		writeError(w, http.StatusBadRequest, "password_long", "password is too long")
 		return false
 	}
 	return true
 }
 
-func (s *Server) startSession(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) startSession(w http.ResponseWriter, r *http.Request, password string) error {
 	secret, hash := auth.NewSecret("")
 	now := time.Now()
 	agent := r.UserAgent()
 	if len(agent) > 256 {
 		agent = agent[:256]
 	}
-	err := s.store.CreateSession(r.Context(), hash, store.Session{
+	err := s.store.CreateSession(r.Context(), hash, password, store.Session{
 		CreatedAt: now.UnixMilli(),
 		SeenAt:    now.UnixMilli(),
 		ExpiresAt: now.Add(sessionTTL).UnixMilli(),
@@ -132,7 +131,8 @@ func (s *Server) setup(w http.ResponseWriter, r *http.Request) {
 	if !validPassword(w, in.Password) {
 		return
 	}
-	ok, err := s.store.SetPasswordOnce(r.Context(), auth.HashPassword(in.Password))
+	hash := auth.HashPassword(in.Password)
+	ok, err := s.store.SetPasswordOnce(r.Context(), hash)
 	if err != nil {
 		s.internalError(w, r, err)
 		return
@@ -143,7 +143,10 @@ func (s *Server) setup(w http.ResponseWriter, r *http.Request) {
 	}
 	s.log.Info("admin password created")
 	s.logins.Reset(ip)
-	if err := s.startSession(w, r); err != nil {
+	if err := s.startSession(w, r, hash); errors.Is(err, store.ErrPasswordChanged) {
+		writeError(w, http.StatusUnauthorized, "wrong_password", "password changed; sign in again")
+		return
+	} else if err != nil {
 		s.internalError(w, r, err)
 		return
 	}
@@ -169,14 +172,17 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusConflict, "needs_setup", "no password has been set yet")
 		return
 	}
-	if len(in.Password) > 1024 || !auth.VerifyPassword(in.Password, hash) {
+	if !auth.VerifyPassword(in.Password, hash) {
 		s.logins.Fail(ip, now)
 		s.log.Warn("failed sign-in", "ip", ip)
 		writeError(w, http.StatusUnauthorized, "wrong_password", "wrong password")
 		return
 	}
 	s.logins.Reset(ip)
-	if err := s.startSession(w, r); err != nil {
+	if err := s.startSession(w, r, hash); errors.Is(err, store.ErrPasswordChanged) {
+		writeError(w, http.StatusUnauthorized, "wrong_password", "password changed; sign in again")
+		return
+	} else if err != nil {
 		s.internalError(w, r, err)
 		return
 	}
@@ -212,16 +218,12 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "wrong_password", "current password is wrong")
 		return
 	}
-	if err := s.store.SetSetting(r.Context(), store.SettingPassword, auth.HashPassword(in.Password)); err != nil {
-		s.internalError(w, r, err)
-		return
-	}
 	// Everyone else has to sign in with the new password.
 	keep := principalOf(r).session
-	if keep == nil {
-		keep = []byte{}
-	}
-	if err := s.store.DeleteSessions(r.Context(), keep); err != nil {
+	if err := s.store.ReplacePassword(r.Context(), hash, auth.HashPassword(in.Password), keep); errors.Is(err, store.ErrPasswordChanged) {
+		writeError(w, http.StatusBadRequest, "wrong_password", "current password is wrong")
+		return
+	} else if err != nil {
 		s.internalError(w, r, err)
 		return
 	}

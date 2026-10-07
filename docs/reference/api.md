@@ -132,7 +132,7 @@ curl https://s.example.com/api/links \
 | `url` | 目标网址。`example.com/a` 会补全为 `https://example.com/a`，`localhost` 和 IP 地址补全为 `http://`；域名转为小写，空格转为 `%20`；最长 8,192 字节。`javascript:`、`data:`、`file:` 等 13 种危险的网址类型会被拒绝，也不能指向本站的另一条短链接。`mailto:`、`tel:` 这类网址是允许的。 |
 | `slug` | 短码，规则见[日常使用](../guide/usage#slugs)。开头的 `/` 会被去掉。不填或为空时自动生成。 |
 | `title` | 标题，连续的空白会合并，超过 300 个字符会被截断。不填时在后台自动获取。 |
-| `expiresAt` | 过期时间，必须晚于现在。`null` 表示永久有效。 |
+| `expiresAt` | RFC 3339 过期时间，必须晚于现在，转换到 UTC 后年份在 0000–9999 内，按毫秒保存。`null` 表示永久有效。 |
 | `maxClicks` | 访问上限，非负整数，`0` 或 `null` 表示不限。 |
 | `redirect` | `302`（默认）、`301`、`307` 或 `308`。 |
 | `enabled` | 默认 `true`。 |
@@ -180,6 +180,8 @@ curl https://s.example.com/api/links \
 - 修改 `url` 时，如果原来的标题是自动获取的，会重新获取；
 - 修改 `slug` 后，旧短码立即失效；
 - 对于文本，`text` 和 `format` 替换它的内容和格式。
+
+自动标题是否需要清空，以写事务中的最新记录为准；更新网址或刷新元数据不会覆盖并发保存的手工标题。显式传入空标题仍表示重新选择自动获取（受 `SANI_FETCH_META` 控制）。
 
 文本和文件没有 `url` 和 `redirect`；`text` 和 `format` 只属于文本。把它们发给别的类型的链接，会得到 `kind_mismatch`。文件的内容不能替换，需要的话重新分享一个。修改在下一次访问时就会生效。返回修改后的[链接对象](#link-object)。
 
@@ -342,7 +344,9 @@ curl https://s.example.com/api/files \
 
 `GET /api/export`
 
-以附件形式返回全部链接的 JSON，文件格式见[导入与导出](../guide/import-export#export)。加上 `?format=csv` 返回 CSV。
+以附件形式返回全部未删除的网址链接及其标签的 Sani JSON，不包含文本或文件分享；文件格式见[导入与导出](../guide/import-export#export)。加上 `?format=csv` 返回 CSV。
+
+CSV 对可能触发电子表格公式的字段添加单引号前缀；重新导入会保留前缀。JSON 保留原始字段，适合无损迁移。
 
 ### 导入 {#import}
 
@@ -361,6 +365,8 @@ curl https://s.example.com/api/import \
 ```
 
 `skipped` 中的 `row` 是文件里的第几条记录，从 1 开始；因为短码已被占用而跳过的，只有 `slug`。
+
+过期时间可以是受支持的日期字符串或 Unix 秒/毫秒时间戳，按毫秒保存。非空值若格式非法、早于 Unix 纪元、超出 UTC 年份 0000–9999 或在单位换算时溢出，该行以 `expires_invalid` 跳过。空值和 `0` 表示永久有效；合法的历史过期时间会保留。
 
 ## 设置 {#config}
 
@@ -425,6 +431,8 @@ curl https://s.example.com/api/import \
 
 登录，请求体为 `{"password": "…"}`。成功后设置会话 Cookie，返回 `{"authenticated": true}`。
 
+首次设置或登录过程中若密码已被另一次修改替换，会话签发返回 `401 wrong_password`，需使用当前密码重新登录。
+
 `DELETE /api/session`
 
 退出登录，返回 `204`。
@@ -435,9 +443,13 @@ curl https://s.example.com/api/import \
 
 ## 密码 {#password}
 
+首次设置与更换密码要求至少 8 个 Unicode 码点、最多 1,024 个 UTF-8 字节，与环境变量及 CLI 限制一致。
+
 `PUT /api/password`
 
 修改密码，请求体为 `{"current": "…", "password": "…"}`。返回 `204`，其他设备上的会话全部失效。密码由 `SANI_PASSWORD` 管理时返回 `409`。
+
+密码替换与会话撤销在同一事务中完成；撤销失败时密码也不会改变。并发改密已使 `current` 失效时返回 `400 wrong_password`。
 
 `POST /api/sessions/revoke`
 
@@ -486,7 +498,7 @@ curl https://s.example.com/api/import \
 | `slug_invalid` | 400 | 短码包含不支持的字符，或者修改时传了空短码 |
 | `slug_too_long` | 400 | 短码超过 64 个字符 |
 | `slug_reserved` | 400 | 短码被系统保留 |
-| `expires_invalid` | 400 | `expiresAt` 不是 RFC 3339 格式的时间 |
+| `expires_invalid` | 400 | `expiresAt` 格式非法或超出 UTC 支持范围；导入时作为跳过原因返回 |
 | `expires_past` | 400 | `expiresAt` 早于当前时间 |
 | `max_clicks_invalid` | 400 | `maxClicks` 不是 0 到 10¹² 之间的整数 |
 | `redirect_invalid` | 400 | `redirect` 不是 301、302、307 或 308 |
@@ -498,11 +510,11 @@ curl https://s.example.com/api/import \
 | `bulk_invalid` | 400 | 批量修改的 `action` 不认识，或者 `ids` 不是 1 到 500 条 |
 | `base_url_invalid` | 400 | 域名格式不对，应该形如 `https://s.example.com` |
 | `name_invalid` | 400 | 令牌名称为空，或者超过 60 个字符 |
-| `password_short` | 400 | 密码少于 8 个字符 |
+| `password_short` | 400 | 密码少于 8 个 Unicode 码点 |
 | `password_long` | 400 | 密码超过 1,024 字节 |
 | `import_unreadable` | 400 | 导入的文件无法解析 |
 | `import_too_many` | 400 | 一次导入超过 100,000 条 |
-| `wrong_password` | 400, 401 | 登录时密码错误为 401；修改密码时当前密码错误为 400 |
+| `wrong_password` | 400, 401 | 登录密码错误或首次设置、登录过程中密码已被替换为 401；修改密码时当前密码错误或已被替换为 400 |
 | `unauthorized` | 401 | 没有登录，也没有提供有效的令牌 |
 | `cross_origin` | 403 | 浏览器从其他网站发来的请求 |
 | `setup_code` | 403 | 设置码错误 |

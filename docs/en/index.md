@@ -2,7 +2,7 @@
 layout: home
 markdownStyles: false
 title: Sani
-titleTemplate: A link shortener you host yourself
+titleTemplate: Self-hosted URL shortener, text and file sharing
 ---
 
 <HomePage />

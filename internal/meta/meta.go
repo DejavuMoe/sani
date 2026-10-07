@@ -33,9 +33,10 @@ import (
 )
 
 const (
-	maxPageBytes = 1 << 20
-	maxIconBytes = 256 << 10
-	userAgent    = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Sani/1"
+	maxPageBytes      = 1 << 20
+	maxIconBytes      = 256 << 10
+	maxIconCandidates = 32
+	userAgent         = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Sani/1"
 )
 
 // PreviewHeader marks requests made by the fetcher, so a destination that
@@ -253,7 +254,9 @@ func (f *Fetcher) Page(ctx context.Context, raw, lang string) (*Page, error) {
 	} else {
 		p.Title = fileTitle(final)
 	}
-	p.Icons = append(p.Icons, final.ResolveReference(&url.URL{Path: "/favicon.ico"}).String())
+	if fallback := final.ResolveReference(&url.URL{Path: "/favicon.ico"}).String(); len(fallback) <= links.MaxURLLength {
+		p.Icons = append(p.Icons, fallback)
+	}
 	p.Icons = dedupe(p.Icons)
 	return p, nil
 }
@@ -264,7 +267,11 @@ func FallbackIcons(raw string) []string {
 	if err != nil || u.Host == "" {
 		return nil
 	}
-	return []string{u.Scheme + "://" + u.Host + "/favicon.ico"}
+	fallback := u.Scheme + "://" + u.Host + "/favicon.ico"
+	if len(fallback) > links.MaxURLLength {
+		return nil
+	}
+	return []string{fallback}
 }
 
 type iconRef struct {
@@ -273,6 +280,10 @@ type iconRef struct {
 }
 
 func parseHead(r io.Reader, base *url.URL, p *Page) {
+	// Redirects can supply a long base too; never multiply it by icon links.
+	if len(base.String()) > links.MaxURLLength {
+		base = &url.URL{}
+	}
 	z := html.NewTokenizer(r)
 	var title, ogTitle, twTitle strings.Builder
 	var icons []iconRef
@@ -310,12 +321,16 @@ loop:
 					}
 				}
 			case "base":
-				if href := attrs["href"]; href != "" {
-					if u, err := base.Parse(href); err == nil {
+				if href := attrs["href"]; href != "" && len(href) <= links.MaxURLLength {
+					if u, err := base.Parse(href); err == nil && len(u.String()) <= links.MaxURLLength {
 						base = u
 					}
 				}
 			case "link":
+				// Bound expansion before resolving more references, not after sorting.
+				if len(icons) >= maxIconCandidates {
+					continue
+				}
 				if ref, ok := iconCandidate(attrs, base); ok {
 					icons = append(icons, ref)
 				}
@@ -366,11 +381,17 @@ func iconCandidate(attrs map[string]string, base *url.URL) (iconRef, bool) {
 	if strings.HasPrefix(href, "data:") {
 		abs = href
 	} else {
+		if len(href) > links.MaxURLLength {
+			return iconRef{}, false
+		}
 		u, err := base.Parse(href)
 		if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
 			return iconRef{}, false
 		}
 		abs = u.String()
+		if len(abs) > links.MaxURLLength {
+			return iconRef{}, false
+		}
 	}
 	score := 40
 	isSVG := strings.Contains(attrs["type"], "svg") || strings.HasSuffix(strings.ToLower(path.Ext(href)), ".svg")

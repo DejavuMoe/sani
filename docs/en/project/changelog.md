@@ -4,7 +4,28 @@
 
 ## Unreleased
 
+- Advance each link's update timestamp in commit order for edits and bulk enable/disable, so requests committed late or within the same millisecond are not mistaken for stale responses by the admin app. Metadata refreshes still preserve the timestamp.
+- Validate expiry consistently across creation, updates and imports. Send a success status only after JSON encoding succeeds; encoding failures return `500 internal`.
+- Protect temporary and renamed files for the full upload request until database ownership or failure cleanup, preventing the file sweeper from removing active uploads.
+- Decide whether to refetch a title from the latest row inside the write transaction, preserving concurrently saved manual titles during URL updates and metadata refreshes.
+- Ignore late list and text responses to preserve saved or deleted data. Retry stale pagination and refresh counts after deletion. Failed sign-out keeps the authenticated interface and shows an error that can be retried.
+- Add CI smoke coverage using real processes for authentication, shares, CLI password reset and stopped-service backup/restore. Run admin axe checks in Chinese/English and light/dark themes.
+- Align bilingual product scope, cache/statistics limits, proxy trust and stopped-service backup/upgrade instructions. Add page descriptions, canonical URLs, language alternates, social metadata and JSON-LD, with post-build checks of HTML, sitemap, robots and 404 indexing rules.
+- Reject session issuance from a password verification that predates a password change. Admin changes, environment synchronization and CLI resets update the password and revoke sessions atomically; a failed revocation rolls back the password.
+- Prevent requests after cache invalidation from joining an older load, so disabling or renaming links and shares takes effect for new requests.
+- Limit HTML icon candidates to 32 and base and HTTP(S) icon URLs to 8192 bytes to bound relative-URL expansion.
+- Bookmarklet and phone shares now prefill the URL and title for review. Click “Shorten” to create or reuse a link.
+- Prefix potentially executable spreadsheet fields in CSV exports; use JSON for lossless migration. Prevent very large imported click counts from overflowing statistics, saturating at the int64 ceiling while retaining exact integer counts within range.
 - Add Ecoku comments to documentation pages, with Chinese and English UI and light/dark themes. Each page has its own discussion; theme changes preserve comment drafts.
+
+### Incompatible changes
+
+The database remains at schema 4 with no new migration. Under the [versioning policy](./versioning), these behavior changes belong in a minor release rather than a patch. The version number has not been selected.
+
+- **CSV formula protection:** fields that could trigger spreadsheet formulas gain an apostrophe prefix. Reimporting retains that prefix and can change original titles and other fields. For lossless migration of URL links and tags, export Sani JSON again from the original instance. Do not strip apostrophes in bulk: they may be original content. Full instance recovery still requires matching backups of the database, files and configuration.
+- **Bookmarklet and phone shares:** incoming URLs and titles only prefill the form; review and confirm creation manually. Workflows that relied on automatic creation must use the authenticated API or keep the manual confirmation step.
+- **Password length:** setting or replacing a password requires at least 8 Unicode code points and at most 1,024 UTF-8 bytes, consistently across the API, `SANI_PASSWORD` and `sani passwd`. Multibyte characters count toward the byte ceiling. Check environment configuration before upgrading: an oversized password prevents startup. Reset an existing oversized password through `sani passwd`; a successful reset revokes sessions. Rejected passwords leave the stored password and sessions unchanged.
+- **Expiry:** creation and updates require a future RFC 3339 time whose UTC year is within 0000–9999, stored with millisecond precision. Imports skip a row with `expires_invalid` when a nonempty expiry is malformed, predates the Unix epoch or exceeds the UTC range, instead of silently making the link permanent. Unix seconds are checked for overflow before conversion to milliseconds. Review `skipped`, correct the input and retry; use an empty value or import value `0` when permanent validity is intended.
 
 ## v0.5.0
 

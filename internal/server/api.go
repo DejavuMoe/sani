@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -71,14 +72,23 @@ type apiError struct {
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
+	var body bytes.Buffer
+	enc := json.NewEncoder(&body)
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(v); err != nil {
+		// Nothing has been committed yet: a failed DTO must not look like
+		// an empty successful response (or a downloadable export).
+		status = http.StatusInternalServerError
+		body.Reset()
+		body.WriteString("{\"error\":{\"code\":\"internal\",\"message\":\"internal error\"}}\n")
+		w.Header().Del("Content-Disposition")
+	}
 	h := w.Header()
 	h.Set("Content-Type", "application/json; charset=utf-8")
 	h.Set("Cache-Control", "no-store")
 	h.Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(status)
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	enc.Encode(v)
+	w.Write(body.Bytes())
 }
 
 func writeError(w http.ResponseWriter, status int, code, msg string) {
@@ -146,6 +156,16 @@ func msTime(ms int64) *time.Time {
 	}
 	t := time.UnixMilli(ms).UTC()
 	return &t
+}
+
+// timestampMillis checks the UTC representation used by every JSON DTO
+// before UnixMilli can turn an out-of-range time into stored data.
+func timestampMillis(t time.Time) (int64, bool) {
+	t = t.UTC()
+	if t.Year() < 0 || t.Year() > 9999 {
+		return 0, false
+	}
+	return t.UnixMilli(), true
 }
 
 const (

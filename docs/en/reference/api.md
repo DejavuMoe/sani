@@ -132,7 +132,7 @@ Only `url` is required.
 | `url` | The destination. `example.com/a` becomes `https://example.com/a`, and `localhost` or IP addresses get `http://`; the host is lowercased and spaces become `%20`; at most 8,192 bytes. Thirteen dangerous schemes such as `javascript:`, `data:` and `file:` are refused, and so is another short link on this server. Addresses like `mailto:` and `tel:` are fine. |
 | `slug` | The slug; see the rules under [Everyday use](../guide/usage#slugs). A leading `/` is dropped. Generated when missing or empty. |
 | `title` | The title. Runs of whitespace are collapsed, and titles over 300 characters are cut. Fetched in the background when missing. |
-| `expiresAt` | The expiry, which must be in the future. `null` means never. |
+| `expiresAt` | A future RFC 3339 expiry whose UTC year is within 0000–9999, stored with millisecond precision. `null` means never. |
 | `maxClicks` | The visit limit, a whole number; `0` or `null` means none. |
 | `redirect` | `302` (default), `301`, `307` or `308`. |
 | `enabled` | Defaults to `true`. |
@@ -180,6 +180,8 @@ Takes every field of *Create* except `reuse`, and changes only the fields presen
 - a new `url` fetches a new title if the old one was fetched automatically;
 - after a `slug` change, the old slug stops working immediately;
 - for a text, `text` and `format` replace its body and its format.
+
+The decision to clear an automatic title uses the latest row inside the write transaction. URL updates and metadata refreshes preserve concurrently saved manual titles. An explicit empty title still selects automatic fetching again, subject to `SANI_FETCH_META`.
 
 `url` and `redirect` don’t apply to texts and files, and `text` and `format` only apply to texts; sending one to a link of another kind gets `kind_mismatch`. A file’s bytes can’t be replaced: share a new one. Changes apply from the next visit. Returns the updated [link](#link-object).
 
@@ -342,7 +344,9 @@ Returns the icon itself, or `404` when there’s none. `{host}` is the `host` of
 
 `GET /api/export`
 
-Returns every link as a JSON attachment; the format is described under [Import and export](../guide/import-export#export). Add `?format=csv` for CSV.
+Returns all undeleted URL links and their tags as a Sani JSON attachment, excluding text and file shares. The format is described under [Import and export](../guide/import-export#export). Add `?format=csv` for CSV.
+
+CSV adds an apostrophe prefix to fields that could trigger spreadsheet formulas; imports retain the prefix. JSON preserves the original fields for lossless migration.
 
 ### Import {#import}
 
@@ -361,6 +365,8 @@ curl https://s.example.com/api/import \
 ```
 
 `row` in `skipped` is the record’s position in the file, starting at 1; entries skipped because their slug is taken only have `slug`.
+
+Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds and is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch, exceeds UTC years 0000–9999 or overflows during unit conversion skips the row with `expires_invalid`. Empty values and `0` mean never; valid past expiry dates are preserved.
 
 ## Settings {#config}
 
@@ -425,6 +431,8 @@ Sets the first password, with `{"code": "k7m2-p9x4-hq3d", "password": "…"}`. `
 
 Signs in with `{"password": "…"}`, sets the session cookie and returns `{"authenticated": true}`.
 
+If another password change replaces the password during setup or sign-in, session issuance returns `401 wrong_password`. Sign in again with the current password.
+
 `DELETE /api/session`
 
 Signs out and returns `204`.
@@ -435,9 +443,13 @@ The session cookie is `sani_session`: `HttpOnly`, `SameSite=Strict`, only sent t
 
 ## Password {#password}
 
+Initial setup and password changes require at least 8 Unicode code points and at most 1,024 UTF-8 bytes, matching the environment and CLI limits.
+
 `PUT /api/password`
 
 Changes the password, with `{"current": "…", "password": "…"}`. Returns `204` and ends the sessions on every other device. Returns `409` when `SANI_PASSWORD` manages the password.
+
+Password replacement and session revocation commit in one transaction; failed revocation leaves the password unchanged. A concurrent change that invalidates `current` returns `400 wrong_password`.
 
 `POST /api/sessions/revoke`
 
@@ -486,7 +498,7 @@ Returns `200` with `ok`, for health checks.
 | `slug_invalid` | 400 | The slug has unsupported characters, or an update sent an empty slug |
 | `slug_too_long` | 400 | The slug is over 64 characters |
 | `slug_reserved` | 400 | The slug is reserved |
-| `expires_invalid` | 400 | `expiresAt` isn’t an RFC 3339 time |
+| `expires_invalid` | 400 | Malformed `expiresAt` or a value outside the supported UTC range; imports return it as a skip reason |
 | `expires_past` | 400 | `expiresAt` is in the past |
 | `max_clicks_invalid` | 400 | `maxClicks` isn’t a whole number from 0 to 10¹² |
 | `redirect_invalid` | 400 | `redirect` isn’t 301, 302, 307 or 308 |
@@ -498,11 +510,11 @@ Returns `200` with `ok`, for health checks.
 | `bulk_invalid` | 400 | A bulk change with an unknown `action`, or without 1 to 500 `ids` |
 | `base_url_invalid` | 400 | The domain should look like `https://s.example.com` |
 | `name_invalid` | 400 | The token name is empty or over 60 characters |
-| `password_short` | 400 | The password is shorter than 8 characters |
+| `password_short` | 400 | The password is shorter than 8 Unicode code points |
 | `password_long` | 400 | The password is over 1,024 bytes |
 | `import_unreadable` | 400 | The import file can’t be read |
 | `import_too_many` | 400 | More than 100,000 links in one import |
-| `wrong_password` | 400, 401 | Wrong password: 401 when signing in, 400 for a wrong current password when changing it |
+| `wrong_password` | 400, 401 | 401 for a wrong sign-in password or one replaced during setup/sign-in; 400 for a wrong or superseded current password during a change |
 | `unauthorized` | 401 | Not signed in, and no valid token |
 | `cross_origin` | 403 | A browser request from another site |
 | `setup_code` | 403 | Wrong setup code |

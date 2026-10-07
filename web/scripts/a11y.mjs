@@ -1,4 +1,4 @@
-// Runs axe-core over the main screens in both themes and reports violations.
+// Runs axe-core over the main screens in both languages and themes.
 //   SANI_URL=http://127.0.0.1:8080 node scripts/a11y.mjs
 // SANI_FRESH_URL may point at an instance without a password to include setup.
 import { chromium } from '@playwright/test';
@@ -50,16 +50,16 @@ const screens = [
     name: 'share-text',
     path: '/admin/',
     run: async (page) => {
-      await page.getByRole('tab', { name: '文本' }).click();
+      await page.getByRole('tab', { name: /^(文本|Text)$/ }).click();
       await page.locator('#share-text-body').fill('server {\n    listen 443;\n}');
-      await page.locator('#create-panel-text').getByRole('radio', { name: '代码' }).click();
+      await page.locator('#create-panel-text').getByRole('radio', { name: /^(代码|Code)$/ }).click();
     },
   },
   {
     name: 'share-file',
     path: '/admin/',
     run: async (page) => {
-      await page.getByRole('tab', { name: '文件' }).click();
+      await page.getByRole('tab', { name: /^(文件|File)$/ }).click();
       await page.locator('#create-panel-file input[type=file]').setInputFiles({
         name: 'notes.txt',
         mimeType: 'text/plain',
@@ -100,9 +100,9 @@ const screens = [
 
 const browser = await chromium.launch();
 let total = 0;
-for (const theme of ['light', 'dark']) {
+for (const [locale, theme] of ['zh-CN', 'en-US'].flatMap((locale) => ['light', 'dark'].map((theme) => [locale, theme]))) {
   for (const s of screens) {
-    const ctx = await browser.newContext({ colorScheme: theme, locale: 'zh-CN', bypassCSP: true, viewport: s.viewport });
+    const ctx = await browser.newContext({ colorScheme: theme, locale, bypassCSP: true, viewport: s.viewport });
     await ctx.addInitScript((t) => localStorage.setItem('sani.theme', t), theme);
     if (s.auth !== false) await ctx.request.post(`${base}/api/session`, { data: { password } });
     const page = await ctx.newPage();
@@ -125,7 +125,7 @@ for (const theme of ['light', 'dark']) {
     const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (wide > 0) result.push({ id: 'reflow', impact: 'serious', help: `page is ${wide}px wider than the viewport`, nodes: [], count: 1 });
     total += result.length;
-    console.log(`\n[${theme}] ${s.name}: ${result.length ? result.length + ' violation(s)' : 'clean'}`);
+    console.log(`\n[${locale}/${theme}] ${s.name}: ${result.length ? result.length + ' violation(s)' : 'clean'}`);
     for (const v of result) {
       console.log(`  - ${v.impact} ${v.id} (${v.count}): ${v.help}`);
       for (const n of v.nodes) console.log(`      ${n.target}${n.summary ? ' — ' + n.summary : ''}`);

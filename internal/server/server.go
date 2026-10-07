@@ -68,6 +68,7 @@ type Server struct {
 	jobSlots chan struct{}
 
 	filesHost string        // host[:port] of FilesURL
+	filesMu   sync.RWMutex  // uploads hold a read lock until ownership transfers or cleanup finishes
 	downloads chan struct{} // bounds concurrent file downloads
 	share     *template.Template
 }
