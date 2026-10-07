@@ -66,7 +66,7 @@ function Index() {
       intro={
         <p>
           A layered reconstruction of the current admin app and visitor pages. It matches production pixel for pixel; revisions change a
-          layer here, get reviewed, then get implemented. Status: <strong>revision 1 implemented</strong>, production matches again (<code>_d_meta.json</code>).
+          layer here, get reviewed, then get implemented. <strong>Revision 1 is implemented; revision 2 (tags) awaits review</strong> (<code>_d_meta.json</code>).
         </p>
       }
     >
@@ -76,6 +76,12 @@ function Index() {
           <code>src/revisions.js</code>
         </div>
         <div className="bd-cards">
+          <a className="bd-card" href={`prototype-r2.html${keep}&scene=tags-create`}>
+            <span className="tag">R2 · needs-review</span>
+            <h3>Link tags</h3>
+            <p>Create, assign and filter tags. Desktop columns and mobile cards.</p>
+            <code>base 61d2a5f</code>
+          </a>
           {window.SANI_REVISIONS.map((r) => (
             <a key={r.id} className="bd-card" href={`changes.html${keep}#${r.id}-title`}>
               <span className="tag">

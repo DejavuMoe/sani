@@ -7,9 +7,11 @@
    "content/dom-app-zh.json",
    "content/dom-app-en.json",
    "content/dom-visitor-zh.json",
-   "content/dom-visitor-en.json"
+   "content/dom-visitor-en.json",
+   "content/dom-r2-zh.json",
+   "content/dom-r2-en.json"
   ],
-  "capturedAt": "2026-10-04T01:33:55Z",
+  "capturedAt": "2026-10-07T07:59:50Z",
   "surfaces": [
    {
     "source": "content/dom-app-zh.json",
@@ -50,6 +52,26 @@
      "height": 800,
      "devicePixelRatio": 1
     }
+   },
+   {
+    "source": "content/dom-r2-zh.json",
+    "url": "prototype-r2.html (zh)",
+    "title": "Sani",
+    "viewport": {
+     "width": 1280,
+     "height": 900,
+     "devicePixelRatio": 1
+    }
+   },
+   {
+    "source": "content/dom-r2-en.json",
+    "url": "prototype-r2.html (en)",
+    "title": "Sani",
+    "viewport": {
+     "width": 390,
+     "height": 844,
+     "devicePixelRatio": 1
+    }
    }
   ],
   "limitations": [
@@ -59,7 +81,8 @@
    "Only the currently rendered state is captured; exercise other states separately.",
    "Ordinary input values and sensitive-looking attributes/JSON keys are deliberately omitted.",
    "Use sanitized test data: arbitrary text nodes or data attributes can still contain private product data.",
-   "Board pages (index, foundations, components, patterns, screens, visitors) and the Tweaks panel are prototype chrome for reviewers and are not captured; every product state they show is captured here from prototype.html and visitor.html."
+   "Board pages (index, foundations, components, patterns, screens, visitors) and the Tweaks panel are prototype chrome for reviewers and are not captured; every product state they show is captured here from prototype.html and visitor.html.",
+   "R2: 13 states in each language; tag copy is proposed task copy, not implemented production behavior."
   ]
  },
  "briefSources": [],
@@ -30091,6 +30114,2940 @@
    },
    "flags": [],
    "notes": "Text around keyboard keys rendered as <kbd>."
+  },
+  {
+   "id": "content-a318c24216defe20",
+   "text": "+",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … span.lr-tags:nth-of-type(3) > span.tag-badges > span.tag-overflow:nth-of-type(3)",
+    "[edit] … span.lr-tags:nth-of-type(3) > span.tag-badges > span.tag-overflow:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-2fb1d65c85be2105",
+   "text": "/guide",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.rest:nth-of-type(2)",
+    "[edit] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.rest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-a5e33a2a79ccd0a2",
+   "text": "/long-label",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[long-tag-row] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.rest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-460f9ca5b3fa88d5",
+   "text": "0 / 5 selected",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[edit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-filter] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[file-created] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[limit] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag-row] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[name-error] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[untagged] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-9c7c51f8ecd001ab",
+   "text": "0 clicks in the last 14 days",
+   "channels": [
+    "aria-label",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-spark:nth-of-type(1)",
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)"
+   ],
+   "visibility": [
+    "hidden",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "list.spark.other"
+   },
+   "flags": [],
+   "notes": "Template with values filled in."
+  },
+  {
+   "id": "content-295c6e3f50385b59",
+   "text": "1 / 5 selected",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[long-tag] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-56b32b92e6a197d2",
+   "text": "10月7日 15:57",
+   "channels": [
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-age:nth-of-type(3)",
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib (i18n.svelte.ts formatters, size.ts, keys.ts)",
+    "reference": "formatted value or key label"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-3c50bc58371f637e",
+   "text": "2 / 5 selected",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[edit] … div#tag-picker-ra > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-0eab0949545c4e26",
+   "text": "2 results",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[untagged] … section.ll:nth-of-type(3) > div.ll-toolbar:nth-of-type(2) > span.ll-count"
+   ],
+   "visibility": [
+    "hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "list.results.other"
+   },
+   "flags": [],
+   "notes": "Template with values filled in."
+  },
+  {
+   "id": "content-7edbdbf00e40a08d",
+   "text": "2 条结果",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[untagged] … section.ll:nth-of-type(3) > div.ll-toolbar:nth-of-type(2) > span.ll-count"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "list.results"
+   },
+   "flags": [],
+   "notes": "Template with values filled in."
+  },
+  {
+   "id": "content-6216ba8c539cb874",
+   "text": "8jjay",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-3e10b08cc8745141",
+   "text": "Add tag",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[edit] … div.tag-field.tag-field-framed > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[limit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[name-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[picker] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[ready] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[save-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.add"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-543b4bb6a59be212",
+   "text": "aff",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(3) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-35cf4ecafd75e42c",
+   "text": "ahpxe",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[long-tag-row] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-a52ace420f2175d0",
+   "text": "All",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[long-tag-row] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.all"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-a5cccbcead7dcd65",
+   "text": "Amber",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-amber:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.amber"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-ec7d56a01607001e",
+   "text": "Blue",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-blue:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.blue"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-5c1f6141ec65a120",
+   "text": "Choose or create tags",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[edit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[empty-catalog] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[empty-filter] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[file-created] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[limit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag-row] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[name-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[picker] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[ready] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[save-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[untagged] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add"
+   ],
+   "visibility": [
+    "hidden",
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.choose"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-f7b3b23c5d9fb9d4",
+   "text": "Choose up to 5 tags",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[limit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.limit"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-7179ea0035fca783",
+   "text": "Clear filters",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … section.ll:nth-of-type(3) > div.ll-blank:nth-of-type(3) > button.ll-text-btn"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.clear"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-76490413af2ce45e",
+   "text": "Create “sixth”",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.create"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-e6bb5689beec52c4",
+   "text": "dark",
+   "channels": [
+    "data-*"
+   ],
+   "locations": [
+    "[created-filtered] … html",
+    "[edit] … html",
+    "[empty-catalog] … html",
+    "[empty-filter] … html",
+    "[file-created] … html",
+    "[limit] … html",
+    "[long-tag-row] … html",
+    "[long-tag] … html",
+    "[name-error] … html",
+    "[picker] … html",
+    "[ready] … html",
+    "[save-error] … html",
+    "[untagged] … html"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "machine-identifier",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/screens.jsx, src/app.jsx, src/patterns.jsx",
+    "reference": "data-screen-label / data-theme / data-link"
+   },
+   "flags": [
+    "dom-metadata"
+   ],
+   "notes": "Attribute only. data-link carries a link id and data-theme the theme, as in production; data-screen-label is the prototype’s screen marker and is not shipped."
+  },
+  {
+   "id": "content-cb1a89405b97da75",
+   "text": "dmit",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(4) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-f38bfcce9d6c643f",
+   "text": "dtzce",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)",
+    "[edit] … div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-a379a6f6eeafb9a5",
+   "text": "example.com",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.host:nth-of-type(1)",
+    "[edit] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.host:nth-of-type(1)",
+    "[long-tag-row] … span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2) > span.host:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-ecd60042effa138b",
+   "text": "Fetching title…",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[created-filtered] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)",
+    "[edit] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)",
+    "[long-tag-row] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "state",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "detail.fetching"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b9274474d0990cb9",
+   "text": "Filter by tag",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[created-filtered] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[edit] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[empty-filter] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[file-created] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[limit] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[long-tag-row] … main.dash > section.ll:nth-of-type(2) > div.tag-filters:nth-of-type(1)",
+    "[name-error] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[picker] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[ready] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[save-error] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[untagged] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.filter"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-fe25111ad715dcbf",
+   "text": "gnjhv",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)",
+    "[edit] … div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-0d5adda3cdccf937",
+   "text": "Gray",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-neutral:nth-of-type(5)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.neutral"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-d486dfbd5fb57834",
+   "text": "Green",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-green:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.green"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-d1caa9c9acb5e3ec",
+   "text": "https://example.com/guide",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[edit] … textarea#edit-url-15"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-4de696556e3c90c0",
+   "text": "ja7pf",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-7ddb44d8a533a753",
+   "text": "just now",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-age:nth-of-type(3)",
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)"
+   ],
+   "visibility": [
+    "hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib (i18n.svelte.ts formatters, size.ts, keys.ts)",
+    "reference": "formatted value or key label"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-abfc412ce6e530df",
+   "text": "launch",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(7) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(7) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(7) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-green:nth-of-type(7) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-9b29d4791aab15a6",
+   "text": "netcup",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-amber:nth-of-type(2) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-1ba5d470e47e9836",
+   "text": "No links match these filters",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … section.ll:nth-of-type(3) > div.ll-blank:nth-of-type(3) > p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.none"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-954a06a8543bd0ea",
+   "text": "No tags yet. Type a name to create one.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-choices:nth-of-type(2) > p.tag-empty"
+   ],
+   "visibility": [
+    "hidden",
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.empty"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-e2966051638b1893",
+   "text": "Oct 7, 03:57 PM",
+   "channels": [
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-age:nth-of-type(3)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)"
+   ],
+   "visibility": [
+    "hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib (i18n.svelte.ts formatters, size.ts, keys.ts)",
+    "reference": "formatted value or key label"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-26ba4a011d8ccb87",
+   "text": "Oct 7, 03:58 PM",
+   "channels": [
+    "title"
+   ],
+   "locations": [
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)"
+   ],
+   "visibility": [
+    "hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib (i18n.svelte.ts formatters, size.ts, keys.ts)",
+    "reference": "formatted value or key label"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-ba19e9c3d5f49882",
+   "text": "Red",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-rose:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.rose"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-2dbcb16d4f1f76e9",
+   "text": "Remove tag aff",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[picker] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[ready] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-dd6b6ec74ee75859",
+   "text": "Remove tag dmit",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(3) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(3) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-ff86260dbef4b3e7",
+   "text": "Remove tag launch",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[edit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(2) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-d0c59a54e9c3c278",
+   "text": "Remove tag netcup",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[edit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[picker] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[ready] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[save-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-356f9b700af81092",
+   "text": "Remove tag 季度回顾与长期项目相关资料归档标签名称",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[long-tag] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-3de2d4f8fbf03712",
+   "text": "Remove tag 工作",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-rose:nth-of-type(5) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-rose:nth-of-type(5) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-9f6818c9722506c0",
+   "text": "Remove tag 阅读",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-neutral:nth-of-type(4) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-neutral:nth-of-type(4) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-b4102eaea34756d8",
+   "text": "s.example.com/ahpxe",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[long-tag-row] … div.toast.toast-success > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-65744d9b393b6183",
+   "text": "s.example.com/dtzce",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.toast.toast-success > span.toast-msg > span.toast-detail",
+    "[edit] … div.toast.toast-success > span.toast-msg > span.toast-detail",
+    "[empty-filter] … div.toast.toast-success:nth-of-type(1) > span.toast-msg > span.toast-detail",
+    "[untagged] … div.toast.toast-success:nth-of-type(1) > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-989324487eaf300b",
+   "text": "s.example.com/gnjhv",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.toast.toast-success > span.toast-msg > span.toast-detail",
+    "[edit] … div.toast.toast-success > span.toast-msg > span.toast-detail",
+    "[empty-filter] … div.toast.toast-success:nth-of-type(1) > span.toast-msg > span.toast-detail",
+    "[untagged] … div.toast.toast-success:nth-of-type(1) > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-eab5a0168442835b",
+   "text": "s.example.com/p/8jjay",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.toast.toast-success:nth-of-type(2) > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-01928460dbed4c16",
+   "text": "s.example.com/p/ja7pf",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.toast.toast-success:nth-of-type(2) > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-fc277a9c0ec3b54f",
+   "text": "s.example.com/u6sat",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[long-tag-row] … div.toast.toast-success > span.toast-msg > span.toast-detail"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/fixtures.js",
+    "reference": "sanitized demo records from scripts/seed via tools/capture.mjs"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-9496eec54d06963f",
+   "text": "sample.txt",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-b5c120b316c237a0",
+   "text": "Saved",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … div.toaster > div.toast.toast-success:nth-of-type(2) > span.toast-msg",
+    "[untagged] … div.toaster > div.toast.toast-success:nth-of-type(2) > span.toast-msg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "completion",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "detail.saved"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-cb6a5d9a2af02881",
+   "text": "Search or create a tag",
+   "channels": [
+    "aria-label",
+    "placeholder"
+   ],
+   "locations": [
+    "[created-filtered] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[edit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-filter] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[file-created] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[limit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag-row] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[name-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[untagged] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.search"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-cb4190b57113dd90",
+   "text": "Tag color",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-choices:nth-of-type(2) > div.tag-new > div.tag-colors"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.color"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-1331275bc537b4c2",
+   "text": "Tags",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[edit] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[empty-catalog] … div#create-panel-file > form.cmp.cmp-share > div.tag-field:nth-of-type(3)",
+    "[empty-filter] … section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1) > span.tag-filter-label",
+    "[file-created] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[limit] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[long-tag-row] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[long-tag] … div#create-panel-file > form.cmp.cmp-share > div.tag-field:nth-of-type(3)",
+    "[name-error] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[picker] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[ready] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[save-error] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[untagged] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)"
+   ],
+   "visibility": [
+    "accessibility-hidden",
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.label"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-5f4d638beaa0af40",
+   "text": "text/plain · 11 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-fdc72325f942dfa2",
+   "text": "Theme: Dark",
+   "channels": [
+    "aria-label",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[edit] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[empty-catalog] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[empty-filter] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[file-created] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[limit] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[long-tag-row] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[long-tag] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[name-error] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[picker] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[ready] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[save-error] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)",
+    "[untagged] … div.hd-inner > nav.hd-tools > button.hd-tool:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "navigation",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/components/AppHeader.svelte",
+    "reference": "`${t('menu.theme')}: ${themeName}`"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-5b79510a6e426bb5",
+   "text": "u6sat",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[long-tag-row] … div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-9a28cbfaf271bc2d",
+   "text": "Untagged",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[long-tag-row] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(3) > span.tag-name:nth-of-type(1)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.untagged"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-50c7e7ac37edf68a",
+   "text": "Upload canceled",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.toaster > div.toast.toast-neutral:nth-of-type(1) > span.toast-msg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "share.canceled"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-fa8d4233d9fc8c36",
+   "text": "Use up to 24 characters",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[name-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-en.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.en.tooLong"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-5c55a67935af8f45",
+   "text": "全部",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[long-tag-row] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(1) > span.tag-name:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.all"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-de6785d99e028971",
+   "text": "刚刚",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-age:nth-of-type(3)",
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-age:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib (i18n.svelte.ts formatters, size.ts, keys.ts)",
+    "reference": "formatted value or key label"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-d86b7897056ef127",
+   "text": "季度回顾与长期项目相关资料归档标签名称",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[long-tag-row] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-blue:nth-of-type(2) > span.tag-name:nth-of-type(2)",
+    "[long-tag] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-bc62d1b6b936c78d",
+   "text": "工作",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-rose:nth-of-type(6) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
+  },
+  {
+   "id": "content-1bd91a7d0c53c936",
+   "text": "已保存",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … div.toaster > div.toast.toast-success:nth-of-type(2) > span.toast-msg",
+    "[untagged] … div.toaster > div.toast.toast-success:nth-of-type(2) > span.toast-msg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "completion",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "detail.saved"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-80bfa30db2096589",
+   "text": "已创建",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.toaster > div.toast.toast-success > span.toast-msg",
+    "[edit] … div.toaster > div.toast.toast-success > span.toast-msg",
+    "[empty-filter] … div.toaster > div.toast.toast-success:nth-of-type(1) > span.toast-msg",
+    "[file-created] … div.toaster > div.toast.toast-success:nth-of-type(2) > span.toast-msg",
+    "[long-tag-row] … div.toaster > div.toast.toast-success > span.toast-msg",
+    "[untagged] … div.toaster > div.toast.toast-success:nth-of-type(1) > span.toast-msg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "created.ready"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-fb2c92fc6af2aec3",
+   "text": "已取消上传",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[file-created] … div.toaster > div.toast.toast-neutral:nth-of-type(1) > span.toast-msg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "share.canceled"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-71390bc2ccbd26df",
+   "text": "已选 0 / 5",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[edit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-filter] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[file-created] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[limit] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag-row] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[name-error] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r3 > div.tag-search:nth-of-type(1) > input",
+    "[untagged] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-817cfba6a35f3847",
+   "text": "已选 1 / 5",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[long-tag] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-e0cd19146ca6e188",
+   "text": "已选 2 / 5",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[edit] … div#tag-picker-ra > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.count"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-234b0b84e2d8e5c1",
+   "text": "按标签筛选",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[created-filtered] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[edit] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[empty-filter] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[file-created] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[limit] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[long-tag-row] … main.dash > section.ll:nth-of-type(2) > div.tag-filters:nth-of-type(1)",
+    "[name-error] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[picker] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[ready] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[save-error] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)",
+    "[untagged] … main.dash > section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.filter"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-a4059dae9325747d",
+   "text": "搜索或新建标签",
+   "channels": [
+    "aria-label",
+    "placeholder"
+   ],
+   "locations": [
+    "[created-filtered] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[edit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[empty-filter] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[file-created] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[limit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag-row] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[long-tag] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[name-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[picker] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[ready] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[save-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input",
+    "[untagged] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.search"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-d4315db476bc497c",
+   "text": "新建「sixth」",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.create"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-cd141a1db3c6e3c7",
+   "text": "最多选择 5 个标签",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[limit] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.limit"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-534fc7e1ac2377d7",
+   "text": "未标记",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[long-tag-row] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(3) > span.tag-name:nth-of-type(1)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(7) > span.tag-name:nth-of-type(1)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter:nth-of-type(8) > span.tag-name:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "navigation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.untagged"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-1d0fd5f9336d9103",
+   "text": "标签",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[edit] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[empty-catalog] … div#create-panel-file > form.cmp.cmp-share > div.tag-field:nth-of-type(3)",
+    "[empty-filter] … section.ll:nth-of-type(3) > div.tag-filters:nth-of-type(1) > span.tag-filter-label",
+    "[file-created] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[limit] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[long-tag-row] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[long-tag] … div#create-panel-file > form.cmp.cmp-share > div.tag-field:nth-of-type(3)",
+    "[name-error] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[picker] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[ready] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[save-error] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)",
+    "[untagged] … div.ll-card:nth-of-type(3) > div.ll-head > span.ll-h-tags:nth-of-type(3)"
+   ],
+   "visibility": [
+    "accessibility-hidden",
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.label"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-bea0e4dd05c46747",
+   "text": "标签名称最多 24 个字",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[name-error] … div#tag-picker-r1 > div.tag-search:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.tooLong"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-f5511e8aa25abeb4",
+   "text": "标签颜色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-choices:nth-of-type(2) > div.tag-new > div.tag-colors"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.color"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-08d4dc5034953ea7",
+   "text": "正在获取标题…",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[created-filtered] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)",
+    "[edit] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)",
+    "[long-tag-row] … span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title.lr-pending:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "detail.fetching"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-496ef41494615d26",
+   "text": "没有符合筛选条件的链接",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … section.ll:nth-of-type(3) > div.ll-blank:nth-of-type(3) > p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.none"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-795cbff909c46891",
+   "text": "添加标签",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[edit] … div.tag-field.tag-field-framed > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[limit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[name-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[picker] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[ready] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[save-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.add"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-657d9cbf45ec9e6a",
+   "text": "清除筛选",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-filter] … section.ll:nth-of-type(3) > div.ll-blank:nth-of-type(3) > button.ll-text-btn"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.clear"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-051e67d913f4a72e",
+   "text": "灰色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-neutral:nth-of-type(5)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.neutral"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-d5234258fd8482e1",
+   "text": "琥珀色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-amber:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.amber"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-aec1e92f921ba2f0",
+   "text": "移除标签 aff",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[picker] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button",
+    "[ready] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue:nth-of-type(2) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-c166a63f994b4ea2",
+   "text": "移除标签 dmit",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(3) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(3) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-8ed2cfe6061bbeb9",
+   "text": "移除标签 launch",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[edit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-green:nth-of-type(2) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-5ad72b3599061280",
+   "text": "移除标签 netcup",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[edit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[picker] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[ready] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber:nth-of-type(1) > button",
+    "[save-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-amber > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-1574861265930d18",
+   "text": "移除标签 季度回顾与长期项目相关资料归档标签名称",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[long-tag] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-blue > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-6b16215ddce8c57e",
+   "text": "移除标签 工作",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-rose:nth-of-type(5) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-rose:nth-of-type(5) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-1e8b21a8fa409525",
+   "text": "移除标签 阅读",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-neutral:nth-of-type(4) > button",
+    "[name-error] … div.tag-selected:nth-of-type(1) > span.tag-badge.tag-neutral:nth-of-type(4) > button"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.remove"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-789f61dbfcc7a2d2",
+   "text": "红色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-rose:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.rose"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-30c83dc25b12c32c",
+   "text": "绿色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-green:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.green"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-67035e6b7f82acdb",
+   "text": "蓝色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[limit] … div.tag-new > div.tag-colors > button.tag-color.tag-blue:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.blue"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-0c26cef89731709b",
+   "text": "近 14 天共 0 次点击",
+   "channels": [
+    "aria-label",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)",
+    "[edit] … div.lr.expanded > div.lr-line:nth-of-type(1) > span.lr-spark:nth-of-type(1)",
+    "[file-created] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)",
+    "[long-tag-row] … div.lr.selected > div.lr-line > span.lr-spark:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "list.spark"
+   },
+   "flags": [],
+   "notes": "Template with values filled in."
+  },
+  {
+   "id": "content-3ffbcccb60d5e222",
+   "text": "还没有标签，输入名称即可新建",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[empty-catalog] … div#tag-picker-r1 > div.tag-choices:nth-of-type(2) > p.tag-empty"
+   ],
+   "visibility": [
+    "hidden",
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.empty"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-288f30f629014d89",
+   "text": "选择或新建标签",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[edit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[empty-catalog] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[empty-filter] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[file-created] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[limit] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag-row] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[long-tag] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[name-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[picker] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[ready] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[save-error] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add",
+    "[untagged] … div.tag-field:nth-of-type(3) > div.tag-selected:nth-of-type(1) > button.tag-add"
+   ],
+   "visibility": [
+    "hidden",
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx",
+    "reference": "TAG_COPY.zh.choose"
+   },
+   "flags": [],
+   "notes": "Necessary field, action, state or validation text for the proposed tag flow; awaiting design approval."
+  },
+  {
+   "id": "content-ce9b12499c471759",
+   "text": "阅读",
+   "channels": [
+    "text",
+    "title"
+   ],
+   "locations": [
+    "[created-filtered] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[edit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[empty-filter] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[file-created] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[limit] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[name-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[picker] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[ready] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[save-error] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)",
+    "[untagged] … div.tag-filters:nth-of-type(1) > button.tag-filter.tag-neutral:nth-of-type(5) > span.tag-name:nth-of-type(2)"
+   ],
+   "visibility": [
+    "hidden",
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r2-en.json",
+    "content/dom-r2-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r2/tags.jsx; src/r2/store.jsx",
+    "reference": "Synthetic tag names and links created during the reviewed flow"
+   },
+   "flags": [],
+   "notes": "Sanitized demo data, not live instance data."
   }
  ]
 }

@@ -15,6 +15,37 @@ becomes the visual and interaction truth once a version is approved
 | Revision | Base | Items | Approved | Implemented |
 |---|---|---|---|---|
 | r1 — detail polish | `f01fe22` | 10 | `c28d7ef` | `0ea9e05` |
+| r2 — link tags | `61d2a5f` | Create, edit, filter | Approved 2026-10-07 | Pending implementation |
+
+### R2 — tags (approved)
+
+Open [prototype-r2.html](http://127.0.0.1:4311/sani/prototype-r2.html?scene=tags-create&lang=zh&theme=light).
+The approved `prototype.html` and its scripts remain unchanged. R2 reuses the
+same tokens, primitives, screens and fixtures; only the changed pattern and
+store layers are copied into `src/r2/` so the original stays reviewable.
+
+The proposed flow supports multiple tags when creating a short link, text or
+file share. Choose existing tags or create one in place; edit assignments in
+the existing link editor. The list shows compact badges in a desktop column
+and below each destination on phones. A tag filter intersects search and type;
+“Untagged” finds records without tags. Counts refer to all records in each tag.
+Newly created links clear filters so the result is visible.
+Creation time appears only in the expanded link detail; the list's sort menu
+still supports creation time and last visit.
+
+Draft rules for review: up to five tags per link, 24 Unicode code points per
+name, whitespace trimming and case-insensitive NFC deduplication. Color is
+optional and defaults to blue. Names are user data and are not translated.
+Tags are private to the administrator and do not appear on visitor pages.
+All assignments live in memory; reloading restores the sample data.
+
+Review scenes: `tags-create`, `tags-filter`, `tags-untagged`, `tags-empty`,
+`tags-noresults`, `tags-edit`, and `tags-save-error` (first save fails; retry
+preserves the form). Existing text/file, disabled, loading and error scenes
+remain available through Tweaks. Both languages and themes use the same flow.
+
+Production has no tag fields in `Link`, `LinkInput` or `FileFields`
+(`web/src/lib/api.ts`). This revision changes no API, schema or runtime code.
 
 <http://127.0.0.1:4311/sani/changes.html> lists every item with its reason,
 the prototype files it touched, the production files it changes, and

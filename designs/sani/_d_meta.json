@@ -15,6 +15,17 @@
             "height": 800
           },
           "section": "Screens"
+        },
+        {
+          "path": "prototype-r2.html",
+          "createdAt": "2026-10-07T07:45:11.892Z",
+          "status": "approved",
+          "subtitle": "Revision 2: tags in creation, editing and filtering",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          },
+          "section": "Screens"
         }
       ]
     },
@@ -80,5 +91,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-04T01:31:11.274Z"
+  "updatedAt": "2026-10-07T08:34:09.549Z"
 }

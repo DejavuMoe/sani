@@ -137,6 +137,30 @@
       "observations": ["The prototype's preview runtime only; never part of the product."],
       "inferences": [],
       "limitations": ["The prototype needs network access to these three files."]
+    },
+    {
+      "id": "tag-grouping-reference",
+      "type": "image",
+      "location": "User-provided tag column screenshot, 2026-10-07",
+      "roles": [
+        "inspiration-only"
+      ],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "No screenshot copied. Sample tag names are demo labels, not account data.",
+      "licenseOrPermission": "User supplied for this design iteration",
+      "localCopies": [],
+      "observations": [
+        "The image shows compact colored labels in a Tags column."
+      ],
+      "inferences": [
+        "Multi-tag selection and single-tag filtering are proposed interactions for review."
+      ],
+      "limitations": [
+        "A static crop does not establish creation, editing, filtering or responsive behavior. Existing approved Sani tokens remain the visual authority."
+      ]
     }
   ]
 }
