@@ -7,6 +7,7 @@ import { chromium } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { groups } from '../.vitepress/pages.ts';
+import { checkComments, mockComments } from './comments.mjs';
 
 const require = createRequire(import.meta.url);
 const axe = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -17,6 +18,7 @@ const browser = await chromium.launch();
 let failures = 0;
 for (const theme of ['light', 'dark']) {
   const ctx = await browser.newContext({ colorScheme: theme });
+  const comments = await mockComments(ctx);
   const page = await ctx.newPage();
   for (const prefix of ['/', '/en/']) {
     for (const path of paths) {
@@ -46,6 +48,7 @@ for (const theme of ['light', 'dark']) {
       }
     }
   }
+  if (theme === 'light') await checkComments(page, base, comments);
   await ctx.close();
 }
 await browser.close();

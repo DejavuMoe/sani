@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Add Ecoku comments to documentation pages, with Chinese and English UI and light/dark themes. Each page has its own discussion; theme changes preserve comment drafts.
+
 ## v0.5.0
 
 2026-10-07 · Add tag grouping, filtering and portable imports/exports, and refine mobile interactions and deployment documentation. First startup migrates to schema 4; read “Database upgrade” before upgrading.

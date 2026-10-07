@@ -1,5 +1,6 @@
 import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme-without-fonts';
+import { h } from 'vue';
 
 // After the default theme, so that style.css overrides its variables.
 import '@fontsource-variable/inter';
@@ -9,6 +10,7 @@ import './style.css';
 
 import ArchDiagram from './components/ArchDiagram.vue';
 import ConfigBuilder from './components/ConfigBuilder.vue';
+import EcokuComments from './components/EcokuComments.vue';
 import HomePage from './components/HomePage.vue';
 import PerfChart from './components/PerfChart.vue';
 import Screenshot from './components/Screenshot.vue';
@@ -16,6 +18,9 @@ import SyncStatus from './components/SyncStatus.vue';
 
 export default {
   extends: DefaultTheme,
+  Layout: () => h(DefaultTheme.Layout, null, {
+    'doc-after': () => h(EcokuComments),
+  }),
   enhanceApp({ app }) {
     // Used directly in the Markdown pages.
     app.component('ArchDiagram', ArchDiagram);
