@@ -15,6 +15,7 @@
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
+  import TagPicker from './TagPicker.svelte';
 
   let { mode }: { mode: 'text' | 'file' } = $props();
 
@@ -26,6 +27,8 @@
   let slug = $state('');
   let slugStatus = $state<SlugStatus>('idle');
   let title = $state('');
+  let tags = $state<number[]>([]);
+  let tagBusy = $state(false);
   let expiry = $state<Expiry>({ preset: 'never' });
   let maxClicks = $state('');
   let more = $state(false);
@@ -84,6 +87,7 @@
     file = null;
     slug = '';
     title = '';
+    tags = [];
     maxClicks = '';
     note = '';
     expiry = { preset: 'never' };
@@ -127,7 +131,7 @@
 
   async function submit(e?: SubmitEvent) {
     e?.preventDefault();
-    if (busy) return;
+    if (busy || tagBusy) return;
     const p = problem();
     if (p) {
       fail(p);
@@ -145,6 +149,7 @@
     const copied = copyLater(shortUrl);
 
     const options = {
+      tags,
       slug: slug.trim() || undefined,
       title: title.trim() || undefined,
       expiresAt: toISO(expiry) ?? undefined,
@@ -334,13 +339,14 @@
       {more ? t('composer.less') : t('composer.more')}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
-    <button class="go" type="submit" disabled={busy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
+    <button class="go" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
       {#if busy}<span class="spinner" aria-hidden="true"></span>{/if}
       {busy && progress !== null ? t('share.uploading', { pct }) : t('share.submit')}
       {#if mode === 'text' && !busy}<kbd class="go-kbd" aria-hidden="true">{mod}↵</kbd>{/if}
     </button>
   </div>
 
+  <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy || (mode === 'file' && !filesOn)} />
   {#if more}
     <div class="more" id="{id}-more" transition:slide={{ duration: 180 }}>
       <label class="cell grow">

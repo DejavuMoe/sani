@@ -30,6 +30,8 @@ curl https://s.example.com/api/links \
 | 方法 | 路径 | 用途 |
 |---|---|---|
 | `GET` | `/api/links` | [列出链接](#list) |
+| `GET` | `/api/tags` | [标签目录与数量](#tags) |
+| `POST` | `/api/tags` | [创建或取得标签](#tags) |
 | `POST` | `/api/links` | [创建链接](#create) |
 | `POST` | `/api/links/bulk` | [批量修改链接](#bulk) |
 | `GET` | `/api/links/{id}` | [读取一条链接](#get) |
@@ -60,11 +62,24 @@ curl https://s.example.com/api/links \
 
 ## 链接 {#links}
 
+### 标签 {#tags}
+
+`GET /api/tags`
+
+返回 `{"items":[{"id":1,"name":"工作","color":"blue","count":3}],"total":8,"untagged":2}`。`count` 是使用该标签的未删除链接数（包含文本、文件和已停用链接）；`total` 与 `untagged` 分别是全部和未标记链接数，不受列表搜索、类型或标签筛选影响。零引用标签仍保留。
+
+`POST /api/tags`
+
+请求 `{"name":"工作","color":"blue"}`，返回 `200` 和标签对象。名称去除首尾空白并做 NFC 规范化，限定 1–24 个 Unicode 码点，不允许控制字符；按小写名称去重。同名请求返回已有标签，不改变原名称与颜色。`color` 可省略，默认为 `blue`；可选 `blue`、`green`、`amber`、`rose`、`neutral`。请求体上限 4 KB，每个实例最多 1,000 个标签。
+
+标签只在鉴权后的管理 API 与界面中展示，访客分享页不包含标签。
+
 ### 链接对象 {#link-object}
 
 ```json
 {
   "id": 12,
+  "tags": [1],
   "kind": "url",
   "content": null,
   "slug": "gh",
@@ -89,6 +104,7 @@ curl https://s.example.com/api/links \
 | 字段 | 说明 |
 |---|---|
 | `kind` | `url` 是短链接，`text` 和 `file` 是[分享](#shares)。 |
+| `tags` | 按选择顺序排列的标签 ID 数组；未标记时为 `[]`。名称与颜色从 [标签目录](#tags) 读取。 |
 | `content` | 文本或文件分享的内容，见[下文](#shares)；短链接为 `null`。 |
 | `slug` | 短码，保留创建时的大小写。查找时不区分大小写。 |
 | `shortUrl` | 完整的短链接，文本和文件的短码前面多一段 `/p/`。域名的来源见[部署](../guide/deploy#domain)。 |
@@ -109,6 +125,8 @@ curl https://s.example.com/api/links \
 
 只有 `url` 是必填的。
 
+可选 `tags` 接受最多 5 个不同的、已存在的正整数标签 ID。省略时无标签；创建标签需先调用 `POST /api/tags`。指定 `tags`（包括 `[]`）时不使用 `reuse`，避免忽略标签设置。文本与文件分享也支持标签。
+
 | 字段 | 说明 |
 |---|---|
 | `url` | 目标网址。`example.com/a` 会补全为 `https://example.com/a`，`localhost` 和 IP 地址补全为 `http://`；域名转为小写，空格转为 `%20`；最长 8,192 字节。`javascript:`、`data:`、`file:` 等 13 种危险的网址类型会被拒绝，也不能指向本站的另一条短链接。`mailto:`、`tel:` 这类网址是允许的。 |
@@ -118,7 +136,7 @@ curl https://s.example.com/api/links \
 | `maxClicks` | 访问上限，非负整数，`0` 或 `null` 表示不限。 |
 | `redirect` | `302`（默认）、`301`、`307` 或 `308`。 |
 | `enabled` | 默认 `true`。 |
-| `reuse` | 设为 `true`，并且没有指定短码、过期时间、访问上限和跳转方式时，如果已经有一条指向同一网址的普通链接（启用、没有过期时间、没有访问上限、302 跳转），就直接返回它，状态码为 `200`，并带上 `"reused": true`。书签小工具和手机分享用的就是它。 |
+| `reuse` | 设为 `true`，并且没有指定短码、过期时间、访问上限、跳转方式和标签时，如果已经有一条指向同一网址的普通链接（启用、没有过期时间、没有访问上限、302 跳转），就直接返回它，状态码为 `200`，并带上 `"reused": true`。书签小工具和手机分享用的就是它。 |
 
 成功时返回 `201` 和新建的[链接对象](#link-object)。
 
@@ -133,6 +151,7 @@ curl https://s.example.com/api/links \
 | `sort` | `created`（默认，最近创建）、`clicks`（点击最多）或 `visited`（最近访问）。 |
 | `limit` | 每页数量，1 到 200，默认 50。 |
 | `cursor` | 上一页返回的 `next`。 |
+| `tag` | 一个标签 ID，或 `untagged`（未标记）；省略时不限标签。与搜索及类型筛选取交集，`total` 和游标分页均基于筛选结果。 |
 
 ```json
 { "items": [ … ], "next": "kx3f2a.c", "total": 128 }
@@ -149,6 +168,8 @@ curl https://s.example.com/api/links \
 返回[链接对象](#link-object)。
 
 ### 修改链接 {#update}
+
+`tags` 省略时保留已有标签；传 `[]` 清空；传 ID 数组整体替换。`null`、重复、不存在的 ID 或超过 5 项会报错，整次修改回滚。
 
 `PATCH /api/links/{id}`
 
@@ -274,6 +295,8 @@ curl https://s.example.com/api/links \
 `text` 必填，最多 1 MB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
 
 ### 分享文件 {#create-file}
+
+可选 multipart 字段 `tags` 使用 JSON 数组字符串，如 `[1,2]`；与 JSON 创建接口使用相同的标签校验。无效标签导致上传失败时会清理已接收的文件。
 
 `POST /api/files`
 
@@ -495,3 +518,5 @@ curl https://s.example.com/api/import \
 | `file_too_large` | 413 | 文件超过 `SANI_MAX_FILE_MB` 设置的上限 |
 | `rate_limited` | 429 | 失败次数太多，按 `Retry-After` 等待后再试 |
 | `internal` | 500 | 服务端出错，详情见服务器日志 |
+| `tags_invalid` | 400 | 标签名称、颜色、ID 数组或筛选参数不合法 |
+| `tag_limit` | 409 | 标签目录已达到 1,000 个；使用已有标签 |

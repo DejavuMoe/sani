@@ -29,7 +29,9 @@
 }
 ```
 
-CSV 格式的列头依次为：`slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks` 和 `created_at`。
+CSV 格式的列头依次为：`slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks`、`created_at` 和 `tags`。
+
+JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 `tags` 单元格保存同样的 JSON 数组。导入按规范化后的名称重建关联，不复用源实例的标签 ID；目标已有同名标签时沿用其名称与颜色。没有 `tags` 的旧文件仍可导入；其他服务的 JSON 名称数组（如 `["工作"]`）按蓝色标签导入。超过 5 项或包含非法名称、颜色的记录会报告 `tags_invalid` 并跳过。达到实例标签总数上限时，整次导入失败并回滚。没有关联链接的目录标签不会导出，完整数据库备份会保留它们。
 
 导出文件包含各项配置与累计点击总量，**不包含**每日细分走势、来源排行、已删除历史、API 令牌与管理员密码。该文件专为跨平台迁移设计，不可替代[系统备份](./operations#backup)。
 

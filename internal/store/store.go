@@ -219,6 +219,22 @@ var migrations = []string{
 	CREATE INDEX links_by_clicks ON links (clicks DESC, id DESC) WHERE deleted_at = 0;
 	CREATE INDEX links_by_visited ON links (last_click_at DESC, id DESC) WHERE deleted_at = 0;
 	CREATE INDEX links_deleted ON links (deleted_at) WHERE deleted_at != 0;`,
+
+	// 4: private administrator tags. Existing links remain untagged.
+	`CREATE TABLE tags (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		name_key TEXT NOT NULL UNIQUE,
+		color TEXT NOT NULL CHECK (color IN ('blue', 'green', 'amber', 'rose', 'neutral'))
+	);
+	CREATE TABLE link_tags (
+		link_id INTEGER NOT NULL REFERENCES links(id) ON DELETE CASCADE,
+		tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+		position INTEGER NOT NULL CHECK (position BETWEEN 0 AND 4),
+		PRIMARY KEY (link_id, tag_id),
+		UNIQUE (link_id, position)
+	) WITHOUT ROWID;
+	CREATE INDEX link_tags_by_tag ON link_tags (tag_id, link_id);`,
 }
 
 func migrate(ctx context.Context, db *sql.DB) (result error) {

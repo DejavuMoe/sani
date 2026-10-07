@@ -89,7 +89,7 @@ test('custom slugs are checked while typing and conflicts are explained', async 
 
 test('the destination can be edited and takes effect immediately', async () => {
   const row = page.locator('.row', { hasText: '/svelte' });
-  await row.locator('.main').click();
+  await row.locator('button.main').click();
   await expect(row.locator('.detail')).toBeVisible();
   await page.keyboard.press('e');
   const url = row.getByLabel('Destination');
@@ -214,7 +214,7 @@ test('a text is shared at /p/ and served raw from the files origin', async () =>
   await page.bringToFront();
 
   // The owner reads it in the details without using up a view.
-  await row.locator('.main').click();
+  await row.locator('button.main').click();
   await expect(row.locator('.preview')).toHaveText(text.trimEnd(), { useInnerText: true });
   await expect(row.locator('.figs')).toContainText('Views');
   await page.keyboard.press('Escape');
@@ -295,4 +295,150 @@ test('unknown and gone links get a readable page', async () => {
   const res = await page.request.get('/does-not-exist', { headers: { 'Accept-Language': 'zh-CN' } });
   expect(res.status()).toBe(404);
   expect(await res.text()).toContain('这个短链接不存在');
+});
+
+test('tags are created inline, survive refresh and retain the draft after a failed save', async () => {
+  await page.goto('/admin/');
+  await page.getByLabel('Long URL').fill('https://example.org/tag-review');
+  await page.locator('#composer-slug').fill('review-tags');
+  await page.locator('#create-panel-url .tag-add').click();
+  const pop = page.locator('.tag-pop:popover-open');
+  const search = pop.getByRole('textbox');
+  await search.fill('界'.repeat(25));
+  await expect(pop).toContainText('Use up to 24 characters');
+  await expect(pop.locator('.tag-create')).toHaveCount(0);
+  await search.fill('Review');
+  await pop.getByRole('button', { name: 'Green', exact: true }).click();
+  await search.press('Enter');
+  await expect(page.locator('#create-panel-url .tag-selected')).toContainText('Review');
+  await search.fill('review');
+  await expect(pop.locator('.tag-create')).toHaveCount(0);
+  await expect(pop.getByRole('checkbox', { name: 'Review', exact: true })).toHaveAttribute('aria-checked', 'true');
+  await search.press('Escape');
+  await expect(page.locator('#create-panel-url .tag-add')).toBeFocused();
+
+  await page.route('**/api/links', route => route.request().method() === 'POST'
+    ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal', message: 'try again' } }) })
+    : route.continue());
+  await page.locator('#create-panel-url .go').click();
+  await expect(page.locator('#create-panel-url [role=alert]')).toBeVisible();
+  await expect(page.getByLabel('Long URL')).toHaveValue('https://example.org/tag-review');
+  await expect(page.locator('#create-panel-url .tag-selected')).toContainText('Review');
+  await page.unroute('**/api/links');
+  await page.locator('#create-panel-url .go').click();
+  const row = page.locator('.row', { hasText: '/review-tags' });
+  await expect(row.locator('.tags')).toContainText('Review');
+  await page.reload();
+  await expect(row.locator('.tags .tag-green')).toBeVisible();
+  await expect(page.locator('.age, .h-age')).toHaveCount(0);
+  await row.locator('button.main').click();
+  await expect(row.locator('.meta')).toContainText('Created');
+  await expect(row.locator('.tag-detail')).toContainText('Review');
+});
+
+test('tag editing, filtering and clearing work together', async () => {
+  const filter = page.locator('.tag-filter', { has: page.locator('.tag-name', { hasText: /^Review$/ }) });
+  await filter.click();
+  await expect(page.locator('.row')).toHaveCount(1);
+  const row = page.locator('.row').first();
+  await row.locator('button.main').click();
+  await page.keyboard.press('e');
+  await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(row.locator('.tags')).toContainText('Review');
+  await page.keyboard.press('e');
+  await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.locator('.row')).toHaveCount(0);
+  await expect(filter.locator('.tag-count')).toHaveText('0');
+  await expect(page.getByRole('button', { name: 'Clear filters', exact: true })).toBeVisible();
+
+  // Creating while filtered returns to the complete list, with the new link visible.
+  await page.getByLabel('Long URL').fill('https://example.org/tag-limit');
+  await page.locator('#composer-slug').fill('limit-tags');
+  await page.locator('#create-panel-url .tag-add').click();
+  const pop = page.locator('.tag-pop:popover-open');
+  await pop.getByRole('checkbox', { name: 'Review', exact: true }).click();
+  for (const name of ['One', 'Two', 'Three', 'Four']) {
+    await pop.getByRole('textbox').fill(name);
+    await pop.getByRole('textbox').press('Enter');
+    await expect(page.locator('#create-panel-url .tag-selected .tag-name')).toHaveCount(['One', 'Two', 'Three', 'Four'].indexOf(name) + 2);
+  }
+  await expect(pop).toContainText('Choose up to 5 tags');
+  await pop.getByRole('textbox').fill('Sixth');
+  await expect(pop.locator('.tag-create')).toBeDisabled();
+  await pop.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.locator('#create-panel-url .go').click();
+  await expect(page.locator('.tag-filter').first()).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.row', { hasText: '/limit-tags' }).locator('.tag-overflow')).toHaveText('+3');
+  await filter.click();
+  await expect(page.locator('.row')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Filter by type' }).click();
+  await page.getByRole('menuitemradio', { name: 'Files', exact: true }).click();
+  await expect(page.locator('.row')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
+  await expect(page.locator('.row')).not.toHaveCount(0);
+});
+
+test('tags work for text and multipart file uploads on a phone', async () => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const kind of ['Text', 'File']) {
+    await page.getByRole('tab', { name: kind, exact: true }).click();
+    const panel = page.locator(`#create-panel-${kind.toLowerCase()}`);
+    if (kind === 'Text') await panel.getByLabel('Text to share').fill('Tagged mobile note');
+    else await panel.locator('input[type=file]').setInputFiles({ name: 'tagged-mobile.txt', mimeType: 'text/plain', buffer: Buffer.from('tagged mobile file') });
+    await panel.locator('.tag-add').click();
+    const pop = page.locator('.tag-pop:popover-open');
+    await expect.poll(() => pop.evaluate(el => el.getBoundingClientRect().right <= document.documentElement.getBoundingClientRect().right - 8)).toBe(true);
+    await pop.getByRole('textbox').fill('Review');
+    await pop.getByRole('textbox').press('ArrowDown');
+    await expect(pop.getByRole('checkbox', { name: 'Review', exact: true })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await pop.getByRole('button', { name: 'Done', exact: true }).click();
+    await panel.locator('.go').click();
+    await expect(page.locator('.row', { hasText: kind === 'Text' ? 'Tagged mobile note' : 'tagged-mobile.txt' }).locator('.tags')).toContainText('Review');
+  }
+  await page.reload();
+  const review = page.locator('.tag-filter', { has: page.locator('.tag-name', { hasText: /^Review$/ }) });
+  await review.click();
+  await expect(page.locator('.row')).toHaveCount(3);
+  await expect(review.locator('.tag-count')).toHaveText('3');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+  const untagged = page.locator('.tag-filter', { has: page.locator('.tag-name', { hasText: /^Untagged$/ }) });
+  await untagged.click();
+  await expect(page.locator('.row')).not.toHaveCount(0);
+  await expect(page.locator('.row .tags .tag-badge')).toHaveCount(0);
+  await page.setViewportSize({ width: 1280, height: 860 });
+});
+
+test('a delayed statistics response cannot undo saved tags', async () => {
+  await page.goto('/admin/');
+  let release!: () => void;
+  let captured!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const ready = new Promise<void>(resolve => { captured = resolve; });
+  await page.route('**/api/links/*/stats?*', async route => {
+    const response = await route.fetch();
+    captured();
+    await held;
+    await route.fulfill({ response });
+  });
+  const row = page.locator('.row', { hasText: '/limit-tags' });
+  try {
+    await row.locator('button.main').click();
+    await ready;
+    await page.keyboard.press('e');
+    await page.getByRole('button', { name: 'Remove tag Four', exact: true }).click();
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(row.locator('.tag-overflow')).toHaveText('+2');
+    const done = page.waitForResponse(r => r.url().includes('/stats?'));
+    release();
+    await done;
+    await expect(row.locator('.chart')).toBeVisible();
+    await expect(row.locator('.tag-overflow')).toHaveText('+2');
+    await expect(row.locator('.tag-detail .tag-name')).toHaveText(['Review', 'One', 'Two', 'Three']);
+  } finally {
+    release();
+    await page.unroute('**/api/links/*/stats?*');
+  }
 });

@@ -29,7 +29,9 @@ The JSON looks like this; fields without a value are left out:
 }
 ```
 
-The CSV columns are `slug`, `url`, `title`, `redirect`, `enabled`, `expires_at`, `max_clicks`, `clicks` and `created_at`.
+The CSV columns are `slug`, `url`, `title`, `redirect`, `enabled`, `expires_at`, `max_clicks`, `clicks`, `created_at` and `tags`.
+
+Each JSON link can include `tags: [{"name":"work","color":"blue"}]`; the CSV `tags` cell holds the same JSON array. Import rebuilds assignments by normalized name, not source IDs. Existing tags keep their name and color. Older files without tags still import; JSON name arrays from other services, such as `["work"]`, create blue tags. Records with more than 5 entries or invalid names/colors are skipped with `tags_invalid`. Exceeding the instance catalog limit fails and rolls back the entire import. Unused catalog tags are not exported; a full database backup preserves them.
 
 An export holds each link’s settings and total clicks. It does **not** include daily statistics, referring sites, deleted links, API tokens or the password. It’s for moving links around, not a replacement for a [backup](./operations#backup).
 

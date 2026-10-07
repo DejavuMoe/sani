@@ -36,6 +36,7 @@ type linkDTO struct {
 	UpdatedAt   time.Time   `json:"updatedAt"`
 	Spark       []int64     `json:"spark,omitempty"`
 	Reused      bool        `json:"reused,omitempty"`
+	Tags        []int64     `json:"tags"`
 }
 
 var metaNames = map[store.MetaState]string{
@@ -107,6 +108,7 @@ func (s *Server) toDTO(base string, l *store.Link, now int64) linkDTO {
 		LastClickAt: msTime(l.LastClickAt),
 		CreatedAt:   time.UnixMilli(l.CreatedAt).UTC(),
 		UpdatedAt:   time.UnixMilli(l.UpdatedAt).UTC(),
+		Tags:        append([]int64{}, l.Tags...),
 	}
 	if l.MaxClicks > 0 {
 		d.MaxClicks = &l.MaxClicks
@@ -138,8 +140,9 @@ type linkInput struct {
 	// of creating another one; "shorten this page" flows set it.
 	Reuse bool `json:"reuse"`
 	// Text and Format belong to text links only.
-	Text   *string `json:"text"`
-	Format *string `json:"format"`
+	Text   *string           `json:"text"`
+	Format *string           `json:"format"`
+	Tags   nullable[[]int64] `json:"tags"`
 }
 
 type inputError struct {
@@ -175,6 +178,12 @@ func fromLinkError(err error) *inputError {
 // resolveInput validates in and turns it into a patch.
 func (s *Server) resolveInput(r *http.Request, in *linkInput, now int64) (*store.Patch, *inputError) {
 	p := &store.Patch{}
+	if in.Tags.Set {
+		if in.Tags.Null || !store.ValidTagIDs(in.Tags.Value) {
+			return nil, badInput("tags_invalid", "tags must be an array of up to five distinct positive tag IDs")
+		}
+		p.Tags = &in.Tags.Value
+	}
 	if in.URL != nil {
 		u, err := links.NormalizeURL(*in.URL)
 		if err != nil {
@@ -286,6 +295,18 @@ func (s *Server) listLinks(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	lq := store.ListQuery{Sort: q.Get("sort")}
 	lq.Limit, _ = strconv.Atoi(q.Get("limit"))
+	if tag := q.Get("tag"); tag != "" {
+		var id int64
+		if tag != "untagged" {
+			var err error
+			id, err = strconv.ParseInt(tag, 10, 64)
+			if err != nil || id <= 0 {
+				writeError(w, http.StatusBadRequest, "tags_invalid", "tag must be a tag ID or untagged")
+				return
+			}
+		}
+		lq.Tag = &id
+	}
 	for k, name := range kindNames {
 		if q.Get("kind") == name {
 			lq.Kind = &k
@@ -357,7 +378,7 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	plain := (p.Slug == nil || *p.Slug == "") && p.ExpiresAt == nil && p.MaxClicks == nil &&
-		p.Redirect == nil && (p.Enabled == nil || *p.Enabled)
+		p.Redirect == nil && p.Tags == nil && (p.Enabled == nil || *p.Enabled)
 	if in.Reuse && plain {
 		existing, err := s.store.FindPlainLink(r.Context(), *p.URL)
 		if err != nil && !errors.Is(err, store.ErrNotFound) {
@@ -497,6 +518,9 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	before, after, err := s.store.UpdateLink(r.Context(), id, *p, now)
+	if tagError(w, err) {
+		return
+	}
 	if errors.Is(err, store.ErrNotFound) {
 		writeError(w, http.StatusNotFound, "not_found", "no such link")
 		return

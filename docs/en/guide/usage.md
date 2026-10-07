@@ -16,6 +16,16 @@ The page title and icon are fetched in the background and usually show up within
 
 You can shorten the same URL as often as you like, and each time you get a new link. The bookmarklet and the share menu are the exception: if you shortened the page before, they hand you that link again.
 
+## Grouping with tags {#tags}
+
+Choose existing tags or create one by name when creating a URL, text or file link. Each link supports up to 5 tags. Names allow 24 Unicode code points, are trimmed and NFC-normalized, and are matched case-insensitively. New tags can have a color; the default is blue. Each instance supports up to 1,000 tags.
+
+Open a link's details and choose Edit to change its tags. Saving applies assignments; canceling keeps the previous grouping. Creating a tag saves it to the catalog immediately, so it remains available even if you later cancel the link edit.
+
+Filter by one tag or Untagged alongside search and type filters. Tag counts include all non-deleted links, including disabled and expired links, and do not change with filters. A successful creation clears filters to show the new link. Tags have their own column on desktop and appear under the destination on phones. Creation time appears only in details; sorting by Newest and Last visited remains available.
+
+Tags are private to administrators. Undoing deletion restores assignments. Tag names and colors are also kept in [link exports](./import-export).
+
 ## Slugs {#slugs}
 
 Leave the slug empty and Sani makes one up. Generated slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) sets the length.

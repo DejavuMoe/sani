@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
@@ -69,6 +70,8 @@ type Link struct {
 	CreatedAt   int64
 	UpdatedAt   int64
 	HasIcon     bool
+	Tags        []int64
+	ImportTags  []Tag // portable names/colors, resolved inside the import transaction
 }
 
 // Target is the part of a link the redirect path needs.
@@ -86,7 +89,8 @@ type Target struct {
 const linkCols = `l.id, l.slug, l.url, l.host, l.title, l.meta, l.redirect, l.enabled,
 	l.expires_at, l.max_clicks, l.clicks, l.last_click_at, l.created_at, l.updated_at,
 	coalesce(f.type != '', 0), l.kind, coalesce(c.format, 0), coalesce(c.name, ''), coalesce(c.type, ''),
-	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, '')`
+	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, ''),
+	(SELECT json_group_array(tag_id ORDER BY position) FROM link_tags WHERE link_id = l.id)`
 
 const linkFrom = `links l LEFT JOIN favicons f ON f.host = l.host LEFT JOIN contents c ON c.link_id = l.id`
 
@@ -95,9 +99,10 @@ type scanner interface{ Scan(...any) error }
 func scanLink(row scanner) (*Link, error) {
 	var l Link
 	var c Content
+	var tags string
 	err := row.Scan(&l.ID, &l.Slug, &l.URL, &l.Host, &l.Title, &l.Meta, &l.Redirect, &l.Enabled,
 		&l.ExpiresAt, &l.MaxClicks, &l.Clicks, &l.LastClickAt, &l.CreatedAt, &l.UpdatedAt, &l.HasIcon,
-		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File)
+		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File, &tags)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -106,6 +111,9 @@ func scanLink(row scanner) (*Link, error) {
 	}
 	if l.Kind != KindURL {
 		l.Content = &c
+	}
+	if err := json.Unmarshal([]byte(tags), &l.Tags); err != nil {
+		return nil, err
 	}
 	return &l, nil
 }
@@ -169,7 +177,10 @@ func insertLink(ctx context.Context, tx *sql.Tx, l *Link) error {
 			(link_id, format, name, type, size, lines, sha256, file, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			l.ID, c.Format, c.Name, c.Type, c.Size, c.Lines, c.SHA256, c.File, body)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return setLinkTags(ctx, tx, l.ID, l.Tags)
 }
 
 // CreateLink inserts l and sets its ID. With reclaim, a slug that only a
@@ -236,6 +247,7 @@ type Patch struct {
 	MaxClicks *int64
 	Text      *string // replaces a text's body
 	Format    *Format
+	Tags      *[]int64
 }
 
 // UpdateLink applies p and returns the link before and after the change.
@@ -301,6 +313,11 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 		}
 		if p.Format != nil {
 			if _, err = tx.ExecContext(ctx, `UPDATE contents SET format = ? WHERE link_id = ?`, *p.Format, id); err != nil {
+				return err
+			}
+		}
+		if p.Tags != nil {
+			if err := setLinkTags(ctx, tx, id, *p.Tags); err != nil {
 				return err
 			}
 		}
@@ -476,6 +493,7 @@ func ParseCursor(s string) (*Cursor, bool) {
 type ListQuery struct {
 	Search string
 	Kind   *Kind  // nil lists every kind
+	Tag    *int64 // nil lists every tag; 0 means untagged
 	Sort   string // "created" (default), "clicks" or "visited"
 	After  *Cursor
 	Limit  int
@@ -508,6 +526,14 @@ func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error)
 	}
 	where := []string{"l.deleted_at = 0"}
 	var args []any
+	if q.Tag != nil {
+		if *q.Tag == 0 {
+			where = append(where, "NOT EXISTS (SELECT 1 FROM link_tags WHERE link_id = l.id)")
+		} else {
+			where = append(where, "l.id IN (SELECT link_id FROM link_tags WHERE tag_id = ?)")
+			args = append(args, *q.Tag)
+		}
+	}
 	if q.Kind != nil {
 		where = append(where, "l.kind = ?")
 		args = append(args, *q.Kind)
@@ -635,6 +661,14 @@ func (s *Store) ImportLinks(ctx context.Context, items []*Link, gen func() strin
 				}
 				err := claimSlug(ctx, tx, links.Key(l.Slug), 0, !generated)
 				if err == nil {
+					l.Tags = nil
+					for _, imported := range l.ImportTags {
+						tag, err := createTag(ctx, tx, imported.Name, imported.Color)
+						if err != nil {
+							return err
+						}
+						l.Tags = append(l.Tags, tag.ID)
+					}
 					err = insertLink(ctx, tx, l)
 				}
 				if errors.Is(err, ErrSlugTaken) {

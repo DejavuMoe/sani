@@ -12,6 +12,7 @@
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
+  import TagPicker from './TagPicker.svelte';
 
   let {
     reuse = false,
@@ -28,6 +29,8 @@
   let slug = $state('');
   let slugStatus = $state<SlugStatus>('idle');
   let title = $state('');
+  let tags = $state<number[]>([]);
+  let tagBusy = $state(false);
   let expiry = $state<Expiry>({ preset: 'never' });
   let maxClicks = $state('');
   let redirect = $state(302);
@@ -65,6 +68,7 @@
     url = '';
     slug = '';
     title = '';
+    tags = [];
     maxClicks = '';
     note = '';
     expiry = { preset: 'never' };
@@ -88,7 +92,7 @@
 
   async function submit(e?: SubmitEvent) {
     e?.preventDefault();
-    if (busy) return;
+    if (busy || tagBusy) return;
     if (!url.trim()) {
       error = { field: 'url', text: t('err.url_required') };
       input?.focus();
@@ -124,6 +128,7 @@
         maxClicks: limit ? Number(limit) : undefined,
         redirect: redirect === 302 ? undefined : redirect,
         reuse: reuse || undefined,
+        tags: tags.length ? tags : undefined,
       });
       deliver(link.shortUrl);
       const ok = await copied;
@@ -177,7 +182,7 @@
         }
       }}
     />
-    <button class="go" type="submit" disabled={busy} aria-busy={busy || undefined}>
+    <button class="go" type="submit" disabled={busy || tagBusy} aria-busy={busy || undefined}>
       {#if busy}<span class="spinner" aria-hidden="true"></span>{/if}
       <span class="go-label">{t('composer.submit')}</span>
       <kbd class="go-kbd" aria-hidden="true"><Icon name="enter" size={12} /></kbd>
@@ -201,6 +206,7 @@
     </button>
   </div>
 
+  <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy} />
   {#if more}
     <div class="more" id="composer-more" transition:slide={{ duration: 180 }}>
       <label class="cell grow">

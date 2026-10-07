@@ -4,6 +4,18 @@
 
 ## Unreleased
 
+### Added
+
+- Select or create colored tags when creating and editing URL, text and file shares. Filter by a tag or Untagged alongside search and type filters, with global tag counts. Desktop and mobile retain the existing layout; creation time stays in link details.
+- Authenticated tag APIs and optional link tag assignments/filtering. JSON/CSV exports and imports preserve tag names, colors and assignments, and older exports still import.
+
+### Database upgrade
+
+- Startup automatically migrates to schema 4, adding `tags`, `link_tags` and a filter index. Existing links start untagged; link IDs, content and statistics are preserved.
+- Stop the service cleanly and back up the database, `files/` and configuration before upgrading. To return to v0.4.0 or earlier, restore that complete pre-upgrade backup; old binaries cannot open schema 4. See [backup and restore](../guide/operations#backup).
+
+### Fixed
+
 - Fix the deployment builder rewriting download hostnames in nginx and Caddy configurations. Preserve the full input and check generated hostnames, environment variables and certificate paths during docs builds.
 - Clarify that the main domain serves both short links and `/p/` share pages, while the download domain serves downloads and raw text. Update the builder hints, deployment guide and configuration reference in both languages.
 

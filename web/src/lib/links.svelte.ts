@@ -9,6 +9,9 @@ import {
   type LinkKind,
   type Overview,
   type Sort,
+  type Tag,
+  type TagColor,
+  type TagFilter,
 } from './api';
 import { errorText, t } from './i18n.svelte';
 import { toasts } from './toast.svelte';
@@ -25,6 +28,51 @@ class LinksStore {
   sort = $state<Sort>('created');
   /** Show only links of this kind; null shows all of them. */
   kind = $state<LinkKind | null>(null);
+  tag = $state<TagFilter>(null);
+  tags = $state<Tag[]>([]);
+  allCount = $state(0);
+  untaggedCount = $state(0);
+  tagsLoaded = $state(false);
+  tagsFailed = $state(false);
+  private tagSeq = 0;
+
+  async refreshTags() {
+    const seq = ++this.tagSeq;
+    try {
+      const catalog = await api.tags();
+      if (seq !== this.tagSeq) return;
+      this.tags = catalog.items;
+      this.allCount = catalog.total;
+      this.untaggedCount = catalog.untagged;
+      this.tagsLoaded = true;
+      this.tagsFailed = false;
+    } catch { if (seq === this.tagSeq) this.tagsFailed = true; }
+  }
+
+  async addTag(name: string, color: TagColor) {
+    const tag = await api.createTag(name, color);
+    ++this.tagSeq; // an older catalog request must not hide a just-created tag
+    if (!this.tags.some(t => t.id === tag.id)) this.tags = [...this.tags, tag];
+    return tag;
+  }
+
+  setTag(tag: TagFilter) {
+    this.tag = tag;
+    this.expandedId = this.editingId = null;
+    this.load();
+  }
+
+  clearFilters() {
+    this.query = '';
+    this.kind = null;
+    this.tag = null;
+    clearTimeout(this.searchTimer);
+    this.load();
+  }
+
+  private matchesTag(link: Link) {
+    return this.tag === null || (this.tag === 'untagged' ? !link.tags.length : link.tags.includes(this.tag));
+  }
   /** First page for the current query has arrived. */
   loaded = $state(false);
   loading = $state(false);
@@ -61,7 +109,7 @@ class LinksStore {
     this.loading = true;
     this.failed = false;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, limit: PAGE }, ctrl.signal);
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
       this.items = res.items;
       this.total = res.total;
@@ -84,7 +132,7 @@ class LinksStore {
     const seq = this.seq;
     this.loadingMore = true;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, cursor: this.next, limit: PAGE });
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
       if (seq !== this.seq) return;
       const seen = new Set(this.items.map((l) => l.id));
       this.items = [...this.items, ...res.items.filter((l) => !seen.has(l.id))];
@@ -119,17 +167,19 @@ class LinksStore {
   async refresh() {
     this.refreshOverview();
     if (!this.loaded) return;
+    if (this.tag !== null) { await this.load(); return; }
     const seq = this.seq;
     try {
       const res = await api.links({
         q: this.query,
         sort: this.sort,
         kind: this.kind,
+        tag: this.tag,
         limit: Math.min(200, Math.max(PAGE, this.items.length)),
       });
       if (seq !== this.seq) return;
       const byId = new Map(res.items.map((l) => [l.id, l]));
-      this.items = this.items.map((l) => byId.get(l.id) ?? l);
+      this.items = this.items.map((l) => byId.get(l.id) ?? l).filter(l => this.matchesTag(l));
       const known = new Set(this.items.map((l) => l.id));
       const added = res.items.filter((l) => !known.has(l.id));
       if (added.length && this.sort === 'created') this.items = [...added, ...this.items];
@@ -140,6 +190,7 @@ class LinksStore {
   }
 
   async refreshOverview() {
+    this.refreshTags();
     try {
       this.overview = await api.overview(30);
     } catch {
@@ -160,7 +211,7 @@ class LinksStore {
     }
     const q = this.query.toLowerCase();
     const fields = [link.slug, link.title, link.url, link.content?.preview ?? '', link.content?.name ?? ''];
-    const visible = (!q || fields.some((s) => s.toLowerCase().includes(q))) && (!this.kind || this.kind === link.kind);
+    const visible = (!q || fields.some((s) => s.toLowerCase().includes(q))) && (!this.kind || this.kind === link.kind) && this.matchesTag(link);
     if (!visible) return;
     const at = this.sort === 'created' && index === 0 ? 0 : Math.min(index, this.items.length);
     this.items = [...this.items.slice(0, at), link, ...this.items.slice(at)];
@@ -171,6 +222,16 @@ class LinksStore {
     const i = this.items.findIndex((l) => l.id === link.id);
     if (i < 0) return;
     const prev = this.items[i];
+    // A delayed stats/metadata response must not undo a newer saved edit.
+    if (Date.parse(link.updatedAt) < Date.parse(prev.updatedAt)) return;
+    if (!this.matchesTag(link)) {
+      this.items = this.items.filter(l => l.id !== link.id);
+      this.total = Math.max(0, this.total - 1);
+      if (this.expandedId === link.id) this.expandedId = null;
+      if (this.editingId === link.id) this.editingId = null;
+      this.picked.delete(link.id);
+      return;
+    }
     this.items[i] = { ...link, spark: link.spark ?? prev.spark };
   }
 
@@ -199,7 +260,9 @@ class LinksStore {
   }
 
   private added(link: Link) {
-    this.place(link);
+    const filtered = !!this.query || !!this.kind || this.tag !== null || this.sort !== 'created';
+    if (filtered) { this.sort = 'created'; this.clearFilters(); }
+    else this.place(link);
     this.flash(link.id);
     this.selectedId = link.id;
     this.refreshOverview();
@@ -226,6 +289,7 @@ class LinksStore {
   async update(id: number, input: LinkInput): Promise<Link> {
     const link = await api.updateLink(id, input);
     this.upsert(link);
+    this.refreshTags();
     this.watchMeta(link);
     return link;
   }

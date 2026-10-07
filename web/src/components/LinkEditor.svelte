@@ -13,6 +13,7 @@
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
   import Switch from './Switch.svelte';
+  import TagPicker from './TagPicker.svelte';
 
   let { link }: { link: Link } = $props();
 
@@ -30,6 +31,7 @@
       maxClicks: link.maxClicks ? String(link.maxClicks) : '',
       redirect: link.redirect,
       enabled: link.enabled,
+      tags: [...link.tags],
     };
   }
 
@@ -37,6 +39,7 @@
   let form = $state(initial());
   let slugStatus = $state<SlugStatus>('idle');
   let saving = $state(false);
+  let tagBusy = $state(false);
   let errors = $state<{ url?: string; text?: string; slug?: string; maxClicks?: string; other?: string }>({});
   let urlField = $state<HTMLTextAreaElement>();
   /** A text's body as saved; it can't be edited before it arrives. */
@@ -58,6 +61,7 @@
     if (limit !== start.maxClicks) p.maxClicks = limit ? Number(limit) : null;
     if (isURL && form.redirect !== start.redirect) p.redirect = form.redirect;
     if (form.enabled !== start.enabled) p.enabled = form.enabled;
+    if (form.tags.join(',') !== start.tags.join(',')) p.tags = form.tags;
     return p;
   }
 
@@ -98,7 +102,7 @@
   }
 
   async function save() {
-    if (saving) return;
+    if (saving || tagBusy) return;
     errors = {};
     if (isURL && !form.url.trim()) return void (errors = { url: t('err.url_required') });
     if (isText && loaded && !form.text.trim()) return void (errors = { text: t('err.text_required') });
@@ -223,6 +227,8 @@
     />
   </div>
 
+  <div class="wide"><TagPicker bind:value={form.tags} bind:creating={tagBusy} disabled={saving || !loaded} framed /></div>
+
   <div class="cell">
     <span class="label">{t('composer.expiry')}</span>
     <ExpiryPicker bind:value={form.expiry} triggerClass="field picker-field" showLabel={false} />
@@ -271,7 +277,7 @@
     <span class="spacer"></span>
     <span class="kbd-hint"><kbd>{mod}</kbd><kbd>↵</kbd></span>
     <Button size="sm" variant="ghost" onclick={cancel}>{t('act.cancel')}</Button>
-    <Button size="sm" variant="primary" type="submit" loading={saving} disabled={!dirty}>{t('act.save')}</Button>
+    <Button size="sm" variant="primary" type="submit" loading={saving} disabled={!dirty || tagBusy}>{t('act.save')}</Button>
   </footer>
 </form>
 

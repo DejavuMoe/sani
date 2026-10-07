@@ -9,6 +9,7 @@
   import LinkRow from './LinkRow.svelte';
   import Menu from './Menu.svelte';
   import MenuItem from './MenuItem.svelte';
+  import TagFilters from './TagFilters.svelte';
 
   let search = $state<HTMLInputElement>();
   let sentinel = $state<HTMLElement>();
@@ -48,7 +49,7 @@
   const allPicked = $derived(pickable.length > 0 && pickable.every((l) => links.picked.has(l.id)));
   const nonePicked = $derived(links.picked.size === 0);
   const empty = $derived(links.loaded && links.items.length === 0);
-  const blank = $derived(empty && !links.query && !links.kind);
+  const blank = $derived(empty && !links.query && !links.kind && links.tag === null);
 
   /** Splits a message around {key} placeholders so keys render as keycaps. */
   function withKeys(text: string, keys: Record<string, string[]>) {
@@ -60,6 +61,7 @@
 </script>
 
 <section class="list-section" aria-label={t('list.label')}>
+  <TagFilters />
   {#if !blank}
   <div class="toolbar">
     <label class="search" class:active={searchFocused || links.query}>
@@ -196,6 +198,8 @@
         {/each}
       </p>
     </div>
+  {:else if empty && links.tag !== null}
+    <div class="blank"><p>{t('tags.none')}</p><button class="text-btn" onclick={() => links.clearFilters()}>{t('tags.clear')}</button></div>
   {:else if empty && links.query}
     <div class="blank">
       <p>{t('list.noResults', { q: links.query })}</p>
@@ -227,18 +231,11 @@
         {#if links.picking}<span class="h-pick"></span>{/if}
         <span class="h-slug">{t('list.col.link')}</span>
         <span class="h-target">{t('list.col.target')}</span>
+        <span class="h-tags">{t('tags.label')}</span>
         <span class="h-spark">{t('list.col.activity')}</span>
         <button class={['h-clicks', links.sort === 'clicks' && 'on']} tabindex="-1" onclick={() => links.setSort('clicks')}>
           {t('list.col.clicks')}
           {#if links.sort === 'clicks'}<Icon name="chevronDown" size={12} />{/if}
-        </button>
-        <button
-          class={['h-age', links.sort !== 'clicks' && 'on']}
-          tabindex="-1"
-          onclick={() => links.setSort(links.sort === 'created' ? 'visited' : 'created')}
-        >
-          {links.sort === 'visited' ? t('sort.visited') : t('list.col.created')}
-          {#if links.sort !== 'clicks'}<Icon name="chevronDown" size={12} />{/if}
         </button>
         <span class="h-copy"></span>
       </div>
@@ -266,7 +263,6 @@
     --col-slug: 150px;
     --col-spark: 55px;
     --col-clicks: 52px;
-    --col-age: 76px;
   }
 
   .toolbar {
@@ -572,11 +568,7 @@
     text-align: right;
   }
 
-  .h-age {
-    width: var(--col-age);
-    text-align: right;
-    white-space: nowrap;
-  }
+  .h-tags { flex: none; width: 110px; }
 
   .h-copy {
     width: 30px;
@@ -763,7 +755,7 @@
     text-align: center;
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 900px) {
     .h-spark {
       display: none;
     }

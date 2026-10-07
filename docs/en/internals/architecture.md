@@ -55,6 +55,8 @@ SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure 
 |---|---|
 | `links` | Each link: kind, slug and lookup key, destination, title, settings, total clicks, last visit, deletion time |
 | `contents` | What a text or file shares: a text’s body, format and line count, or a file’s name, type, SHA-256 and stored name |
+| `tags` | Administrator tag names, normalized name keys and colors |
+| `link_tags` | Link/tag assignments and display order, at most 5 per link |
 | `clicks_daily` | Clicks per link per day |
 | `referrers` | Clicks per link per referring site, at most 200 sites per link |
 | `settings` | The password hash and the short domain from Settings |
@@ -64,7 +66,7 @@ SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure 
 
 Shared files themselves are not in the database but in `files/` in the data directory, each under a random name; texts and files share the cache and click counting with links.
 
-The schema version is kept in `PRAGMA user_version`; startup runs outstanding migrations in order, each in a transaction. The current working tree uses schema 3: `links.id` becomes `AUTOINCREMENT`, preserving IDs and child rows with a foreign-key check, so deleted IDs cannot inherit queued clicks. Take a complete backup first; downgrades need that backup.
+The schema version is kept in `PRAGMA user_version`; startup runs outstanding migrations in order, each in a transaction. Schema 4 adds `tags` (name, normalized name key, color) and `link_tags` (link ID, tag ID, display order), with cascading foreign keys and an index for tag filtering. The non-reused `AUTOINCREMENT` link IDs introduced in schema 3 remain. Tag assignments and link updates share a transaction; redirect caches and target lookups do not read tags. Take a complete backup first; downgrades need the pre-upgrade backup.
 
 ## Background work
 

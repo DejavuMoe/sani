@@ -30,6 +30,8 @@ curl https://s.example.com/api/links \
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/api/links` | [List links](#list) |
+| `GET` | `/api/tags` | [Tag catalog and counts](#tags) |
+| `POST` | `/api/tags` | [Create or get a tag](#tags) |
 | `POST` | `/api/links` | [Create a link](#create) |
 | `POST` | `/api/links/bulk` | [Change several links at once](#bulk) |
 | `GET` | `/api/links/{id}` | [Read a link](#get) |
@@ -60,11 +62,24 @@ curl https://s.example.com/api/links \
 
 ## Links {#links}
 
+### Tags {#tags}
+
+`GET /api/tags`
+
+Returns `{"items":[{"id":1,"name":"work","color":"blue","count":3}],"total":8,"untagged":2}`. A tag's `count` includes every non-deleted URL, text and file link using it, including disabled links. `total` and `untagged` count all links and untagged links. These counts do not depend on search, type or tag filters. Unused tags remain in the catalog.
+
+`POST /api/tags`
+
+Send `{"name":"work","color":"blue"}`; returns `200` and a tag object. Names are trimmed and NFC-normalized, with 1–24 Unicode code points and no control characters. Lowercase names identify duplicates: an existing tag is returned without changing its name or color. Color defaults to `blue`; allowed values are `blue`, `green`, `amber`, `rose`, `neutral`. The body limit is 4 KB and each instance holds at most 1,000 tags.
+
+Tags appear only in authenticated administration APIs and screens, never on visitor share pages.
+
 ### The link object {#link-object}
 
 ```json
 {
   "id": 12,
+  "tags": [1],
   "kind": "url",
   "content": null,
   "slug": "gh",
@@ -89,6 +104,7 @@ curl https://s.example.com/api/links \
 | Field | Meaning |
 |---|---|
 | `kind` | `url` for a short link, `text` or `file` for a [share](#shares). |
+| `tags` | Tag IDs in selection order, or `[]` when untagged. Read names and colors from the [catalog](#tags). |
 | `content` | What a text or file shares, described [below](#shares); `null` for short links. |
 | `slug` | The slug, with the capitalization it was created with. Lookups ignore case. |
 | `shortUrl` | The full short link, with `/p/` before the slug of a text or file; where its domain comes from is explained under [Deployment](../guide/deploy#domain). |
@@ -105,6 +121,8 @@ curl https://s.example.com/api/links \
 
 ### Create a link {#create}
 
+Optional `tags` accepts up to 5 distinct, existing positive tag IDs. Omission creates an untagged link; create tags first through `POST /api/tags`. Supplying `tags` (even `[]`) disables `reuse` so tag choices are never silently discarded. Text and file shares also support tags.
+
 `POST /api/links`
 
 Only `url` is required.
@@ -118,7 +136,7 @@ Only `url` is required.
 | `maxClicks` | The visit limit, a whole number; `0` or `null` means none. |
 | `redirect` | `302` (default), `301`, `307` or `308`. |
 | `enabled` | Defaults to `true`. |
-| `reuse` | With `true`, and no slug, expiry, visit limit or redirect given, an existing plain link to the same URL (enabled, no expiry, no limit, 302) is returned instead of a new one, with status `200` and `"reused": true`. The bookmarklet and the share menu use it. |
+| `reuse` | With `true`, and no slug, expiry, visit limit, redirect or tags given, an existing plain link to the same URL (enabled, no expiry, no limit, 302) is returned instead of a new one, with status `200` and `"reused": true`. The bookmarklet and the share menu use it. |
 
 Returns `201` with the new [link](#link-object).
 
@@ -133,6 +151,7 @@ Returns `201` with the new [link](#link-object).
 | `sort` | `created` (default, newest first), `clicks` (most clicked) or `visited` (last visited). |
 | `limit` | Links per page, 1 to 200, default 50. |
 | `cursor` | The `next` value from the previous page. |
+| `tag` | One tag ID, or `untagged`; omit to include all tags. Intersects search and type filters. Totals and cursor pagination reflect the filtered result. |
 
 ```json
 { "items": [ … ], "next": "kx3f2a.c", "total": 128 }
@@ -149,6 +168,8 @@ Returns `201` with the new [link](#link-object).
 Returns the [link](#link-object).
 
 ### Update a link {#update}
+
+Omitted `tags` preserves the assignments; `[]` clears them; an ID array replaces them. `null`, duplicates, nonexistent IDs or more than 5 entries fail and roll back the entire update.
 
 `PATCH /api/links/{id}`
 
@@ -274,6 +295,8 @@ A share’s `content`:
 `text` is required: at most 1 MB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
 
 ### Share a file {#create-file}
+
+The optional multipart `tags` field is a JSON array string such as `[1,2]`. It uses the same validation as JSON creation. A rejected tag assignment also cleans up any file received during that upload.
 
 `POST /api/files`
 
@@ -495,3 +518,5 @@ Returns `200` with `ok`, for health checks.
 | `file_too_large` | 413 | The file is over the limit set by `SANI_MAX_FILE_MB` |
 | `rate_limited` | 429 | Too many failures; wait for `Retry-After` |
 | `internal` | 500 | Something failed on the server; its log has the details |
+| `tags_invalid` | 400 | Invalid tag name, color, ID array or filter |
+| `tag_limit` | 409 | The 1,000-tag catalog limit was reached; choose an existing tag |

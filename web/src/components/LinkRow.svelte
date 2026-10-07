@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { Link } from '../lib/api';
-  import { clock } from '../lib/clock.svelte';
   import { copyText } from '../lib/clipboard';
-  import { formatCompact, formatDateTime, formatNumber, formatRelative, t, type MessageKey } from '../lib/i18n.svelte';
+  import { formatCompact, formatNumber, t, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { formatSize, mediaType } from '../lib/size';
@@ -11,6 +10,7 @@
   import Icon, { type IconName } from './Icon.svelte';
   import LinkDetail from './LinkDetail.svelte';
   import Sparkline from './Sparkline.svelte';
+  import TagList from './TagList.svelte';
 
   let { link }: { link: Link } = $props();
 
@@ -21,7 +21,6 @@
   const parts = $derived(displayParts(link.url));
   const spark = $derived(link.spark ?? new Array(14).fill(0));
   const sparkTotal = $derived(spark.reduce((a, b) => a + b, 0));
-  const timeKey = $derived(links.sort === 'visited' ? link.lastClickAt : link.createdAt);
   const shared = $derived(link.kind !== 'url' && link.content ? link.content : null);
   const sharedTitle = $derived(link.title || shared?.preview || shared?.name || link.slug);
   /** What a text or file is, in place of a destination. */
@@ -126,14 +125,12 @@
           {/if}
         </span>
       </span>
+      <span class="tags"><TagList ids={link.tags} limit={2} /></span>
     </button>
     <span class="spark" title={t('list.spark', { n: sparkTotal })}>
       <Sparkline values={spark} label={t('list.spark', { n: sparkTotal })} />
     </span>
     <span class="clicks" title={formatNumber(link.clicks)}>{formatCompact(link.clicks)}</span>
-    <span class="age" title={timeKey ? formatDateTime(timeKey) : ''}>
-      {timeKey ? formatRelative(timeKey, clock.now) : '–'}
-    </span>
     <button
       class={['copy', copied && 'done']}
       aria-label={t('list.copyShort')}
@@ -161,7 +158,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    min-height: 60px;
+    min-height: 66px;
     padding: 8px 10px 8px 16px;
     cursor: pointer;
     transition: background-color var(--fast) var(--ease);
@@ -387,14 +384,7 @@
     text-align: right;
   }
 
-  .age {
-    flex: none;
-    width: var(--col-age);
-    color: var(--text-3);
-    font-size: 12.5px;
-    text-align: right;
-    white-space: nowrap;
-  }
+  .tags { flex: none; width: 110px; }
 
   .copy {
     display: grid;
@@ -422,7 +412,7 @@
     color: var(--success) !important;
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 900px) {
     .spark {
       display: none;
     }
@@ -449,9 +439,8 @@
       padding-left: 0;
     }
 
-    .age {
-      display: none;
-    }
+    .tags { width: auto; margin-top: 4px; }
+    .tags :global(.tag-badge) { max-width: 160px; }
 
     .clicks {
       width: auto;

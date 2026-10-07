@@ -258,20 +258,51 @@
         ]
       },
       "production": {
-        "routeOrWindow": "/admin/",
+        "routeOrWindow": "/admin/, /admin/new",
         "files": [
           "web/src/components/Composer.svelte",
           "web/src/components/ShareComposer.svelte",
           "web/src/components/LinkEditor.svelte",
           "web/src/components/LinkList.svelte",
           "web/src/components/LinkRow.svelte",
-          "web/src/lib/api.ts"
+          "web/src/components/LinkDetail.svelte",
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/TagBadge.svelte",
+          "web/src/components/TagList.svelte",
+          "web/src/components/TagFilters.svelte",
+          "web/src/tags.css",
+          "web/src/lib/links.svelte.ts",
+          "web/src/lib/api.ts",
+          "web/src/lib/tags.ts",
+          "web/src/lib/i18n.svelte.ts",
+          "internal/server/api_tags.go",
+          "internal/server/api_links.go",
+          "internal/server/share.go",
+          "internal/server/api_misc.go",
+          "internal/store/tags.go",
+          "internal/store/links.go",
+          "internal/store/store.go"
         ],
-        "interfaces": [],
-        "tests": []
+        "interfaces": [
+          "GET /api/tags",
+          "POST /api/tags",
+          "GET /api/links?tag={id|untagged}",
+          "POST /api/links",
+          "POST /api/texts",
+          "POST /api/files",
+          "PATCH /api/links/{id}",
+          "GET /api/export",
+          "POST /api/import"
+        ],
+        "tests": [
+          "internal/store/tags_test.go",
+          "internal/server/tags_test.go",
+          "web/e2e/app.spec.ts",
+          "web/scripts/a11y.mjs"
+        ]
       },
-      "status": "approved",
-      "notes": "Approved 2026-10-07 for implementation. R2 uses an in-memory mock store. Labels are admin-only. Up to 5 tags per link and 24 characters per tag; trim/NFC/case-insensitive deduplication; one active tag filter intersects search/kind. Creating a link clears list filters to reveal the result. Creation time is shown only in expanded details; the list sort menu retains creation and last-visit sorting. Reload restores fixtures."
+      "status": "implemented",
+      "notes": "Approved 2026-10-07 in 99109ac. Implemented in Svelte and the authenticated API with schema 4 (tags, link_tags, foreign keys and a filter index). Up to 5 private tags per link, 24 Unicode code points per name, 1,000 catalog entries; trim/NFC/lowercase deduplication. One active tag filter intersects search/kind. Creation clears filters to reveal the result. Creation time remains in details only; creation and last-visit sorting remain available. JSON/CSV portability and upgrade/rollback steps are documented. The prototype keeps its mock fixtures; production persists tags in SQLite."
     }
   ]
 }

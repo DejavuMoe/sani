@@ -8,23 +8,23 @@ reviewed, then implement it in `web/`.
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
-(`_d_meta.json`). Revision 1 is approved and implemented (`0ea9e05`).
+(`_d_meta.json`). Revisions 1 and 2 are approved and implemented.
 
 ## Revisions
 
 | Revision | Base | Items | Approved | Implemented |
 |---|---|---|---|---|
 | r1 — detail polish | `f01fe22` | 10 | `c28d7ef` | `0ea9e05` |
-| r2 — link tags | `61d2a5f` | Create, edit, filter | Approved 2026-10-07 | Pending implementation |
+| r2 — link tags | `61d2a5f` | Create, edit, filter | `99109ac` | Implemented 2026-10-07; schema 4 |
 
-### R2 — tags (approved)
+### R2 — tags (implemented)
 
 Open [prototype-r2.html](http://127.0.0.1:4311/sani/prototype-r2.html?scene=tags-create&lang=zh&theme=light).
 The approved `prototype.html` and its scripts remain unchanged. R2 reuses the
 same tokens, primitives, screens and fixtures; only the changed pattern and
 store layers are copied into `src/r2/` so the original stays reviewable.
 
-The proposed flow supports multiple tags when creating a short link, text or
+The approved flow supports multiple tags when creating a short link, text or
 file share. Choose existing tags or create one in place; edit assignments in
 the existing link editor. The list shows compact badges in a desktop column
 and below each destination on phones. A tag filter intersects search and type;
@@ -33,19 +33,33 @@ Newly created links clear filters so the result is visible.
 Creation time appears only in the expanded link detail; the list's sort menu
 still supports creation time and last visit.
 
-Draft rules for review: up to five tags per link, 24 Unicode code points per
+Rules: up to five tags per link, 24 Unicode code points per
 name, whitespace trimming and case-insensitive NFC deduplication. Color is
 optional and defaults to blue. Names are user data and are not translated.
 Tags are private to the administrator and do not appear on visitor pages.
-All assignments live in memory; reloading restores the sample data.
+The prototype keeps assignments in memory; reloading restores its sample data.
+The implementation persists the tag catalog and assignments in SQLite.
 
 Review scenes: `tags-create`, `tags-filter`, `tags-untagged`, `tags-empty`,
 `tags-noresults`, `tags-edit`, and `tags-save-error` (first save fails; retry
 preserves the form). Existing text/file, disabled, loading and error scenes
 remain available through Tweaks. Both languages and themes use the same flow.
 
-Production has no tag fields in `Link`, `LinkInput` or `FileFields`
-(`web/src/lib/api.ts`). This revision changes no API, schema or runtime code.
+Production mappings are recorded in `ui-contract.json`. `Link`, `LinkInput`
+and `FileFields` carry tag IDs; authenticated `/api/tags` manages the catalog.
+Schema 4 adds `tags` and `link_tags`, with transactional assignment updates,
+foreign keys and a filter index. Portable JSON/CSV exports use names and colors.
+The catalog is bounded at 1,000 tags; tags never appear on visitor pages.
+
+Implementation verification on 2026-10-07: `make check test e2e` and `make docs`,
+including schema-3 upgrade, backup/reopen, assignment rollback, filtering,
+upload cleanup and cross-instance import/export tests. Browser checks cover
+creation, failed-save retry, editing, cancellation, filtering, text/file uploads,
+refresh persistence and delayed-response protection. The rendered review covers
+both languages and themes, desktop and phone layouts, widths from 320 to 1280px,
+keyboard operation and native popover bounds. All 92 tag-state axe/reflow checks
+and 26 existing app/visitor axe checks passed. Native mobile browsers have not
+been tested. Screenshots and DOM captures are generated review artifacts.
 
 <http://127.0.0.1:4311/sani/changes.html> lists every item with its reason,
 the prototype files it touched, the production files it changes, and
@@ -155,7 +169,7 @@ node designs/sani/tools/compare.mjs
 Comparing visits the seeded instance, which adds clicks to its data. A fresh
 seed restores it.
 
-### Current comparison
+### Revision 1 comparison
 
 With r1 implemented (`0ea9e05`), all 26 cases are captured in all four theme
 and language combinations (104 captures; by default `compare.mjs` runs
@@ -187,11 +201,11 @@ node designs/sani/tools/content.mjs classify
 python .agents/skills/prototype-first-ui/scripts/content_audit.py check --inventory designs/sani/content-inventory.json
 ```
 
-All 778 strings come from production: i18n keys or server copy (with the key
-as evidence), values production formats, or sanitized demo records. The one
-exception is the sample file name `design-review.pdf` used for the upload
-states. The 25 warnings are `data-*` attribute values (link ids, theme, screen
-labels), which the checker always asks a person to look at.
+The inventory now contains 975 reviewed strings, including 447 strings captured
+from the implemented tag flow in both languages. Sources include production
+i18n/server copy, formatted values, sanitized demo records and approved R2 mock
+copy. The 26 warnings are reviewed `data-*` metadata values (link IDs, theme and
+screen labels). No strings remain unclassified.
 
 ### Production quirks found at the baseline
 

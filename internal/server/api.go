@@ -27,6 +27,8 @@ func (s *Server) routes() http.Handler {
 	mux.Handle("GET /api/config", a(s.getConfig))
 	mux.Handle("PATCH /api/config", a(s.patchConfig))
 	mux.Handle("GET /api/overview", a(s.overview))
+	mux.Handle("GET /api/tags", a(s.listTags))
+	mux.Handle("POST /api/tags", a(s.createTag))
 
 	mux.Handle("GET /api/links", a(s.listLinks))
 	mux.Handle("POST /api/links", a(s.createLink))

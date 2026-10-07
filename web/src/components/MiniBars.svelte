@@ -66,14 +66,14 @@
       <span>{formatDay(d.date)}</span>
     </div>
   {/if}
-  <table class="sr-only">
+  <div class="sr-only"><table>
     <caption>{label}</caption>
     <tbody>
       {#each days as d (d.date)}
         <tr><td>{d.date}</td><td>{d.count}</td></tr>
       {/each}
     </tbody>
-  </table>
+  </table></div>
 </div>
 
 <style>

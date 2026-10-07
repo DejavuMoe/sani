@@ -11,6 +11,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -71,6 +72,9 @@ func (s *Server) onFilesOrigin(r *http.Request) bool {
 // applyOptions copies the settings every kind of link shares from p into a
 // new link.
 func applyOptions(l *store.Link, p *store.Patch) {
+	if p.Tags != nil {
+		l.Tags = *p.Tags
+	}
 	if p.Title != nil {
 		l.Title = *p.Title
 	}
@@ -94,6 +98,9 @@ func (s *Server) save(w http.ResponseWriter, r *http.Request, l *store.Link, slu
 		err = s.store.CreateLink(r.Context(), l, true)
 	} else {
 		err = s.createGenerated(r, l)
+	}
+	if tagError(w, err) {
+		return false
 	}
 	if errors.Is(err, store.ErrSlugTaken) {
 		writeError(w, http.StatusConflict, "slug_taken", "this slug is already in use")
@@ -183,7 +190,7 @@ type upload struct {
 }
 
 // uploadFields are the multipart fields createFile reads besides the file.
-var uploadFields = map[string]bool{"slug": true, "title": true, "expiresAt": true, "maxClicks": true, "enabled": true}
+var uploadFields = map[string]bool{"slug": true, "title": true, "expiresAt": true, "maxClicks": true, "enabled": true, "tags": true}
 
 // createFile stores one uploaded file as a new link. The body is
 // multipart/form-data with a "file" part and optional fields named like the
@@ -291,6 +298,11 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 // formInput reads multipart fields as the JSON body of a create request.
 func formInput(f map[string]string) (*linkInput, *inputError) {
 	in := &linkInput{}
+	if v, ok := f["tags"]; ok {
+		if err := json.Unmarshal([]byte(v), &in.Tags); err != nil {
+			return nil, badInput("tags_invalid", "tags must be a JSON array of tag IDs")
+		}
+	}
 	if v, ok := f["slug"]; ok {
 		in.Slug = &v
 	}

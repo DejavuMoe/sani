@@ -5,6 +5,10 @@ export type BulkAction = 'enable' | 'disable' | 'delete' | 'restore';
 /** What a link does: redirect, or share a text or a file at /p/{slug}. */
 export type LinkKind = 'url' | 'text' | 'file';
 export type TextFormat = 'plain' | 'code';
+export type TagColor = 'blue' | 'green' | 'amber' | 'rose' | 'neutral';
+export type TagFilter = number | 'untagged' | null;
+export interface Tag { id: number; name: string; color: TagColor; count: number }
+export interface TagCatalog { items: Tag[]; total: number; untagged: number }
 
 export interface LinkContent {
   size: number;
@@ -20,6 +24,7 @@ export interface LinkContent {
 }
 
 export interface Link {
+  tags: number[];
   id: number;
   kind: LinkKind;
   content: LinkContent | null;
@@ -45,6 +50,7 @@ export interface Link {
 }
 
 export interface LinkInput {
+  tags?: number[];
   url?: string;
   slug?: string;
   title?: string;
@@ -59,6 +65,7 @@ export interface LinkInput {
 
 /** Settings sent with an uploaded file, as multipart fields. */
 export interface FileFields {
+  tags?: number[];
   slug?: string;
   title?: string;
   expiresAt?: string;
@@ -172,7 +179,7 @@ function uploadFile(
 ): Promise<Link> {
   return new Promise((resolve, reject) => {
     const form = new FormData();
-    for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== '') form.append(k, String(v));
+    for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== '') form.append(k, Array.isArray(v) ? JSON.stringify(v) : String(v));
     form.append('file', file, file.name);
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/api/files');
@@ -203,14 +210,17 @@ export const api = {
   config: () => request<Config>('GET', '/config'),
   setBaseUrl: (baseUrl: string | null) => request<Config>('PATCH', '/config', { baseUrl }),
   overview: (days = 30) => request<Overview>('GET', `/overview?days=${days}`),
+  tags: (signal?: AbortSignal) => request<TagCatalog>('GET', '/tags', undefined, { signal }),
+  createTag: (name: string, color: TagColor) => request<Tag>('POST', '/tags', { name, color }),
 
   links: (
-    q: { q?: string; sort?: Sort; kind?: LinkKind | null; cursor?: string | null; limit?: number },
+    q: { q?: string; sort?: Sort; kind?: LinkKind | null; tag?: TagFilter; cursor?: string | null; limit?: number },
     signal?: AbortSignal,
   ) => {
     const p = new URLSearchParams();
     if (q.q) p.set('q', q.q);
     if (q.kind) p.set('kind', q.kind);
+    if (q.tag != null) p.set('tag', String(q.tag));
     if (q.sort && q.sort !== 'created') p.set('sort', q.sort);
     if (q.cursor) p.set('cursor', q.cursor);
     if (q.limit) p.set('limit', String(q.limit));

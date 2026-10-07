@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TagList from './TagList.svelte';
   import { untrack } from 'svelte';
   import { slide } from 'svelte/transition';
   import { api, ApiError, type Link, type LinkStats } from '../lib/api';
@@ -154,6 +155,7 @@
           </p>
         {/if}
 
+        {#if link.tags.length}<div class="tag-detail"><span>{t('tags.label')}</span><TagList ids={link.tags} /></div>{/if}
         <div class="stats-head">
           <dl class="figs">
             <div>

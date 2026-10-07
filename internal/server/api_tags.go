@@ -1,0 +1,48 @@
+package server
+
+import (
+	"errors"
+	"net/http"
+
+	"github.com/DejavuMoe/sani/internal/store"
+)
+
+func tagError(w http.ResponseWriter, err error) bool {
+	switch {
+	case errors.Is(err, store.ErrTagsInvalid):
+		writeError(w, http.StatusBadRequest, "tags_invalid", "invalid tag name, color or tag IDs")
+	case errors.Is(err, store.ErrTagLimit):
+		writeError(w, http.StatusConflict, "tag_limit", "at most 1,000 tags are allowed")
+	default:
+		return false
+	}
+	return true
+}
+
+func (s *Server) listTags(w http.ResponseWriter, r *http.Request) {
+	catalog, err := s.store.Tags(r.Context())
+	if err != nil {
+		s.internalError(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, catalog)
+}
+
+func (s *Server) createTag(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Name  string `json:"name"`
+		Color string `json:"color"`
+	}
+	if !decodeJSONMax(w, r, &in, 4096) {
+		return
+	}
+	tag, err := s.store.CreateTag(r.Context(), in.Name, in.Color)
+	if tagError(w, err) {
+		return
+	}
+	if err != nil {
+		s.internalError(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, tag)
+}

@@ -1,0 +1,69 @@
+.tag-blue { --tag-color: var(--accent); }
+.tag-green { --tag-color: var(--success); }
+.tag-amber { --tag-color: var(--warning); }
+.tag-rose { --tag-color: var(--danger); }
+.tag-neutral { --tag-color: var(--text-2); }
+.tag-dot { flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--tag-color); }
+.tag-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag-badge { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 23px; padding: 2px 7px; border-radius: var(--radius-xs); background: color-mix(in oklab, var(--tag-color) 10%, var(--surface)); color: var(--text); font-size: 11.5px; font-weight: 500; }
+.tag-badges { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.tag-overflow { color: var(--text-3); font-size: 11px; }
+.tag-field { display: flex; align-items: flex-start; gap: 14px; padding: 8px 16px; border-top: 1px solid var(--line); font-size: 12px; }
+.tag-label { display: flex; align-items: center; gap: 7px; min-height: 30px; color: var(--text-3); flex: none; }
+.tag-selected { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-width: 0; }
+.tag-selected .tag-badge { min-height: 30px; padding: 2px 3px 2px 8px; font-size: 12px; }
+.tag-badge button { display: grid; place-items: center; width: 26px; height: 26px; flex: none; border-radius: var(--radius-xs); color: var(--text-2); }
+.tag-badge button:hover { background: color-mix(in oklab, var(--tag-color) 15%, transparent); color: var(--text); }
+.tag-add { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 30px; padding: 0 7px; border-radius: var(--radius-sm); color: var(--text-2); font-size: 12px; }
+.tag-add:hover, .tag-add[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+.tag-field-framed { border: 1px solid var(--line-2); border-radius: var(--radius); }
+.tag-pop { position: fixed; inset: auto; margin: 0; width: min(302px, calc(100vw - 16px)); padding: 0; border: 1px solid var(--line-2); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); box-shadow: var(--shadow-pop); overflow: hidden; }
+.tag-pop:popover-open { display: flex; flex-direction: column; }
+.tag-search { display: flex; align-items: center; flex: none; gap: 9px; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--text-3); }
+.tag-search input { width: 100%; min-width: 0; border: 0; background: transparent; font-size: 13px; color: var(--text); outline: none; }
+.tag-search:focus-within { box-shadow: inset 0 -2px var(--accent); }
+.tag-search input::placeholder { color: var(--text-3); }
+.tag-choices { min-height: 0; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; padding: 6px; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.tag-choice { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 38px; padding: 5px 8px; border-radius: var(--radius-sm); text-align: left; }
+.tag-choice:hover, .tag-choice:focus-visible { background: var(--surface-2); }
+.tag-choice[aria-checked="true"] .tag-check { color: var(--accent); }
+.tag-choice:disabled { color: var(--text-3); cursor: default; }
+.tag-check { flex: none; width: 16px; }
+.tag-choice .tag-badge { font-size: 12px; }
+.tag-new { padding: 4px 0; }
+.tag-create { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 38px; padding: 7px 8px; color: var(--accent); border-radius: var(--radius-sm); font-size: 13px; text-align: left; overflow-wrap: anywhere; }
+.tag-create .icon { flex: none; }
+.tag-create:hover:not(:disabled) { background: var(--accent-soft); }
+.tag-create:disabled { color: var(--text-3); }
+.tag-colors { display: flex; gap: 4px; padding: 0 6px; }
+.tag-color { display: grid; place-items: center; width: 34px; height: 34px; border-radius: var(--radius-sm); }
+.tag-swatch { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: color-mix(in oklab, var(--tag-color) 15%, var(--surface)); color: var(--text); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tag-color) 35%, var(--surface)); }
+.tag-color[aria-pressed="true"] { background: var(--surface-2); }
+.tag-pop footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px 7px 14px; border-top: 1px solid var(--line); flex: none; color: var(--text-3); font-size: 11.5px; }
+.tag-done { min-height: 30px; padding: 0 8px; color: var(--accent); border-radius: var(--radius-sm); font-size: 12px; }
+.tag-done:hover { background: var(--accent-soft); }
+.tag-empty { padding: 16px 10px; font-size: 12px; color: var(--text-3); }
+.tag-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
+.tag-filter-label { display: flex; align-items: center; gap: 6px; color: var(--text-3); font-size: 12px; margin-right: 4px; }
+.tag-filter { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 30px; padding: 0 9px; border: 1px solid transparent; border-radius: var(--radius-sm); color: var(--text-2); font-size: 12px; }
+.tag-filter:hover { background: var(--surface-2); color: var(--text); }
+.tag-filter[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+.tag-count { flex: none; font-variant-numeric: tabular-nums; color: var(--text-3); font-size: 11px; }
+.tag-filter[aria-pressed="true"] .tag-count { color: var(--accent); }
+.tag-detail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 0; color: var(--text-3); font-size: 12px; }
+@media (max-width: 640px) {
+  .tag-field { gap: 9px; padding: 8px 12px; }
+  .tag-label { min-height: 44px; }
+  .tag-add, .tag-badge button { min-height: 44px; }
+  .tag-badge button { width: 30px; }
+  .tag-selected .tag-badge { min-height: 44px; }
+  .tag-filter { min-height: 44px; padding: 0 10px; }
+  .tag-filter-label { width: 100%; }
+  .tag-filters { gap: 4px; margin-bottom: 12px; }
+  .tag-pop { width: min(340px, calc(100vw - 16px)); }
+  .tag-search { min-height: 50px; }
+  .tag-search input { font-size: 16px; }
+  .tag-choice, .tag-create, .tag-done, .tag-color { min-height: 44px; }
+  .tag-color { width: 44px; }
+  .tag-colors { gap: 4px; }
+}

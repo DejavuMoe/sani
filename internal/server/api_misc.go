@@ -188,15 +188,21 @@ func (s *Server) favicon(w http.ResponseWriter, r *http.Request) {
 
 // exportLink is the portable form of a link, shared by export and import.
 type exportLink struct {
-	Slug      string     `json:"slug"`
-	URL       string     `json:"url"`
-	Title     string     `json:"title,omitempty"`
-	Redirect  int        `json:"redirect,omitempty"`
-	Enabled   *bool      `json:"enabled,omitempty"`
-	ExpiresAt *time.Time `json:"expiresAt,omitempty"`
-	MaxClicks int64      `json:"maxClicks,omitempty"`
-	Clicks    int64      `json:"clicks,omitempty"`
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Tags      []exportTag `json:"tags,omitempty"`
+	Slug      string      `json:"slug"`
+	URL       string      `json:"url"`
+	Title     string      `json:"title,omitempty"`
+	Redirect  int         `json:"redirect,omitempty"`
+	Enabled   *bool       `json:"enabled,omitempty"`
+	ExpiresAt *time.Time  `json:"expiresAt,omitempty"`
+	MaxClicks int64       `json:"maxClicks,omitempty"`
+	Clicks    int64       `json:"clicks,omitempty"`
+	CreatedAt *time.Time  `json:"createdAt,omitempty"`
+}
+
+type exportTag struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
 }
 
 func (s *Server) export(w http.ResponseWriter, r *http.Request) {
@@ -209,12 +215,28 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	stamp := time.Now().Format("20060102-150405")
+	catalog, err := s.store.Tags(r.Context())
+	if err != nil {
+		s.internalError(w, r, err)
+		return
+	}
+	byID := make(map[int64]exportTag, len(catalog.Items))
+	for _, tag := range catalog.Items {
+		byID[tag.ID] = exportTag{Name: tag.Name, Color: tag.Color}
+	}
+	tagsOf := func(l *store.Link) []exportTag {
+		tags := make([]exportTag, 0, len(l.Tags))
+		for _, id := range l.Tags {
+			tags = append(tags, byID[id])
+		}
+		return tags
+	}
 	if r.URL.Query().Get("format") == "csv" {
 		w.Header().Set("Content-Type", "text/csv; charset=utf-8")
 		w.Header().Set("Content-Disposition", `attachment; filename="sani-links-`+stamp+`.csv"`)
 		w.Header().Set("Cache-Control", "no-store")
 		cw := csv.NewWriter(w)
-		cw.Write([]string{"slug", "url", "title", "redirect", "enabled", "expires_at", "max_clicks", "clicks", "created_at"})
+		cw.Write([]string{"slug", "url", "title", "redirect", "enabled", "expires_at", "max_clicks", "clicks", "created_at", "tags"})
 		for _, l := range all {
 			exp := ""
 			if l.ExpiresAt != 0 {
@@ -224,8 +246,9 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 			if l.MaxClicks > 0 {
 				max = strconv.FormatInt(l.MaxClicks, 10)
 			}
+			tags, _ := json.Marshal(tagsOf(l))
 			cw.Write([]string{l.Slug, l.URL, l.Title, strconv.Itoa(l.Redirect), strconv.FormatBool(l.Enabled), exp, max,
-				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339)})
+				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339), string(tags)})
 		}
 		cw.Flush()
 		return
@@ -233,7 +256,7 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 	out := make([]exportLink, len(all))
 	for i, l := range all {
 		enabled := l.Enabled
-		out[i] = exportLink{Slug: l.Slug, URL: l.URL, Title: l.Title, Redirect: l.Redirect, Enabled: &enabled,
+		out[i] = exportLink{Tags: tagsOf(l), Slug: l.Slug, URL: l.URL, Title: l.Title, Redirect: l.Redirect, Enabled: &enabled,
 			ExpiresAt: msTime(l.ExpiresAt), MaxClicks: l.MaxClicks, Clicks: l.Clicks, CreatedAt: msTime(l.CreatedAt)}
 	}
 	w.Header().Set("Content-Disposition", `attachment; filename="sani-links-`+stamp+`.json"`)
@@ -290,6 +313,9 @@ func (s *Server) importLinks(w http.ResponseWriter, r *http.Request) {
 	}
 	n := s.opt.SlugLength
 	res, err := s.store.ImportLinks(r.Context(), items, func() string { return links.Generate(n + 1) })
+	if tagError(w, err) {
+		return
+	}
 	if err != nil {
 		s.internalError(w, r, err)
 		return
@@ -393,6 +419,33 @@ func (s *Server) recordToLink(r *http.Request, rec map[string]string, now time.T
 	if v, err := strconv.ParseBool(rec["enabled"]); err == nil {
 		l.Enabled = v
 	}
+	if raw := strings.TrimSpace(rec["tags"]); raw != "" {
+		var tags []json.RawMessage
+		if err := json.Unmarshal([]byte(raw), &tags); err != nil || len(tags) > store.MaxLinkTags {
+			return nil, "tags_invalid"
+		}
+		seen := map[string]bool{}
+		for _, rawTag := range tags {
+			var tag exportTag
+			if len(rawTag) > 0 && rawTag[0] == '"' {
+				if err := json.Unmarshal(rawTag, &tag.Name); err != nil {
+					return nil, "tags_invalid"
+				}
+			} else if err := json.Unmarshal(rawTag, &tag); err != nil {
+				return nil, "tags_invalid"
+			}
+			name, color, err := store.NormalizeTag(tag.Name, tag.Color)
+			if err != nil {
+				return nil, "tags_invalid"
+			}
+			key := strings.ToLower(name)
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			l.ImportTags = append(l.ImportTags, store.Tag{Name: name, Color: color})
+		}
+	}
 	return l, ""
 }
 
@@ -436,6 +489,15 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 	for _, obj := range raw {
 		rec := map[string]string{}
 		for k, v := range obj {
+			if normalizeKey(k) == "tags" {
+				if text, ok := v.(string); ok {
+					rec["tags"] = text
+				} else {
+					b, _ := json.Marshal(v)
+					rec["tags"] = string(b)
+				}
+				continue
+			}
 			switch x := v.(type) {
 			case string:
 				rec[normalizeKey(k)] = x
