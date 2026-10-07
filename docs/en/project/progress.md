@@ -12,6 +12,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 |---|---|---|
 | Redirects and statistics | <span class="sn-status done">Done</span> | In-memory cache, click aggregation, crawler and preview filtering, expiry, visit limits |
 | Admin app | <span class="sn-status done">Done</span> | English and Chinese, light and dark, keyboard control, bulk actions, QR codes, bookmarklet, phone share menu |
+| Tags | <span class="sn-status done">Done</span> | Colored tags for links, texts and files; assign during creation or editing, filter by tag or Untagged, and transfer through JSON/CSV, since v0.5.0 |
 | Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own, since v0.3.0 |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
 | Import and export | <span class="sn-status done">Done</span> | Sani, Shlink, Sink and all kinds of CSV |
@@ -21,6 +22,14 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
 | Continuous integration | <span class="sn-status done">Done</span> | Every commit runs the checks and tests (Linux, macOS, Windows), the end-to-end tests, axe and a vulnerability scan, and builds the image and every binary |
 | Hosted docs | <span class="sn-status done">Done</span> | Chinese and English documentation is live at [sani.zsh.moe](https://sani.zsh.moe) |
+
+## v0.5.0 tag verification {#tags-acceptance}
+
+| Capability | Acceptance entry point |
+|---|---|
+| Schema 4 migration, assignment transactions, backup/restore and filtered pagination | `internal/store/tags_test.go` |
+| Authentication, rejected upload cleanup and cross-instance tag imports/exports | `internal/server/tags_test.go` |
+| Creation and editing, filters, failed-save retry, mobile popovers and delayed-response protection | `web/e2e/app.spec.ts` |
 
 ## v0.4.0 implementation and verification {#acceptance}
 
@@ -57,7 +66,6 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 
 Under consideration, not decided:
 
-- **Tags.** Group links once there are many, if there’s a way to do it without adding complexity.
 - **Markdown.** Show shared texts written in Markdown as formatted text; for now they’re plain text or code.
 
 ## Not planned {#non-goals}

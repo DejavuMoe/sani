@@ -2,12 +2,15 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.5.0
+
+2026-10-07 · Add tag grouping, filtering and portable imports/exports, and refine mobile interactions and deployment documentation. First startup migrates to schema 4; read “Database upgrade” before upgrading.
 
 ### Added
 
 - Select or create colored tags when creating and editing URL, text and file shares. Filter by a tag or Untagged alongside search and type filters, with global tag counts. Desktop and mobile retain the existing layout; creation time stays in link details.
 - Authenticated tag APIs and optional link tag assignments/filtering. JSON/CSV exports and imports preserve tag names, colors and assignments, and older exports still import.
+- Assign up to 5 tags per link, with names up to 24 Unicode code points, 5 colors and case-insensitive deduplication. Tags are private to the administrator and never appear on visitor pages.
 
 ### Database upgrade
 
@@ -16,6 +19,8 @@
 
 ### Fixed
 
+- Prevent delayed statistics or metadata responses from overwriting newly saved tags and other link edits.
+- Keep mobile tag popovers clear of the reserved scrollbar gutter, and prevent hidden chart data tables from adding blank space to the page.
 - Fix the deployment builder rewriting download hostnames in nginx and Caddy configurations. Preserve the full input and check generated hostnames, environment variables and certificate paths during docs builds.
 - Clarify that the main domain serves both short links and `/p/` share pages, while the download domain serves downloads and raw text. Update the builder hints, deployment guide and configuration reference in both languages.
 

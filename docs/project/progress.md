@@ -12,6 +12,7 @@ import { data as status } from '../.vitepress/data/status.data'
 |---|---|---|
 | 跳转与统计 | <span class="sn-status done">已完成</span> | 内存分片缓存、点击批量聚合、爬虫与预取过滤、有效期、访问配额 |
 | 管理界面 | <span class="sn-status done">已完成</span> | 中英双语、深浅主题、键盘快捷键、批量操作、二维码、书签小脚本、PWA 分享菜单 |
+| 标签管理 | <span class="sn-status done">已完成</span> | 短链接、文本与文件的彩色标签，创建与编辑时分配，按标签或未标记筛选，JSON/CSV 迁移（v0.5.0 起） |
 | 文本与文件分享 | <span class="sn-status done">已完成</span> | `/p/` 路由下的纯文本与代码展示、独立文件域名安全下载（v0.3.0 起） |
 | HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
 | 导入与导出 | <span class="sn-status done">已完成</span> | Sani 原生、Shlink、Sink 及各类 CSV 格式导入导出 |
@@ -21,6 +22,14 @@ import { data as status } from '../.vitepress/data/status.data'
 | 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |
 | 持续集成（CI） | <span class="sn-status done">已完成</span> | 全平台交叉编译测试（Linux/macOS/Windows）、E2E 回归、axe 无障碍核查、CVE 漏洞扫描 |
 | 线上文档站点 | <span class="sn-status done">已完成</span> | 官方中英双语文档已部署：[sani.zsh.moe](https://sani.zsh.moe) |
+
+## v0.5.0 标签管理验收入口 {#tags-acceptance}
+
+| 能力 | 验收入口 |
+|---|---|
+| schema 4 迁移、关联事务、备份恢复与筛选分页 | `internal/store/tags_test.go` |
+| 鉴权、文件上传清理、跨实例标签导入导出 | `internal/server/tags_test.go` |
+| 创建与编辑、筛选、失败重试、移动端弹层、迟到响应保护 | `web/e2e/app.spec.ts` |
 
 ## v0.4.0 关键实施与验收入口 {#acceptance}
 
@@ -57,7 +66,6 @@ import { data as status } from '../.vitepress/data/status.data'
 
 待评估功能（视复杂度而定）：
 
-- **短链接标签管理**：在大规模链接场景下支持按标签检索，需权衡存储和接口复杂度。
 - **Markdown 内容渲染**：支持在文本分享页面安全渲染 Markdown（当前仅支持纯文本与代码）。
 
 ## 明确不做的事（Non-Goals） {#non-goals}
