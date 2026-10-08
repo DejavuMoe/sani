@@ -47,6 +47,8 @@ Sani 严格遵循[语义化版本 2.0.0](https://semver.org/lang/zh-CN/)（`主�
 
 镜像坐标 `ghcr.io/dejavumoe/sani`、Tag 命名策略及预编译归档包名称（参见[部署说明](../guide/deploy#binaries)）保持固定，便于部署脚本长期锚定。
 
+从 v0.7.0 起，Git tag、GitHub Release 与容器镜像统一使用完整的 `vX.Y.Z`（预发布为 `vX.Y.Z-rc.N`）。不发布 `latest` 或主、次版本浮动标签。旧的无 `v` 镜像标签停止使用；这是 0.x 阶段的分发兼容性变更，部署脚本需显式更新标签。发布检查要求 `compose.yaml` 固定版本与发布 tag 相同。
+
 ## 非兼容承诺范围（内部实现） {#unstable}
 
 - **管理前端界面**：UI 视觉呈现、操作交互与辅助快捷键可能持续优化。

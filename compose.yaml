@@ -1,8 +1,8 @@
 services:
   sani:
-    # Or pin a version, such as ghcr.io/dejavumoe/sani:0.1.0. To build from
-    # a checkout of the repository instead, replace this line with `build: .`
-    image: ghcr.io/dejavumoe/sani:latest
+    # Keep the full release tag, including v. To build from a checkout,
+    # replace this line with `build: .`
+    image: ghcr.io/dejavumoe/sani:v0.7.0
     container_name: sani
     restart: unless-stopped
     stop_grace_period: 30s
@@ -17,6 +17,8 @@ services:
       # SANI_PASSWORD: change-me # optional; otherwise pick one on first visit with the setup code from `docker logs sani`
       # SANI_ROOT_REDIRECT: https://example.com # where the bare domain goes
     volumes:
+      # A named volume gets the image's /data ownership (65532:65532).
+      # For ./sani-data:/data, prepare host permissions first; see docs/guide/deploy.md.
       - sani-data:/data
 
 volumes:

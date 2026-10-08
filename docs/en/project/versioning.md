@@ -47,6 +47,8 @@ Every `SANI_*` [environment variable](../reference/configuration) keeps its name
 
 The image name `ghcr.io/dejavumoe/sani`, the scheme of its tags and the names of the binary archives (listed under [Deployment](../guide/deploy#binaries)) stay the same, so download URLs in scripts keep working.
 
+From v0.7.0, Git tags, GitHub Releases and container images use the same full `vX.Y.Z` identifier (`vX.Y.Z-rc.N` for prereleases). Releases do not publish `latest`, major or minor floating tags. Old image tags without `v` are retired. This is a distribution compatibility change during 0.x: update deployment scripts explicitly. Release checks require the pinned version in `compose.yaml` to match the release tag.
+
 ## What isn’t covered {#unstable}
 
 - **The admin app.** Its layout, wording and shortcuts may improve at any time.

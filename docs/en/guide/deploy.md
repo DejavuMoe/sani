@@ -23,15 +23,16 @@ A few things worth knowing about `compose.yaml`:
 - **A tiny image.** It’s built `FROM scratch`, about 25 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
-The image has these tags:
+### Image versions
 
 | Tag | Points at |
 |---|---|
-| `latest` | The newest release |
-| `0.3` | The newest patch release of 0.3, which only fixes things |
-| `0.3.0` | That one version, for good |
+| `v0.7.0` | The exact version matching Git tag and GitHub Release `v0.7.0` |
+| `v0.7.0-rc.1` | The matching prerelease Git tag, available only once published |
 
-`compose.yaml` uses `latest`. To decide for yourself when to upgrade, put a version number there instead. To upgrade, [back up](./operations#backup) first, then pull the new image:
+From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v0.7.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
+
+To upgrade, [back up](./operations#backup), change `image:` in `compose.yaml` to the target version's full tag, then run:
 
 ```sh
 docker compose pull
@@ -39,6 +40,48 @@ docker compose up -d
 ```
 
 To build the image from source instead, replace the `image:` line with `build: .` in a checkout of the repository and run `docker compose up -d --build`.
+
+### Data directory permissions {#data-permissions}
+
+The default `sani-data:/data` is a Docker named volume. A new volume inherits the image's `/data` ownership, `65532:65532`; no host directory needs to be created manually. Recreating the container preserves it. Do not upgrade with `docker compose down -v`, which deletes named volumes.
+
+To keep the data beside the Compose file instead, run this in that directory **before** switching to `./sani-data:/data`:
+
+```sh
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
+```
+
+Then use the service mount below and remove the unused top-level `volumes:` declaration. `create_host_path: false` prevents Docker from silently creating a `root:root` directory if initialization was missed:
+
+```yaml
+    volumes:
+      - type: bind
+        source: ./sani-data
+        target: /data
+        bind:
+          create_host_path: false
+```
+
+If startup already reports `sani: open database: unable to open database file (14)`, inspect the actual mount and permissions first:
+
+```sh
+docker inspect sani --format '{{json .Mounts}}'
+ls -ldn ./sani-data
+```
+
+If the mount is confirmed to be `./sani-data` in the current directory, owned by `root:root` with mode `755`, the unprivileged container cannot create the database or SQLite WAL/SHM files. Stop the service and repair only this dedicated data directory:
+
+```sh
+docker compose stop sani
+sudo chown -R 65532:65532 ./sani-data
+sudo chmod -R u+rwX ./sani-data
+sudo chmod 750 ./sani-data
+docker compose up -d
+docker compose logs --tail=50 sani
+docker exec sani /sani healthcheck
+```
+
+Keep existing data: do not delete the directory or switch to an empty volume. Do not work around permissions with `chmod 777` or a root container. If ownership is correct, also check for a read-only mount, disk exhaustion or host SELinux policy. These UID/GID values assume ordinary Docker Engine; rootless Docker or user namespace remapping requires the mapped host UID/GID instead.
 
 ## With systemd {#binaries}
 
@@ -60,7 +103,7 @@ The binary is statically linked and needs no libraries on the server. On macOS, 
 ::: code-group
 
 ```sh [Download]
-base=https://github.com/DejavuMoe/sani/releases/latest/download
+base=https://github.com/DejavuMoe/sani/releases/download/v0.7.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -75,7 +118,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-`latest/download` always points at the newest release; to pin one, use a path like `download/v0.3.0` instead.
+The download path pins `v0.7.0`. When upgrading, replace it with the published target version's tag.
 
 ### Checking where a build came from {#verify}
 
@@ -83,7 +126,7 @@ Release files and images are built by GitHub Actions from the tagged commit, wit
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:latest -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.7.0 -R DejavuMoe/sani
 ```
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:

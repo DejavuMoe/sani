@@ -23,15 +23,16 @@ docker compose up -d
 - **极小基础镜像**：基于 `scratch` 构建，大小仅约 25 MB，仅含 `sani` 可执行文件与 CA 证书。以 `65532` 非特权用户运行且无 shell。如需执行命令可直接调用 `/sani`（例如 `docker exec -it sani /sani passwd`）。
 - **内置健康检查**：已配置 `HEALTHCHECK`，可通过 `docker ps` 查看容器 `healthy` 状态。
 
-镜像标签策略：
+### 镜像版本
 
 | 标签 | 指向 |
 |---|---|
-| `latest` | 最新正式发布版 |
-| `0.3` | 0.3 分支最新维护版（仅含 bug 修复） |
-| `0.3.0` | 锁定的具体版本 |
+| `v0.7.0` | 对应 Git tag 和 GitHub Release `v0.7.0` 的具体版本 |
+| `v0.7.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
 
-`compose.yaml` 默认使用 `latest`。若需自主控制升级节奏，可指定具体版本号。升级前建议先[备份](./operations#backup)，随后拉取镜像：
+从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.7.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
+
+升级时先[备份](./operations#backup)，再手动将 `compose.yaml` 的 `image:` 改为目标版本的完整标签，随后执行：
 
 ```sh
 docker compose pull
@@ -39,6 +40,48 @@ docker compose up -d
 ```
 
 如需从源码自建镜像，在仓库根目录将 `image:` 替换为 `build: .`，然后执行 `docker compose up -d --build`。
+
+### 数据目录权限 {#data-permissions}
+
+默认配置使用 Docker 命名卷 `sani-data:/data`。新卷会继承镜像内 `/data` 的所有权 `65532:65532`，无需手动创建服务器目录。容器重建保留数据；不要用 `docker compose down -v` 升级，它会删除命名卷。
+
+如果要把数据直接放在 Compose 文件旁边，改用 `./sani-data:/data` **之前**，先在该目录执行：
+
+```sh
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
+```
+
+然后把服务的挂载改为下面的写法，并删除文件末尾不再使用的顶层 `volumes:` 声明。`create_host_path: false` 可避免 Docker 在忘记初始化时自动创建 `root:root` 目录：
+
+```yaml
+    volumes:
+      - type: bind
+        source: ./sani-data
+        target: /data
+        bind:
+          create_host_path: false
+```
+
+如果已经出现 `sani: open database: unable to open database file (14)`，先检查实际挂载和目录权限：
+
+```sh
+docker inspect sani --format '{{json .Mounts}}'
+ls -ldn ./sani-data
+```
+
+若确认挂载的是当前目录下的 `./sani-data`，且所有者是 `root:root`、权限为 `755`，非特权容器不能创建数据库及 SQLite 的 WAL/SHM 文件。停止服务后，只修复这个专用数据目录：
+
+```sh
+docker compose stop sani
+sudo chown -R 65532:65532 ./sani-data
+sudo chmod -R u+rwX ./sani-data
+sudo chmod 750 ./sani-data
+docker compose up -d
+docker compose logs --tail=50 sani
+docker exec sani /sani healthcheck
+```
+
+已有数据不要删除目录或换成空卷；不要用 `chmod 777` 或改为 root 运行来绕过权限。如果所有权正确仍报错，再检查挂载是否只读、磁盘空间和宿主机的 SELinux 策略。这里的 UID/GID 适用于普通 Docker Engine；启用了 rootless 或 user namespace 映射时，需要按映射后的宿主 UID/GID 授权。
 
 ## systemd 服务管理 {#binaries}
 
@@ -60,7 +103,7 @@ docker compose up -d
 ::: code-group
 
 ```sh [下载]
-base=https://github.com/DejavuMoe/sani/releases/latest/download
+base=https://github.com/DejavuMoe/sani/releases/download/v0.7.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -75,7 +118,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-`latest/download` 始终指向最新版；如需锁定版本，替换为 `download/v0.3.0` 等对应路径。
+下载路径固定到 `v0.7.0`；升级时将路径中的标签改为已发布的目标版本。
 
 ### 校验来源与签名 {#verify}
 
@@ -83,7 +126,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:latest -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.7.0 -R DejavuMoe/sani
 ```
 
 将生成的 `sani.service` 写入 `/etc/systemd/system/` 并启动：

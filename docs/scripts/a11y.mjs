@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { groups } from '../.vitepress/pages.ts';
 import { checkComments, mockComments } from './comments.mjs';
+import { checkBuilder } from './builder.mjs';
 
 const require = createRequire(import.meta.url);
 const axe = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -48,6 +49,7 @@ for (const theme of ['light', 'dark']) {
       }
     }
   }
+  await checkBuilder(page, base, theme);
   if (theme === 'light') await checkComments(page, base, comments);
   await ctx.close();
 }

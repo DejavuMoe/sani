@@ -5,6 +5,10 @@
 set -euo pipefail
 
 tag=${1:?usage: scripts/release-notes.sh vX.Y.Z}
+if ! grep -Fxq "    image: ghcr.io/dejavumoe/sani:$tag" compose.yaml; then
+  echo "release-notes: compose.yaml must pin the release tag $tag" >&2
+  exit 1
+fi
 changelog=docs/en/project/changelog.md
 docs=https://github.com/DejavuMoe/sani/blob/master/docs
 # The section without its heading, and without the date the release page
@@ -27,7 +31,7 @@ $notes
 With Docker, for linux/amd64, linux/arm64 and linux/arm/v7:
 
 \`\`\`sh
-docker pull ghcr.io/dejavumoe/sani:${tag#v}
+docker pull ghcr.io/dejavumoe/sani:${tag}
 \`\`\`
 
 Or download the archive for your platform below. To check a download against

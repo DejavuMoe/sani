@@ -37,7 +37,7 @@ The documentation, in English and Chinese, lives in [docs/](docs/): guides for [
 
 ```sh
 mkdir sani && cd sani
-curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/v0.7.0/compose.yaml
 # Set SANI_BASE_URL (and TZ) in compose.yaml, then:
 docker compose up -d
 ```
@@ -46,12 +46,14 @@ Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first vis
 
 The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
+The template pins `v0.7.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. The default named volume handles permissions. For a host directory such as `./sani-data:/data`, [prepare ownership as `65532:65532` first](docs/en/guide/deploy.md#data-permissions).
+
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.7.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 

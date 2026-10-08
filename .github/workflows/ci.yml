@@ -27,6 +27,7 @@ jobs:
       # gofmt, go vet, svelte-check, the docs sync check and vue-tsc.
       - run: make check
       - run: make test
+      - run: bash scripts/test-release-notes.sh
       - name: Capacity and count consistency
         run: |
           sizes=1000
@@ -121,15 +122,10 @@ jobs:
           tags: sani:ci
           build-args: VERSION=ci
           cache-from: type=gha
-      - name: Start the image and wait for its health check
+      - name: Verify non-root storage and health checks
         run: |
           docker image inspect -f 'image size: {{.Size}} bytes' sani:ci
-          docker run -d --name sani -p 127.0.0.1:8080:8080 sani:ci
-          # The inner shell expands this command.
-          # shellcheck disable=SC2016
-          timeout 60 sh -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" sani)" = healthy ]; do sleep 1; done'
-          docker exec sani /sani version
-          docker logs sani 2>&1 | grep -q setup_code
+          bash scripts/test-docker-storage.sh sani:ci
 
   dist:
     name: Release archives

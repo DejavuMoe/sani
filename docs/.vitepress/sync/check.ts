@@ -250,6 +250,17 @@ function checkBuilder(): Check {
  * The deploy page names every archive and image platform a release publishes,
  * and nothing it doesn't; compose.yaml uses the image the release pushes.
  */
+export function imageTagProblems(compose: string, workflow: string): string[] {
+  const problems: string[] = [];
+  if (!/^\s+image: ghcr\.io\/dejavumoe\/sani:v\d+\.\d+\.\d+(?:-[\w.-]+)?\s*$/m.test(compose)) {
+    problems.push('compose.yaml: pin a full vX.Y.Z image tag');
+  }
+  if (!workflow.includes('type=raw,value=${{ github.ref_name }}') || workflow.includes('type=semver') || !workflow.includes('flavor: latest=false')) {
+    problems.push('release.yml: publish the exact Git tag without floating aliases');
+  }
+  return problems;
+}
+
 function checkRelease(): Check {
   const problems: string[] = [];
   const { image, archives, platforms } = release();
@@ -264,6 +275,16 @@ function checkRelease(): Check {
   }
   const composeImage = /^\s+image: (\S+?)(:\S+)?(\s|$)/m.exec(read('compose.yaml'))?.[1];
   if (composeImage !== image) problems.push(`compose.yaml: the image is ${composeImage}, but releases push ${image}`);
+  problems.push(...imageTagProblems(read('compose.yaml'), read('.github/workflows/release.yml')));
+  const pin = /^\s+image: (\S+)/m.exec(read('compose.yaml'))?.[1];
+  for (const file of ['README.md', 'README.zh-CN.md', 'SECURITY.md', ...locales.flatMap(({ dir }) => [`docs/${dir}guide/deploy.md`, `docs/${dir}guide/quick-start.md`])]) {
+    for (const match of read(file).matchAll(/ghcr\.io\/dejavumoe\/sani:[\w.-]+/g)) {
+      if (match[0] !== pin) problems.push(`${file}: ${match[0]} differs from compose.yaml's ${pin}`);
+    }
+    if (/docker (?:run|pull)[^\n]*ghcr\.io\/dejavumoe\/sani(?:\s|$)/m.test(read(file))) {
+      problems.push(`${file}: Docker command implicitly uses latest`);
+    }
+  }
 
   const zh = [...doc('', 'project/changelog').matchAll(/^## (v\S+)/gm)].map(m => m[1]);
   const en = [...doc('en/', 'project/changelog').matchAll(/^## (v\S+)/gm)].map(m => m[1]);

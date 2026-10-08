@@ -2,6 +2,20 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## v0.7.0
+
+2026-10-08 · Align release and image tags, fix the deployment configuration builder, and document container data directory permissions. Database schema remains at 4.
+
+### Breaking changes
+
+- **Container image tags:** from v0.7.0, Git tags, GitHub Releases and GHCR image tags match, retaining the full `v` prefix. Releases no longer publish `latest`, major or minor floating tags; old image tags are retired. Back up, change the image in Compose or deployment scripts to `ghcr.io/dejavumoe/sani:v0.7.0`, then run `docker compose pull && docker compose up -d`. This change does not alter the database schema.
+
+### Fixed
+
+- Pin Compose and the configuration builder to an explicit version; reject releases whose Git tag differs from the template. Align bilingual quick starts, downloads and image verification examples with the full version.
+- Document named volumes versus bind mounts, `65532:65532` ownership setup, and a data-preserving repair for SQLite database-open failures.
+- Use a full time zone selector, retaining the browser's zone and including UTC. Correct form alignment, narrow-screen file tabs and actions, and the width of highlighted scrolling code.
+
 ## v0.6.0
 
 2026-10-08 · Harden concurrency boundaries for sessions, caching and file uploads, and improve imports, exports, admin state and bilingual documentation checks. Read “Incompatible changes” before upgrading.

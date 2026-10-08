@@ -24,12 +24,14 @@ const fixedPassword = ref(false);
 const password = ref('');
 const rootRedirect = ref('');
 const filesInput = ref('');
-const zones = ref<string[]>([]);
+const zones = ref(['UTC', 'Asia/Shanghai']);
+const imageTag = compose.match(/^\s+image: ghcr\.io\/dejavumoe\/sani:(\S+)/m)![1];
 
 onMounted(() => {
   const own = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  if (own && own !== 'UTC') tzInput.value = own;
-  zones.value = 'supportedValuesOf' in Intl ? (Intl as any).supportedValuesOf('timeZone') : [];
+  if (own) tzInput.value = own;
+  const supported = 'supportedValuesOf' in Intl ? Intl.supportedValuesOf('timeZone') : [];
+  zones.value = [...new Set([...zones.value, tzInput.value, ...supported])].sort();
 });
 
 const ALNUM = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
@@ -207,10 +209,10 @@ const steps = computed(() => {
   } else {
     list.push({
       text: pick(
-        '在服务器上下载最新版本并安装。ARM 服务器把 amd64 换成 arm64 或 armv7：',
-        'Download the latest release on the server and install it. On an ARM server, use arm64 or armv7 instead of amd64:',
+        `在服务器上下载 ${imageTag} 并安装。ARM 服务器把 amd64 换成 arm64 或 armv7：`,
+        `Download ${imageTag} on the server and install it. On an ARM server, use arm64 or armv7 instead of amd64:`,
       ),
-      code: 'curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani && sudo install -m 755 sani /usr/local/bin/sani',
+      code: `curl -fsSL https://github.com/DejavuMoe/sani/releases/download/${imageTag}/sani-linux-amd64.tar.gz | tar -xz sani && sudo install -m 755 sani /usr/local/bin/sani`,
     });
     list.push({
       text: pick('把 sani.service 保存到上面的位置，然后启用：', 'Save sani.service where shown above, then enable it:'),
@@ -329,11 +331,10 @@ const steps = computed(() => {
 
       <label class="field">
         <span class="k">{{ pick('统计时区', 'Time zone for statistics') }}</span>
-        <input v-model="tzInput" class="input mono" list="b-zones" spellcheck="false" autocomplete="off" :aria-invalid="!tz ? true : undefined" />
-        <datalist id="b-zones">
-          <option v-for="z in zones" :key="z" :value="z" />
-        </datalist>
-        <span class="hint" :class="{ bad: !tz }">
+        <select v-model="tzInput" class="input mono" aria-describedby="b-zone-hint">
+          <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
+        </select>
+        <span id="b-zone-hint" class="hint" :class="{ bad: !tz }">
           {{ tz ? pick('“今天”和每日统计按这个时区划分', 'Days in the statistics follow this zone') : pick('无法识别这个时区', 'Unknown time zone') }}
         </span>
       </label>
@@ -429,8 +430,7 @@ const steps = computed(() => {
         <span v-else>{{ file.where }}</span>
         <span v-if="file.built.filled.length" class="legend"><i />{{ pick('按你的输入填写的行', 'lines filled in from your input') }}</span>
       </p>
-      <pre :id="`b-file-${file.id}`" class="code" role="tabpanel" :aria-labelledby="`b-tab-${file.id}`" tabindex="0"><code><span v-for="(l, i) in lines" :key="i" class="line" :class="{ filled: l.filled }">{{ l.code }}<span v-if="l.comment" class="comment">{{ l.comment }}</span>
-</span></code></pre>
+      <pre :id="`b-file-${file.id}`" class="code" role="tabpanel" :aria-labelledby="`b-tab-${file.id}`" tabindex="0"><code><span v-for="(l, i) in lines" :key="i" class="line" :class="{ filled: l.filled }">{{ l.code }}<span v-if="l.comment" class="comment">{{ l.comment }}</span></span></code></pre>
     </div>
 
     <ol class="steps">
@@ -471,6 +471,7 @@ const steps = computed(() => {
   color: var(--sn-text-2);
   font-size: 13px;
   font-weight: 550;
+  line-height: 20px;
 }
 
 .input {
@@ -490,6 +491,11 @@ const steps = computed(() => {
 .input.mono {
   font-family: var(--sn-font-mono);
   font-size: 13px;
+}
+
+select.input {
+  appearance: auto;
+  cursor: pointer;
 }
 
 .input:focus {
@@ -589,6 +595,7 @@ const steps = computed(() => {
 
 .bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 2px;
   padding: 10px 12px 0;
@@ -599,9 +606,11 @@ const steps = computed(() => {
   flex: 1;
   gap: 2px;
   min-width: 0;
+  overflow-x: auto;
 }
 
 .tabs [role='tab'] {
+  flex-shrink: 0;
   position: relative;
   height: 32px;
   padding: 0 10px;
@@ -665,6 +674,12 @@ const steps = computed(() => {
   font-family: var(--sn-font-mono);
   font-size: 12.5px;
   line-height: 1.7;
+}
+
+.code > code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
 }
 
 .line {
@@ -733,6 +748,14 @@ const steps = computed(() => {
     margin-inline: -24px;
     border-inline: 0;
     border-radius: 0;
+  }
+
+  .tabs {
+    flex-basis: 100%;
+  }
+
+  .bar > .mini:first-of-type {
+    margin-left: auto;
   }
 }
 </style>

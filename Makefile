@@ -67,7 +67,7 @@ capacity:
 	$(RUN) go run ./scripts/capacity
 
 docker:
-	docker build --build-arg VERSION=$(VERSION) -t sani:$(VERSION) -t sani:latest .
+	docker build --build-arg VERSION=$(VERSION) -t sani:$(VERSION) .
 
 # The documentation site: a static build in docs/.vitepress/dist, or a live
 # preview on 127.0.0.1:5174.
