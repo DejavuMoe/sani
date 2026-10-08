@@ -116,3 +116,19 @@ func TestWriteJSONFailureIsAnErrorResponse(t *testing.T) {
 		t.Fatalf("serialization failure: %d %s (%v)", w.Code, w.Body.String(), err)
 	}
 }
+
+func TestWriteJSONEscapesHTMLWithoutChangingData(t *testing.T) {
+	w := httptest.NewRecorder()
+	want := map[string]string{"value": `<script>alert("中文")</script>&`}
+	writeJSON(w, http.StatusCreated, want)
+	if w.Code != http.StatusCreated || w.Header().Get("Content-Type") != "application/json; charset=utf-8" || w.Header().Get("X-Content-Type-Options") != "nosniff" {
+		t.Fatalf("JSON response: %d %v", w.Code, w.Header())
+	}
+	if strings.ContainsAny(w.Body.String(), "<>&") {
+		t.Fatalf("literal HTML in JSON: %s", w.Body.String())
+	}
+	var got map[string]string
+	if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil || got["value"] != want["value"] {
+		t.Fatalf("JSON data changed: %q (%v)", got, err)
+	}
+}

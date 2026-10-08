@@ -73,9 +73,7 @@ type apiError struct {
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	var body bytes.Buffer
-	enc := json.NewEncoder(&body)
-	enc.SetEscapeHTML(false)
-	if err := enc.Encode(v); err != nil {
+	if err := json.NewEncoder(&body).Encode(v); err != nil {
 		// Nothing has been committed yet: a failed DTO must not look like
 		// an empty successful response (or a downloadable export).
 		status = http.StatusInternalServerError

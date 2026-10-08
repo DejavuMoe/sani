@@ -2,10 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.6.0
+
+2026-10-08 · Harden concurrency boundaries for sessions, caching and file uploads, and improve imports, exports, admin state and bilingual documentation checks. Read “Incompatible changes” before upgrading.
 
 - Advance each link's update timestamp in commit order for edits and bulk enable/disable, so requests committed late or within the same millisecond are not mistaken for stale responses by the admin app. Metadata refreshes still preserve the timestamp.
 - Validate expiry consistently across creation, updates and imports. Send a success status only after JSON encoding succeeds; encoding failures return `500 internal`.
+- Use standard HTML character escaping in JSON responses without changing decoded field values or JSON import/export content.
 - Protect temporary and renamed files for the full upload request until database ownership or failure cleanup, preventing the file sweeper from removing active uploads.
 - Decide whether to refetch a title from the latest row inside the write transaction, preserving concurrently saved manual titles during URL updates and metadata refreshes.
 - Ignore late list and text responses to preserve saved or deleted data. Retry stale pagination and refresh counts after deletion. Failed sign-out keeps the authenticated interface and shows an error that can be retried.
@@ -20,7 +23,7 @@
 
 ### Incompatible changes
 
-The database remains at schema 4 with no new migration. Under the [versioning policy](./versioning), these behavior changes belong in a minor release rather than a patch. The version number has not been selected.
+Upgrading from v0.5.0 keeps the database at schema 4 with no new migration. This minor release includes the behavior changes below under the [versioning policy](./versioning). Stop the service cleanly and back up the database, `files/` and configuration before upgrading; review password configuration and import/export workflows. See [backup and restore](../guide/operations#backup) for the complete procedure.
 
 - **CSV formula protection:** fields that could trigger spreadsheet formulas gain an apostrophe prefix. Reimporting retains that prefix and can change original titles and other fields. For lossless migration of URL links and tags, export Sani JSON again from the original instance. Do not strip apostrophes in bulk: they may be original content. Full instance recovery still requires matching backups of the database, files and configuration.
 - **Bookmarklet and phone shares:** incoming URLs and titles only prefill the form; review and confirm creation manually. Workflows that relied on automatic creation must use the authenticated API or keep the manual confirmation step.

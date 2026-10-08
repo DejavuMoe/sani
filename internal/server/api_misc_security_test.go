@@ -29,6 +29,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 		{"＝1+1", true}, {"＋1+1", true}, {"－1+1", true}, {"＠SUM(1,1)", true},
 		{"'=1+1", false}, {"''literal", false}, {"'ordinary", false},
 		{"=\"a,b\"\n+1", true}, {"normal, \"quoted\"; =text", false}, {"中文标题", false}, {"", false},
+		{`<script>alert("中文")</script>&`, false},
 	}
 	ctx := context.Background()
 	for i, tc := range cases {
@@ -70,7 +71,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 		}
 	}
 
-	// JSON stays a portable, unescaped backup, including integers above 2^53.
+	// JSON preserves original values, including integers above 2^53.
 	var doc struct {
 		Links []exportLink `json:"links"`
 	}
