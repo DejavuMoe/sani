@@ -5,6 +5,7 @@ package clicks
 import (
 	"context"
 	"log/slog"
+	"math"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -109,7 +110,7 @@ func (r *Recorder) Counter(id, stored int64) *atomic.Int64 {
 	})
 	c := &box.value
 	if p := s.links[id]; p != nil {
-		stored += p.total
+		stored += min(p.total, math.MaxInt64-stored)
 		p.counter = c
 	}
 	c.Store(stored)

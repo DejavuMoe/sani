@@ -61,14 +61,17 @@
     if (link.kind !== 'text') return;
     const linkId = id;
     void link.updatedAt;
+    let current = true;
+    body = null;
     untrack(async () => {
       try {
         const r = await api.linkText(linkId);
-        if (linkId === id) body = r.text;
+        if (current && linkId === id) body = r.text;
       } catch {
         /* the list notices a deleted link on its own */
       }
     });
+    return () => { current = false; };
   });
 
   async function copyBody() {

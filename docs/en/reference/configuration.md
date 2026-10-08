@@ -63,7 +63,7 @@ Only turn it on when Sani really sits behind a proxy that sets these headers. Ot
 
 ### `SANI_PASSWORD`
 
-No default. A fixed admin password of at least 8 characters. When it’s set:
+No default. A fixed admin password of at least 8 Unicode code points and at most 1,024 UTF-8 bytes. Invalid length prevents startup without changing the stored password or sessions. When it’s set:
 
 - at every start, if it differs from the stored password, it replaces it and signs out every device;
 - Settings can’t change the password;
@@ -91,7 +91,7 @@ Generated slugs use only the 31 characters of `23456789abcdefghjkmnpqrstuvwxyz`;
 
 Default `true`. After a link is created, fetch the destination in the background for its title and icon. When off, new links aren’t fetched and the list shows their domain. Clicking “Refetch title” in a link’s details still fetches the page.
 
-Fetches only ever reach public addresses; see [Security](../internals/security#fetching). If the server reaches the internet through a proxy, set the usual `HTTPS_PROXY` and `HTTP_PROXY` variables.
+The fetcher checks target names and resolved addresses, then checks the dialed IP again for direct connections. `HTTPS_PROXY` and `HTTP_PROXY` enable proxy access; the proxy’s DNS and final outbound connections require their own restrictions. See [Security](../internals/security#fetching).
 
 ### `SANI_FORWARD_QUERY`
 
@@ -106,7 +106,7 @@ If the destination already has a query, the two are joined with `&`, and a `#` f
 
 ### `SANI_CACHE_SIZE`
 
-Default `100000`, from 64 to 100,000,000. How many redirect targets to keep in memory. Sani also caches up to a quarter as many unknown slugs, so a scan for random slugs neither keeps hitting the database nor pushes real links out of the cache.
+Default `100000`, from 64 to 100,000,000. How many redirect targets to keep in memory. Sani separately caches up to a quarter as many unknown slugs to reduce repeated misses. Scanning new slugs still queries the database; apply ingress traffic limits as needed.
 
 When the cache is full, a random entry makes room. With far fewer links than this, every link that has been visited stays in memory.
 
@@ -146,7 +146,7 @@ Default: the system time zone. “Today” and the daily statistics follow it. T
 
 ### `HTTPS_PROXY` and `HTTP_PROXY`
 
-The proxy for fetching titles and icons, with the usual meaning; `NO_PROXY` is honored too. The proxy itself may have a private address, like a proxy running on the same machine; destinations still have to pass the public address check.
+Outbound proxies for title and icon fetching use the standard library’s `http.ProxyFromEnvironment`, including `NO_PROXY`. Targets still pass through `checkHost`; with a proxy configured, failed local DNS lookups may be left to it, and the proxy itself may be private. Sani does not inspect the address the proxy ultimately connects to. Use a trusted proxy with its own DNS and outbound restrictions; see the [fetching trust boundary](../internals/security#fetching).
 
 ## Configuration errors
 

@@ -17,7 +17,7 @@ describe('t', () => {
 
   it('has every key in both languages', async () => {
     // A missing English key falls back to the key itself.
-    const zhKeys = ['composer.submit', 'settings.tokens', 'keys.title', 'err.slug_taken', 'summary.last30'] as const;
+    const zhKeys = ['composer.submit', 'settings.tokens', 'keys.title', 'err.slug_taken', 'reason.expires_invalid', 'summary.last30'] as const;
     i18n.lang = 'en';
     for (const k of zhKeys) expect(t(k)).not.toBe(k);
   });

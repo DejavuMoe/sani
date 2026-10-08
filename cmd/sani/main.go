@@ -223,6 +223,9 @@ func finish(grace context.Context, hs *http.Server, srv *server.Server, rec *cli
 // syncEnvPassword makes SANI_PASSWORD the password, signing out sessions
 // created under an older one.
 func syncEnvPassword(ctx context.Context, st *store.Store, pw string) error {
+	if err := auth.ValidatePassword(pw); err != nil {
+		return err
+	}
 	hash, err := st.Setting(ctx, store.SettingPassword)
 	if err != nil && !errors.Is(err, store.ErrNotFound) {
 		return err
@@ -230,13 +233,7 @@ func syncEnvPassword(ctx context.Context, st *store.Store, pw string) error {
 	if hash != "" && auth.VerifyPassword(pw, hash) {
 		return nil
 	}
-	if err := st.SetSetting(ctx, store.SettingPassword, auth.HashPassword(pw)); err != nil {
-		return err
-	}
-	if hash != "" {
-		return st.DeleteSessions(ctx, []byte{})
-	}
-	return nil
+	return st.ReplacePassword(ctx, hash, auth.HashPassword(pw), nil)
 }
 
 func passwd() error {
@@ -270,8 +267,8 @@ func passwd() error {
 		}
 		pw = strings.TrimRight(line, "\r\n")
 	}
-	if len([]rune(pw)) < auth.MinPasswordLength {
-		return fmt.Errorf("use at least %d characters", auth.MinPasswordLength)
+	if err := auth.ValidatePassword(pw); err != nil {
+		return err
 	}
 
 	ctx := context.Background()
@@ -280,10 +277,11 @@ func passwd() error {
 		return err
 	}
 	defer st.Close()
-	if err := st.SetSetting(ctx, store.SettingPassword, auth.HashPassword(pw)); err != nil {
+	hash, err := st.Setting(ctx, store.SettingPassword)
+	if err != nil && !errors.Is(err, store.ErrNotFound) {
 		return err
 	}
-	if err := st.DeleteSessions(ctx, []byte{}); err != nil {
+	if err := st.ReplacePassword(ctx, hash, auth.HashPassword(pw), nil); err != nil {
 		return err
 	}
 	fmt.Fprintln(os.Stderr, "Password updated; every session has been signed out.")

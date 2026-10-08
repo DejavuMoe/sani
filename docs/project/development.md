@@ -43,6 +43,7 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 | `make check` | 静态质量检查：gofmt、go vet、svelte-check、文档与源码核对、vue-tsc |
 | `make test` | 单元测试套件：Go 竞态检测（`-race`）与前端测试 |
 | `make e2e` | 启动全新实例并运行 Playwright 端到端全链路测试 |
+| `make smoke` | 运行真实二进制，验收认证、网址/文本/文件/标签、SIGTERM 停机、CLI 备份恢复与密码重置 |
 | `make bench` | 核心跳转、缓存查找与点击累加基准性能测试 |
 | `make load` | 高并发轰炸压测（自动校验重定向与落库计数绝对一致） |
 | `make capacity` | 阶梯容量压测（1千/1万/10万级），输出结构化 JSON |
@@ -52,7 +53,7 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 | `make docs-dev` | 启动文档本地预览服务器（`127.0.0.1:5174`） |
 | `make docs` | 构建静态文档站点（输出至 `docs/.vitepress/dist`） |
 
-提交代码前务必通过 `make check test`；涉及管理界面改动必须执行 `make e2e`。本地测试服务严禁对外暴露，一律限定绑定 `127.0.0.1`。
+提交代码前务必通过 `make check test`；涉及管理界面改动必须执行 `make e2e`。发布验收还需运行 `make smoke`，通过真实进程验证 HTTP、CLI 与冷备恢复路径。本地测试服务一律限定绑定 `127.0.0.1`。
 
 ## 架构核心原则（不变量）
 
@@ -62,7 +63,7 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 - **外部输入严格施加容量边界**：任何以客户端输入为 Key 的映射结构必须配置显式容量上限。
 - **UI 文案双语同源**：文案统一维护于 `web/src/lib/i18n.svelte.ts`。中文表达地道自然，拒绝生硬机器直译。
 - **坚决不引入重量级 UI 与图标依赖**：图标采用 `Icon.svelte` 矢量手绘；下拉框使用原生 Popover API，弹窗使用原生 `<dialog>`。
-- **无障碍（A11y）合规**：双主题满足 WCAG AA 文本对比度要求，全功能支持键盘访问，axe 扫描零违规（管理端 `pnpm --dir web a11y`，文档站 `pnpm --dir docs a11y`）。
+- **无障碍（A11y）验收**：要求文本对比度满足 WCAG AA，操作支持键盘。管理端 `pnpm --dir web a11y` 检查主要页面的中文/英文与浅色/深色组合；文档站 `pnpm --dir docs a11y` 检查所有页面的双语双主题。axe 扫描应零违规，仍需人工核对焦点与键盘交互。
 - **统一 API 错误协议**：所有异常统一响应 `{"error": {"code": "…", "message": "…"}}`，前端基于 `code` 路由至对应多语言文案。
 
 ## 文档同步维护
@@ -72,6 +73,7 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 - **页面对齐**：侧边栏路由登记于 `docs/.vitepress/pages.ts`。中文源文件位于 `docs/`，英文置于 `docs/en/`，目录层级严格一致。
 - **强类型源码比对**：构建前执行 `node docs/.vitepress/sync/check.ts`，强一致性校验涵盖配置项、接口、错误码及命令行参数。比对规则与状态见[进度清单](./progress#checks)。
 - **无障碍检测**：先构建 `pnpm --dir docs build`，通过 `pnpm --dir docs preview` 启动预览，随后执行 `pnpm --dir docs a11y` 进行全页全主题 axe 审计。
+- **SEO 回归**：逐页摘要与 canonical、hreflang、OG、Twitter、JSON-LD 由 `.vitepress/seo.ts` 生成，随 `make check` 验证。`make docs` 在构建后执行 `scripts/check-seo.mjs`，检查真实 HTML 的唯一标题、摘要与 canonical，双语 sitemap、robots 与 404 禁止收录；新增页面需补充双语摘要。
 - **自动化衍生内容**：首页演示组件、部署生成器与性能图表数据均通过模板或共享数据脚本自动挂载，无需手动复制粘贴。
 
 源码变更与文档更新映射清单：

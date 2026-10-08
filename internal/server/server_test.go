@@ -22,10 +22,11 @@ import (
 )
 
 type env struct {
-	t   *testing.T
-	srv *Server
-	ts  *httptest.Server
-	c   *http.Client
+	t      *testing.T
+	srv    *Server
+	ts     *httptest.Server
+	c      *http.Client
+	dbPath string
 }
 
 var testUI = fstest.MapFS{
@@ -36,7 +37,8 @@ var testUI = fstest.MapFS{
 
 func newEnv(t *testing.T, opt Options) *env {
 	t.Helper()
-	st, err := store.Open(context.Background(), filepath.Join(t.TempDir(), "sani.db"))
+	dbPath := filepath.Join(t.TempDir(), "sani.db")
+	st, err := store.Open(context.Background(), dbPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +56,7 @@ func newEnv(t *testing.T, opt Options) *env {
 	}
 	ts := httptest.NewServer(s)
 	jar, _ := cookiejar.New(nil)
-	e := &env{t: t, srv: s, ts: ts, c: &http.Client{
+	e := &env{t: t, srv: s, ts: ts, dbPath: dbPath, c: &http.Client{
 		Jar:           jar,
 		CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse },
 	}}
@@ -188,6 +190,57 @@ func TestSetupAndLogin(t *testing.T) {
 	}
 	if r := e.req("GET", "/api/links", nil); r.status != 200 {
 		t.Fatal("current session lost after password change")
+	}
+}
+
+func TestMaximumPasswordHTTPFlow(t *testing.T) {
+	for _, tc := range []struct{ name, initial, replacement string }{
+		{"ascii", strings.Repeat("x", 1024), strings.Repeat("y", 1024)},
+		{"multibyte", strings.Repeat("界", 341) + "x", strings.Repeat("語", 341) + "y"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if len(tc.initial) != 1024 || len(tc.replacement) != 1024 {
+				t.Fatal("fixture must exercise exactly 1024 UTF-8 bytes")
+			}
+			e := newEnv(t, Options{})
+			protected := func() {
+				t.Helper()
+				if r := e.req("GET", "/api/links", nil); r.status != 200 || !json.Valid(r.body) {
+					t.Fatalf("protected API: %d %s", r.status, r.body)
+				}
+			}
+			logout := func() {
+				t.Helper()
+				if r := e.req("DELETE", "/api/session", nil); r.status != 204 {
+					t.Fatalf("logout: %d %s", r.status, r.body)
+				}
+				if r := e.req("GET", "/api/links", nil); r.status != 401 {
+					t.Fatalf("protected API after logout: %d %s", r.status, r.body)
+				}
+			}
+			login := func(password string) {
+				t.Helper()
+				if r := e.req("POST", "/api/session", map[string]string{"password": password}); r.status != 200 || r.json()["authenticated"] != true {
+					t.Fatalf("login: %d %s", r.status, r.body)
+				}
+				protected()
+			}
+			if r := e.req("POST", "/api/setup", map[string]string{"password": tc.initial, "code": e.srv.opt.SetupCode}); r.status != 200 || r.json()["authenticated"] != true {
+				t.Fatalf("setup: %d %s", r.status, r.body)
+			}
+			protected()
+			logout()
+			login(tc.initial)
+			if r := e.req("PUT", "/api/password", map[string]string{"current": tc.initial, "password": tc.replacement}); r.status != 204 {
+				t.Fatalf("change password: %d %s", r.status, r.body)
+			}
+			protected()
+			logout()
+			if r := e.req("POST", "/api/session", map[string]string{"password": tc.initial}); r.status != 401 || r.code() != "wrong_password" {
+				t.Fatalf("old password still works: %d %s", r.status, r.body)
+			}
+			login(tc.replacement)
+		})
 	}
 }
 

@@ -40,9 +40,10 @@ type shard struct {
 }
 
 type call struct {
-	done chan struct{}
-	e    *Entry
-	err  error
+	done  chan struct{}
+	epoch uint64
+	e     *Entry
+	err   error
 }
 
 type Cache struct {
@@ -100,7 +101,9 @@ func (c *Cache) Get(ctx context.Context, key string) (*Entry, error) {
 
 func (c *Cache) fill(ctx context.Context, s *shard, key string) (*Entry, error) {
 	c.flightMu.Lock()
-	if f, ok := c.flight[key]; ok {
+	epoch := c.epoch.Load()
+	// Requests after invalidation must not join a load from before the write.
+	if f, ok := c.flight[key]; ok && f.epoch == epoch {
 		c.flightMu.Unlock()
 		select {
 		case <-f.done:
@@ -109,13 +112,12 @@ func (c *Cache) fill(ctx context.Context, s *shard, key string) (*Entry, error) 
 			return nil, ctx.Err()
 		}
 	}
-	f := &call{done: make(chan struct{})}
+	f := &call{done: make(chan struct{}), epoch: epoch}
 	c.flight[key] = f
 	c.flightMu.Unlock()
 
 	// The load is shared by every waiter, so it must not die with the
 	// request that happened to start it.
-	epoch := c.epoch.Load()
 	lctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 	f.e, f.err = c.load(lctx, key)
 	cancel()
@@ -137,7 +139,10 @@ func (c *Cache) fill(ctx context.Context, s *shard, key string) (*Entry, error) 
 	}
 
 	c.flightMu.Lock()
-	delete(c.flight, key)
+	// An invalidated load may finish after its replacement has started.
+	if c.flight[key] == f {
+		delete(c.flight, key)
+	}
 	c.flightMu.Unlock()
 	close(f.done)
 	return f.e, f.err

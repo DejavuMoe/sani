@@ -3,13 +3,19 @@ package meta
 import (
 	"bytes"
 	"context"
+	"io"
+	"net/http"
 	"net/netip"
 	"net/url"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding/simplifiedchinese"
+
+	"github.com/DejavuMoe/sani/internal/links"
 )
 
 func TestParseHead(t *testing.T) {
@@ -20,6 +26,8 @@ func TestParseHead(t *testing.T) {
 		<link rel="mask-icon" href="/mask.svg">
 		<link rel="icon" sizes="16x16" href="/fav16.png">
 		<link rel="icon" sizes="64x64" href="fav64.png">
+		<link rel="icon" sizes="64x64" href="other64.png">
+		<link rel="icon" href="fav.svg">
 		<link rel="apple-touch-icon" href="/touch.png">
 	</head><body><svg><title>not me</title></svg></body></html>`
 	base, _ := url.Parse("https://example.com/page")
@@ -30,11 +38,132 @@ func TestParseHead(t *testing.T) {
 	}
 	want := []string{
 		"https://cdn.example.com/static/fav64.png",
+		"https://cdn.example.com/static/other64.png",
+		"https://cdn.example.com/static/fav.svg",
 		"https://cdn.example.com/touch.png",
 		"https://cdn.example.com/fav16.png",
 	}
 	if strings.Join(p.Icons, " ") != strings.Join(want, " ") {
 		t.Errorf("icons = %v\nwant    %v", p.Icons, want)
+	}
+}
+
+func TestParseHeadURLLimits(t *testing.T) {
+	const origin = "https://example.com/"
+	limitBase := origin + strings.Repeat("a", links.MaxURLLength-len(origin)-1) + "/"
+	for _, tt := range []struct {
+		name, base, head, want string
+	}{
+		{"long base", origin, `<base href="https://cdn.example.com/` + strings.Repeat("a", 64<<10) + `/"><link rel="icon" href="i">`, origin + "i"},
+		{"escaped base", origin, `<base href="https://cdn.example.com/` + strings.Repeat("é", links.MaxURLLength/3) + `/"><link rel="icon" href="i">`, origin + "i"},
+		{"expanded base", limitBase, `<base href="b/"><link rel="icon" href="..">`, origin},
+		{"expanded icon", limitBase, `<link rel="icon" href="i"><link rel="icon" href="/i">`, origin + "i"},
+		{"long redirect", limitBase + "x", `<link rel="icon" href="i"><link rel="icon" href="` + origin + `i">`, origin + "i"},
+		{"exact limit", origin, `<base href="` + limitBase + `"><link rel="icon" href=".">`, limitBase},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			base, err := url.Parse(tt.base)
+			if err != nil {
+				t.Fatal(err)
+			}
+			p := &Page{}
+			parseHead(strings.NewReader(tt.head+"<title>Still parsed</title>"), base, p)
+			if p.Title != "Still parsed" || !slices.Equal(p.Icons, []string{tt.want}) {
+				t.Fatalf("title = %q, icons = %v; want %q", p.Title, p.Icons, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseHeadManyShortIcons(t *testing.T) {
+	const origin = "https://example.com/"
+	base, _ := url.Parse(origin)
+	iconBase := origin + strings.Repeat("a", links.MaxURLLength-len(origin)-16) + "/"
+	var doc strings.Builder
+	doc.WriteString(`<base href="` + iconBase + `">`)
+	doc.WriteString(strings.Repeat(`<link rel="stylesheet" href="s">`, maxIconCandidates))
+	for i := 0; i < 5000; i++ {
+		doc.WriteString(`<link rel="icon" href="` + strconv.Itoa(i) + `">`)
+	}
+	doc.WriteString("<title>After icons</title>")
+	p := &Page{}
+	parseHead(strings.NewReader(doc.String()), base, p)
+	if p.Title != "After icons" || len(p.Icons) != maxIconCandidates {
+		t.Fatalf("title = %q, icon count = %d", p.Title, len(p.Icons))
+	}
+	for i, href := range p.Icons {
+		if href != iconBase+strconv.Itoa(i) || len(href) > links.MaxURLLength {
+			t.Fatalf("icon %d changed order or exceeded URL limit", i)
+		}
+	}
+}
+
+func TestIconCandidateURLLimits(t *testing.T) {
+	const origin = "https://example.com/"
+	base, _ := url.Parse(origin)
+	for _, tt := range []struct {
+		name, href string
+		want       bool
+	}{
+		{"exact limit", origin + strings.Repeat("a", links.MaxURLLength-len(origin)), true},
+		{"long href before normalization", strings.Repeat("a/../", links.MaxURLLength/5+1) + "i", false},
+		{"escaped href", strings.Repeat("é", links.MaxURLLength/3), false},
+		{"data URI", "data:image/svg+xml,<svg>" + strings.Repeat(" ", links.MaxURLLength) + "</svg>", true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			_, ok := iconCandidate(map[string]string{"rel": "icon", "href": tt.href}, base)
+			if ok != tt.want {
+				t.Fatalf("accepted = %v, want %v", ok, tt.want)
+			}
+		})
+	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+func TestPageIconFallback(t *testing.T) {
+	const origin = "https://example.com/"
+	for _, tt := range []struct {
+		name, final, doc string
+		want             []string
+	}{
+		{"empty", origin + "page", "", []string{origin + "favicon.ico"}},
+		{"duplicate fallback", origin, `<link rel="icon" href="/favicon.ico">`, []string{origin + "favicon.ico"}},
+		{"sorted and deduplicated", origin + "page", `<base href="https://cdn.example.com/"><link rel="icon" sizes="16x16" href="a"><link rel="icon" sizes="64x64" href="b"><link rel="icon" sizes="64x64" href="b">`, []string{"https://cdn.example.com/b", "https://cdn.example.com/a", origin + "favicon.ico"}},
+		{"full candidates", origin, strings.Repeat(`<link rel="icon" href="/i">`, maxIconCandidates+1), []string{origin + "i", origin + "favicon.ico"}},
+		{"long final path", origin + strings.Repeat("a", links.MaxURLLength), `<link rel="icon" href="i">`, []string{origin + "favicon.ico"}},
+		{"long final host", "https://" + strings.Repeat("a", links.MaxURLLength) + ".com/", "", nil},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			final, err := url.Parse(tt.final)
+			if err != nil {
+				t.Fatal(err)
+			}
+			f := &Fetcher{client: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Header:     http.Header{"Content-Type": {"text/html"}},
+					Body:       io.NopCloser(strings.NewReader(tt.doc)),
+					Request:    &http.Request{URL: final},
+				}, nil
+			})}}
+			// A public literal passes the SSRF check; the transport never uses the network.
+			p, err := f.Page(context.Background(), "https://1.1.1.1/", "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !slices.Equal(p.Icons, tt.want) {
+				t.Fatalf("icons = %v, want %v", p.Icons, tt.want)
+			}
+		})
+	}
+	if got := FallbackIcons(origin + "page"); !slices.Equal(got, []string{origin + "favicon.ico"}) {
+		t.Fatalf("FallbackIcons = %v", got)
+	}
+	if got := FallbackIcons("https://" + strings.Repeat("a", links.MaxURLLength) + ".com/"); len(got) != 0 {
+		t.Fatal("oversized fallback URL accepted")
 	}
 }
 

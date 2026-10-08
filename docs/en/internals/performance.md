@@ -23,9 +23,11 @@ const workloadNames = { list: 'List', search: 'Search', 'click-sort': 'Click sor
 
 This run used an {{ benchmark.cores }}-core laptop ({{ benchmark.cpu }}, {{ benchmark.environment }}), with the load generator on the same machine competing for the CPU. Repeated runs on the laptop vary by about 10%. In a real deployment the network and the reverse proxy add latency, but none of that is Sani’s.
 
-## Not a click lost
+## Click count verification
 
 During the {{ benchmark.duration }} on `/hot`, Sani served {{ num(benchmark.clicks.served) }} redirects, and the database recorded {{ num(benchmark.clicks.counted) }} clicks. Counting holds up under load because clicks are first added up in memory per link and then written in batches by a background task; a cached redirect never waits for a write.
+
+This checks count consistency after flushing in a normal run, not lossless persistence through crashes or power failure. See [Operations](../guide/operations) for those durability limits.
 
 ## Microbenchmarks
 
@@ -41,7 +43,7 @@ During the {{ benchmark.duration }} on `/hot`, Sani served {{ num(benchmark.clic
 
 - **A sharded cache.** Redirect targets sit in 64 shards; a hit is one map lookup under a read lock, and shards don’t get in each other’s way.
 - **Clicks stay in memory.** Recording a click never touches the database. Every 2 seconds all clicks go out in one transaction, however many there were.
-- **Unknown slugs are cached too.** They’re kept separately and bounded, so a scan for random slugs neither keeps querying the database nor pushes real links out. The 404 page is prerendered and costs a few writes.
+- **Unknown slugs are cached too.** A separate bounded cache reduces repeated misses without evicting valid links. Scanning new slugs still queries the database; prerendered error pages reduce response work.
 - **Separate readers and writer.** SQLite WAL permits normal reads alongside writes; pool contention, external writers and cold counter snapshots can still wait.
 - **Precompressed assets.** The admin app is compressed with Brotli and gzip at build time and sent as is, never compressed at runtime.
 

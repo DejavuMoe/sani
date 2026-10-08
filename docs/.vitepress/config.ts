@@ -3,6 +3,7 @@ import { defineConfig, type DefaultTheme } from 'vitepress';
 import { readableTokens } from './contrast';
 import { saniMarkdown } from './markdown';
 import { groups, prefix, type Lang } from './pages';
+import { pageSeo, productDescription, siteUrl } from './seo';
 import { latestVersion } from './sync/source';
 
 const repo = 'https://github.com/DejavuMoe/sani';
@@ -83,7 +84,16 @@ const enTheme: DefaultTheme.Config = {
 export default defineConfig({
   title: 'Sani',
   cleanUrls: true,
-  sitemap: { hostname: 'https://sani.zsh.moe' },
+  sitemap: { hostname: siteUrl },
+  transformPageData(page) {
+    const { description, head } = pageSeo(page);
+    page.description = description;
+    page.frontmatter.head = [...(page.frontmatter.head ?? []), ...head];
+  },
+  // VitePress's generated 404 bypasses transformPageData.
+  transformHead: ({ pageData }) => pageData.isNotFound
+    ? [['meta', { name: 'robots', content: 'noindex, follow' }]]
+    : [],
   lastUpdated: git,
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
@@ -97,14 +107,14 @@ export default defineConfig({
     root: {
       label: '简体中文',
       lang: 'zh-CN',
-      description: '一个小而快、可以自己部署的短链接服务：一个二进制文件、一个 SQLite 数据库。',
+      description: productDescription.zh,
       themeConfig: zhTheme,
     },
     en: {
       label: 'English',
       lang: 'en',
       link: '/en/',
-      description: 'A small, fast link shortener you host yourself: one binary, one SQLite file.',
+      description: productDescription.en,
       themeConfig: enTheme,
     },
   },

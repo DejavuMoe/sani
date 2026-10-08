@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/DejavuMoe/sani/internal/auth"
 )
 
 type Config struct {
@@ -125,8 +127,10 @@ func Load() (*Config, error) {
 			collect(fmt.Errorf("SANI_ROOT_REDIRECT: expected an absolute http(s) URL, got %q", c.RootRedirect))
 		}
 	}
-	if c.Password != "" && len([]rune(c.Password)) < 8 {
-		collect(fmt.Errorf("SANI_PASSWORD: use at least 8 characters"))
+	if c.Password != "" {
+		if err := auth.ValidatePassword(c.Password); err != nil {
+			collect(fmt.Errorf("SANI_PASSWORD: %w", err))
+		}
 	}
 	c.TrustProxy, err = envBool("SANI_TRUST_PROXY", false)
 	collect(err)

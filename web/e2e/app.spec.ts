@@ -442,3 +442,141 @@ test('a delayed statistics response cannot undo saved tags', async () => {
     await page.unroute('**/api/links/*/stats?*');
   }
 });
+
+test('external shared URLs need confirmation on desktop and phone', async () => {
+  const destination = 'https://example.com/review-before-shortening';
+  const before = await (await page.request.get('/api/links')).json();
+  let createdURL = '';
+  for (const [index, width] of [1280, 390].entries()) {
+    await page.setViewportSize({ width, height: 860 });
+    const target = new URL('/admin/new', page.url());
+    target.searchParams.set(index === 0 ? 'url' : 'text', destination);
+    target.searchParams.set('title', 'Review this shared page');
+    const posts: string[] = [];
+    const track = (request: import('@playwright/test').Request) => {
+      if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/links') posts.push(request.url());
+    };
+    page.on('request', track);
+    await page.route('http://external.test/share', route => route.fulfill({
+      contentType: 'text/html', body: `<a href="${target.href}">Open shared page</a>`,
+    }));
+    try {
+      // A local fixture supplies a genuinely cross-site top-level navigation.
+      await page.goto('http://external.test/share');
+      await page.getByRole('link', { name: 'Open shared page' }).click();
+      await expect(page.getByRole('heading', { name: 'Shorten this page' })).toBeVisible();
+      await expect(page.getByLabel('Long URL')).toHaveValue(destination);
+      await page.getByRole('button', { name: 'More options' }).click();
+      await expect(page.locator('#composer-more input').first()).toHaveValue('Review this shared page');
+      await page.waitForLoadState('networkidle');
+      expect(posts).toHaveLength(0);
+      const unconfirmed = await (await page.request.get('/api/links')).json();
+      expect(unconfirmed.total).toBe(before.total + index);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+
+      await page.getByRole('button', { name: 'Shorten', exact: true }).click();
+      await expect(page.locator('.result .short')).toBeVisible();
+      expect(posts).toHaveLength(1);
+      if (index === 0) createdURL = (await page.locator('.result .short').getAttribute('href'))!;
+      else await expect(page.locator('.result .short')).toHaveAttribute('href', createdURL);
+      await expect(page.locator('.result .page')).toHaveText('Review this shared page');
+    } finally {
+      page.off('request', track);
+      await page.unroute('http://external.test/share');
+    }
+  }
+  const after = await (await page.request.get('/api/links')).json();
+  expect(after.total).toBe(before.total + 1);
+  await page.setViewportSize({ width: 1280, height: 860 });
+});
+
+test('a text response from before an edit cannot replace its saved preview or clipboard', async () => {
+  const created = await page.request.post('/api/texts', { data: { slug: 'delayed-body', text: 'Old body' } });
+  expect(created.status()).toBe(201);
+  const link = await created.json();
+  await page.goto('/admin/');
+  let release!: () => void;
+  let captured!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const ready = new Promise<void>(resolve => { captured = resolve; });
+  let first = true;
+  const path = `**/api/links/${link.id}/text`;
+  await page.route(path, async route => {
+    if (!first) return route.continue();
+    first = false;
+    const response = await route.fetch();
+    captured();
+    await held;
+    await route.fulfill({ response });
+  });
+  const row = page.locator('.row', { hasText: '/p/delayed-body' });
+  try {
+    await row.locator('button.main').click();
+    await ready;
+    await page.keyboard.press('e');
+    await expect(row.locator('.editor textarea')).toBeEnabled();
+    await row.locator('.editor textarea').fill('New saved body');
+    await row.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(row.locator('.preview')).toHaveText('New saved body');
+    const response = page.waitForResponse(r => r.url().endsWith(`/api/links/${link.id}/text`));
+    release();
+    await response;
+    await row.getByRole('button', { name: 'Copy text', exact: true }).click();
+    expect(await clipboard()).toBe('New saved body');
+    await expect(row.locator('.preview')).toHaveText('New saved body');
+  } finally {
+    release();
+    await page.unroute(path);
+  }
+});
+
+test('failed sign-out stays authenticated and can be retried', async () => {
+  await page.goto('/admin/settings');
+  for (const failure of ['server', 'network']) {
+    await page.route('**/api/session', route => {
+      if (route.request().method() !== 'DELETE') return route.continue();
+      return failure === 'network' ? route.abort('failed') : route.fulfill({
+        status: 500, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal', message: 'failed' } }),
+      });
+    });
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(page.locator('.toast').last()).toContainText(failure === 'network' ? 'Can’t reach the server' : 'Something went wrong');
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+    await page.unroute('**/api/session');
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+  }
+  const oldCookie = (await page.context().cookies()).filter(cookie => cookie.path === '/api/').map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+  expect(oldCookie).not.toBe('');
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+  expect((await page.request.get('/api/links', { headers: { Cookie: oldCookie } })).status()).toBe(401);
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+});
+
+test('import validation explains skipped rows in both languages', async () => {
+  await page.goto('/admin/settings');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'validation.json', mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify([
+      { slug: 'import-valid', url: 'https://example.com/imported', title: 'Imported' },
+      { slug: 'import-expiry', url: 'https://example.com/', expiresAt: '9999-12-31T23:59:59-01:00' },
+      { slug: 'import-tags', url: 'https://example.com/', tags: [{ name: '' }] },
+    ])),
+  });
+  const result = page.locator('.import-result');
+  await expect(result).toContainText('invalid expiry format or range');
+  await expect(result).toContainText('Check the tags');
+  expect((await follow('import-valid')).status).toBe(302);
+  expect((await follow('import-expiry')).status).toBe(404);
+  await page.getByRole('radio', { name: '中文', exact: true }).click();
+  await expect(result).toContainText('过期时间格式或范围无效');
+  await expect(result).toContainText('请检查标签');
+  await expect(result).not.toContainText('expires_invalid');
+  await expect(result).not.toContainText('tags_invalid');
+  await page.getByRole('radio', { name: 'English', exact: true }).click();
+});

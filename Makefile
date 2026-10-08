@@ -1,4 +1,4 @@
-.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e bench load capacity docker docs docs-dev clean
+.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e smoke bench load capacity docker docs docs-dev clean
 
 # Run through mise when it is installed, so the pinned toolchain is used.
 RUN     ?= $(shell command -v mise >/dev/null 2>&1 && echo "mise exec --")
@@ -50,6 +50,10 @@ demo: build
 
 e2e: build
 	$(RUN) pnpm --dir web e2e
+
+# Real process shutdown, CLI backup and restore using disposable local data.
+smoke: build
+	$(RUN) node scripts/smoke.mjs
 
 bench:
 	$(RUN) go test -run '^$$' -bench . -benchmem ./internal/...

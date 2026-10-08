@@ -1,6 +1,6 @@
 # Architecture
 
-<p class="lead">Sani is one Go process that serves redirects, the JSON API and the admin app, with its data in one SQLite file. The whole design follows from one goal: redirects must be fast, whatever else is going on.</p>
+<p class="lead">Sani is one Go process serving redirects, the JSON API, text and file shares, and the admin app. SQLite stores records and texts; files/ stores uploads. Cache hits avoid database writes, while cold loads and resource contention can still affect latency.</p>
 
 ## Where a request goes
 
@@ -28,12 +28,12 @@ A request for the [files domain](../reference/configuration#sani-files-url) is t
 1. **Request checks.** Only `GET` and `HEAD` are accepted. A trailing `/` is dropped, and paths that can’t be a slug get a 404 without even touching the cache.
 2. **The lookup key.** Unicode normalization (NFC) and lowercasing, so `/GitHub` matches `/github`, and the same word typed with different input methods matches too.
 3. **The cache.** It’s split into 64 shards with a read-write lock each. A hit is one map lookup under a read lock. Slugs known not to exist are cached too and get a 404 right away.
-4. **A cache miss.** A reader-pool query pairs committed and pending counts before caching the result. Cold loads coordinate with flushing for that snapshot; cache hits never wait for it. Concurrent misses for the same slug share that one query. If an edit invalidated the cache while the query ran, the result is still served but not cached, so stale data never sticks.
+4. **A cache miss.** A reader-pool query pairs committed and pending counts before caching the result. Cold loads coordinate with flushing for that snapshot; cache hits never wait for it. Concurrent misses for the same slug and cache epoch share one query. If invalidation happens during a load, requests that already started may use the old result, but it is not cached; requests starting after invalidation do not join that old load.
 5. **Link state.** Turned off, expired, visit limit used up? Different cache entries for the same link share an atomic counter, so invalidation or eviction does not reset the allowance of in-flight requests.
 6. **Counting.** A request that [counts as a click](../guide/statistics#counted) hands it to the click aggregator: an in-memory increment that never waits for a write.
 7. **The response.** Append the query string, set `Location` and `Cache-Control`, and send the redirect status.
 
-The 404 and 410 pages are rendered for each language at startup and split where the short link goes, so sending one takes three writes. When something scans for random paths, an error page costs about as little as a redirect.
+The 404 and 410 pages are rendered for each language at startup and split where the short link goes, so sending one takes three writes. Cached unknown slugs return immediately; scanning new slugs still triggers database queries. Negative caching does not replace ingress traffic limits.
 
 ## Where clicks go
 
@@ -48,8 +48,8 @@ Live totals use a shared counter instead of adding a database value and a commit
 SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure Go implementation. Without cgo the binary links statically, and the image can be `FROM scratch`.
 
 - **WAL mode** permits normal reads alongside writes, though pool and lock waits remain possible. It uses `synchronous=NORMAL`; see [Operations](../guide/operations) for power-loss durability.
-- **One writer connection**: writes queue up instead of fighting over locks, and transactions start with `BEGIN IMMEDIATE`.
-- **A pool of readers**, one per CPU core, at least 4.
+- **One writer connection**: writes in this process queue up, and transactions start with `BEGIN IMMEDIATE`. External writers can still cause lock waits and errors.
+- **A pool of readers**, capped at startup `GOMAXPROCS`, with a minimum of 4 connections.
 
 | Table | Contents |
 |---|---|
@@ -78,6 +78,8 @@ The schema version is kept in `PRAGMA user_version`; startup runs outstanding mi
 | Sweeping files | Every 10 minutes | Removes stored files no link refers to any more, and uploads that never finished |
 | Fetching titles and icons | When links are created | At most 3 at a time, each for at most 20 seconds |
 
+Upload requests share a file lifecycle read lock until the database owns the file or failure cleanup finishes. A sweep skips its turn while any upload is active, so continuous uploads delay orphan collection. Without active uploads, the sweep still checks file age and database references before deletion.
+
 ## Titles and icons
 
 After a link is created, a background task fetches the destination: it reads at most 1 MB and follows at most 5 redirects. The request carries your browser’s language preferences, so titles usually come in the language you read.
@@ -86,7 +88,7 @@ After a link is created, a background task fetches the destination: it reads at 
 - **Icon.** Chosen from the icons the page declares: images close to 64 pixels and SVGs first, then `apple-touch-icon` and larger images, and `/favicon.ico` last, trying at most 4. An icon must be at most 256 KB, and its content must really be an image.
 - **Reuse.** Icons are stored per host, so other links to the same site share them. An icon older than 30 days is fetched again the next time it’s needed; after a failure, Sani waits a day before trying again.
 
-Fetches only ever reach public addresses; see [Security](./security#fetching).
+The fetcher checks destination hosts and direct dial addresses for private networks. With an environment proxy, the proxy's DNS and forwarding policy remain an operator trust boundary; see [Security](./security#fetching).
 
 ## The admin app
 

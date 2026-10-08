@@ -4,7 +4,24 @@ import (
 	"log/slog"
 	"strings"
 	"testing"
+
+	"github.com/DejavuMoe/sani/internal/auth"
 )
+
+func TestPasswordByteLimit(t *testing.T) {
+	for _, password := range []string{strings.Repeat("x", auth.MaxPasswordBytes), strings.Repeat("界", 341) + "x"} {
+		t.Setenv("SANI_PASSWORD", password)
+		if _, err := Load(); err != nil {
+			t.Fatalf("1024-byte password rejected: %v", err)
+		}
+	}
+	for _, password := range []string{strings.Repeat("x", auth.MaxPasswordBytes+1), strings.Repeat("界", 342)} {
+		t.Setenv("SANI_PASSWORD", password)
+		if _, err := Load(); err == nil || !strings.Contains(err.Error(), "SANI_PASSWORD: use at most 1024 bytes") {
+			t.Fatalf("oversized password accepted: %v", err)
+		}
+	}
+}
 
 func TestDefaults(t *testing.T) {
 	c, err := Load()

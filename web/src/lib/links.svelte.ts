@@ -99,6 +99,8 @@ class LinksStore {
   busy = $state(false);
 
   private seq = 0;
+  // Lists started before a local write must not replace its result.
+  private revision = 0;
   private ctrl: AbortController | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -106,11 +108,13 @@ class LinksStore {
     this.ctrl?.abort();
     const ctrl = (this.ctrl = new AbortController());
     const seq = ++this.seq;
+    const revision = this.revision;
     this.loading = true;
     this.failed = false;
     try {
       const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
+      if (revision !== this.revision) { void this.load(); return; }
       this.items = res.items;
       this.total = res.total;
       this.next = res.next;
@@ -130,10 +134,13 @@ class LinksStore {
   async loadMore() {
     if (!this.next || this.loadingMore || this.loading) return;
     const seq = this.seq;
+    const revision = this.revision;
     this.loadingMore = true;
+    let retry = false;
     try {
       const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
       if (seq !== this.seq) return;
+      if (revision !== this.revision) { retry = true; return; }
       const seen = new Set(this.items.map((l) => l.id));
       this.items = [...this.items, ...res.items.filter((l) => !seen.has(l.id))];
       this.next = res.next;
@@ -142,6 +149,8 @@ class LinksStore {
       /* the sentinel will try again when it comes back into view */
     } finally {
       this.loadingMore = false;
+      // The sentinel may stay visible, so it will not emit another entry.
+      if (retry && seq === this.seq) void this.loadMore();
     }
   }
 
@@ -169,6 +178,7 @@ class LinksStore {
     if (!this.loaded) return;
     if (this.tag !== null) { await this.load(); return; }
     const seq = this.seq;
+    const revision = this.revision;
     try {
       const res = await api.links({
         q: this.query,
@@ -177,7 +187,7 @@ class LinksStore {
         tag: this.tag,
         limit: Math.min(200, Math.max(PAGE, this.items.length)),
       });
-      if (seq !== this.seq) return;
+      if (seq !== this.seq || revision !== this.revision) return;
       const byId = new Map(res.items.map((l) => [l.id, l]));
       this.items = this.items.map((l) => byId.get(l.id) ?? l).filter(l => this.matchesTag(l));
       const known = new Set(this.items.map((l) => l.id));
@@ -213,12 +223,14 @@ class LinksStore {
     const fields = [link.slug, link.title, link.url, link.content?.preview ?? '', link.content?.name ?? ''];
     const visible = (!q || fields.some((s) => s.toLowerCase().includes(q))) && (!this.kind || this.kind === link.kind) && this.matchesTag(link);
     if (!visible) return;
+    ++this.revision;
     const at = this.sort === 'created' && index === 0 ? 0 : Math.min(index, this.items.length);
     this.items = [...this.items.slice(0, at), link, ...this.items.slice(at)];
     this.total += 1;
   }
 
   upsert(link: Link) {
+    ++this.revision;
     const i = this.items.findIndex((l) => l.id === link.id);
     if (i < 0) return;
     const prev = this.items[i];
@@ -309,6 +321,7 @@ class LinksStore {
 
   /** Delete right away and offer undo; no confirmation dialog. */
   async remove(link: Link) {
+    ++this.revision;
     const index = this.items.findIndex((l) => l.id === link.id);
     const neighbor = this.items[index + 1] ?? this.items[index - 1] ?? null;
     this.leaving.add(link.id);
@@ -325,7 +338,13 @@ class LinksStore {
       toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
       return;
     }
-    this.refreshOverview();
+    ++this.revision;
+    // A refresh that began during the delete may have seen the old row.
+    if (this.items.some(l => l.id === link.id)) {
+      this.items = this.items.filter(l => l.id !== link.id);
+      this.total = Math.max(0, this.total - 1);
+    }
+    await this.refresh();
     toasts.show(t('detail.deleted', { slug: '/' + link.slug }), {
       action: { label: t('act.undo'), run: () => this.restore(link, index) },
     });
@@ -400,6 +419,7 @@ class LinksStore {
       toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
       return;
     }
+    ++this.revision;
     for (const id of ids) {
       this.leaving.add(id);
       setTimeout(() => this.leaving.delete(id), 400);
@@ -408,7 +428,7 @@ class LinksStore {
     this.total = Math.max(0, this.total - ids.size);
     if (this.selectedId !== null && ids.has(this.selectedId)) this.selectedId = null;
     this.stopPicking();
-    this.refreshOverview();
+    await this.refresh();
     toasts.show(t('bulk.deleted', { n: ids.size }), {
       action: { label: t('act.undo'), run: () => this.bulkRestore(removed) },
     });
@@ -428,7 +448,7 @@ class LinksStore {
         this.place({ ...restored, spark: link.spark }, index);
         this.flash(restored.id);
       }
-      this.refreshOverview();
+      await this.refresh();
       toasts.show(t('bulk.restored', { n: items.length }));
     } catch (e) {
       toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
@@ -441,7 +461,7 @@ class LinksStore {
       this.place({ ...restored, spark: link.spark }, index);
       this.flash(restored.id);
       this.selectedId = restored.id;
-      this.refreshOverview();
+      await this.refresh();
       toasts.show(t('detail.restored', { slug: '/' + restored.slug }));
     } catch (e) {
       toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));

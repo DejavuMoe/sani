@@ -303,6 +303,64 @@ func TestLinkLifecycle(t *testing.T) {
 	}
 }
 
+func TestUpdateLinkTimestampIncreasesInCommitOrder(t *testing.T) {
+	ctx := context.Background()
+	s := open(t)
+	l := newLink("ordered", "https://example.com/", 2000)
+	if err := s.CreateLink(ctx, l, false); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct{ now, want int64 }{{2000, 2001}, {1500, 2002}, {3000, 3000}} {
+		title := fmt.Sprintf("saved at %d", tc.now)
+		before, after, err := s.UpdateLink(ctx, l.ID, Patch{Title: &title}, tc.now)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if after.UpdatedAt != tc.want || after.UpdatedAt <= before.UpdatedAt || after.Title != title {
+			t.Fatalf("now=%d: before=%+v after=%+v", tc.now, before, after)
+		}
+		stored, err := s.GetLink(ctx, l.ID)
+		if err != nil || stored.UpdatedAt != tc.want {
+			t.Fatalf("persisted timestamp: %+v, %v", stored, err)
+		}
+	}
+	before, after, err := s.UpdateLink(ctx, l.ID, Patch{RefreshMeta: true}, 9000)
+	if err != nil || after.UpdatedAt != before.UpdatedAt {
+		t.Fatalf("metadata refresh changed timestamp: before=%+v after=%+v err=%v", before, after, err)
+	}
+}
+
+func TestBulkTimestampIncreasesPerRow(t *testing.T) {
+	ctx := context.Background()
+	s := open(t)
+	var ids []int64
+	for i, at := range []int64{1000, 2000, 3000} {
+		l := newLink(fmt.Sprintf("ordered%d", i), "https://example.com/", at)
+		if err := s.CreateLink(ctx, l, false); err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, l.ID)
+	}
+	for step, action := range []BulkAction{BulkDisable, BulkEnable} {
+		changed, err := s.Bulk(ctx, action, ids, 2000)
+		if err != nil || len(changed) != len(ids) {
+			t.Fatalf("bulk %d: %d rows, %v", action, len(changed), err)
+		}
+		for i, base := range []int64{2000, 2001, 3001} {
+			want := base + int64(step)
+			stored, err := s.GetLink(ctx, ids[i])
+			if err != nil || stored.UpdatedAt != want || stored.Enabled != (action == BulkEnable) {
+				t.Fatalf("bulk %d row %d: %+v, %v; want timestamp %d", action, ids[i], stored, err, want)
+			}
+			for _, returned := range changed {
+				if returned.ID == ids[i] && returned.UpdatedAt != want {
+					t.Fatalf("bulk returned stale timestamp: %+v", returned)
+				}
+			}
+		}
+	}
+}
+
 func TestPurgeAndCascade(t *testing.T) {
 	ctx := context.Background()
 	s := open(t)
@@ -542,8 +600,8 @@ func TestAuthRecords(t *testing.T) {
 		t.Fatalf("password = %q", v)
 	}
 
-	s.CreateSession(ctx, []byte("a"), Session{ExpiresAt: 10})
-	s.CreateSession(ctx, []byte("b"), Session{ExpiresAt: 100})
+	s.CreateSession(ctx, []byte("a"), "h1", Session{ExpiresAt: 10})
+	s.CreateSession(ctx, []byte("b"), "h1", Session{ExpiresAt: 100})
 	s.DeleteSessions(ctx, []byte("b"))
 	if _, err := s.Session(ctx, []byte("a")); !errors.Is(err, ErrNotFound) {
 		t.Error("other sessions should be gone")

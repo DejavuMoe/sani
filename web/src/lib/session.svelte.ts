@@ -1,4 +1,6 @@
-import { api, setUnauthorizedHandler, type Config } from './api';
+import { api, ApiError, setUnauthorizedHandler, type Config } from './api';
+import { errorText } from './i18n.svelte';
+import { toasts } from './toast.svelte';
 
 export type SessionState = 'loading' | 'setup' | 'login' | 'ready' | 'offline';
 
@@ -37,8 +39,9 @@ class Session {
   async signOut() {
     try {
       await api.logout();
-    } finally {
       this.state = 'login';
+    } catch (error) {
+      toasts.error(errorText(error instanceof ApiError ? error.code : 'unknown'));
     }
   }
 

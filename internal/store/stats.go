@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"math"
 	"strings"
 )
 
@@ -37,14 +39,16 @@ type ClickBatch struct {
 func (b *ClickBatch) Empty() bool { return len(b.Links) == 0 }
 
 // ApplyClicks adds a batch to the stored counters in one transaction. Clicks
-// for links purged in the meantime are dropped.
+// for links purged in the meantime are dropped. Saturating before addition
+// keeps counters as INTEGERs: SQLite otherwise promotes overflowing sums to REAL.
 func (s *Store) ApplyClicks(ctx context.Context, b *ClickBatch) error {
 	if b.Empty() {
 		return nil
 	}
 	return s.tx(ctx, func(tx *sql.Tx) error {
 		upd, err := tx.PrepareContext(ctx,
-			`UPDATE links SET clicks = clicks + ?, last_click_at = max(last_click_at, ?) WHERE id = ?`)
+			`UPDATE links SET clicks = clicks + min(?, 9223372036854775807 - clicks),
+			last_click_at = max(last_click_at, ?) WHERE id = ?`)
 		if err != nil {
 			return err
 		}
@@ -203,9 +207,30 @@ func (s *Store) Referrers(ctx context.Context, linkID int64, limit int) ([]Refer
 	return out, total, rows.Err()
 }
 
-// Totals counts live links and their clicks.
+// Totals counts live links and their clicks, capped at MaxInt64.
 func (s *Store) Totals(ctx context.Context) (links, clicks int64, err error) {
 	err = s.r.QueryRowContext(ctx, `SELECT count(*), coalesce(sum(clicks), 0) FROM links WHERE deleted_at = 0`).
 		Scan(&links, &clicks)
-	return links, clicks, err
+	var sqliteErr interface{ Code() int }
+	if !errors.As(err, &sqliteErr) || sqliteErr.Code() != 1 || !strings.Contains(err.Error(), "integer overflow") {
+		return links, clicks, err
+	}
+	// Separate imports can overflow sum(). Keep its fast path for normal data;
+	// total() is not a substitute because it loses integer precision.
+	// ponytail: saturate unrepresentable totals; larger totals need a wider API.
+	links, clicks = 0, 0
+	rows, err := s.r.QueryContext(ctx, `SELECT clicks FROM links WHERE deleted_at = 0`)
+	if err != nil {
+		return 0, 0, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var n int64
+		if err := rows.Scan(&n); err != nil {
+			return 0, 0, err
+		}
+		links++
+		clicks += min(n, math.MaxInt64-clicks)
+	}
+	return links, clicks, rows.Err()
 }

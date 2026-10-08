@@ -75,11 +75,11 @@ Preserve the current data first, stop all writers, then choose the matching proc
 1. **Full directory backup:** restore into a new empty directory or volume, keeping `sani.db`, any `sani.db-wal`/`sani.db-shm`, and `files/` from the same snapshot. Do not mix in files from the old running instance. Point `SANI_DATA_DIR` or the Compose volume at the restored location and restore ownership (`65532:65532` in the image).
 2. **Database made by `sani backup`:** restore it as `sani.db` in an empty directory, without the old instance’s WAL/SHM. This is complete for URL and text links. File shares also need `files/` copied during the same stopped-service interval. An online database snapshot alone cannot guarantee old downloads remain available.
 
-In an isolated local instance, check `/healthz`, login, URL redirects, text bodies, file downloads and SHA-256 before switching the live instance or DNS. Downgrades after a schema migration need the complete pre-upgrade backup; do not force an older binary to open the migrated database. The repository’s `go test ./cmd/sani -run TestStoppedBackup` exercises shutdown, flushing, the database snapshot, file copy, restore and hash verification.
+In an isolated local instance, check `/healthz`, login, URL redirects, text bodies, file downloads and SHA-256 before switching the live instance or DNS. Downgrades after a schema migration need the complete pre-upgrade backup; do not force an older binary to open the migrated database. `go test ./cmd/sani -run TestStoppedBackup` checks storage-level flushing, snapshots and file copies. `make smoke` additionally runs the real binary through SIGTERM shutdown, CLI backup to standard output, and HTTP access to restored URLs, texts, files and tags. Neither replaces a restore rehearsal for your deployment.
 
 ## Upgrading {#upgrade}
 
-[Back up](#backup) first, then put the new version in place:
+Read the target release’s [changelog](../project/changelog), pin its version tag or image digest, and [verify downloaded artifacts](./deploy#verify). Take a [complete stopped-service backup](#backup-files) and retain the old binary or image and configuration. For this upgrade backup, omit the restart at the end of the backup example until the version has been replaced:
 
 ::: code-group
 
@@ -89,14 +89,16 @@ docker compose up -d
 ```
 
 ```sh [systemd]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/latest/download/sani-linux-amd64.tar.gz | tar -xz sani
+# sani is the target binary, downloaded and verified beforehand
+sudo systemctl stop sani
 sudo install -m 755 sani /usr/local/bin/sani
-sudo systemctl restart sani
+sudo systemctl start sani
+SANI_LISTEN=127.0.0.1:8080 sani healthcheck
 ```
 
 :::
 
-What each version changes, and anything to watch for when upgrading, is in the [changelog](../project/changelog). The database schema is upgraded on start and older versions can’t open it afterwards, so going back means restoring the backup from before the upgrade.
+After startup, check logs and `/healthz`, then sign in, follow a redirect, read a text and download a file. Match the health-check address to your `SANI_LISTEN`; `/healthz` proves process liveness, not database writability or backup recoverability. Startup applies schema migrations. To roll back, stop the new version, restore the pre-upgrade backup into an empty directory, and start the old version with its original configuration. Replacing only the image or binary does not roll back migrated data.
 
 ## Resetting the password
 

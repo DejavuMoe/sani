@@ -60,10 +60,6 @@
     input?.select();
   }
 
-  export function submitNow() {
-    submit();
-  }
-
   function reset() {
     url = '';
     slug = '';

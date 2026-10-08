@@ -12,6 +12,8 @@ const (
 	SettingBaseURL  = "base_url" // public origin used to build short URLs
 )
 
+var ErrPasswordChanged = errors.New("password changed")
+
 func (s *Store) Setting(ctx context.Context, key string) (string, error) {
 	var v string
 	err := s.r.QueryRowContext(ctx, `SELECT value FROM settings WHERE key = ?`, key).Scan(&v)
@@ -44,6 +46,26 @@ func (s *Store) SetPasswordOnce(ctx context.Context, hash string) (bool, error) 
 	return n == 1, err
 }
 
+// ReplacePassword atomically replaces the expected password and revokes sessions.
+// Checking the old hash also rejects a password change verified before a reset.
+func (s *Store) ReplacePassword(ctx context.Context, old, hash string, keep []byte) error {
+	return s.tx(ctx, func(tx *sql.Tx) error {
+		res, err := tx.ExecContext(ctx, `INSERT INTO settings (key, value)
+			SELECT ?1, ?2 WHERE coalesce((SELECT value FROM settings WHERE key = ?1), '') = ?3
+			ON CONFLICT (key) DO UPDATE SET value = excluded.value`, SettingPassword, hash, old)
+		if err != nil {
+			return err
+		}
+		if n, err := res.RowsAffected(); err != nil {
+			return err
+		} else if n == 0 {
+			return ErrPasswordChanged
+		}
+		_, err = tx.ExecContext(ctx, `DELETE FROM sessions WHERE ?1 IS NULL OR hash != ?1`, keep)
+		return err
+	})
+}
+
 type Session struct {
 	CreatedAt int64
 	SeenAt    int64
@@ -51,10 +73,20 @@ type Session struct {
 	Agent     string
 }
 
-func (s *Store) CreateSession(ctx context.Context, hash []byte, sess Session) error {
-	_, err := s.w.ExecContext(ctx, `INSERT INTO sessions (hash, created_at, seen_at, expires_at, agent)
-		VALUES (?, ?, ?, ?, ?)`, hash, sess.CreatedAt, sess.SeenAt, sess.ExpiresAt, sess.Agent)
-	return err
+func (s *Store) CreateSession(ctx context.Context, hash []byte, password string, sess Session) error {
+	// Verification runs outside the write lock; bind issuance to that exact hash.
+	res, err := s.w.ExecContext(ctx, `INSERT INTO sessions (hash, created_at, seen_at, expires_at, agent)
+		SELECT ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM settings WHERE key = ? AND value = ?)`,
+		hash, sess.CreatedAt, sess.SeenAt, sess.ExpiresAt, sess.Agent, SettingPassword, password)
+	if err != nil {
+		return err
+	}
+	if n, err := res.RowsAffected(); err != nil {
+		return err
+	} else if n == 0 {
+		return ErrPasswordChanged
+	}
+	return nil
 }
 
 func (s *Store) Session(ctx context.Context, hash []byte) (Session, error) {

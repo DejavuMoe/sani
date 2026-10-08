@@ -4,7 +4,7 @@ import { data as status } from '../.vitepress/data/status.data'
 
 # 研发进度
 
-<p class="lead">本文档对应 {{ status.latestVersion }}，各版本变更明细见更新日志。本页系统化梳理已交付能力、验收入口与后续演进路线。</p>
+<p class="lead">最近发布版本为 {{ status.latestVersion }}，尚未发布的修改列在更新日志顶部。本页列出已实现能力、生产验收入口与后续范围；功能已实现不等于某个部署已通过验收。</p>
 
 ## 功能现状 {#current}
 
@@ -15,13 +15,31 @@ import { data as status } from '../.vitepress/data/status.data'
 | 标签管理 | <span class="sn-status done">已完成</span> | 短链接、文本与文件的彩色标签，创建与编辑时分配，按标签或未标记筛选，JSON/CSV 迁移（v0.5.0 起） |
 | 文本与文件分享 | <span class="sn-status done">已完成</span> | `/p/` 路由下的纯文本与代码展示、独立文件域名安全下载（v0.3.0 起） |
 | HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
-| 导入与导出 | <span class="sn-status done">已完成</span> | Sani 原生、Shlink、Sink 及各类 CSV 格式导入导出 |
+| 导入与导出 | <span class="sn-status done">已完成</span> | 导入 Sani、Shlink、Sink JSON 与兼容 CSV；导出网址链接为 Sani JSON 或 CSV |
 | 部署生态 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的极简 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
 | 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
 | 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期与源码规则强一致性核对 |
 | 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |
-| 持续集成（CI） | <span class="sn-status done">已完成</span> | 全平台交叉编译测试（Linux/macOS/Windows）、E2E 回归、axe 无障碍核查、CVE 漏洞扫描 |
+| 持续集成（CI） | <span class="sn-status done">已完成</span> | Linux/macOS/Windows Go 测试、全部发布平台交叉编译、E2E、axe 无障碍核查和已知漏洞扫描；结果以具体提交的流水线为准 |
 | 线上文档站点 | <span class="sn-status done">已完成</span> | 官方中英双语文档已部署：[sani.zsh.moe](https://sani.zsh.moe) |
+
+## 生产验收范围 {#production}
+
+Sani 面向**单管理员、单个服务进程、本地持久化数据目录**的自托管部署。前置代理负责 HTTPS，文件分享使用独立主机名；备份、磁盘余量、日志监控和升级恢复由部署者负责。多个进程共享数据库时，内存缓存与访问额度不会同步，因此不支持通过多副本实现高可用。短码是分享地址，不是访客身份认证；点击统计也不承诺断电时零丢失。
+
+每个准备发布的候选提交都应通过以下检查。历史版本的绿灯不能替代当前提交的结果。
+
+| 验收层 | 检查入口 | 通过条件 |
+|---|---|---|
+| 代码与功能 | `make check test e2e` | 静态检查、Go 竞态、前端单测及实际浏览器操作通过 |
+| 真实进程与恢复 | `make smoke` | 构建产物启动、正常停机、CLI 数据库备份与配套文件恢复通过；计数、凭据、标签、文本与文件哈希保留 |
+| 存储演进与故障 | `internal/store/*_test.go`、`cmd/sani/main_test.go` | 历史 schema 迁移、失败回滚、锁等待、停机超时与刷盘失败有回归验证 |
+| 容量与计数 | `make bench load capacity` | 记录测量环境；负载请求和点击一致，无未解释的性能退化 |
+| 页面可用性 | `pnpm --dir web a11y`、`pnpm --dir docs a11y` | 管理端主要页面及全部文档页面的中英双语、深浅主题 axe 检查通过 |
+| 文档与 SEO | `make docs`、文档输出与发布脚本检查 | 源码与双语说明对齐，页面描述、canonical、语言替代链接及站点地图对应实际页面 |
+| 分发与供应链 | 当前提交的 CI、CodeQL 及 Release 工作流 | 跨平台测试、归档、容器、依赖扫描通过；正式制品另核对版本、校验和与来源证明 |
+
+上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
 
 ## v0.5.0 标签管理验收入口 {#tags-acceptance}
 

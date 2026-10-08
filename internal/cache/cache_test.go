@@ -6,6 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"testing/synctest"
 	"time"
 )
 
@@ -98,6 +99,91 @@ func TestLoadRacingWriteIsNotCached(t *testing.T) {
 	}
 	if e, _ := c.Get(context.Background(), "k"); e.Location != "v1" {
 		t.Fatalf("stale entry was cached: %q", e.Location)
+	}
+}
+
+func TestInvalidationDoesNotJoinOldFlight(t *testing.T) {
+	old, fresh := &Entry{Location: "old"}, &Entry{Location: "fresh"}
+	for _, tc := range []struct {
+		name       string
+		old, fresh *Entry
+	}{
+		{"update", old, fresh},
+		{"create", nil, fresh},
+		{"delete", old, nil},
+	} {
+		for _, order := range []string{"old-first", "new-first"} {
+			t.Run(tc.name+"/"+order, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					oldRelease, newRelease := make(chan struct{}), make(chan struct{})
+					finishOld := sync.OnceFunc(func() { close(oldRelease) })
+					finishNew := sync.OnceFunc(func() { close(newRelease) })
+					defer finishOld()
+					defer finishNew()
+					var loads atomic.Int32
+					c := New(1000, func(context.Context, string) (*Entry, error) {
+						if loads.Add(1) == 1 {
+							<-oldRelease
+							return tc.old, nil
+						}
+						<-newRelease
+						return tc.fresh, nil
+					})
+					get := func(want *Entry) <-chan struct{} {
+						done := make(chan struct{})
+						go func() {
+							defer close(done)
+							if e, err := c.Get(context.Background(), "k"); e != want || err != nil {
+								t.Errorf("Get = %v, %v; want %v, nil", e, err, want)
+							}
+						}()
+						return done
+					}
+					oldDone := get(tc.old)
+					synctest.Wait()
+					oldWaiter := get(tc.old)
+					synctest.Wait()
+					c.Invalidate("k")
+					newDone := get(tc.fresh)
+					synctest.Wait()
+					if n := loads.Load(); n != 2 {
+						t.Fatalf("%d loads after invalidation; want 2", n)
+					}
+					c.flightMu.Lock()
+					replacement := c.flight["k"]
+					c.flightMu.Unlock()
+					if order == "old-first" {
+						finishOld()
+						<-oldDone
+						<-oldWaiter
+						c.flightMu.Lock()
+						current := c.flight["k"]
+						c.flightMu.Unlock()
+						if current != replacement {
+							t.Fatal("old flight removed its replacement")
+						}
+					}
+					newWaiter := get(tc.fresh)
+					synctest.Wait()
+					if n := loads.Load(); n != 2 {
+						t.Fatalf("%d loads; new waiters must share the replacement", n)
+					}
+					finishNew()
+					<-newDone
+					<-newWaiter
+					finishOld()
+					<-oldDone
+					<-oldWaiter
+					<-get(tc.fresh)
+					if n := loads.Load(); n != 2 {
+						t.Fatalf("%d loads; want the replacement to remain cached", n)
+					}
+					if len(c.flight) != 0 {
+						t.Fatal("completed flights were not removed")
+					}
+				})
+			})
+		}
 	}
 }
 

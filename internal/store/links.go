@@ -237,17 +237,18 @@ func (s *Store) SlugAvailable(ctx context.Context, key string) (bool, error) {
 
 // Patch lists the fields an update changes; nil fields stay as they are.
 type Patch struct {
-	URL       *string
-	Slug      *string
-	Title     *string
-	Meta      *MetaState
-	Redirect  *int
-	Enabled   *bool
-	ExpiresAt *int64
-	MaxClicks *int64
-	Text      *string // replaces a text's body
-	Format    *Format
-	Tags      *[]int64
+	URL         *string
+	Slug        *string
+	Title       *string
+	Redirect    *int
+	Enabled     *bool
+	ExpiresAt   *int64
+	MaxClicks   *int64
+	Text        *string // replaces a text's body
+	Format      *Format
+	Tags        *[]int64
+	FetchMeta   bool // queue automatic titles when a URL or an empty title changes
+	RefreshMeta bool // refresh an automatic title without replacing a manual title
 }
 
 // UpdateLink applies p and returns the link before and after the change.
@@ -277,11 +278,23 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 			set("url", *p.URL)
 			set("host", links.FetchHost(*p.URL))
 		}
+		// Decide from the row read under the write transaction: a caller's
+		// earlier snapshot may predate an owner-provided title.
+		title, state := before.Title, before.Meta
 		if p.Title != nil {
-			set("title", *p.Title)
+			title, state = *p.Title, MetaManual
 		}
-		if p.Meta != nil {
-			set("meta", *p.Meta)
+		changedURL := p.URL != nil && *p.URL != before.URL
+		if before.Kind == KindURL && (p.Title != nil && *p.Title == "" ||
+			p.Title == nil && before.Meta != MetaManual && (p.RefreshMeta || changedURL)) {
+			title, state = "", MetaFailed
+			if p.FetchMeta || p.RefreshMeta {
+				state = MetaPending
+			}
+		}
+		if title != before.Title || state != before.Meta {
+			set("title", title)
+			set("meta", state)
 		}
 		if p.Redirect != nil {
 			set("redirect", *p.Redirect)
@@ -295,7 +308,13 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 		if p.MaxClicks != nil {
 			set("max_clicks", *p.MaxClicks)
 		}
-		set("updated_at", now)
+		if p.RefreshMeta {
+			set("updated_at", before.UpdatedAt)
+		} else {
+			// Commit order must stay distinguishable even when requests start
+			// in the same millisecond or reach this transaction out of order.
+			set("updated_at", max(now, before.UpdatedAt+1))
+		}
 		args = append(args, id)
 		_, err = tx.ExecContext(ctx, `UPDATE links SET `+strings.Join(sets, ", ")+` WHERE id = ?`, args...)
 		if isUniqueViolation(err) {
@@ -386,7 +405,7 @@ func (s *Store) Bulk(ctx context.Context, action BulkAction, ids []int64, now in
 	switch action {
 	case BulkEnable, BulkDisable:
 		on := action == BulkEnable
-		stmt = `UPDATE links SET enabled = ?, updated_at = ? WHERE deleted_at = 0 AND enabled != ? AND id IN ` + in
+		stmt = `UPDATE links SET enabled = ?, updated_at = max(?, updated_at + 1) WHERE deleted_at = 0 AND enabled != ? AND id IN ` + in
 		args = []any{on, now, on}
 	case BulkDelete:
 		stmt = `UPDATE links SET deleted_at = ? WHERE deleted_at = 0 AND id IN ` + in
