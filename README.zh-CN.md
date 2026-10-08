@@ -20,8 +20,8 @@
 - **够用的统计**：总点击、每日趋势、主要来源、最近访问。爬虫、链接预览、浏览器预取和你自己在控制台里的点击都不计入。
 - **标签分组**：创建和编辑短链接、文本、文件时分配彩色标签，按标签筛选或查找未标记项目。标签仅供管理员使用。
 - **每条链接都可控**：设置过期时间、访问次数上限，选择临时或永久跳转，也可以随时停用。修改目标链接后立即生效。
-- **也能分享文本和文件**：不超过 1 MB 的笔记或配置（等宽显示，带行号），以及默认上限 64 MB 的文件，放在 `/p/…` 下，同样支持有效期、访问上限与统计。文件上传和原始内容下载需要单独的文件主机名。
-- **融入你的日常**：书签小工具、Android 系统分享菜单（添加到主屏幕后），供脚本和快捷指令使用的 API 令牌，还能从 Shlink、Sink、YOURLS 或 CSV 导入。
+- **也能分享文本和文件**：不超过 1 MB 的笔记或配置（等宽显示，带行号），以及默认上限 99 MB 的文件，放在 `/p/…` 下，同样支持有效期、访问上限与统计。文件上传和原始内容下载需要单独的文件主机名。
+- **融入你的日常**：书签小工具、Android 系统分享菜单（添加到主屏幕后），供脚本和快捷指令使用的 API 令牌，还能从 Shlink 或 Sani CSV/JSON 导入。
 - **支持中文短码**：`s.example.com/简历` 可以直接使用，短码不区分大小写。
 - **中文 / English 切换**，浅色 / 深色主题，桌面和手机都好用。
 
@@ -47,14 +47,14 @@ docker compose up -d
 
 镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
 
-模板固定使用 `v0.8.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v0.9.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
 每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS、Windows 和 FreeBSD 的压缩包，附校验和与构建来源证明：
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.8.0/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -73,12 +73,14 @@ SANI_BASE_URL=https://s.example.com ./sani
 | `SANI_SETUP_CODE` | 随机 | 首次设置密码时要填写的设置码。默认在还没有密码时每次启动随机生成，并打印到日志里。 |
 | `SANI_ROOT_REDIRECT` | — | 访问根路径 `/` 时跳转到哪里，默认进入管理界面。 |
 | `SANI_TRUST_PROXY` | `false` | 信任 `X-Forwarded-*` 和 `X-Real-IP`，客户端地址取 `X-Forwarded-For` 的最后一项。只在会设置这些请求头的反向代理之后开启。 |
-| `SANI_SLUG_LENGTH` | `5` | 自动生成的短码长度。字符集为 `23456789abcdefghjkmnpqrstuvwxyz`，去掉了 0/o、1/l/i，念出来也不会弄错。 |
+| `SANI_SLUG_LENGTH` | `5` | 自动生成的短码长度。默认字符集为 `23456789abcdefghjkmnpqrstuvwxyz`，去掉了 0/o、1/l/i，念出来也不会弄错。 |
+| `SANI_EXCLUDE_CONFUSABLE` | `true` | 自动网址短码排除 0/o、1/i/l。 |
+| `SANI_META_PROXY` | — | 可选网页信息 HTTP/HTTPS/SOCKS5 专用代理，凭据仅在服务器配置。 |
 | `SANI_FETCH_META` | `true` | 为新链接获取网页标题和图标。不会访问内网、本机等私有地址。 |
 | `SANI_FORWARD_QUERY` | `true` | 把访问者的查询参数带到目标链接上（`/gh?utm_source=x`）。 |
 | `SANI_CACHE_SIZE` | `100000` | 内存中缓存的跳转目标数量。 |
 | `SANI_FILES_URL` | — | 第二个域名，如 `https://f.example.com`，指向同一个 Sani，用来提供分享的文件和原始文本。分享文件必须设置。 |
-| `SANI_MAX_FILE_MB` | `64` | 单个文件的大小上限，单位 MB（1–4096）。 |
+| `SANI_MAX_FILE_MB` | `99` | 未设置时为十进制 99 MB；显式设置仍按 MiB 计算（1–4096）。 |
 | `SANI_LOG_LEVEL` / `SANI_LOG_FORMAT` | `info` / `text` | 日志级别 `debug`…`error`；格式 `text` 或 `json`。 |
 | `TZ` | 系统时区 | 每日统计按这个时区划分日期。 |
 
@@ -105,7 +107,7 @@ curl -X POST https://s.example.com/api/links \
 
 **文本和文件**：链接输入框上方的“文本”和“文件”标签页用来分享一段文字、一段代码或一个文件；在页面任意位置粘贴一段文字或一个文件也可以直接开始。访问者在 `/p/{短码}` 页面上阅读、复制或下载，只有你能创建。分享没有列表可以翻，短码就是唯一的保护，所以自动生成的短码有 10 位。
 
-**导入与导出**：设置 → 数据，可把网址链接及标签导出为 JSON 或 CSV；文本、文件和详细统计需通过数据库与文件备份保存。导入支持 Sani 自己的导出文件、Shlink 的 JSON（`shortCode`、`longUrl`、`visitsSummary` 等字段）、Sink 的导出、YOURLS 或 Kutt 的 CSV，以及任何带 `url` 列的 CSV。已存在的短码会被跳过，并列出原因。无损迁移请使用 JSON：CSV 为疑似电子表格公式的字段添加保护单引号，重新导入时会保留。
+**导入与导出**：设置 → 数据，可把网址链接及标签导出为 JSON 或 CSV；文本、文件和详细统计需通过数据库与文件备份保存。导入仅支持 Sani 原生及 Shlink 的 CSV/JSON，后台与文档提供原生格式示例。已存在的短码会被跳过，并列出原因。无损迁移请使用 JSON：CSV 为疑似电子表格公式的字段添加保护单引号，重新导入时会保留。
 
 **访问者看到的页面**：短码不存在时显示简洁的 404 页面；链接过期、停用或次数用完时显示 410 页面。页面会按访问者的浏览器语言显示中文或英文。
 

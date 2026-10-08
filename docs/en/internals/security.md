@@ -85,7 +85,7 @@ Everything whose size someone outside controls has an explicit limit:
 | JSON request bodies | 1 MB; 8 MB to create or update a link |
 | Import files | 32 MB, 100,000 links |
 | Texts | 1 MB |
-| Files | `SANI_MAX_FILE_MB`, 64 MB by default; other upload fields 4 KB each |
+| Files | `SANI_MAX_FILE_MB`, 99,000,000 bytes by default; other upload fields 4 KB each |
 | File names | 255 bytes |
 | Downloads at once | 32 |
 | Destinations | 8,192 bytes |
@@ -114,3 +114,5 @@ Images and binaries are built by GitHub Actions from the tagged commit, without 
 ## Reporting a vulnerability {#reporting}
 
 Please don’t open a public issue for security problems. Report them privately through GitHub’s [private vulnerability reporting](https://github.com/DejavuMoe/sani/security/advisories/new) instead.
+
+The dedicated `SANI_META_PROXY` mode pins verified public IPs through CONNECT/SOCKS5 and fails closed. Legacy environment proxies retain their previous trust boundary; see [configuration](../reference/configuration#sani-meta-proxy). Chunk uploads are bound to the authenticated credential hash, limited to 8 active sessions, 2 per credential and 8 GiB reserved total. Up to 32 completion receipts are retained, evicting the oldest completed receipt under pressure. Each session expires after an hour of inactivity; maintenance runs every minute, and restart removes abandoned chunk files. Completed shares retain the existing deletion/expiry rules.

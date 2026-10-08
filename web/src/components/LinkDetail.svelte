@@ -121,7 +121,7 @@
           <a class="short-url" href={link.shortUrl} target="_blank" rel="noopener">{stripScheme(link.shortUrl)}</a>
           <div class="short-actions">
             <Button size="sm" icon="copy" onclick={copy}>{t('act.copy')}</Button>
-            <Button size="sm" variant="ghost" icon="open" onclick={() => open(link.shortUrl, '_blank', 'noopener')}>
+            <Button size="sm" icon="open" onclick={() => open(link.shortUrl, '_blank', 'noopener')}>
               {t('act.open')}
             </Button>
           </div>

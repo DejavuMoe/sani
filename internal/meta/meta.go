@@ -51,15 +51,32 @@ type Page struct {
 }
 
 type Fetcher struct {
-	client  *http.Client
-	proxied bool
+	client      *http.Client
+	proxied     bool
+	environment bool
 }
 
-func New() *Fetcher {
+func New() *Fetcher { return newFetcher(true) }
+
+// NewDirect ignores process-wide proxy settings.
+func NewDirect() *Fetcher { return newFetcher(false) }
+
+func (f *Fetcher) EnvironmentProxyConfigured() bool { return f.environment }
+
+func newFetcher(environment bool) *Fetcher {
 	// Every connection is checked at dial time, after DNS, so a name that
 	// resolves differently the second time cannot reach a private address.
 	// The one exception is a configured proxy, which may well be local.
-	proxies := proxyAddrs()
+	proxies := map[string]struct{}{}
+	var proxy func(*http.Request) (*url.URL, error)
+	configured := false
+	if environment {
+		proxies = proxyAddrs()
+		proxy = http.ProxyFromEnvironment
+		for _, k := range []string{"HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"} {
+			configured = configured || os.Getenv(k) != ""
+		}
+	}
 	dialer := &net.Dialer{Timeout: 5 * time.Second, KeepAlive: 30 * time.Second}
 	dialer.Control = func(network, address string, c syscall.RawConn) error {
 		if _, ok := proxies[address]; ok {
@@ -67,11 +84,11 @@ func New() *Fetcher {
 		}
 		return guardDial(network, address, c)
 	}
-	f := &Fetcher{proxied: len(proxies) > 0}
+	f := &Fetcher{proxied: len(proxies) > 0, environment: configured}
 	f.client = &http.Client{
 		Timeout: 12 * time.Second,
 		Transport: &http.Transport{
-			Proxy:                 http.ProxyFromEnvironment,
+			Proxy:                 proxy,
 			DialContext:           dialer.DialContext,
 			TLSHandshakeTimeout:   6 * time.Second,
 			ResponseHeaderTimeout: 8 * time.Second,

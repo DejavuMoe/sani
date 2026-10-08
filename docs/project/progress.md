@@ -15,7 +15,7 @@ import { data as status } from '../.vitepress/data/status.data'
 | 标签管理 | <span class="sn-status done">已完成</span> | 短链接、文本与文件的彩色标签，创建与编辑时分配，按标签或未标记筛选，JSON/CSV 迁移（v0.5.0 起） |
 | 文本与文件分享 | <span class="sn-status done">已完成</span> | `/p/` 路由下的纯文本与代码展示、独立文件域名安全下载（v0.3.0 起） |
 | HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
-| 导入与导出 | <span class="sn-status done">已完成</span> | 导入 Sani、Shlink、Sink JSON 与兼容 CSV；导出网址链接为 Sani JSON 或 CSV |
+| 导入与导出 | <span class="sn-status done">已完成</span> | 导入 Sani、Shlink CSV/JSON；导出网址链接为 Sani JSON 或 CSV |
 | 部署生态 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的极简 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
 | 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
 | 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期与源码规则强一致性核对 |

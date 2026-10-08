@@ -28,10 +28,10 @@ A few things worth knowing about `compose.yaml`:
 
 | Tag | Points at |
 |---|---|
-| `v0.8.0` | The exact version matching Git tag and GitHub Release `v0.8.0` |
-| `v0.8.0-rc.1` | The matching prerelease Git tag, available only once published |
+| `v0.9.0` | The exact version matching Git tag and GitHub Release `v0.9.0` |
+| `v0.9.0-rc.1` | The matching prerelease Git tag, available only once published |
 
-From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v0.8.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
+From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v0.9.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
 
 To upgrade, [back up](./operations#backup), change `image:` in `compose.yaml` to the target version's full tag, then run:
 
@@ -104,7 +104,7 @@ The binary is statically linked and needs no libraries on the server. On macOS, 
 ::: code-group
 
 ```sh [Download]
-base=https://github.com/DejavuMoe/sani/releases/download/v0.8.0
+base=https://github.com/DejavuMoe/sani/releases/download/v0.9.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -119,7 +119,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-The download path pins `v0.8.0`. When upgrading, replace it with the published target version's tag.
+The download path pins `v0.9.0`. When upgrading, replace it with the published target version's tag.
 
 ### Checking where a build came from {#verify}
 
@@ -127,7 +127,7 @@ Release files and images are built by GitHub Actions from the tagged commit, wit
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.8.0 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.0 -R DejavuMoe/sani
 ```
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:
@@ -208,7 +208,7 @@ The link copied after creating a share opens its page on the main domain. Visito
 
 1. **DNS.** Point the files domain at the same server.
 2. **The proxy.** Serve it like the main domain, with the same headers: list it in the Caddy site address (`example.com, f.example.com {` for the example above), or add it to both `server_name` lines in nginx, with a certificate that covers both. The builder above does this when you fill in a download domain.
-3. **Body size.** Uploads can be as large as [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) plus 1 MB. Caddy has no limit by default. The nginx example sets `client_max_body_size 65m` for the default 64 MB file limit plus form overhead. If you raise `SANI_MAX_FILE_MB`, raise the proxy limit too.
+3. **Body size.** The admin app sends independent chunks of at most 25,000,000 bytes for files over 25 MB. The nginx example uses `client_max_body_size 100m`, covering 32 MiB imports and the default 99 MB single-request API plus form overhead. Larger direct API uploads need a higher proxy limit; chunked uploads only need room for each request. Cloudflare Free/Pro allows 100 MB per request; a zone may set a smaller limit. Chunking avoids that per-request ceiling but does not change Sani’s whole-file limit. See [Cloudflare’s 413 guidance](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/4xx-client-error/error-413/). Slow uploads can still hit proxy timeouts.
 4. **Sani.** Set [`SANI_FILES_URL`](../reference/configuration#sani-files-url) to `https://f.example.com` and restart.
 
 Sani requires a **different hostname** for downloads to isolate uploaded content from the admin app. Changing only the path does not isolate browser origins. Another port is not accepted either, because browsers share cookies across the ports of one host. A subdomain works, since Sani’s session cookie is not sent to subdomains. Uploads still go through the main domain’s API.

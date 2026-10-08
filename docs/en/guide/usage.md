@@ -28,7 +28,7 @@ Tags are private to administrators. Undoing deletion restores assignments. Tag n
 
 ## Slugs {#slugs}
 
-Leave the slug empty and Sani makes one up. Generated slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) sets the length.
+Leave the slug empty and Sani makes one up. By default, generated slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. Settings controls the length and look-alike exclusion; an explicit [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) takes priority.
 
 When you pick a slug yourself, the field tells you as you type whether it’s free. The rules:
 
@@ -70,7 +70,7 @@ Search first and then check everything to handle a group of related links at onc
 Besides links, Sani shares a piece of text or a file. Switch to the Text or File tab above the link box, or start from anywhere on the page:
 
 - **Paste text.** Pasting text with several lines, or a line that isn’t a link, opens it in the Text tab. A link on its own is shortened as usual.
-- **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 64 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that.
+- **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 99 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that.
 
 A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MB. Nothing is rendered: Markdown and HTML show as written.
 
@@ -145,3 +145,5 @@ A token has full access and keeps working after a password change. It’s shown 
 - **Forgiving addresses.** A trailing `/` or different capitalization still redirects.
 - **Texts and files.** They open at `/p/{slug}` on a page in the visitor’s language; `/{slug}` without the `/p/` doesn’t find them.
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.
+
+Creation defaults in Settings control generated slug length (3–32), look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, a color picker and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.

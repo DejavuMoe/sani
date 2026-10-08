@@ -1,6 +1,8 @@
 # 配置项
 
-<p class="lead">Sani 遵循现代云原生原则，所有配置均通过环境变量传递，不依赖配置文件。空值视作未设置。启动时会统一校验所有变量，若有异常将一次性列出并中断退出。</p>
+<p class="lead">Sani 遵循现代云原生原则，服务器配置通过环境变量传递，创建默认值也可在后台保存。空值视作未设置。启动时会统一校验所有变量，若有异常将一次性列出并中断退出。</p>
+
+后台修改的创建默认值保存在 SQLite 中，逐字段按“内置默认值 → 已保存设置 → 显式环境变量”取值，不另设配置文件。
 
 ## 配置一览
 
@@ -14,11 +16,13 @@
 | [`SANI_ROOT_REDIRECT`](#sani-root-redirect) | — | 访问根路径时跳转到哪里 |
 | [`SANI_TRUST_PROXY`](#sani-trust-proxy) | `false` | 是否信任反向代理的请求头 |
 | [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | 自动生成的短码长度 |
+| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | 排除易混淆字符 |
+| [`SANI_META_PROXY`](#sani-meta-proxy) | — | 网页信息专用 HTTP/HTTPS/SOCKS5 代理 |
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | 是否自动获取网页标题和图标 |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | 是否把查询参数带到目标网址 |
 | [`SANI_CACHE_SIZE`](#sani-cache-size) | `100000` | 内存中缓存的跳转目标数量 |
 | [`SANI_FILES_URL`](#sani-files-url) | — | 提供文件下载和原始文本的域名 |
-| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `64` | 单个文件的大小上限（MB） |
+| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `99` | 单文件默认上限（十进制 MB；显式变量保留 MiB 语义） |
 | [`SANI_LOG_LEVEL`](#sani-log-level) | `info` | 日志级别 |
 | [`SANI_LOG_FORMAT`](#sani-log-format) | `text` | 日志格式 |
 | [`TZ`](#tz) | 系统时区 | 每日统计使用的时区 |
@@ -83,11 +87,21 @@
 
 短码采用安全无歧义字符集 `23456789abcdefghjkmnpqrstuvwxyz`（31 个字符）。5 位长度具备约 2,860 万种排列组合。修改该项不影响已有短链接；当存储量上升且随机生成碰撞频次升高时，系统会自动在此基础上扩充一位。
 
+### `SANI_EXCLUDE_CONFUSABLE`
+
+默认 `true`，排除 `0`、`o`、`1`、`i`、`l`。`false` 使用全部小写字母和数字。只影响未来自动生成的网址短码，已有、手动与导入短码不变。文本/文件分享仍使用安全字符集且至少 10 位。显式值锁定后台相应设置。
+
+### `SANI_META_PROXY`
+
+无默认值。接受 `http://`、`https://`、`socks5://` 代理 URL，可带用户名与密码。凭据仅放在服务器环境变量中，API 只返回是否配置，不返回地址。当抓取启用且没有已保存模式时，自动选择专用代理。
+
+通过 CONNECT 或 SOCKS5 连接本机解析并校验的公网 IP，保留目标 Host 与 TLS SNI。失败不回退直连，不受 `NO_PROXY` 绕过。拒绝内网目标、不安全重定向，以及严格模式下的 fake-IP DNS 结果（`198.18.0.0/15`）。DNS 在本地解析，不承诺 DNS 隐私。代理端点自身可为私网地址；HTTP 代理需要支持对 HTTP 与 HTTPS 目标使用 CONNECT。
+
+HTTPS 加密服务器到代理这一跳，普通 HTTP/SOCKS5 不加密；密码认证不等于加密。代理运营方仍能看到目标元数据。DuckDuckGo 搜索跳转不是通用网页信息中继。
+
 ### `SANI_FETCH_META`
 
-默认 `true`。开启后，新建短链接时后台异步抓取目标页面的标题与 Favicon 图标。关闭后新链接不自动解析（列表展示目标域名）。在详情页手动点击“重新获取标题”仍可按需触发单次抓取。
-
-抓取器校验目标域名与解析地址，并在直连时再次检查拨号 IP。若需代理访问公网，可配置 `HTTPS_PROXY` 与 `HTTP_PROXY`；代理端的解析与最终出站连接需另行限制，详见[安全机制](../internals/security#fetching)。
+默认 `true`。控制标题与图标抓取；`false` 同时禁用手动刷新，保留已有缓存。显式设置后，后台网页信息模式只读；未显式设置时可在后台选择关闭、直接连接或使用代理。直接连接忽略系统代理；未更改设置的旧部署继续沿用 `HTTP_PROXY`、`HTTPS_PROXY`、`NO_PROXY`，界面显示“环境代理”。切换模式前已开始的请求可能继续完成。
 
 ### `SANI_FORWARD_QUERY`
 
@@ -120,9 +134,9 @@ https://s.example.com/gh?utm_source=weekly
 
 ### `SANI_MAX_FILE_MB`
 
-默认 `64`（取值范围 1–4096）。允许上传的单文件大小阈值（单位 MB，1 MB = 1,048,576 字节）。超限请求将被立即拒绝并中断接收。
+未设置时默认 **99,000,000 字节**；后台接受 1–4096 的整数十进制 MB。为兼容旧部署，**显式环境变量**仍以 MiB 计：`99` 表示 103,809,024 字节。显式值优先并锁定后台相应字段。
 
-前置反代（如 nginx）常有默认体积上限，需配套调大（详见[部署指南](../guide/deploy#files-domain)）。纯文本分享上限固定为 1 MB，不受此项约束。
+后台对超过 25,000,000 字节的文件使用独立分片请求，每片最多 25,000,000 字节。完整文件仍受总上限控制，需要更大文件时先提高上限；分片不会自动提高限制。原单请求 API 保留，需匹配反代体积限制。纯文本分享仍限制为 1,048,576 字节。
 
 ## 运行日志
 

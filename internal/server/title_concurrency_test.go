@@ -19,7 +19,7 @@ func TestMetadataChangesKeepConcurrentlySavedManualTitle(t *testing.T) {
 			name = "refresh"
 		}
 		t.Run(name, func(t *testing.T) {
-			e := newEnv(t, Options{})
+			e := newEnv(t, Options{FetchMeta: refresh})
 			e.signIn()
 			ctx := context.Background()
 			now := time.Now().UnixMilli()

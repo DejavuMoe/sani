@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"strings"
 	"unicode"
@@ -19,6 +20,7 @@ const MaxTags = 1000
 
 var ErrTagsInvalid = errors.New("invalid tags")
 var ErrTagLimit = errors.New("tag catalog is full")
+var ErrTagTaken = errors.New("tag name is already in use")
 
 type Tag struct {
 	ID    int64  `json:"id"`
@@ -45,6 +47,11 @@ func NormalizeTag(name, color string) (string, string, error) {
 	case "blue", "green", "amber", "rose", "neutral":
 		return name, color, nil
 	default:
+		if len(color) == 7 && color[0] == '#' {
+			if _, err := hex.DecodeString(color[1:]); err == nil {
+				return name, strings.ToLower(color), nil
+			}
+		}
 		return "", "", ErrTagsInvalid
 	}
 }
@@ -79,6 +86,34 @@ func createTag(ctx context.Context, tx *sql.Tx, name, color string) (*Tag, error
 func (s *Store) CreateTag(ctx context.Context, name, color string) (tag *Tag, err error) {
 	err = s.tx(ctx, func(tx *sql.Tx) error { tag, err = createTag(ctx, tx, name, color); return err })
 	return
+}
+
+func (s *Store) UpdateTag(ctx context.Context, id int64, name, color string) (*Tag, error) {
+	name, color, err := NormalizeTag(name, color)
+	if err != nil {
+		return nil, err
+	}
+	tag := &Tag{ID: id, Name: name, Color: color}
+	err = s.tx(ctx, func(tx *sql.Tx) error {
+		var conflict bool
+		if err := tx.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM tags WHERE name_key = ? AND id != ?)`, strings.ToLower(name), id).Scan(&conflict); err != nil {
+			return err
+		}
+		if conflict {
+			return ErrTagTaken
+		}
+		res, err := tx.ExecContext(ctx, `UPDATE tags SET name = ?, name_key = ?, color = ? WHERE id = ?`, name, strings.ToLower(name), color, id)
+		if err != nil {
+			return err
+		}
+		if n, err := res.RowsAffected(); err != nil {
+			return err
+		} else if n == 0 {
+			return ErrNotFound
+		}
+		return tx.QueryRowContext(ctx, `SELECT count(*) FROM link_tags lt JOIN links l ON l.id = lt.link_id AND l.deleted_at = 0 WHERE lt.tag_id = ?`, id).Scan(&tag.Count)
+	})
+	return tag, err
 }
 
 type TagCatalog struct {

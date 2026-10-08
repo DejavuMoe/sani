@@ -1,0 +1,2 @@
+slug,url,title,redirect,enabled,expires_at,max_clicks,clicks,created_at,tags
+guide,https://example.com/guide,Example guide,302,true,,,0,2026-10-08T00:00:00Z,"[{""name"":""Docs"",""color"":""blue""}]"

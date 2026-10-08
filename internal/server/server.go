@@ -25,15 +25,21 @@ import (
 )
 
 type Options struct {
-	BaseURL         string // fixed public origin; overrides the stored setting
-	RootRedirect    string // where "/" sends visitors; the admin app when empty
-	TrustProxy      bool   // honor X-Forwarded-* headers
-	SlugLength      int
-	FetchMeta       bool
-	ForwardQuery    bool
-	PasswordFromEnv bool
-	CacheSize       int
-	Version         string
+	BaseURL                  string // fixed public origin; overrides the stored setting
+	RootRedirect             string // where "/" sends visitors; the admin app when empty
+	TrustProxy               bool   // honor X-Forwarded-* headers
+	SlugLength               int
+	IncludeConfusable        bool
+	SlugLengthFromEnv        bool
+	ExcludeConfusableFromEnv bool
+	MaxFileFromEnv           bool
+	FetchMetaFromEnv         bool
+	MetaProxy                string
+	FetchMeta                bool
+	ForwardQuery             bool
+	PasswordFromEnv          bool
+	CacheSize                int
+	Version                  string
 
 	// FilesURL is the origin that serves shared files and raw text; empty
 	// turns file sharing off. FilesDir holds the uploaded files.
@@ -59,7 +65,12 @@ type Server struct {
 	pages   *pages
 	api     http.Handler
 
-	storedBase atomic.Pointer[string] // base URL from settings
+	settings                    atomic.Pointer[runtimeSettings]
+	settingsMu                  sync.Mutex
+	directFetcher, proxyFetcher *meta.Fetcher
+	uploadsMu                   sync.Mutex
+	uploads                     map[string]*uploadSession
+	storedBase                  atomic.Pointer[string] // base URL from settings
 
 	ctx      context.Context // canceled on shutdown; parents background jobs
 	cancel   context.CancelFunc
@@ -78,7 +89,7 @@ func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetch
 		opt.SlugLength = 5
 	}
 	if opt.MaxFileBytes <= 0 {
-		opt.MaxFileBytes = 64 << 20
+		opt.MaxFileBytes = 99_000_000
 	}
 	s := &Server{
 		opt:       opt,
@@ -103,6 +114,20 @@ func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetch
 		return nil, err
 	}
 	s.storedBase.Store(&base)
+	s.directFetcher = meta.NewDirect()
+	if opt.MetaProxy != "" {
+		s.proxyFetcher, err = meta.NewProxy(opt.MetaProxy)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := s.loadSettings(); err != nil {
+		return nil, err
+	}
+	s.uploads = make(map[string]*uploadSession)
+	if err := s.cleanRestartUploads(); err != nil {
+		return nil, err
+	}
 
 	if s.web, err = newWebApp(ui); err != nil {
 		return nil, err
@@ -202,6 +227,7 @@ func (s *Server) RunMaintenance(ctx context.Context) {
 		case <-t.C:
 		}
 		now := time.Now()
+		s.expireUploads(now)
 		if n, err := s.store.PurgeDeleted(ctx, now.Add(-deletedRetention).UnixMilli()); err != nil {
 			s.log.Error("purge deleted links", "err", err)
 		} else if n > 0 {

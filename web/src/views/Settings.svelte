@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { slide } from 'svelte/transition';
   import AppHeader from '../components/AppHeader.svelte';
   import Button from '../components/Button.svelte';
   import Icon from '../components/Icon.svelte';
+  import Switch from '../components/Switch.svelte';
   import Segmented from '../components/Segmented.svelte';
   import { api, ApiError, type ImportResult, type Token } from '../lib/api';
   import { clock } from '../lib/clock.svelte';
@@ -36,6 +37,35 @@
     } finally {
       baseBusy = false;
     }
+  }
+
+  let slugLength = $state(untrack(() => session.config?.slugLength ?? 5));
+  let excludeConfusable = $state(untrack(() => session.config?.excludeConfusable ?? true));
+  let maxFileMB = $state(untrack(() => (session.config?.maxFileSize ?? 99_000_000) / 1_000_000));
+  let metaMode = $state(untrack(() => session.config?.metaMode ?? 'off'));
+  let defaultsBusy = $state(false), metaBusy = $state(false);
+  let defaultsError = $state(''), metaError = $state('');
+  let defaultsSaved = $state(false), metaSaved = $state(false);
+  const locked = (key: 'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode') => config?.configSources[key] === 'env';
+  const defaultsValid = $derived(Number.isInteger(slugLength) && slugLength >= 3 && slugLength <= 32 && (locked('maxFileSize') || Number.isInteger(maxFileMB) && maxFileMB >= 1 && maxFileMB <= 4096));
+  const defaultsChanged = $derived(slugLength !== config?.slugLength || excludeConfusable !== config?.excludeConfusable || maxFileMB * 1_000_000 !== config?.maxFileSize);
+  async function saveDefaults(e: SubmitEvent) {
+    e.preventDefault(); if (!defaultsValid) return;
+    defaultsBusy = true; defaultsError = ''; defaultsSaved = false;
+    try {
+      session.config = await api.setConfig({
+        ...(!locked('slugLength') && { slugLength }),
+        ...(!locked('excludeConfusable') && { excludeConfusable }),
+        ...(!locked('maxFileSize') && { maxFileSize: maxFileMB * 1_000_000 }),
+      }); defaultsSaved = true;
+    } catch (err) { defaultsError = errorText(err instanceof ApiError ? err.code : 'unknown'); }
+    finally { defaultsBusy = false; }
+  }
+  async function saveMetadata(e: SubmitEvent) {
+    e.preventDefault(); metaBusy = true; metaError = ''; metaSaved = false;
+    try { session.config = await api.setConfig({ metaMode }); metaSaved = true; }
+    catch (err) { metaError = errorText(err instanceof ApiError ? err.code : 'unknown'); }
+    finally { metaBusy = false; }
   }
 
   // Tokens
@@ -231,6 +261,34 @@
   </section>
 
   <section>
+    <header><h2>{t('settings.defaults')}</h2></header>
+    <form class="body defaults-form" onsubmit={saveDefaults}>
+      {#if ['slugLength', 'excludeConfusable', 'maxFileSize'].some(key => config?.configSources[key as 'slugLength'] === 'env')}<p class="hint">{t('settings.defaultsEnv')}</p>{/if}
+      <div class="setting"><div><label for="default-length">{t('settings.slugLength')}</label><p class="hint">{t('settings.slugLengthHint')}</p></div><input id="default-length" class="field" type="number" min="3" max="32" step="1" bind:value={slugLength} disabled={locked('slugLength') || defaultsBusy} /></div>
+      <div class="setting"><div><label for="default-exclude">{t('settings.exclude')}</label><p class="hint">{t('settings.excludeHint')}</p></div><Switch id="default-exclude" label={t('settings.exclude')} checked={excludeConfusable} onchange={v => excludeConfusable = v} disabled={locked('excludeConfusable') || defaultsBusy} /></div>
+      <div class="slug-preview"><span>{t('settings.slugExample')}</span><code>/{(excludeConfusable ? 'k7mx9p4w2r6h8q3t' : 'k0mi9p1o2r6h8q3t').repeat(2).slice(0, Math.max(3, Math.min(32, slugLength || 5)))}</code></div>
+      <div class="setting"><div><label for="default-max-file">{t('settings.maxFile')}</label><p class="hint">{t('settings.maxFileHint')}</p></div><span class="unit"><input id="default-max-file" class="field" type="number" min="1" max="4096" step="1" bind:value={maxFileMB} disabled={locked('maxFileSize') || defaultsBusy} />MB</span></div>
+      {#if !defaultsValid}<p class="error-text" role="alert">{t('settings.defaultsInvalid')}</p>{/if}
+      {#if defaultsError}<p class="error-text" role="alert">{defaultsError}</p>{/if}
+      <div class="settings-save"><Button type="submit" loading={defaultsBusy} disabled={!defaultsValid || !defaultsChanged}>{t('act.save')}</Button><span class="saved" role="status">{defaultsSaved && !defaultsChanged ? t('settings.saved') : ''}</span></div>
+    </form>
+  </section>
+  <section>
+    <header><h2>{t('settings.metadata')}</h2></header>
+    <form class="body defaults-form" onsubmit={saveMetadata}>
+      {#if locked('metaMode')}<p class="hint">{t('settings.defaultsEnv')}</p>{/if}
+      <div class="setting"><div><label for="metadata-mode">{t('settings.metadataLabel')}</label><p class="hint">{t('settings.metadataHint')}</p></div><select id="metadata-mode" class="field" bind:value={metaMode} disabled={locked('metaMode') || metaBusy}>
+        {#if config?.metaMode === 'environment'}<option value="environment">{t('settings.metaEnvironment')}</option>{/if}
+        <option value="off">{t('settings.metaOff')}</option><option value="direct">{t('settings.metaDirect')}</option><option value="proxy" disabled={!config?.metaProxyConfigured}>{t('settings.metaProxy')}</option>
+      </select></div>
+      <p class="hint">{t(metaMode === 'off' ? 'settings.metaOffHint' : metaMode === 'direct' ? 'settings.metaDirectHint' : metaMode === 'environment' ? 'settings.metaEnvironmentHint' : 'settings.metaProxyHint')}</p>
+      <div class="meta-status"><Icon name={config?.metaProxyConfigured ? 'check' : 'lock'} size={14} />{t(config?.metaProxyConfigured ? 'settings.proxyReady' : 'settings.proxyMissing')}</div>
+      {#if metaError}<p class="error-text" role="alert">{metaError}</p>{/if}
+      <div class="settings-save"><Button type="submit" loading={metaBusy} disabled={locked('metaMode') || metaMode === config?.metaMode || metaMode === 'environment' || metaMode === 'proxy' && !config?.metaProxyConfigured}>{t('act.save')}</Button><span class="saved" role="status">{metaSaved && metaMode === config?.metaMode ? t('settings.saved') : ''}</span></div>
+    </form>
+  </section>
+
+  <section>
     <header>
       <h2>{t('settings.tokens')}</h2>
       <p>{t('settings.tokensHint')}</p>
@@ -339,6 +397,7 @@
         <div>
           <h3>{t('settings.import')}</h3>
           <p class="hint">{t('settings.importHint')}</p>
+          <div class="examples"><span>{t('settings.examples')}</span><a href="/admin/examples/sani.csv" download>CSV</a><a href="/admin/examples/sani.json" download>JSON</a></div>
         </div>
         <label
           class={['drop', dragOver && 'over', importing && 'busy']}
@@ -621,8 +680,8 @@
 
   .drop:hover,
   .drop.over {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    border-color: var(--text-3);
+    background: var(--surface-2);
     color: var(--text);
   }
 
@@ -821,6 +880,7 @@
 
   .about {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
     margin: 0;
     font-size: 13px;
@@ -837,17 +897,19 @@
   }
 
   .about dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
     margin: 0;
   }
 
   @media (max-width: 720px) {
     section {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 14px;
     }
 
     .pw-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .tool {
@@ -861,5 +923,26 @@
       align-items: flex-start;
       gap: 8px;
     }
+  }
+  .defaults-form { gap: 16px; }
+  .setting { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .setting label { display: block; font-size: 13px; font-weight: 500; }
+  .setting .hint { margin: 6px 0 0; line-height: 1.6; }
+  .defaults-form > .hint { margin: 0; line-height: 1.65; }
+  .setting .field { width: 82px; flex: none; }
+  .setting select.field { width: 144px; }
+  .unit { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; }
+  .slug-preview { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-3); }
+  .slug-preview code { color: var(--text-2); overflow-wrap: anywhere; }
+  .settings-save { display: flex; gap: 12px; align-items: center; min-height: 32px; }
+  .saved { color: var(--success); font-size: 12px; }
+  .meta-status { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 12px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
+  .examples a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
+  @media (max-width: 640px) {
+    .setting { gap: 12px; }
+    .setting select.field { width: 126px; }
+    .setting .field { min-height: 44px; }
+    .examples a { display: inline-flex; align-items: center; min-height: 44px; }
   }
 </style>

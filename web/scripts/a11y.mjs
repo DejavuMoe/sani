@@ -2,7 +2,7 @@
 //   SANI_URL=http://127.0.0.1:8080 node scripts/a11y.mjs
 // SANI_FRESH_URL may point at an instance without a password to include setup.
 import { chromium } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
@@ -11,12 +11,15 @@ const base = process.env.SANI_URL ?? 'http://127.0.0.1:8080';
 const password = process.env.SANI_DEMO_PASSWORD ?? 'sani-demo';
 const fresh = process.env.SANI_FRESH_URL;
 
+const screenshots = process.env.SANI_SCREENSHOTS;
+if (screenshots) mkdirSync(screenshots, {recursive:true});
 const phone = { width: 390, height: 800 };
 
 const screens = [
   ...(fresh ? [{ name: 'setup', path: '/admin/', auth: false, origin: fresh }] : []),
   { name: 'login', path: '/admin/', auth: false },
   { name: 'dashboard', path: '/admin/' },
+  { name: 'dashboard-narrow', path: '/admin/', viewport:{width:320,height:860} },
   {
     name: 'detail',
     path: '/admin/',
@@ -46,6 +49,21 @@ const screens = [
     },
   },
   { name: 'settings', path: '/admin/settings' },
+  { name: 'settings-narrow', path: '/admin/settings', viewport: {width:320,height:860} },
+  ...[1280,390,320].flatMap(width => ['create','edit'].map(mode => ({
+    name: `r3-tag-${mode}-${width}`, path:'/admin/', viewport:{width,height:860},
+    run:async page => {
+      if (mode === 'edit') {
+        await page.request.post(`${base}/api/tags`, {data:{name:'QA color',color:'#5872a5'}});
+        await page.reload();
+      }
+      await page.locator('#create-panel-url .tag-add').click();
+      const pop = page.locator('.tag-pop:popover-open');
+      if (mode === 'create') await pop.locator('.tag-search input').fill('R3 custom');
+      else await pop.locator('.tag-edit-button').first().click();
+      await pop.locator('.color-input .field').fill('#e8dfcc');
+    },
+  }))),
   {
     name: 'share-text',
     path: '/admin/',
@@ -109,10 +127,18 @@ for (const [locale, theme] of ['zh-CN', 'en-US'].flatMap((locale) => ['light', '
     const path = typeof s.path === 'function' ? await s.path(ctx.request) : s.path;
     await page.goto((s.origin ?? base) + path, { waitUntil: 'networkidle' });
     if (s.run) await s.run(page);
+    if (screenshots && (s.name.startsWith('r3-') || s.name === 'settings-narrow' || s.name === 'settings' || s.name === 'dashboard')) {
+      const artifact = `${screenshots}/${locale}-${theme}-${s.name}`;
+      await page.screenshot({path:artifact+'.png',fullPage:false});
+      await page.addScriptTag({content:readFileSync('../.agents/skills/prototype-first-ui/scripts/collect_dom_content.js','utf8')});
+      writeFileSync(artifact+'.json', JSON.stringify(await page.evaluate(() => window.__prototypeFirstUICollectDOMContent()),null,2));
+    }
     await page.addScriptTag({ content: axe });
     const result = await page.evaluate(async () => {
       // @ts-ignore injected above
-      const r = await window.axe.run(document, { resultTypes: ['violations'] });
+      // Scan the top-layer popover separately: covered rows otherwise inherit its button background in axe.
+      // The underlying page has its own full-document checks at desktop and narrow widths.
+      const r = await window.axe.run(document.querySelector('.tag-pop:popover-open') ?? document, { resultTypes: ['violations'] });
       return r.violations.map((v) => ({
         id: v.id,
         impact: v.impact,

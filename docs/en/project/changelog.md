@@ -2,6 +2,24 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## v0.9.0
+
+2026-10-09 · Implement approved R3: editable tag colors, creation defaults, a dedicated metadata proxy and chunked file uploads, with consistent admin interactions. First startup migrates to schema 5; read the upgrade notes below.
+
+- Add 12 muted tag presets, the system color picker and HEX/RGB/HSL input, stored as six-digit HEX. Edit existing tag names and colors in place across all references; legacy named colors remain supported.
+- Add persisted settings for generated slug length, look-alike character exclusion, file size and off/direct/proxy metadata fetching. Explicit environment values take priority and lock their corresponding controls. Generated share IDs remain at least 10 characters.
+- Default to a 99,000,000-byte file limit when unset, configurable to 1–4096 decimal MB in Settings. Files over 25,000,000 bytes use sequential independent requests, retrying from the last confirmed offset in the current page. Cancellation, expiry and restart reclaim fragments; a share is published only after full validation. Limit pending uploads to 2 per credential, 8 per instance and 8 GiB of reserved space.
+- Add optional `SANI_META_PROXY` for HTTP, HTTPS or SOCKS5 with optional authentication. Dedicated mode pins verified public target IPs while retaining Host/TLS SNI, ignores NO_PROXY and never falls back to direct connections. Proxy credentials stay on the server; refreshing with fetching disabled preserves existing metadata.
+- Limit imports to native Sani CSV/JSON and explicit Shlink formats, with downloadable Sani examples. Remove other products’ aliases and arbitrary wrappers; reject unrecognized formats before writing. Verify an unmodified Shlink CSV against an isolated database and repeated imports without duplicate links or counts.
+- Soften composer focus halos and upload hover; unify keyboard, copy, open and Enter icons and action buttons. Keep hidden creation panels out of focus order and prevent long domains from widening narrow Settings pages.
+- Align bilingual API, configuration, import, deployment and security documentation; add proxy protocol/DNS, schema migration, settings precedence, chunk retry and browser regression coverage.
+
+### Incompatible changes and upgrade
+
+- **Database schema 5:** extend tag color constraints while retaining tag IDs, link associations and statistics. Stop the service cleanly and back up the database, `files/` and configuration before upgrading. v0.8.x and earlier cannot open schema 5; rollback requires the matching full pre-upgrade backup, not just the old image. See [backup and restore](../guide/operations#backup).
+- **Import allowlist:** product-specific Sink, YOURLS, Kutt exports and arbitrary JSON wrappers are no longer supported. Native JSON requires `app: "sani"`, `version: 1` and `links`. Convert other sources using the [standard examples](../guide/import-export). Existing links and duplicate-slug handling are unchanged.
+- **File limit units:** the unset default and Settings use decimal MB. Explicit `SANI_MAX_FILE_MB` retains its existing MiB semantics and takes priority over Settings. Chunking does not bypass the whole-file limit; resume across reloads or server restarts is not supported. Review proxy body limits, timeouts and `/api/` cache rules as needed.
+
 ## v0.8.0
 
 2026-10-08 · Fix original Shlink CSV imports and caching of limited access; document CDN rules and shared-file cleanup. Database schema stays at 4 with no new migration.

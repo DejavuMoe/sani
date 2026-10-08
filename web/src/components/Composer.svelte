@@ -254,10 +254,8 @@
   }
 
   .composer:focus-within {
-    border-color: color-mix(in oklab, var(--accent) 55%, var(--line-2));
-    box-shadow:
-      0 0 0 3px color-mix(in oklab, var(--accent) 12%, transparent),
-      0 1px 2px rgb(28 27 25 / 0.04);
+    border-color: var(--accent);
+    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
   }
 
   .composer.invalid {
@@ -265,17 +263,9 @@
   }
 
   .pulse {
-    animation: pulse 700ms var(--ease);
+    animation: none;
   }
 
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 35%, transparent);
-    }
-    100% {
-      box-shadow: 0 0 0 10px transparent;
-    }
-  }
 
   .main {
     display: flex;

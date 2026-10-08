@@ -235,6 +235,18 @@ var migrations = []string{
 		UNIQUE (link_id, position)
 	) WITHOUT ROWID;
 	CREATE INDEX link_tags_by_tag ON link_tags (tag_id, link_id);`,
+
+	// 5: preserve legacy colors and allow normalized six-digit custom colors.
+	`CREATE TABLE tags_new (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		name_key TEXT NOT NULL UNIQUE,
+		color TEXT NOT NULL CHECK (color IN ('blue', 'green', 'amber', 'rose', 'neutral') OR
+			(length(color) = 7 AND substr(color, 1, 1) = '#' AND substr(color, 2) NOT GLOB '*[^0-9a-f]*'))
+	);
+	INSERT INTO tags_new SELECT * FROM tags;
+	DROP TABLE tags;
+	ALTER TABLE tags_new RENAME TO tags;`,
 }
 
 func migrate(ctx context.Context, db *sql.DB) (result error) {

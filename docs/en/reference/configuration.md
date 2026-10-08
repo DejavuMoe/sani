@@ -14,11 +14,13 @@
 | [`SANI_ROOT_REDIRECT`](#sani-root-redirect) | — | Where the bare domain goes |
 | [`SANI_TRUST_PROXY`](#sani-trust-proxy) | `false` | Trust the reverse proxy’s headers |
 | [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | Length of generated slugs |
+| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | Exclude look-alike characters |
+| [`SANI_META_PROXY`](#sani-meta-proxy) | — | Dedicated HTTP/HTTPS/SOCKS5 metadata proxy |
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | Fetch titles and icons automatically |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | Pass query strings on to destinations |
 | [`SANI_CACHE_SIZE`](#sani-cache-size) | `100000` | Redirect targets kept in memory |
 | [`SANI_FILES_URL`](#sani-files-url) | — | Domain that serves files and raw text |
-| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `64` | Size limit for one file, in MB |
+| [`SANI_MAX_FILE_MB`](#sani-max-file-mb) | `99` | Default file limit in decimal MB; explicit variable values keep MiB semantics |
 | [`SANI_LOG_LEVEL`](#sani-log-level) | `info` | Log level |
 | [`SANI_LOG_FORMAT`](#sani-log-format) | `text` | Log format |
 | [`TZ`](#tz) | system | Time zone for daily statistics |
@@ -87,11 +89,21 @@ Default `5`, from 3 to 32. The length of generated slugs.
 
 Generated slugs use only the 31 characters of `23456789abcdefghjkmnpqrstuvwxyz`; 5 of them make about 28.6 million combinations. Existing links aren’t affected. When there are so many links that random slugs start colliding, new ones grow automatically.
 
+### `SANI_EXCLUDE_CONFUSABLE`
+
+Default `true`. Omits `0`, `o`, `1`, `i`, `l`. `false` uses lowercase letters and digits. Only future generated URL slugs change; existing, manual and imported slugs stay intact. Shared text/file IDs retain the safe alphabet and at least 10 characters. Explicit values lock the corresponding setting.
+
+### `SANI_META_PROXY`
+
+No default. Accepts `http://`, `https://` or `socks5://` proxy URLs, optionally with username/password. Credentials belong only in the server environment; the API returns a configured boolean, never the URL. When enabled without a stored mode, a dedicated proxy is selected automatically.
+
+Connections tunnel to a locally resolved, verified public IP through CONNECT or SOCKS5, preserving the destination Host and TLS SNI. Failures never fall back to direct connections and `NO_PROXY` does not apply. Private targets, unsafe redirects and fake-IP DNS answers (`198.18.0.0/15`) are rejected in this strict mode. DNS runs locally, so this does not promise DNS privacy. The configured proxy endpoint itself may be private. HTTP proxies must support CONNECT for HTTP as well as HTTPS targets.
+
+HTTPS encrypts the server-to-proxy hop; ordinary HTTP/SOCKS5 do not. Password authentication alone is not encryption. The proxy operator can observe destination metadata. DuckDuckGo’s search redirect is not a general metadata relay.
+
 ### `SANI_FETCH_META`
 
-Default `true`. After a link is created, fetch the destination in the background for its title and icon. When off, new links aren’t fetched and the list shows their domain. Clicking “Refetch title” in a link’s details still fetches the page.
-
-The fetcher checks target names and resolved addresses, then checks the dialed IP again for direct connections. `HTTPS_PROXY` and `HTTP_PROXY` enable proxy access; the proxy’s DNS and final outbound connections require their own restrictions. See [Security](../internals/security#fetching).
+Default `true`. Enables title and icon fetching. `false` also disables manual refresh; existing cached metadata remains available. An explicit value locks the metadata mode in the admin app. With no explicit value, choose Off, Direct or Use proxy in Settings. Direct ignores environment proxies; an unchanged legacy deployment still uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`, shown as Environment proxy. Requests already in progress may finish after a mode change.
 
 ### `SANI_FORWARD_QUERY`
 
@@ -124,9 +136,9 @@ The domain points at the same Sani process; nothing else needs deploying. Sani t
 
 ### `SANI_MAX_FILE_MB`
 
-Default `64`, from 1 to 4096. The largest file you can share, in MB (1 MB = 1,048,576 bytes). A larger upload is refused, and whatever arrived of it is deleted.
+When unset, the default is **99,000,000 bytes**. Settings accepts integer decimal MB (1–4096). For compatibility, an **explicit** environment value still means MiB: `99` means 103,809,024 bytes. Explicit values take precedence and lock this field in Settings.
 
-Reverse proxies usually limit request bodies too; raise that limit as well, as shown under [Deployment](../guide/deploy#files-domain). Texts are limited to 1 MB, whatever this is set to.
+The admin app sends files over 25,000,000 bytes in independent chunks of at most 25,000,000 bytes. The whole-file limit still applies. Raise it deliberately for larger files; chunking does not raise it automatically. The legacy single-request API remains available and needs a suitable proxy body limit. Text shares remain limited to 1,048,576 bytes.
 
 ## Logging
 
@@ -147,6 +159,8 @@ Default: the system time zone. “Today” and the daily statistics follow it. T
 ### `HTTPS_PROXY` and `HTTP_PROXY`
 
 Outbound proxies for title and icon fetching use the standard library’s `http.ProxyFromEnvironment`, including `NO_PROXY`. Targets still pass through `checkHost`; with a proxy configured, failed local DNS lookups may be left to it, and the proxy itself may be private. Sani does not inspect the address the proxy ultimately connects to. Use a trusted proxy with its own DNS and outbound restrictions; see the [fetching trust boundary](../internals/security#fetching).
+
+Creation defaults are stored in SQLite when edited in Settings. Priority is built-in defaults → saved settings → explicitly set environment variables, per field. No configuration file is required.
 
 ## Configuration errors
 

@@ -21,7 +21,7 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 			e.signIn()
 			for i, value := range []any{last, maxMS, "9999-12-31T23:59:59-01:00", maxMS + 1, int64(math.MaxInt64), int64(math.MinInt64), "not a date"} {
 				slug := fmt.Sprintf("expiry%d", i)
-				body, _ := json.Marshal([]map[string]any{{"url": "https://example.com/", "slug": slug, "expiresAt": value}})
+				body, _ := json.Marshal(map[string]any{"app": "sani", "version": 1, "links": []map[string]any{{"url": "https://example.com/", "slug": slug, "expiresAt": value}}})
 				if format == "csv" {
 					body = []byte(fmt.Sprintf("url,slug,expires_at\nhttps://example.com/,%s,%v\n", slug, value))
 				}

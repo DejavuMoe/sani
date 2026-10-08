@@ -95,3 +95,5 @@ The fetcher checks destination hosts and direct dial addresses for private netwo
 The admin app is written in Svelte 5 and TypeScript and built with Vite, without UI or icon libraries. The build output is precompressed with Brotli and gzip and embedded in the binary with Go’s `embed`, and each browser gets the precompressed version it supports.
 
 Assets with hashed file names are cached for a year; `index.html` is revalidated every time and carries a strict Content Security Policy.
+
+Schema 5 rebuilds the tags table to accept normalized six-digit HEX colors as well as legacy named colors. IDs and link associations are preserved. The settings table also stores creation defaults. Back up before upgrading; v0.8.x cannot open schema 5, so a downgrade requires restoring the pre-upgrade database and files.

@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"math"
 	"net/http"
@@ -23,23 +22,29 @@ import (
 )
 
 func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
+	cfg := s.settings.Load()
 	var files *string
 	if s.opt.FilesURL != "" {
 		files = &s.opt.FilesURL
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"filesUrl":        files,
-		"maxFileSize":     s.opt.MaxFileBytes,
-		"maxTextSize":     links.MaxTextBytes,
-		"version":         s.opt.Version,
-		"baseUrl":         s.baseURL(r),
-		"baseUrlSource":   s.baseSource(),
-		"requestOrigin":   s.requestOrigin(r),
-		"slugLength":      s.opt.SlugLength,
-		"fetchMeta":       s.opt.FetchMeta,
-		"forwardQuery":    s.opt.ForwardQuery,
-		"passwordFromEnv": s.opt.PasswordFromEnv,
-		"timezone":        s.clicks.Location().String(),
+		"filesUrl":            files,
+		"maxFileSize":         cfg.maxFileSize,
+		"excludeConfusable":   cfg.excludeConfusable,
+		"metaMode":            cfg.metaMode,
+		"metaProxyConfigured": s.proxyFetcher != nil,
+		"configSources":       cfg.sources,
+		"uploadChunkSize":     uploadChunkSize,
+		"maxTextSize":         links.MaxTextBytes,
+		"version":             s.opt.Version,
+		"baseUrl":             s.baseURL(r),
+		"baseUrlSource":       s.baseSource(),
+		"requestOrigin":       s.requestOrigin(r),
+		"slugLength":          cfg.slugLength,
+		"fetchMeta":           s.metadataFetcher() != nil,
+		"forwardQuery":        s.opt.ForwardQuery,
+		"passwordFromEnv":     s.opt.PasswordFromEnv,
+		"timezone":            s.clicks.Location().String(),
 	})
 }
 
@@ -61,42 +66,6 @@ func hostname(origin string) string {
 		return ""
 	}
 	return u.Hostname()
-}
-
-func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
-	var in struct {
-		BaseURL nullable[string] `json:"baseUrl"`
-	}
-	if !decodeJSON(w, r, &in) {
-		return
-	}
-	if in.BaseURL.Set {
-		if s.opt.BaseURL != "" {
-			writeError(w, http.StatusConflict, "base_url_env", "the base URL is fixed by SANI_BASE_URL")
-			return
-		}
-		value := ""
-		if !in.BaseURL.Null && strings.TrimSpace(in.BaseURL.Value) != "" {
-			v, ok := normalizeOrigin(in.BaseURL.Value)
-			if !ok || (s.filesHost != "" && hostname(v) == hostname(s.opt.FilesURL)) {
-				writeError(w, http.StatusBadRequest, "base_url_invalid", "use an origin such as https://s.example.com")
-				return
-			}
-			value = v
-		}
-		var err error
-		if value == "" {
-			err = s.store.DeleteSetting(r.Context(), store.SettingBaseURL)
-		} else {
-			err = s.store.SetSetting(r.Context(), store.SettingBaseURL, value)
-		}
-		if err != nil {
-			s.internalError(w, r, err)
-			return
-		}
-		s.storedBase.Store(&value)
-	}
-	s.getConfig(w, r)
 }
 
 type tokenDTO struct {
@@ -297,9 +266,7 @@ type importProblem struct {
 	Reason string `json:"reason"`
 }
 
-// importLinks accepts Sani's own export and the common shapes other
-// shorteners produce: a JSON array (or {"links": [...]}) or a CSV file with a
-// header row. Field names from Shlink, Sink, YOURLS and Kutt are recognized.
+// importLinks accepts only the documented Sani and Shlink CSV/JSON formats.
 func (s *Server) importLinks(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 32<<20))
 	if err != nil {
@@ -334,7 +301,7 @@ func (s *Server) importLinks(w http.ResponseWriter, r *http.Request) {
 		}
 		items = append(items, l)
 	}
-	n := s.opt.SlugLength
+	n := s.settings.Load().slugLength
 	res, err := s.store.ImportLinks(r.Context(), items, func() string { return links.Generate(n + 1) })
 	if tagError(w, err) {
 		return
@@ -354,13 +321,13 @@ func (s *Server) importLinks(w http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	slugFields    = []string{"slug", "shortcode", "short_code", "code", "keyword", "key", "alias", "address", "custom_slug", "customslug"}
-	urlFields     = []string{"url", "longurl", "long_url", "target", "destination", "original_url", "originalurl", "link"}
-	titleFields   = []string{"title", "name", "description"}
-	createdFields = []string{"createdat", "created_at", "datecreated", "date_created", "timestamp", "created"}
-	clicksFields  = []string{"clicks", "visits", "visitscount", "visits_count", "visit_count", "count"}
-	expiresFields = []string{"expiresat", "expires_at", "validuntil", "valid_until", "expiration", "expires"}
-	maxFields     = []string{"maxclicks", "max_clicks", "maxvisits", "max_visits"}
+	slugFields    = []string{"slug", "shortcode"}
+	urlFields     = []string{"url", "longurl"}
+	titleFields   = []string{"title"}
+	createdFields = []string{"createdat", "created_at", "datecreated"}
+	clicksFields  = []string{"clicks", "visits", "visitscount"}
+	expiresFields = []string{"expiresat", "expires_at", "validuntil"}
+	maxFields     = []string{"maxclicks", "max_clicks", "maxvisits"}
 )
 
 func pick(rec map[string]string, keys []string) string {
@@ -494,35 +461,55 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 		d.UseNumber()
 		return d.Decode(&raw)
 	}
+	shlink := false
+	if len(data) == 0 {
+		return nil, errors.New("the file is empty")
+	}
 	if data[0] == '{' {
-		var wrapped map[string]json.RawMessage
+		var wrapped struct {
+			App       string          `json:"app"`
+			Version   int             `json:"version"`
+			Links     json.RawMessage `json:"links"`
+			ShortURLs json.RawMessage `json:"shortUrls"`
+		}
 		if err := json.Unmarshal(data, &wrapped); err != nil {
 			return nil, errors.New("the file is not valid JSON")
 		}
-		found := false
-		for _, key := range []string{"links", "shortUrls", "short_urls", "data", "items", "urls"} {
-			if v, ok := wrapped[key]; ok {
-				// Shlink nests the list: {"shortUrls": {"data": [...]}}.
-				if len(v) > 0 && v[0] == '{' {
-					var inner map[string]json.RawMessage
-					if json.Unmarshal(v, &inner) == nil {
-						if d, ok := inner["data"]; ok {
-							v = d
-						}
-					}
-				}
-				if err := decode(v); err != nil {
-					return nil, fmt.Errorf("%q is not a list of links", key)
-				}
-				found = true
-				break
+		switch {
+		case wrapped.App == "sani" && wrapped.Version == 1:
+			if err := decode(wrapped.Links); err != nil || raw == nil {
+				return nil, errors.New("expected a Sani links array")
+			}
+		case wrapped.App == "" && len(wrapped.ShortURLs) > 0:
+			var inner struct {
+				Data json.RawMessage `json:"data"`
+			}
+			if json.Unmarshal(wrapped.ShortURLs, &inner) != nil {
+				return nil, errors.New("expected Shlink shortUrls.data")
+			}
+			if err := decode(inner.Data); err != nil || raw == nil {
+				return nil, errors.New("expected Shlink shortUrls.data")
+			}
+			shlink = true
+		default:
+			return nil, errors.New("expected a Sani version 1 export or Shlink shortUrls.data")
+		}
+	} else {
+		// Shlink API records can also be saved as their data array.
+		if err := decode(data); err != nil || raw == nil {
+			return nil, errors.New("the file is not a Shlink array")
+		}
+		shlink = true
+	}
+	if shlink {
+		for _, obj := range raw {
+			if _, ok := obj["shortCode"].(string); !ok {
+				return nil, errors.New("Shlink records need shortCode and longUrl")
+			}
+			if _, ok := obj["longUrl"].(string); !ok {
+				return nil, errors.New("Shlink records need shortCode and longUrl")
 			}
 		}
-		if !found {
-			return nil, errors.New(`expected a list of links, or an object with a "links" list`)
-		}
-	} else if err := decode(data); err != nil {
-		return nil, errors.New("the file is not valid JSON")
 	}
 	out := make([]map[string]string, 0, len(raw))
 	for _, obj := range raw {
@@ -583,7 +570,7 @@ func importNumber(n json.Number) string {
 	if _, err := n.Int64(); err == nil {
 		return n.String()
 	}
-	// Keep accepting decimal/exponent notation used by other shorteners.
+	// JSON numbers may use decimal or exponent notation.
 	if f, err := n.Float64(); err == nil {
 		return strconv.FormatFloat(f, 'f', -1, 64)
 	}
@@ -592,8 +579,6 @@ func importNumber(n json.Number) string {
 
 func parseCSVRecords(data []byte) ([]map[string]string, error) {
 	cr := csv.NewReader(bytes.NewReader(data))
-	cr.FieldsPerRecord = -1
-	cr.LazyQuotes = true
 	rows, err := cr.ReadAll()
 	if err != nil {
 		return nil, errors.New("the file is not valid CSV")
@@ -602,20 +587,18 @@ func parseCSVRecords(data []byte) ([]map[string]string, error) {
 		return nil, errors.New("the file is empty")
 	}
 	header := make([]string, len(rows[0]))
-	hasURL := false
+	seen := map[string]bool{}
 	for i, h := range rows[0] {
 		header[i] = normalizeKey(h)
-		for _, f := range urlFields {
-			if header[i] == f {
-				hasURL = true
-			}
+		if seen[header[i]] {
+			return nil, errors.New("the CSV contains duplicate columns")
 		}
+		seen[header[i]] = true
 	}
-	if !hasURL {
-		return nil, errors.New(`the CSV needs a header row with a "url" column`)
+	shlink := seen["shortcode"] && seen["longurl"] && seen["shorturl"] && seen["domain"]
+	if !shlink && !(seen["slug"] && seen["url"]) {
+		return nil, errors.New("expected Sani slug,url or Shlink shortCode,longUrl,shortUrl,domain columns")
 	}
-	shlink := slices.Contains(header, "shortcode") && slices.Contains(header, "longurl") &&
-		slices.Contains(header, "shorturl") && slices.Contains(header, "domain")
 	out := make([]map[string]string, 0, len(rows)-1)
 	for _, row := range rows[1:] {
 		rec := map[string]string{}

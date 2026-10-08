@@ -15,7 +15,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Tags | <span class="sn-status done">Done</span> | Colored tags for links, texts and files; assign during creation or editing, filter by tag or Untagged, and transfer through JSON/CSV, since v0.5.0 |
 | Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own, since v0.3.0 |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
-| Import and export | <span class="sn-status done">Done</span> | Import Sani, Shlink and Sink JSON or compatible CSV; export URL links as Sani JSON or CSV |
+| Import and export | <span class="sn-status done">Done</span> | Import Sani and Shlink CSV/JSON; export URL links as Sani JSON or CSV |
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |
 | Operations | <span class="sn-status done">Done</span> | Online database snapshots, stopped-service database and file backups, password reset, health checks |
 | Documentation | <span class="sn-status done">Done</span> | This site: English and Chinese, checked against the source at build time |

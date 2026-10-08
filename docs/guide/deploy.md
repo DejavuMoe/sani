@@ -28,10 +28,10 @@ docker compose up -d
 
 | 标签 | 指向 |
 |---|---|
-| `v0.8.0` | 对应 Git tag 和 GitHub Release `v0.8.0` 的具体版本 |
-| `v0.8.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
+| `v0.9.0` | 对应 Git tag 和 GitHub Release `v0.9.0` 的具体版本 |
+| `v0.9.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
 
-从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.8.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
+从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.9.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
 
 升级时先[备份](./operations#backup)，再手动将 `compose.yaml` 的 `image:` 改为目标版本的完整标签，随后执行：
 
@@ -104,7 +104,7 @@ docker exec sani /sani healthcheck
 ::: code-group
 
 ```sh [下载]
-base=https://github.com/DejavuMoe/sani/releases/download/v0.8.0
+base=https://github.com/DejavuMoe/sani/releases/download/v0.9.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -119,7 +119,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-下载路径固定到 `v0.8.0`；升级时将路径中的标签改为已发布的目标版本。
+下载路径固定到 `v0.9.0`；升级时将路径中的标签改为已发布的目标版本。
 
 ### 校验来源与签名 {#verify}
 
@@ -127,7 +127,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.8.0 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.0 -R DejavuMoe/sani
 ```
 
 将生成的 `sani.service` 写入 `/etc/systemd/system/` 并启动：
@@ -208,7 +208,7 @@ Traefik、Cloudflare Tunnel 等方案同样满足前述三条原则即可。
 
 1. **DNS 解析**：将文件域名解析指向当前服务器。
 2. **反向代理**：同主域名一样反代并传递请求头。Caddy 仅需在站点列表中追加域名（上述例子为 `example.com, f.example.com {`）；nginx 需在两处 `server_name` 中添加该域名并配置覆盖两者的证书。上方配置生成器填入后会自动适配。
-3. **请求体大小**：文件上传上限受 [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) 限制（另加 1 MB 表单开销）。Caddy 默认无限制；nginx 示例设置 `client_max_body_size 65m`，容纳默认的 64 MB 文件与表单开销。若修改了环境变量限制，反代配置也需同步增加。
+3. **请求体大小**：后台对超过 25 MB 的文件发送多个独立请求，每片最多 25,000,000 字节。nginx 示例 `client_max_body_size 100m` 可容纳 32 MiB 导入及默认 99 MB 单请求上传的表单开销。更大的直接 API 上传需提高反代上限；分片只需容纳单次请求。Cloudflare Free/Pro 的请求上限为 100 MB，zone 可另行调低；分片避免单请求超限，但不改变 Sani 的完整文件上限。参阅 [Cloudflare 413 官方说明](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/4xx-client-error/error-413/)。慢速上传仍可能触发代理超时。
 4. **环境变量**：将 [`SANI_FILES_URL`](../reference/configuration#sani-files-url) 设为 `https://f.example.com` 并重启 Sani。
 
 Sani 要求文件下载使用 **不同的主机名**，以隔离上传内容与管理后台。仅换路径不能隔离浏览器来源；仅换端口也不被接受，因为同主机的不同端口仍共享 Cookie。子域名符合要求，Sani 的管理会话 Cookie 不会发送到子域名。上传仍经由主域名的 API 完成。

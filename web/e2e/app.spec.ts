@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createHash } from 'node:crypto';
 
 // One server and database for the whole file: each test builds on the last,
 // the way an owner actually uses Sani.
@@ -303,12 +304,12 @@ test('tags are created inline, survive refresh and retain the draft after a fail
   await page.locator('#composer-slug').fill('review-tags');
   await page.locator('#create-panel-url .tag-add').click();
   const pop = page.locator('.tag-pop:popover-open');
-  const search = pop.getByRole('textbox');
+  const search = pop.getByRole('textbox', { name: 'Search or create a tag' });
   await search.fill('界'.repeat(25));
   await expect(pop).toContainText('Use up to 24 characters');
   await expect(pop.locator('.tag-create')).toHaveCount(0);
   await search.fill('Review');
-  await pop.getByRole('button', { name: 'Green', exact: true }).click();
+  await pop.getByRole('button', { name: 'Teal', exact: true }).click();
   await search.press('Enter');
   await expect(page.locator('#create-panel-url .tag-selected')).toContainText('Review');
   await search.fill('review');
@@ -329,7 +330,7 @@ test('tags are created inline, survive refresh and retain the draft after a fail
   const row = page.locator('.row', { hasText: '/review-tags' });
   await expect(row.locator('.tags')).toContainText('Review');
   await page.reload();
-  await expect(row.locator('.tags .tag-green')).toBeVisible();
+  await expect(row.locator('.tags .tag-badge')).toHaveAttribute('style', /#56877e/);
   await expect(page.locator('.age, .h-age')).toHaveCount(0);
   await row.locator('button.main').click();
   await expect(row.locator('.meta')).toContainText('Created');
@@ -360,12 +361,12 @@ test('tag editing, filtering and clearing work together', async () => {
   const pop = page.locator('.tag-pop:popover-open');
   await pop.getByRole('checkbox', { name: 'Review', exact: true }).click();
   for (const name of ['One', 'Two', 'Three', 'Four']) {
-    await pop.getByRole('textbox').fill(name);
-    await pop.getByRole('textbox').press('Enter');
+    await pop.getByRole('textbox', {name: 'Search or create a tag'}).fill(name);
+    await pop.getByRole('textbox', {name: 'Search or create a tag'}).press('Enter');
     await expect(page.locator('#create-panel-url .tag-selected .tag-name')).toHaveCount(['One', 'Two', 'Three', 'Four'].indexOf(name) + 2);
   }
   await expect(pop).toContainText('Choose up to 5 tags');
-  await pop.getByRole('textbox').fill('Sixth');
+  await pop.getByRole('textbox', {name: 'Search or create a tag'}).fill('Sixth');
   await expect(pop.locator('.tag-create')).toBeDisabled();
   await pop.getByRole('button', { name: 'Done', exact: true }).click();
   await page.locator('#create-panel-url .go').click();
@@ -390,8 +391,8 @@ test('tags work for text and multipart file uploads on a phone', async () => {
     await panel.locator('.tag-add').click();
     const pop = page.locator('.tag-pop:popover-open');
     await expect.poll(() => pop.evaluate(el => el.getBoundingClientRect().right <= document.documentElement.getBoundingClientRect().right - 8)).toBe(true);
-    await pop.getByRole('textbox').fill('Review');
-    await pop.getByRole('textbox').press('ArrowDown');
+    await pop.getByRole('textbox', {name: 'Search or create a tag'}).fill('Review');
+    await pop.getByRole('textbox', {name: 'Search or create a tag'}).press('ArrowDown');
     await expect(pop.getByRole('checkbox', { name: 'Review', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
     await pop.getByRole('button', { name: 'Done', exact: true }).click();
@@ -562,11 +563,11 @@ test('import validation explains skipped rows in both languages', async () => {
   await page.goto('/admin/settings');
   await page.locator('input[type="file"]').setInputFiles({
     name: 'validation.json', mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify([
+    buffer: Buffer.from(JSON.stringify({ app: 'sani', version: 1, links: [
       { slug: 'import-valid', url: 'https://example.com/imported', title: 'Imported' },
       { slug: 'import-expiry', url: 'https://example.com/', expiresAt: '9999-12-31T23:59:59-01:00' },
       { slug: 'import-tags', url: 'https://example.com/', tags: [{ name: '' }] },
-    ])),
+    ] })),
   });
   const result = page.locator('.import-result');
   await expect(result).toContainText('invalid expiry format or range');
@@ -594,4 +595,102 @@ test('imports the original Shlink CSV shape through Settings', async () => {
     url: 'https://example.com/from-shlink', title: 'Imported from Shlink', clicks: 17,
     tags: [{ name: 'blog', color: 'blue' }, { name: 'work', color: 'blue' }],
   });
+});
+
+
+test('custom tag colors validate, edit existing references and keep Enter inside the popover', async () => {
+  await page.goto('/admin/');
+  const panel = page.getByRole('tabpanel', { name: 'Link', exact: true });
+  await panel.getByRole('button', { name: 'Choose or create tags' }).click();
+  const pop = page.locator('.tag-pop:popover-open');
+  await pop.getByLabel('Search or create a tag').fill('Custom R3');
+  const color = pop.getByLabel('Custom color', { exact: true });
+  await color.fill('rgb(300, 0, 0)');
+  await expect(color).toHaveAttribute('aria-invalid', 'true');
+  await expect(pop.locator('.tag-create')).toBeDisabled();
+  await color.fill('rgb(88, 114, 165)');
+  await color.press('Enter');
+  await expect(pop).toBeVisible();
+  await pop.locator('.tag-create').click();
+  await pop.getByRole('button', { name: 'Edit tag Custom R3' }).click();
+  await pop.getByLabel('Name', { exact: true }).fill('Custom renamed');
+  await pop.getByLabel('Custom color', { exact: true }).fill('hsl(120, 20%, 40%)');
+  await pop.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(pop.getByRole('button', { name: 'Edit tag Custom renamed' })).toBeFocused();
+  const tags = await (await page.request.get('/api/tags')).json();
+  expect(tags.items.find((tag: {name:string}) => tag.name === 'Custom renamed').color).toBe('#527a52');
+  await pop.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(panel.locator('.tag-selected')).toContainText('Custom renamed');
+});
+
+test('creation defaults persist and environment metadata stays locked', async () => {
+  await page.goto('/admin/settings');
+  await page.getByLabel('Generated slug length').fill('7');
+  await page.getByLabel('Maximum file size', { exact: true }).fill('200');
+  await page.locator('section', {has:page.getByRole('heading', {name:'Creation defaults'})}).getByRole('button', {name:'Save',exact:true}).click();
+  await expect(page.locator('.saved').first()).toContainText('Saved');
+  await page.reload();
+  await expect(page.getByLabel('Generated slug length')).toHaveValue('7');
+  await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
+  await expect(page.locator('#metadata-mode')).toBeDisabled();
+  const created = await page.request.post('/api/links', {data:{url:'https://example.com/r3-settings'}});
+  expect((await created.json()).slug).toHaveLength(7);
+  for (const format of ['csv', 'json']) {
+    const sample = await page.request.get(`/admin/examples/sani.${format}`);
+    expect(sample.ok()).toBe(true);
+    expect(await sample.text()).toContain('example.com');
+  }
+});
+
+test('large file retries the failed chunk without resending confirmed bytes', async () => {
+  test.setTimeout(60000);
+  await page.goto('/admin/');
+  await page.getByRole('tab', {name:'File',exact:true}).click();
+  const panel = page.getByRole('tabpanel', {name:'File',exact:true});
+  const bytes = Buffer.alloc(26_000_000, 37);
+  const offsets:number[] = [];
+  let fail = true;
+  await page.route('**/api/uploads/*', route => {
+    if (route.request().method() !== 'PUT') return route.continue();
+    const offset = Number(route.request().headers()['upload-offset']);
+    offsets.push(offset);
+    if (offset === 25_000_000 && fail) { fail = false; return route.abort('failed'); }
+    return route.continue();
+  });
+  try {
+    await panel.locator('input[type=file]').setInputFiles({name:'large-r3.bin',mimeType:'application/octet-stream',buffer:bytes});
+    await panel.getByRole('button', {name:'Share',exact:true}).click();
+    await expect(panel.getByRole('button', {name:'Retry upload'})).toBeVisible();
+    const completed = page.waitForResponse(r => r.url().endsWith('/complete') && r.request().method() === 'POST');
+    await panel.getByRole('button', {name:'Retry upload'}).click();
+    await expect(page.locator('.toast').last()).toContainText('Copied');
+    expect(offsets).toEqual([0,25_000_000,25_000_000]);
+    const link = await (await completed).json();
+    expect(link).toBeTruthy();
+    const file = await page.request.get(`http://localhost:${new URL(page.url()).port}/${link.slug}/large-r3.bin`, {headers:{'User-Agent':'Mozilla/5.0'}});
+    expect(file.status()).toBe(200);
+    const downloaded = await file.body();
+    expect(downloaded.length).toBe(bytes.length);
+    expect(createHash('sha256').update(downloaded).digest('hex')).toBe(createHash('sha256').update(bytes).digest('hex'));
+  } finally { await page.unroute('**/api/uploads/*'); }
+});
+
+test('tabs and settings keep horizontal geometry at desktop and narrow widths', async () => {
+  for (const width of [1280,390,320]) {
+    await page.setViewportSize({width,height:860});
+    await page.goto('/admin/');
+    let left:number|undefined;
+    for (const name of ['Link','Text','File','Link']) {
+      const tab = page.getByRole('tab', {name,exact:true});
+      await tab.click();
+      const x = (await page.getByRole('tablist').boundingBox())!.x;
+      if (left !== undefined) expect(Math.abs(x-left)).toBeLessThanOrEqual(1);
+      left=x;
+      expect(await page.evaluate(() => document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+      await expect(page.locator('[role=tabpanel][hidden]')).toHaveCount(2);
+    }
+    await page.goto('/admin/settings');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+  }
+  await page.setViewportSize({width:1280,height:860});
 });

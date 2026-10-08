@@ -410,7 +410,7 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case l.Title != "":
 		l.Meta = store.MetaManual
-	case !s.opt.FetchMeta:
+	case s.metadataFetcher() == nil:
 		l.Meta = store.MetaFailed
 	}
 
@@ -426,12 +426,13 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 // createGenerated inserts l under a fresh random slug, growing the slug when
 // the space at the configured length gets crowded.
 func (s *Server) createGenerated(r *http.Request, l *store.Link) error {
-	n := s.opt.SlugLength
+	cfg := s.settings.Load()
+	n := cfg.slugLength
 	if l.Kind != store.KindURL {
 		n = max(n, sharedSlugLength)
 	}
 	for attempt := 0; ; attempt++ {
-		l.Slug = links.Generate(n)
+		l.Slug = links.GenerateWithAlphabet(n, cfg.excludeConfusable || l.Kind != store.KindURL)
 		if links.IsReserved(l.Slug) {
 			continue
 		}
@@ -498,7 +499,7 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p.FetchMeta = s.opt.FetchMeta
+	p.FetchMeta = s.metadataFetcher() != nil
 	before, after, err := s.store.UpdateLink(r.Context(), id, *p, now)
 	if tagError(w, err) {
 		return
@@ -635,11 +636,16 @@ func (s *Server) refreshLink(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "kind_mismatch", "texts and files have no page to fetch a title from")
 		return
 	}
+	fetcher := s.metadataFetcher()
+	if fetcher == nil {
+		writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
+		return
+	}
 	if _, l, err = s.store.UpdateLink(r.Context(), id, store.Patch{RefreshMeta: true}, 0); err != nil {
 		s.internalError(w, r, err)
 		return
 	}
-	s.fetchMeta(r.Context(), l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"), true)
+	s.fetchMetaUsing(r.Context(), fetcher, l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"), true)
 	if l, err = s.store.GetLink(r.Context(), id); err != nil {
 		s.internalError(w, r, err)
 		return

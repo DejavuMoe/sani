@@ -98,7 +98,7 @@ func TestTagExportImport(t *testing.T) {
 		t.Run(format, func(t *testing.T) {
 			source := newEnv(t, Options{})
 			source.signIn()
-			tag := source.req("POST", "/api/tags", `{"name":"发布,一组","color":"green"}`).json()["id"]
+			tag := source.req("POST", "/api/tags", `{"name":"发布,一组","color":"#5872a5"}`).json()["id"]
 			source.create(map[string]any{"url": "https://example.com/portable", "slug": "portable", "tags": []any{tag}})
 			exported := source.req("GET", "/api/export?format="+format, nil)
 			target := newEnv(t, Options{})
@@ -112,11 +112,11 @@ func TestTagExportImport(t *testing.T) {
 			ids := links[0].(map[string]any)["tags"].([]any)
 			catalog := target.req("GET", "/api/tags", nil).json()["items"].([]any)
 			got := catalog[1].(map[string]any)
-			if len(ids) != 1 || ids[0] != got["id"] || got["name"] != "发布,一组" || got["color"] != "green" || got["count"] != float64(1) {
+			if len(ids) != 1 || ids[0] != got["id"] || got["name"] != "发布,一组" || got["color"] != "#5872a5" || got["count"] != float64(1) {
 				t.Fatalf("import tags: %v %v", ids, catalog)
 			}
 			// Older exports without tags are still accepted.
-			r = target.req("POST", "/api/import", `[{"slug":"legacy","url":"https://example.com/old"},{"slug":"foreign","url":"https://example.com/foreign","tags":["team"]}]`)
+			r = target.req("POST", "/api/import", `{"app":"sani","version":1,"links":[{"slug":"legacy","url":"https://example.com/old"},{"slug":"foreign","url":"https://example.com/foreign","tags":["team"]}]}`)
 			if r.json()["created"] != float64(2) {
 				t.Fatal(string(r.body))
 			}

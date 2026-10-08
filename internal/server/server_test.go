@@ -585,7 +585,7 @@ func TestImportExport(t *testing.T) {
 	e.signIn()
 	e.create(map[string]any{"url": "https://taken.example", "slug": "taken"})
 
-	csv := "Short Code,Long URL,Title,Visits\nblog,https://blog.example,My blog,12\ntaken,https://x.example,,\n,https://noslug.example,,\nbad,javascript:alert(1),,\n"
+	csv := "slug,url,title,clicks\nblog,https://blog.example,My blog,12\ntaken,https://x.example,,\n,https://noslug.example,,\nbad,javascript:alert(1),,\n"
 	r := e.req("POST", "/api/import", csv, "Content-Type", "text/csv")
 	m := r.json()
 	if m["created"] != float64(2) || len(m["skipped"].([]any)) != 2 {

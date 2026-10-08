@@ -112,9 +112,9 @@ func TestCSVLegacyApostrophesAreData(t *testing.T) {
 
 func TestJSONImportIntegerPrecision(t *testing.T) {
 	for _, data := range []string{
-		`[{"clicks":9223372036854775807,"maxClicks":9007199254740993}]`,
-		`{"links":[{"clicks":9223372036854775807,"maxClicks":9007199254740993}]}`,
-		`{"shortUrls":{"data":[{"visitsSummary":{"total":9223372036854775807},"meta":{"maxVisits":9007199254740993}}]}}`,
+		`{"app":"sani","version":1,"links":[{"clicks":9223372036854775807,"maxClicks":9007199254740993}]}`,
+		`[{"shortCode":"precision","longUrl":"https://example.com","visits":9223372036854775807,"maxVisits":9007199254740993}]`,
+		`{"shortUrls":{"data":[{"shortCode":"precision","longUrl":"https://example.com","visitsSummary":{"total":9223372036854775807},"meta":{"maxVisits":9007199254740993}}]}}`,
 	} {
 		records, err := parseJSONRecords([]byte(data))
 		if err != nil || len(records) != 1 {
@@ -124,7 +124,7 @@ func TestJSONImportIntegerPrecision(t *testing.T) {
 			t.Fatalf("rounded JSON integers: %v", records[0])
 		}
 	}
-	records, err := parseJSONRecords([]byte(`[{"clicks":1e3,"maxClicks":1001.0}]`))
+	records, err := parseJSONRecords([]byte(`{"app":"sani","version":1,"links":[{"clicks":1e3,"maxClicks":1001.0}]}`))
 	if err != nil || len(records) != 1 || records[0]["clicks"] != "1000" || records[0]["maxclicks"] != "1001" {
 		t.Fatalf("decimal/exponent compatibility: %v, %v", records, err)
 	}
@@ -137,8 +137,8 @@ func TestImportedExtremeClicksRemainUsable(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
 	for i, body := range []string{
-		`[{"slug":"extreme","url":"https://example.com/extreme","clicks":9223372036854775807}]`,
-		`[{"slug":"second","url":"https://example.com/second","clicks":"9223372036854775807"}]`,
+		`{"app":"sani","version":1,"links":[{"slug":"extreme","url":"https://example.com/extreme","clicks":9223372036854775807}]}`,
+		`{"app":"sani","version":1,"links":[{"slug":"second","url":"https://example.com/second","clicks":"9223372036854775807"}]}`,
 		"slug,url,clicks\nthird,https://example.com/third,9007199254740993\n",
 	} {
 		r := e.req("POST", "/api/import", body)

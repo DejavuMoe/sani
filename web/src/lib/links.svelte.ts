@@ -12,6 +12,7 @@ import {
   type Tag,
   type TagColor,
   type TagFilter,
+  type UploadResume,
 } from './api';
 import { errorText, t } from './i18n.svelte';
 import { toasts } from './toast.svelte';
@@ -53,6 +54,13 @@ class LinksStore {
     const tag = await api.createTag(name, color);
     ++this.tagSeq; // an older catalog request must not hide a just-created tag
     if (!this.tags.some(t => t.id === tag.id)) this.tags = [...this.tags, tag];
+    return tag;
+  }
+
+  async editTag(id: number, name: string, color: TagColor) {
+    const tag = await api.updateTag(id, name, color);
+    ++this.tagSeq;
+    this.tags = this.tags.map(t => t.id === id ? tag : t);
     return tag;
   }
 
@@ -265,8 +273,9 @@ class LinksStore {
     fields: FileFields,
     onProgress?: (sent: number, total: number) => void,
     signal?: AbortSignal,
+    resume?: UploadResume,
   ): Promise<Link> {
-    const link = await api.uploadFile(file, fields, onProgress, signal);
+    const link = await api.uploadFile(file, fields, onProgress, signal, resume);
     this.added(link);
     return link;
   }

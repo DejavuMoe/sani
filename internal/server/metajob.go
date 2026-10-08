@@ -18,7 +18,10 @@ const (
 // fetchMetaLater fetches a link's title and icon in the background, a few
 // at a time so a large batch cannot flood outbound connections.
 func (s *Server) fetchMetaLater(id int64, url, host, lang string) {
-	if !s.opt.FetchMeta {
+	if s.metadataFetcher() == nil {
+		if err := s.store.SetFetchedMeta(s.ctx, id, url, "", store.MetaFailed); err != nil {
+			s.log.Warn("store metadata state", "err", err)
+		}
 		return
 	}
 	s.jobs.Add(1)
@@ -35,10 +38,22 @@ func (s *Server) fetchMetaLater(id int64, url, host, lang string) {
 }
 
 func (s *Server) fetchMeta(ctx context.Context, id int64, url, host, lang string, forceIcon bool) {
+	fetcher := s.metadataFetcher()
+	if fetcher == nil {
+		// A queued fetch disabled before it starts must not remain pending.
+		if err := s.store.SetFetchedMeta(context.WithoutCancel(ctx), id, url, "", store.MetaFailed); err != nil {
+			s.log.Warn("store metadata state", "err", err)
+		}
+		return
+	}
+	s.fetchMetaUsing(ctx, fetcher, id, url, host, lang, forceIcon)
+}
+
+func (s *Server) fetchMetaUsing(ctx context.Context, fetcher *meta.Fetcher, id int64, url, host, lang string, forceIcon bool) {
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
-	page, err := s.fetcher.Page(ctx, url, lang)
+	page, err := fetcher.Page(ctx, url, lang)
 	state, title := store.MetaFailed, ""
 	var icons []string
 	if err != nil {
@@ -75,7 +90,11 @@ func (s *Server) fetchIcon(ctx context.Context, host string, candidates []string
 		if i == 4 {
 			break
 		}
-		ct, data, err := s.fetcher.Icon(ctx, c)
+		fetcher := s.metadataFetcher()
+		if fetcher == nil {
+			return
+		}
+		ct, data, err := fetcher.Icon(ctx, c)
 		if err != nil {
 			s.log.Debug("fetch icon", "url", c, "err", err)
 			continue

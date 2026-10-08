@@ -55,7 +55,7 @@ func TestFilesURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.FilesURL != "https://f.example.com" || c.MaxFileMB != 64 {
+	if c.FilesURL != "https://f.example.com" || c.MaxFileBytes != 99_000_000 || !c.ExcludeConfusable {
 		t.Fatalf("files = %q, %d MB", c.FilesURL, c.MaxFileMB)
 	}
 
@@ -83,5 +83,18 @@ func TestInvalidValuesAreReportedTogether(t *testing.T) {
 		if !strings.Contains(err.Error(), want) {
 			t.Errorf("error does not mention %s:\n%v", want, err)
 		}
+	}
+}
+
+func TestExplicitFileLimitKeepsMiB(t *testing.T) {
+	t.Setenv("SANI_MAX_FILE_MB", "99")
+	c, err := Load()
+	if err != nil || c.MaxFileBytes != 99<<20 || !c.MaxFileFromEnv {
+		t.Fatalf("explicit MiB: %d, %v", c.MaxFileBytes, err)
+	}
+	t.Setenv("SANI_MAX_FILE_MB", "")
+	c, err = Load()
+	if err != nil || c.MaxFileBytes != 99_000_000 || c.MaxFileFromEnv {
+		t.Fatalf("unset MB: %d, %v", c.MaxFileBytes, err)
 	}
 }

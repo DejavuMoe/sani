@@ -127,8 +127,15 @@ func checkSyntax(slug string) error {
 
 // Generate returns a random slug of n characters from the unambiguous
 // alphabet. Rejection sampling keeps every character equally likely.
-func Generate(n int) string {
-	const limit = 256 - 256%len(alphabet)
+func Generate(n int) string { return GenerateWithAlphabet(n, true) }
+
+// GenerateWithAlphabet uses rejection sampling with the selected character set.
+func GenerateWithAlphabet(n int, excludeConfusable bool) string {
+	alphabet := alphabet
+	if !excludeConfusable {
+		alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+	}
+	limit := 256 - 256%len(alphabet)
 	out := make([]byte, 0, n)
 	buf := make([]byte, n+8)
 	for len(out) < n {

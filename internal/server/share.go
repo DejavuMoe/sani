@@ -203,7 +203,7 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 	}
 	s.filesMu.RLock()
 	defer s.filesMu.RUnlock()
-	limit := s.opt.MaxFileBytes
+	limit := s.settings.Load().maxFileSize
 	rc := http.NewResponseController(w)
 	rc.SetReadDeadline(time.Now().Add(transferTime(limit)))
 	rc.SetWriteDeadline(time.Now().Add(transferTime(limit)))
@@ -220,7 +220,7 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 			os.Remove(filepath.Join(s.opt.FilesDir, up.file))
 		}
 	}()
-	tooLargeMsg := fmt.Sprintf("files are limited to %d MB", limit>>20)
+	tooLargeMsg := fmt.Sprintf("files are limited to %d bytes", limit)
 	fields := map[string]string{}
 	for {
 		part, err := mr.NextPart()

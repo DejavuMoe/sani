@@ -30,6 +30,7 @@ func (s *Server) routes() http.Handler {
 	mux.Handle("GET /api/overview", a(s.overview))
 	mux.Handle("GET /api/tags", a(s.listTags))
 	mux.Handle("POST /api/tags", a(s.createTag))
+	mux.Handle("PATCH /api/tags/{id}", a(s.updateTag))
 
 	mux.Handle("GET /api/links", a(s.listLinks))
 	mux.Handle("POST /api/links", a(s.createLink))
@@ -43,6 +44,10 @@ func (s *Server) routes() http.Handler {
 	mux.Handle("GET /api/links/{id}/text", a(s.linkText))
 	mux.Handle("POST /api/texts", a(s.createText))
 	mux.Handle("POST /api/files", a(s.createFile))
+	mux.Handle("POST /api/uploads", a(s.beginUpload))
+	mux.Handle("PUT /api/uploads/{id}", a(s.uploadChunk))
+	mux.Handle("POST /api/uploads/{id}/complete", a(s.completeUpload))
+	mux.Handle("DELETE /api/uploads/{id}", a(s.cancelUpload))
 	mux.Handle("GET /api/slugs/{slug}", a(s.checkSlug))
 
 	mux.Handle("GET /api/tokens", a(s.listTokens))

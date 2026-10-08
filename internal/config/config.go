@@ -13,21 +13,28 @@ import (
 )
 
 type Config struct {
-	Listen       string
-	DataDir      string
-	BaseURL      string
-	Password     string
-	SetupCode    string
-	RootRedirect string
-	TrustProxy   bool
-	SlugLength   int
-	FetchMeta    bool
-	ForwardQuery bool
-	CacheSize    int
-	FilesURL     string // origin that serves shared files and raw text; "" turns file sharing off
-	MaxFileMB    int
-	LogLevel     slog.Level
-	LogJSON      bool
+	Listen                   string
+	DataDir                  string
+	BaseURL                  string
+	Password                 string
+	SetupCode                string
+	RootRedirect             string
+	TrustProxy               bool
+	SlugLength               int
+	FetchMeta                bool
+	ForwardQuery             bool
+	CacheSize                int
+	FilesURL                 string // origin that serves shared files and raw text; "" turns file sharing off
+	MaxFileMB                int
+	MaxFileBytes             int64
+	MetaProxy                string
+	ExcludeConfusable        bool
+	SlugLengthFromEnv        bool
+	ExcludeConfusableFromEnv bool
+	MaxFileFromEnv           bool
+	FetchMetaFromEnv         bool
+	LogLevel                 slog.Level
+	LogJSON                  bool
 }
 
 func env(key, def string) string {
@@ -119,7 +126,7 @@ func Load() (*Config, error) {
 			c.FilesURL = o
 		}
 	}
-	c.MaxFileMB, err = envInt("SANI_MAX_FILE_MB", 64, 1, 4096)
+	c.MaxFileMB, err = envInt("SANI_MAX_FILE_MB", 99, 1, 4096)
 	collect(err)
 	if c.RootRedirect != "" {
 		u, e := url.Parse(c.RootRedirect)
@@ -140,6 +147,17 @@ func Load() (*Config, error) {
 	collect(err)
 	c.SlugLength, err = envInt("SANI_SLUG_LENGTH", 5, 3, 32)
 	collect(err)
+	c.SlugLengthFromEnv = env("SANI_SLUG_LENGTH", "") != ""
+	c.ExcludeConfusableFromEnv = env("SANI_EXCLUDE_CONFUSABLE", "") != ""
+	c.MaxFileFromEnv = env("SANI_MAX_FILE_MB", "") != ""
+	c.FetchMetaFromEnv = env("SANI_FETCH_META", "") != ""
+	c.ExcludeConfusable, err = envBool("SANI_EXCLUDE_CONFUSABLE", true)
+	collect(err)
+	c.MaxFileBytes = 99_000_000
+	if c.MaxFileFromEnv {
+		c.MaxFileBytes = int64(c.MaxFileMB) << 20
+	}
+	c.MetaProxy = env("SANI_META_PROXY", "")
 	c.CacheSize, err = envInt("SANI_CACHE_SIZE", 100_000, 64, 100_000_000)
 	collect(err)
 

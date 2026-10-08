@@ -39,7 +39,7 @@ func TestTagsMigrationAndTransactions(t *testing.T) {
 	}
 	defer func() { s.Close() }()
 	var version int
-	if err := s.r.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 4 {
+	if err := s.r.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != len(migrations) {
 		t.Fatalf("schema %d: %v", version, err)
 	}
 	l, err := s.GetLink(ctx, 42)

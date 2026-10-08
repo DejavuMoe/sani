@@ -30,6 +30,11 @@ curl https://s.example.com/api/links \
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/api/links` | [List links](#list) |
+| `PATCH` | `/api/tags/{id}` | [Edit a tag](#tags) |
+| `POST` | `/api/uploads` | [Start a chunked upload](#chunk-upload) |
+| `PUT` | `/api/uploads/{id}` | [Upload a chunk](#chunk-upload) |
+| `POST` | `/api/uploads/{id}/complete` | [Complete an upload](#chunk-upload) |
+| `DELETE` | `/api/uploads/{id}` | [Cancel an upload](#chunk-upload) |
 | `GET` | `/api/tags` | [Tag catalog and counts](#tags) |
 | `POST` | `/api/tags` | [Create or get a tag](#tags) |
 | `POST` | `/api/links` | [Create a link](#create) |
@@ -70,9 +75,13 @@ Returns `{"items":[{"id":1,"name":"work","color":"blue","count":3}],"total":8,"u
 
 `POST /api/tags`
 
-Send `{"name":"work","color":"blue"}`; returns `200` and a tag object. Names are trimmed and NFC-normalized, with 1–24 Unicode code points and no control characters. Lowercase names identify duplicates: an existing tag is returned without changing its name or color. Color defaults to `blue`; allowed values are `blue`, `green`, `amber`, `rose`, `neutral`. The body limit is 4 KB and each instance holds at most 1,000 tags.
+Send `{"name":"work","color":"blue"}`; returns `200` and a tag object. Names are trimmed and NFC-normalized, with 1–24 Unicode code points and no control characters. Lowercase names identify duplicates: an existing tag is returned without changing its name or color. Color defaults to `blue`; allowed values are `blue`, `green`, `amber`, `rose`, `neutral` or six-digit HEX such as `#5872a5`. The body limit is 4 KB and each instance holds at most 1,000 tags.
 
 Tags appear only in authenticated administration APIs and screens, never on visitor share pages.
+
+`PATCH /api/tags/{id}`
+
+Send both `name` and `color` to rename/recolor an existing tag; returns `200` with the updated tag. All assignments retain the same ID. A conflicting normalized name returns `409 tag_taken`, a missing ID `404`. Creation and editing accept legacy named colors or six-digit HEX (`#5872a5`), normalized to lowercase. The admin UI converts HEX3, RGB and HSL to HEX6; the API does not accept arbitrary CSS.
 
 ### The link object {#link-object}
 
@@ -310,7 +319,7 @@ curl https://s.example.com/api/files \
   -F file=@report.pdf -F maxClicks=10
 ```
 
-- The file must not be empty and is limited by [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb). It’s written to disk as it arrives, never held in memory.
+- The file must not be empty and is limited by Settings or an explicit [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb). It’s written to disk as it arrives, never held in memory.
 - The file name is kept, without its path, control characters or invisible direction marks.
 - Sharing files needs a files domain; without one this answers `409 files_disabled`.
 
@@ -368,13 +377,35 @@ curl https://s.example.com/api/import \
 
 Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds and is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch, exceeds UTC years 0000–9999 or overflows during unit conversion skips the row with `expires_invalid`. Empty values and `0` mean never; valid past expiry dates are preserved.
 
+### Chunked uploads {#chunk-upload}
+
+All four endpoints require authentication and the same origin checks as the other API routes. The admin app uses this flow for files over 25,000,000 bytes; smaller files still use `POST /api/files`.
+
+`POST /api/uploads`
+
+Send JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`; link options `title`, `tags`, `expiresAt`, `maxClicks` and `enabled` are optional. Body limit: 16 KiB. Returns `201` with `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`. The complete size must fit the effective `maxFileSize`. Sessions belong to the exact authenticated session/token credential, not a reusable token ID.
+
+`PUT /api/uploads/{id}`
+
+Send raw bytes with `Content-Length` from 1 to 25,000,000 and `Upload-Offset` equal to the last acknowledged byte offset. Returns `200` with `{ "offset":25000000 }`. Upload serially. Retrying the most recent chunk is idempotent only when its length and SHA-256 match. Wrong offsets or different duplicate bytes return `409 upload_offset`; failed/short transfers do not advance the offset. No whole-file buffering is used.
+
+`POST /api/uploads/{id}/complete`
+
+After every byte is acknowledged, complete with an empty body. The server verifies the stored size, calculates SHA-256 and publishes one share atomically. Returns `201` with the link; retrying a retained completion receipt returns `200` with the same link. Incomplete uploads return `409 upload_incomplete`. No share is visible before completion. Validation/storage errors leave the pending upload retryable where storage permits.
+
+`DELETE /api/uploads/{id}`
+
+Cancels a pending upload, removes its temporary bytes and returns `204`. Removing a completed receipt never deletes its share. A foreign/expired/missing session returns `404 upload_not_found`; concurrent operations return `409 upload_busy`.
+
+Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserved file sizes; admission over budget returns `429 upload_limit`. Up to 32 recent completion receipts are retained, with the oldest completed one evicted when needed. Inactive sessions expire after one hour and are cleaned by minute maintenance; startup removes abandoned chunk files. Current-page retries are supported; reload/restart resume is not. A lost cancellation request is eventually reclaimed by the expiry sweep. Only complete shares enter normal backup and retention behavior.
+
 ## Settings {#config}
 
 `GET /api/config`
 
 ```json
 {
-  "version": "v0.3.0",
+  "version": "v0.9.0",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
@@ -384,7 +415,12 @@ Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds
   "passwordFromEnv": false,
   "timezone": "Europe/Berlin",
   "filesUrl": "https://f.example.com",
-  "maxFileSize": 67108864,
+  "maxFileSize": 99000000,
+  "excludeConfusable": true,
+  "metaMode": "direct",
+  "metaProxyConfigured": false,
+  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default"},
+  "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
 ```
@@ -400,6 +436,8 @@ Changes the short domain stored in Settings:
 ```
 
 `null` or an empty string clears it. The files domain can’t be the short domain too. Returns `409` when `SANI_BASE_URL` is set, and the updated settings on success.
+
+The creation fields `slugLength` (integer 3–32), `excludeConfusable` (boolean), `maxFileSize` (integer decimal MB expressed in bytes: 1,000,000–4,096,000,000, multiple of 1,000,000) and `metaMode` (`off`, `direct`, `proxy`) can also be patched. Omitted/null creation fields are unchanged. All supplied settings, including the base URL, validate and commit together. Effective values come from defaults → saved settings → explicit environment variables; `configSources` gives `default`, `settings` or `env` for each creation field. An environment-locked patch returns `409 config_env`. Invalid values return `400 config_invalid`. Proxy mode requires `SANI_META_PROXY`, otherwise `409 proxy_missing`. `metaProxyConfigured` is a boolean; credentials and the proxy URL are never returned. A legacy inherited process proxy is reported as `metaMode: "environment"`; it is not an accepted patch value. `fetchMeta` reports whether a fetcher is currently available. When fetching is off or a saved proxy mode has no configured proxy, refresh preserves existing metadata without a network request. The request limit is 4 KiB.
 
 ## API tokens {#tokens}
 
@@ -527,7 +565,16 @@ Returns `200` with `ok`, for health checks.
 | `files_disabled` | 409 | No files domain is set, so files can’t be shared |
 | `too_large` | 413 | The request body is over its [limit](#conventions), such as an import file over 32 MB |
 | `text_too_large` | 413 | The text is over 1 MB |
-| `file_too_large` | 413 | The file is over the limit set by `SANI_MAX_FILE_MB` |
+| `config_env` | 409 | Setting fixed by environment |
+| `config_invalid` | 400 | Invalid creation settings |
+| `proxy_missing` | 409 | Dedicated proxy is not configured |
+| `tag_taken` | 409 | Tag name already exists |
+| `upload_limit` | 429 | Pending upload quota exceeded |
+| `upload_not_found` | 404 | Upload unavailable or expired |
+| `upload_busy` | 409 | Upload has an operation in progress |
+| `upload_offset` | 409 | Unexpected offset or different duplicate chunk |
+| `upload_incomplete` | 409 | File has not finished uploading |
+| `file_too_large` | 413 | The file exceeds the effective configured limit |
 | `rate_limited` | 429 | Too many failures; wait for `Retry-After` |
 | `internal` | 500 | Something failed on the server; its log has the details |
 | `tags_invalid` | 400 | Invalid tag name, color, ID array or filter |

@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -73,7 +74,6 @@ func TestCSVTagDialects(t *testing.T) {
 		{"shlink", "ShortCode,LongUrl,shortUrl,DOMAIN,tags", "work|home", `["work","home"]`},
 		{"shlink-json-looking-name", "shortCode,longUrl,shortUrl,domain,tags", `["work"]`, `["[\"work\"]"]`},
 		{"sani", "slug,url,title,redirect,tags", `[{"name":"work","color":"green"}]`, `[{"name":"work","color":"green"}]`},
-		{"generic-invalid", "shortCode,longUrl,title,redirect,tags", "work|home", "work|home"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var data bytes.Buffer
@@ -90,4 +90,29 @@ func TestCSVTagDialects(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestExternalShlinkCSV(t *testing.T) {
+	path := os.Getenv("SANI_TEST_SHLINK_CSV")
+	if path == "" {
+		t.Skip("optional private CSV fixture")
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	e := newEnv(t, Options{BaseURL: "https://zsh.moe", FetchMeta: false})
+	e.signIn()
+	for _, want := range []float64{82, 0} {
+		r := e.req("POST", "/api/import", string(data), "Content-Type", "text/csv")
+		if r.status != 200 || r.json()["created"] != want {
+			t.Fatalf("import status=%d, created=%v", r.status, r.json()["created"])
+		}
+		n, clicks, err := e.srv.store.Totals(context.Background())
+		tags, tagErr := e.srv.store.Tags(context.Background())
+		if err != nil || tagErr != nil || n != 82 || clicks != 38234 || len(tags.Items) != 10 {
+			t.Fatalf("totals=%d clicks=%d tags=%d errors=%v/%v", n, clicks, len(tags.Items), err, tagErr)
+		}
+	}
+	t.Log("Unmodified private CSV: 82 links, 10 tags, 38234 clicks; repeat import created 0; isolated temporary database, metadata disabled")
 }

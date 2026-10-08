@@ -191,3 +191,15 @@ func TestFileName(t *testing.T) {
 		t.Errorf("long name = %q (%d bytes)", long, len(long))
 	}
 }
+
+func TestGenerateFullAlphabet(t *testing.T) {
+	slug := GenerateWithAlphabet(4096, false)
+	if len(slug) != 4096 || !strings.ContainsAny(slug, "01ilo") {
+		t.Fatal("full alphabet was not used")
+	}
+	for _, ch := range slug {
+		if !strings.ContainsRune("0123456789abcdefghijklmnopqrstuvwxyz", ch) {
+			t.Fatalf("unexpected character %q", ch)
+		}
+	}
+}

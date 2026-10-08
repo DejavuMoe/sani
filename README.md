@@ -20,8 +20,8 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 - **Simple statistics.** Total and daily clicks, top referrers, last visit. Clicks from crawlers, link previews, prefetches and your own dashboard are not counted.
 - **Tags for organization.** Assign colored tags to links, texts and files while creating or editing them, then filter by a tag or find untagged items. Tags stay private to the administrator.
 - **Per-link controls.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. You can edit the destination and the change applies immediately.
-- **Texts and files, too.** Share a note up to 1 MB, a config snippet (monospace, with line numbers) or a file up to 64 MB by default at `/p/…`, with the same expiry, visit limit and statistics. File uploads and raw downloads require a separate files hostname.
-- **Works with what you use.** A bookmarklet, the Android share sheet (install it as an app), API tokens for scripts and Shortcuts, and import from Shlink, Sink, YOURLS or CSV.
+- **Texts and files, too.** Share a note up to 1 MB, a config snippet (monospace, with line numbers) or a file up to 99 MB by default at `/p/…`, with the same expiry, visit limit and statistics. File uploads and raw downloads require a separate files hostname.
+- **Works with what you use.** A bookmarklet, the Android share sheet (install it as an app), API tokens for scripts and Shortcuts, and import from Shlink or Sani CSV/JSON.
 - **Unicode slugs.** `s.example.com/简历` works. Slugs match case-insensitively.
 - **Chinese and English**, with light and dark themes, on desktop and mobile.
 
@@ -47,14 +47,14 @@ Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first vis
 
 The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
-The template pins `v0.8.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
+The template pins `v0.9.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.8.0/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -73,12 +73,14 @@ Everything is set through environment variables. See [.env.example](.env.example
 | `SANI_SETUP_CODE` | random | The code the first visit asks for. By default a new one is generated at each start, until a password exists, and printed to the log. |
 | `SANI_ROOT_REDIRECT` | — | Where the bare domain `/` goes. Defaults to the admin app. |
 | `SANI_TRUST_PROXY` | `false` | Honor `X-Forwarded-*` and `X-Real-IP`; the client address is the last `X-Forwarded-For` entry. Enable only behind a proxy that sets them. |
-| `SANI_SLUG_LENGTH` | `5` | Length of generated slugs. They use `23456789abcdefghjkmnpqrstuvwxyz`, with no 0/o or 1/l/i, so they survive being read aloud. |
+| `SANI_SLUG_LENGTH` | `5` | Length of generated slugs. By default they use `23456789abcdefghjkmnpqrstuvwxyz`, with no 0/o or 1/l/i, so they survive being read aloud. |
+| `SANI_EXCLUDE_CONFUSABLE` | `true` | Exclude 0/o and 1/i/l from generated URL slugs. |
+| `SANI_META_PROXY` | — | Optional HTTP/HTTPS/SOCKS5 metadata proxy; credentials stay on the server. |
 | `SANI_FETCH_META` | `true` | Fetch the page title and icon for new links. Private and loopback addresses are never fetched. |
 | `SANI_FORWARD_QUERY` | `true` | Append the visitor's query string to the destination (`/gh?utm_source=x`). |
 | `SANI_CACHE_SIZE` | `100000` | Redirect targets kept in memory. |
 | `SANI_FILES_URL` | — | A second domain, such as `https://f.example.com`, pointed at the same Sani, that serves shared files and raw text. Sharing files needs it. |
-| `SANI_MAX_FILE_MB` | `64` | Largest file you can share, in MB (1–4096). |
+| `SANI_MAX_FILE_MB` | `99` | Whole-file default: 99 decimal MB; explicit values remain MiB (1–4096). |
 | `SANI_LOG_LEVEL` / `SANI_LOG_FORMAT` | `info` / `text` | `debug`…`error`; `text` or `json`. |
 | `TZ` | system | Time zone the daily statistics use. |
 
@@ -105,7 +107,7 @@ The [API reference](docs/en/reference/api.md) covers every endpoint and error co
 
 **Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. Generated slugs for shares are 10 characters long, since nothing else keeps them private.
 
-**Import and export.** Settings → Data exports URL links and their tags as JSON or CSV; texts, files and detailed statistics require a database/files backup. Import accepts Sani's own export, Shlink's JSON (`shortCode`, `longUrl`, `visitsSummary`, …), Sink's export, YOURLS or Kutt CSVs, and any CSV with a `url` column. Slugs that already exist are skipped and listed. Use JSON for lossless migration: CSV export adds protective apostrophes to potential spreadsheet formulas, and reimport retains them.
+**Import and export.** Settings → Data exports URL links and their tags as JSON or CSV; texts, files and detailed statistics require a database/files backup. Import accepts only Sani native CSV/JSON and Shlink CSV/JSON. Download native examples from Settings or the documentation. Slugs that already exist are skipped and listed. Use JSON for lossless migration: CSV export adds protective apostrophes to potential spreadsheet formulas, and reimport retains them.
 
 **Visitors.** Unknown slugs get a quiet 404 page, and expired, disabled or used-up links a 410, in Chinese or English depending on the visitor's browser.
 

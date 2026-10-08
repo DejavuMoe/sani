@@ -133,19 +133,25 @@ func serve() error {
 
 	rec := clicks.New(st, time.Local)
 	srv, err := server.New(server.Options{
-		BaseURL:         cfg.BaseURL,
-		RootRedirect:    cfg.RootRedirect,
-		TrustProxy:      cfg.TrustProxy,
-		SlugLength:      cfg.SlugLength,
-		FetchMeta:       cfg.FetchMeta,
-		ForwardQuery:    cfg.ForwardQuery,
-		PasswordFromEnv: cfg.Password != "",
-		SetupCode:       setupCode,
-		CacheSize:       cfg.CacheSize,
-		Version:         version,
-		FilesURL:        cfg.FilesURL,
-		FilesDir:        filepath.Join(cfg.DataDir, "files"),
-		MaxFileBytes:    int64(cfg.MaxFileMB) << 20,
+		BaseURL:                  cfg.BaseURL,
+		RootRedirect:             cfg.RootRedirect,
+		TrustProxy:               cfg.TrustProxy,
+		SlugLength:               cfg.SlugLength,
+		IncludeConfusable:        !cfg.ExcludeConfusable,
+		SlugLengthFromEnv:        cfg.SlugLengthFromEnv,
+		ExcludeConfusableFromEnv: cfg.ExcludeConfusableFromEnv,
+		MaxFileFromEnv:           cfg.MaxFileFromEnv,
+		FetchMetaFromEnv:         cfg.FetchMetaFromEnv,
+		MetaProxy:                cfg.MetaProxy,
+		FetchMeta:                cfg.FetchMeta,
+		ForwardQuery:             cfg.ForwardQuery,
+		PasswordFromEnv:          cfg.Password != "",
+		SetupCode:                setupCode,
+		CacheSize:                cfg.CacheSize,
+		Version:                  version,
+		FilesURL:                 cfg.FilesURL,
+		FilesDir:                 filepath.Join(cfg.DataDir, "files"),
+		MaxFileBytes:             cfg.MaxFileBytes,
 	}, st, rec, meta.New(), webui.FS(), log)
 	if err != nil {
 		return err

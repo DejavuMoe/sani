@@ -5,7 +5,7 @@ export type BulkAction = 'enable' | 'disable' | 'delete' | 'restore';
 /** What a link does: redirect, or share a text or a file at /p/{slug}. */
 export type LinkKind = 'url' | 'text' | 'file';
 export type TextFormat = 'plain' | 'code';
-export type TagColor = 'blue' | 'green' | 'amber' | 'rose' | 'neutral';
+export type TagColor = 'blue' | 'green' | 'amber' | 'rose' | 'neutral' | `#${string}`;
 export type TagFilter = number | 'untagged' | null;
 export interface Tag { id: number; name: string; color: TagColor; count: number }
 export interface TagCatalog { items: Tag[]; total: number; untagged: number }
@@ -98,6 +98,11 @@ export interface Config {
   requestOrigin: string;
   slugLength: number;
   fetchMeta: boolean;
+  excludeConfusable: boolean;
+  metaMode: 'off' | 'direct' | 'proxy' | 'environment';
+  metaProxyConfigured: boolean;
+  configSources: Record<'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode', 'default' | 'settings' | 'env'>;
+  uploadChunkSize: number;
   forwardQuery: boolean;
   passwordFromEnv: boolean;
   timezone: string;
@@ -167,35 +172,76 @@ function failure(status: number, body: unknown, statusText = ''): ApiError {
   return new ApiError(status, code, e.message ?? statusText, data?.retryAfter);
 }
 
-/**
- * Uploads a file as a new link. XMLHttpRequest rather than fetch, because
- * only it reports upload progress.
- */
-function uploadFile(
-  file: File,
-  fields: FileFields,
-  onProgress?: (sent: number, total: number) => void,
-  signal?: AbortSignal,
-): Promise<Link> {
+export const UPLOAD_CHUNK_SIZE = 25_000_000;
+export interface UploadResume { id?: string; offset: number; file?: File; fields?: string }
+
+function sendUpload<T>(method: string, path: string, body: XMLHttpRequestBodyInit, headers: Record<string, string>, onProgress?: (sent: number, total: number) => void, signal?: AbortSignal): Promise<T> {
   return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const abort = () => xhr.abort();
+    const clean = () => signal?.removeEventListener('abort', abort);
+    if (signal?.aborted) { reject(new DOMException('upload canceled', 'AbortError')); return; }
+    xhr.open(method, '/api' + path);
+    xhr.responseType = 'json';
+    for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value);
+    xhr.upload.onprogress = e => e.lengthComputable && onProgress?.(e.loaded, e.total);
+    xhr.onload = () => {
+      clean();
+      if (xhr.status >= 200 && xhr.status < 300 && xhr.response) resolve(xhr.response);
+      else reject(failure(xhr.status, xhr.response));
+    };
+    xhr.onerror = () => { clean(); reject(new ApiError(0, 'network', 'network error')); };
+    xhr.onabort = () => { clean(); reject(new DOMException('upload canceled', 'AbortError')); };
+    signal?.addEventListener('abort', abort, { once: true });
+    xhr.send(body);
+  });
+}
+
+export async function cancelFileUpload(resume: UploadResume) {
+  const id = resume.id;
+  resume.id = undefined; resume.offset = 0;
+  if (!id) return;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try { await request<void>('DELETE', `/uploads/${id}`); return; }
+    catch (err) {
+      if (!(err instanceof ApiError) || err.code !== 'upload_busy') return;
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+  }
+  // A disconnected client cannot guarantee cancellation; the server TTL reclaims it.
+}
+
+async function uploadFile(file: File, fields: FileFields, onProgress?: (sent: number, total: number) => void, signal?: AbortSignal, resume: UploadResume = { offset: 0 }): Promise<Link> {
+  if (file.size <= UPLOAD_CHUNK_SIZE) {
     const form = new FormData();
     for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== '') form.append(k, Array.isArray(v) ? JSON.stringify(v) : String(v));
     form.append('file', file, file.name);
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/files');
-    xhr.responseType = 'json';
-    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded, e.total);
-    // A reverse proxy with a smaller body limit answers 413 without Sani's body.
-    const tooLarge = () => new ApiError(413, 'file_too_large', 'the file is too large');
-    xhr.onload = () =>
-      xhr.status === 201
-        ? resolve(xhr.response)
-        : reject(xhr.status === 413 && !xhr.response?.error ? tooLarge() : failure(xhr.status, xhr.response));
-    xhr.onerror = () => reject(new ApiError(0, 'network', 'network error'));
-    xhr.onabort = () => reject(new DOMException('upload canceled', 'AbortError'));
-    signal?.addEventListener('abort', () => xhr.abort(), { once: true });
-    xhr.send(form);
-  });
+    return sendUpload<Link>('POST', '/files', form, {}, onProgress, signal);
+  }
+  const signature = JSON.stringify(fields);
+  if (resume.id && (resume.file !== file || resume.fields !== signature)) await cancelFileUpload(resume);
+  try {
+    signal?.throwIfAborted();
+    if (!resume.id) {
+      const session = await request<{ id: string; offset: number }>('POST', '/uploads', { ...fields, name: file.name, size: file.size }, { signal });
+      resume.id = session.id; resume.offset = session.offset; resume.file = file; resume.fields = signature;
+    }
+    onProgress?.(resume.offset, file.size);
+    while (resume.offset < file.size) {
+      const start = resume.offset, end = Math.min(start + UPLOAD_CHUNK_SIZE, file.size);
+      const result = await sendUpload<{ offset: number }>('PUT', `/uploads/${resume.id}`, file.slice(start, end), { 'Content-Type': 'application/octet-stream', 'Upload-Offset': String(start) }, (sent) => onProgress?.(start + sent, file.size), signal);
+      if (result.offset !== end) throw new ApiError(409, 'upload_offset', 'unexpected upload offset');
+      resume.offset = end;
+    }
+    signal?.throwIfAborted();
+    const link = await request<Link>('POST', `/uploads/${resume.id}/complete`, undefined, { signal });
+    void cancelFileUpload(resume);
+    return link;
+  } catch (err) {
+    if (signal?.aborted) await cancelFileUpload(resume);
+    else if (err instanceof ApiError && err.code === 'upload_not_found') { resume.id = undefined; resume.offset = 0; }
+    throw err;
+  }
 }
 
 export const api = {
@@ -209,6 +255,8 @@ export const api = {
 
   config: () => request<Config>('GET', '/config'),
   setBaseUrl: (baseUrl: string | null) => request<Config>('PATCH', '/config', { baseUrl }),
+  setConfig: (values: Partial<Pick<Config, 'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode'>>) => request<Config>('PATCH', '/config', values),
+  updateTag: (id: number, name: string, color: TagColor) => request<Tag>('PATCH', `/tags/${id}`, { name, color }),
   overview: (days = 30) => request<Overview>('GET', `/overview?days=${days}`),
   tags: (signal?: AbortSignal) => request<TagCatalog>('GET', '/tags', undefined, { signal }),
   createTag: (name: string, color: TagColor) => request<Tag>('POST', '/tags', { name, color }),

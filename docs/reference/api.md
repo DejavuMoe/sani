@@ -30,6 +30,11 @@ curl https://s.example.com/api/links \
 | 方法 | 路径 | 用途 |
 |---|---|---|
 | `GET` | `/api/links` | [列出链接](#list) |
+| `PATCH` | `/api/tags/{id}` | [修改标签](#tags) |
+| `POST` | `/api/uploads` | [建立分片上传](#chunk-upload) |
+| `PUT` | `/api/uploads/{id}` | [写入分片](#chunk-upload) |
+| `POST` | `/api/uploads/{id}/complete` | [完成上传](#chunk-upload) |
+| `DELETE` | `/api/uploads/{id}` | [取消上传](#chunk-upload) |
 | `GET` | `/api/tags` | [标签目录与数量](#tags) |
 | `POST` | `/api/tags` | [创建或取得标签](#tags) |
 | `POST` | `/api/links` | [创建链接](#create) |
@@ -49,7 +54,7 @@ curl https://s.example.com/api/links \
 | `GET` | `/api/export` | [导出全部链接](#export) |
 | `POST` | `/api/import` | [导入链接](#import) |
 | `GET` | `/api/config` | [读取设置](#config) |
-| `PATCH` | `/api/config` | [修改短链接域名](#config) |
+| `PATCH` | `/api/config` | [修改域名与创建设置](#config) |
 | `GET` | `/api/tokens` | [列出 API 令牌](#tokens) |
 | `POST` | `/api/tokens` | [创建 API 令牌](#tokens) |
 | `DELETE` | `/api/tokens/{id}` | [撤销 API 令牌](#tokens) |
@@ -70,9 +75,14 @@ curl https://s.example.com/api/links \
 
 `POST /api/tags`
 
-请求 `{"name":"工作","color":"blue"}`，返回 `200` 和标签对象。名称去除首尾空白并做 NFC 规范化，限定 1–24 个 Unicode 码点，不允许控制字符；按小写名称去重。同名请求返回已有标签，不改变原名称与颜色。`color` 可省略，默认为 `blue`；可选 `blue`、`green`、`amber`、`rose`、`neutral`。请求体上限 4 KB，每个实例最多 1,000 个标签。
+请求 `{"name":"工作","color":"blue"}`，返回 `200` 和标签对象。名称去除首尾空白并做 NFC 规范化，限定 1–24 个 Unicode 码点，不允许控制字符；按小写名称去重。同名请求返回已有标签，不改变原名称与颜色。`color` 可省略，默认为 `blue`；可选 `blue`、`green`、`amber`、`rose`、`neutral` 或六位 HEX（如 `#5872a5`）。请求体上限 4 KB，每个实例最多 1,000 个标签。
 
 标签只在鉴权后的管理 API 与界面中展示，访客分享页不包含标签。
+
+
+`PATCH /api/tags/{id}`
+
+传入 `name` 与 `color` 修改现有标签，返回 `200` 和更新后的标签对象；所有关联保留同一 ID。规范化后的同名冲突返回 `409 tag_taken`，不存在的 ID 返回 `404`。创建与修改均接受旧命名色或六位 HEX（如 `#5872a5`），规范化为小写。后台会把 HEX3、RGB、HSL 转为 HEX6；API 不接受任意 CSS。
 
 ### 链接对象 {#link-object}
 
@@ -310,7 +320,7 @@ curl https://s.example.com/api/files \
   -F file=@report.pdf -F maxClicks=10
 ```
 
-- 文件不能为空，大小上限由 [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb) 决定。文件边接收边写入磁盘，不会整个放进内存。
+- 文件不能为空，大小上限由后台设置或显式 [`SANI_MAX_FILE_MB`](./configuration#sani-max-file-mb) 决定。文件边接收边写入磁盘，不会整个放进内存。
 - 保留文件名，但去掉路径、控制字符和看不见的文字方向标记。
 - 分享文件需要文件域名，没有设置时返回 `409 files_disabled`。
 
@@ -368,13 +378,35 @@ curl https://s.example.com/api/import \
 
 过期时间可以是受支持的日期字符串或 Unix 秒/毫秒时间戳，按毫秒保存。非空值若格式非法、早于 Unix 纪元、超出 UTC 年份 0000–9999 或在单位换算时溢出，该行以 `expires_invalid` 跳过。空值和 `0` 表示永久有效；合法的历史过期时间会保留。
 
+### 分片上传 {#chunk-upload}
+
+四个端点均需鉴权并接受相同的同源校验。后台对超过 25,000,000 字节的文件使用此流程；较小文件继续调用 `POST /api/files`。
+
+`POST /api/uploads`
+
+发送 JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`，可选链接字段 `title`、`tags`、`expiresAt`、`maxClicks`、`enabled`。请求体限制 16 KiB。返回 `201` 和 `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`。完整文件大小不得超过当前 `maxFileSize`。会话绑定具体登录会话或令牌凭据，不使用可复用的令牌数字 ID。
+
+`PUT /api/uploads/{id}`
+
+请求体为原始分片字节，`Content-Length` 为 1–25,000,000，`Upload-Offset` 等于上次确认的偏移。返回 `200` 和 `{ "offset":25000000 }`。按顺序上传；仅最近一个分片可重试，且长度与 SHA-256 必须相同。偏移或重复分片内容不符返回 `409 upload_offset`；传输失败或不完整不会推进偏移。文件流式写盘，不整体缓存在内存。
+
+`POST /api/uploads/{id}/complete`
+
+全部字节确认后发送空请求体完成上传。服务端核验文件长度、计算 SHA-256 并原子发布分享。返回 `201` 和链接对象；完成回执尚保留时再次调用返回 `200` 和同一链接。未完成返回 `409 upload_incomplete`，完成前没有可见分享。校验或存储错误在存储条件允许时保留待完成上传供重试。
+
+`DELETE /api/uploads/{id}`
+
+取消待完成上传、删除临时字节并返回 `204`；删除已完成回执不会删除分享。其他凭据、过期或不存在的会话返回 `404 upload_not_found`，并发操作返回 `409 upload_busy`。
+
+限制：每实例 8 个活动会话，每份凭据 2 个，总预留完整文件空间 8 GiB；超限返回 `429 upload_limit`。最近完成回执最多 32 个，必要时淘汰最早完成项。会话闲置一小时失效，由每分钟维护清理；启动时清理遗留分片。支持当前页面重试，不支持刷新或重启后的续传。取消请求丢失时由过期清理回收。只有完整分享参与常规备份和保留规则。
+
 ## 设置 {#config}
 
 `GET /api/config`
 
 ```json
 {
-  "version": "v0.3.0",
+  "version": "v0.9.0",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
@@ -384,7 +416,12 @@ curl https://s.example.com/api/import \
   "passwordFromEnv": false,
   "timezone": "Asia/Shanghai",
   "filesUrl": "https://f.example.com",
-  "maxFileSize": 67108864,
+  "maxFileSize": 99000000,
+  "excludeConfusable": true,
+  "metaMode": "direct",
+  "metaProxyConfigured": false,
+  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default"},
+  "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
 ```
@@ -400,6 +437,8 @@ curl https://s.example.com/api/import \
 ```
 
 传 `null` 或空字符串表示清除。短链接域名不能和文件域名相同。设置了 `SANI_BASE_URL` 时返回 `409`。成功时返回修改后的设置。
+
+创建设置也可修改：`slugLength`（3–32 的整数）、`excludeConfusable`（布尔值）、`maxFileSize`（以字节表示的整数十进制 MB，范围 1,000,000–4,096,000,000，须为 1,000,000 的倍数）、`metaMode`（`off`、`direct`、`proxy`）。省略或为 null 的创建字段不变。所有提交字段连同基础域名统一校验并原子保存。有效值按默认值 → 已保存设置 → 显式环境变量取值；`configSources` 逐项返回 `default`、`settings` 或 `env`。修改环境变量锁定项返回 `409 config_env`，非法值返回 `400 config_invalid`，未配置 `SANI_META_PROXY` 却选择代理返回 `409 proxy_missing`。`metaProxyConfigured` 仅是布尔值，不返回代理地址或凭据。旧部署沿用的系统代理显示为 `metaMode: "environment"`，该值不可写入。`fetchMeta` 表示当前是否有可用抓取器；关闭或已保存代理模式却缺少代理配置时，刷新不会联网，也不清空已有元数据。请求体限制 4 KiB。
 
 ## API 令牌 {#tokens}
 
@@ -527,7 +566,16 @@ curl https://s.example.com/api/import \
 | `files_disabled` | 409 | 没有设置文件域名，不能分享文件 |
 | `too_large` | 413 | 请求体超过[上限](#conventions)，比如导入的文件超过 32 MB |
 | `text_too_large` | 413 | 文本超过 1 MB |
-| `file_too_large` | 413 | 文件超过 `SANI_MAX_FILE_MB` 设置的上限 |
+| `config_env` | 409 | 设置由环境变量固定 |
+| `config_invalid` | 400 | 创建默认值不合法 |
+| `proxy_missing` | 409 | 未配置专用代理 |
+| `tag_taken` | 409 | 标签名称已存在 |
+| `upload_limit` | 429 | 待完成上传超过额度 |
+| `upload_not_found` | 404 | 上传会话不可用或过期 |
+| `upload_busy` | 409 | 上传正在进行其他操作 |
+| `upload_offset` | 409 | 偏移或重复分片内容不符 |
+| `upload_incomplete` | 409 | 文件尚未上传完整 |
+| `file_too_large` | 413 | 文件超过当前有效配置上限 |
 | `rate_limited` | 429 | 失败次数太多，按 `Retry-After` 等待后再试 |
 | `internal` | 500 | 服务端出错，详情见服务器日志 |
 | `tags_invalid` | 400 | 标签名称、颜色、ID 数组或筛选参数不合法 |

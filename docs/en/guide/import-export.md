@@ -47,9 +47,12 @@ Sani tells the format from the content and understands:
 |---|---|
 | Sani | Its own JSON or CSV export |
 | Shlink | The unmodified `short_urls.csv` exported by Web Client, or its short URL list JSON: `{"shortUrls": {"data": [...]}}` |
-| Sink | Its JSON export: `{"links": [...]}` |
-| YOURLS, Kutt and others | A CSV with a header row and a column with the destination |
-| Anything else | A JSON array of objects, or a JSON object with such an array under `links`, `data`, `items` or `urls` |
+
+Only Sani and Shlink formats are supported. Sani JSON requires `app: "sani"`, `version: 1` and a `links` array; Sani CSV requires `slug,url` columns. Shlink JSON accepts `shortUrls.data` or its data array, with `shortCode` and `longUrl` on every record. Unrecognized wrappers, duplicate CSV columns and malformed CSV are rejected before any database writes. A recognized file may still have invalid rows; those are skipped as described below.
+
+Download a native [CSV example](/examples/sani.csv) or [JSON example](/examples/sani.json). The admin settings page offers the same files. Convert other products to this documented format before importing.
+
+Custom tag colors use six-digit HEX (`#5872a5`); legacy named colors remain valid.
 
 ### Field names
 
@@ -57,19 +60,19 @@ Sani recognizes each field by its column (or JSON key) name. Names are case-inse
 
 | Field | Accepted names |
 |---|---|
-| Destination (required) | `url`, `longUrl`, `long_url`, `target`, `destination`, `original_url`, `link` |
-| Slug | `slug`, `shortCode`, `short_code`, `code`, `keyword`, `key`, `alias`, `address`, `custom_slug` |
-| Title | `title`, `name`, `description` |
-| Created | `createdAt`, `created_at`, `dateCreated`, `date_created`, `timestamp`, `created` |
-| Clicks | `clicks`, `visits`, `visitsCount`, `visits_count`, `visit_count`, `count` |
-| Expires | `expiresAt`, `expires_at`, `validUntil`, `valid_until`, `expiration`, `expires` |
-| Visit limit | `maxClicks`, `max_clicks`, `maxVisits`, `max_visits` |
+| Destination (required) | `url`, `longUrl` |
+| Slug | `slug`, `shortCode` |
+| Title | `title` |
+| Created | `createdAt`, `created_at`, `dateCreated` |
+| Clicks | `clicks`, `visits`, `visitsCount` |
+| Expires | `expiresAt`, `expires_at`, `validUntil` |
+| Visit limit | `maxClicks`, `max_clicks`, `maxVisits` |
 | Redirect | `redirect` (301, 302, 307 or 308) |
 | Enabled | `enabled` (`true` or `false`) |
 
 Shlink nests some values, so `visitsSummary.total`, `meta.validUntil` and `meta.maxVisits` are recognized as well.
 
-Shlink CSV is identified by the `shortCode`, `longUrl`, `shortUrl` and `domain` columns. Its `tags` cell contains names separated by `|`, such as `blog|work`; an empty cell means no tags. Import this file directly without converting tags to JSON arrays. The limits of 5 tags per link and 24 Unicode code points per name still apply, and invalid rows are skipped with `tags_invalid`. Sani's own CSV and other generic CSV files still use JSON arrays for tags; malformed JSON is not treated as a plain tag name.
+Shlink CSV is identified by the `shortCode`, `longUrl`, `shortUrl` and `domain` columns. Its `tags` cell contains names separated by `|`, such as `blog|work`; an empty cell means no tags. Import this file directly without converting tags to JSON arrays. The limits of 5 tags per link and 24 Unicode code points per name still apply, and invalid rows are skipped with `tags_invalid`. Sani's own CSV still use JSON arrays for tags; malformed JSON is not treated as a plain tag name.
 
 `shortCode` is kept as the slug. `domain` and `shortUrl` do not change the destination instance's domain; imported links use Sani's configured domain. Settings absent from Shlink's CSV cannot be recovered: missing enabled state, redirect type, expiry and visit limit default to enabled, 302, never and unlimited. Tags default to blue. Historical visit totals are preserved, without daily or referrer breakdowns. Before importing, check whether the old instance depends on any limits not included in its export.
 

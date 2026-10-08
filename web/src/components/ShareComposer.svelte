@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { ApiError, type Link, type TextFormat } from '../lib/api';
+  import { ApiError, UPLOAD_CHUNK_SIZE, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
   import { errorText, t } from '../lib/i18n.svelte';
@@ -42,11 +42,16 @@
   let picker = $state<HTMLInputElement>();
   let chooser = $state<HTMLButtonElement>();
   let upload: AbortController | null = null;
+  let resume: UploadResume = { offset: 0 };
+  let lastFileDraft = '';
+  let savedFileOptions: FileFields | null = null;
+  let uploadFailed = $state(false);
+  onDestroy(() => { upload?.abort(); void cancelFileUpload(resume); });
 
   const id = $derived(`share-${mode}`);
   const prefix = $derived(hostOf(session.origin) + '/p');
   const maxText = $derived(session.config?.maxTextSize ?? 1 << 20);
-  const maxFile = $derived(session.config?.maxFileSize ?? 64 << 20);
+  const maxFile = $derived(session.config?.maxFileSize ?? 99_000_000);
   const filesOn = $derived(!!session.config?.filesUrl);
   const bytes = $derived(mode === 'text' ? byteLength(text) : 0);
   const pct = $derived(progress === null ? 0 : Math.round(progress * 100));
@@ -66,6 +71,8 @@
   /** Called by the page for files dropped or pasted anywhere. */
   export function fillFile(f: File) {
     if (busy) return;
+    void cancelFileUpload(resume); resume = { offset: 0 }; uploadFailed = false;
+    lastFileDraft = ''; savedFileOptions = null;
     file = f;
     error = null;
     note = t('share.dropped');
@@ -84,6 +91,7 @@
 
   function reset() {
     text = '';
+    uploadFailed = false; lastFileDraft = ''; savedFileOptions = null;
     file = null;
     slug = '';
     title = '';
@@ -161,8 +169,10 @@
         link = await links.createText({ ...options, text, format });
       } else {
         upload = new AbortController();
-        progress = 0;
-        link = await links.createFile(file!, options, (sent, total) => (progress = sent / total), upload.signal);
+        progress = resume.offset / file!.size;
+        const draft = JSON.stringify({ tags, slug, title, expiry, maxClicks });
+        if (draft !== lastFileDraft) { savedFileOptions = options; lastFileDraft = draft; }
+        link = await links.createFile(file!, savedFileOptions ?? options, (sent, total) => (progress = sent / total), upload.signal, resume);
       }
       deliver(link.shortUrl);
       const ok = await copied;
@@ -171,7 +181,7 @@
     } catch (err) {
       reject(err);
       if (err instanceof DOMException && err.name === 'AbortError') toasts.show(t('share.canceled'));
-      else fail(err instanceof ApiError ? err.code : 'unknown');
+      else { uploadFailed = mode === 'file'; fail(err instanceof ApiError ? err.code : 'unknown'); }
     } finally {
       busy = false;
       progress = null;
@@ -263,6 +273,7 @@
               title={t('share.fileRemove')}
               disabled={busy}
               onclick={() => {
+                void cancelFileUpload(resume); resume = { offset: 0 }; uploadFailed = false;
                 file = null;
                 note = '';
                 tick().then(() => chooser?.focus());
@@ -291,7 +302,7 @@
             {t('share.fileDrop')}
             <button bind:this={chooser} type="button" class="choose" onclick={() => picker?.click()}>{t('share.fileChoose')}</button>
           </span>
-          <span class="limit">{t('share.fileLimit', { max: formatSize(maxFile) })}</span>
+          <span class="limit">{t('share.fileLimit', { max: `${+(maxFile / 1_000_000).toFixed(3)} MB` })}</span>
         </div>
       {/if}
       <input
@@ -341,7 +352,7 @@
     </button>
     <button class="go" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
       {#if busy}<span class="spinner" aria-hidden="true"></span>{/if}
-      {busy && progress !== null ? t('share.uploading', { pct }) : t('share.submit')}
+      {busy && progress !== null ? t('share.uploading', { pct }) : t(uploadFailed ? 'share.retry' : 'share.submit')}
       {#if mode === 'text' && !busy}<kbd class="go-kbd" aria-hidden="true">{mod}↵</kbd>{/if}
     </button>
   </div>
@@ -367,6 +378,7 @@
   {/if}
 </form>
 
+{#if mode === 'file' && file && file.size > UPLOAD_CHUNK_SIZE}<p class="chunk-hint">{t('share.chunked')}</p>{/if}
 {#if error}
   <p class="problem" id="{id}-error" role="alert"><Icon name="alert" size={14} />{error.text}</p>
 {:else if note}
@@ -386,10 +398,8 @@
 
   .composer:focus-within,
   .composer.dragging {
-    border-color: color-mix(in oklab, var(--accent) 55%, var(--line-2));
-    box-shadow:
-      0 0 0 3px color-mix(in oklab, var(--accent) 12%, transparent),
-      0 1px 2px rgb(28 27 25 / 0.04);
+    border-color: var(--accent);
+    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
   }
 
   .composer.invalid {
@@ -767,4 +777,5 @@
       display: none;
     }
   }
+  .chunk-hint { margin-top: 8px; color: var(--text-3); font-size: 12px; line-height: 1.6; }
 </style>

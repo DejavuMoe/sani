@@ -75,13 +75,13 @@
       </button>
     {/each}
   </div>
-  <div role="tabpanel" id="create-panel-url" aria-labelledby="create-tab-url" hidden={mode !== 'url'}>
+  <div role="tabpanel" id="create-panel-url" aria-labelledby="create-tab-url" hidden={mode !== 'url'} inert={mode !== 'url'}>
     <Composer bind:this={composer} />
   </div>
-  <div role="tabpanel" id="create-panel-text" aria-labelledby="create-tab-text" hidden={mode !== 'text'}>
+  <div role="tabpanel" id="create-panel-text" aria-labelledby="create-tab-text" hidden={mode !== 'text'} inert={mode !== 'text'}>
     <ShareComposer bind:this={texts} mode="text" />
   </div>
-  <div role="tabpanel" id="create-panel-file" aria-labelledby="create-tab-file" hidden={mode !== 'file'}>
+  <div role="tabpanel" id="create-panel-file" aria-labelledby="create-tab-file" hidden={mode !== 'file'} inert={mode !== 'file'}>
     <ShareComposer bind:this={files} mode="file" />
   </div>
 </section>

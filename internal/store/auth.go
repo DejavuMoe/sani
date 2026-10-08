@@ -10,6 +10,7 @@ import (
 const (
 	SettingPassword = "password" // argon2id hash of the admin password
 	SettingBaseURL  = "base_url" // public origin used to build short URLs
+	SettingCreation = "creation" // JSON defaults edited in the admin app
 )
 
 var ErrPasswordChanged = errors.New("password changed")
@@ -32,6 +33,24 @@ func (s *Store) SetSetting(ctx context.Context, key, value string) error {
 func (s *Store) DeleteSetting(ctx context.Context, key string) error {
 	_, err := s.w.ExecContext(ctx, `DELETE FROM settings WHERE key = ?`, key)
 	return err
+}
+
+// SetSettings commits one validated configuration change, including removals.
+func (s *Store) SetSettings(ctx context.Context, values map[string]string) error {
+	return s.tx(ctx, func(tx *sql.Tx) error {
+		for key, value := range values {
+			var err error
+			if value == "" {
+				_, err = tx.ExecContext(ctx, `DELETE FROM settings WHERE key = ?`, key)
+			} else {
+				_, err = tx.ExecContext(ctx, `INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value`, key, value)
+			}
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // SetPasswordOnce stores the first password. It reports false when a
