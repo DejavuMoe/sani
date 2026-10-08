@@ -46,7 +46,7 @@ JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 
 | 来源平台 | 格式规范 |
 |---|---|
 | Sani | 原生导出的 JSON 或 CSV |
-| Shlink | 列表接口返回的 JSON（形如 `{"shortUrls": {"data": [...]}}`） |
+| Shlink | Web Client 原样导出的 `short_urls.csv`，或列表接口返回的 JSON（形如 `{"shortUrls": {"data": [...]}}`） |
 | Sink | 导出的 JSON（形如 `{"links": [...]}`） |
 | YOURLS、Kutt 等 | 带表头的 CSV（包含目标网址列） |
 | 通用结构 | 标准 JSON 对象数组，或包含 `links`、`data`、`items`、`urls` 键的对象 |
@@ -68,6 +68,10 @@ JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 
 | 启用状态 | `enabled`（`true` 或 `false`） |
 
 Shlink 的嵌套字段亦可自动提取，包括 `visitsSummary.total`、`meta.validUntil` 及 `meta.maxVisits`。
+
+Shlink CSV 通过 `shortCode`、`longUrl`、`shortUrl`、`domain` 列识别；其 `tags` 是以 `|` 分隔的标签名称（如 `blog|work`），空值表示无标签，可直接导入，无需预先改为 JSON 数组。每条最多 5 个标签、每个名称最多 24 个 Unicode 码点的限制仍然适用，非法行以 `tags_invalid` 跳过。Sani 自有 CSV 和其他通用 CSV 的标签仍使用 JSON 数组，不会把格式错误的 JSON 当作普通标签。
+
+`shortCode` 保留为短码；`domain`、`shortUrl` 不会修改目标实例的域名，导入后的地址使用 Sani 配置的域名。Shlink CSV 没有导出的字段无法恢复：缺少启用状态、重定向类型、过期时间和访问上限时，分别使用启用、302、永不过期和不限次数。标签颜色默认蓝色；历史累计访问量保留，但没有每日和来源明细。导入前检查旧实例是否依赖这些未导出的限制。
 
 时间字段支持 RFC 3339（`2026-09-29T08:00:00Z`）、标准格式（`2026-09-29 08:00:00`、`2026-09-29`）及 Unix 时间戳（秒或毫秒）。未显式标注时区时按 UTC 解析。
 

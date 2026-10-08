@@ -614,6 +614,8 @@ func parseCSVRecords(data []byte) ([]map[string]string, error) {
 	if !hasURL {
 		return nil, errors.New(`the CSV needs a header row with a "url" column`)
 	}
+	shlink := slices.Contains(header, "shortcode") && slices.Contains(header, "longurl") &&
+		slices.Contains(header, "shorturl") && slices.Contains(header, "domain")
 	out := make([]map[string]string, 0, len(rows)-1)
 	for _, row := range rows[1:] {
 		rec := map[string]string{}
@@ -621,6 +623,11 @@ func parseCSVRecords(data []byte) ([]map[string]string, error) {
 			if i < len(header) {
 				rec[header[i]] = v
 			}
+		}
+		if shlink && strings.TrimSpace(rec["tags"]) != "" {
+			// Shlink's CSV exporter joins tag names with pipes, not JSON.
+			tags, _ := json.Marshal(strings.Split(rec["tags"], "|"))
+			rec["tags"] = string(tags)
 		}
 		out = append(out, rec)
 	}

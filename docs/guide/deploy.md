@@ -28,10 +28,10 @@ docker compose up -d
 
 | 标签 | 指向 |
 |---|---|
-| `v0.7.0` | 对应 Git tag 和 GitHub Release `v0.7.0` 的具体版本 |
-| `v0.7.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
+| `v0.8.0` | 对应 Git tag 和 GitHub Release `v0.8.0` 的具体版本 |
+| `v0.8.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
 
-从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.7.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
+从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.8.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
 
 升级时先[备份](./operations#backup)，再手动将 `compose.yaml` 的 `image:` 改为目标版本的完整标签，随后执行：
 
@@ -104,7 +104,7 @@ docker exec sani /sani healthcheck
 ::: code-group
 
 ```sh [下载]
-base=https://github.com/DejavuMoe/sani/releases/download/v0.7.0
+base=https://github.com/DejavuMoe/sani/releases/download/v0.8.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -119,7 +119,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-下载路径固定到 `v0.7.0`；升级时将路径中的标签改为已发布的目标版本。
+下载路径固定到 `v0.8.0`；升级时将路径中的标签改为已发布的目标版本。
 
 ### 校验来源与签名 {#verify}
 
@@ -127,7 +127,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.7.0 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.8.0 -R DejavuMoe/sani
 ```
 
 将生成的 `sani.service` 写入 `/etc/systemd/system/` 并启动：
@@ -214,6 +214,33 @@ Traefik、Cloudflare Tunnel 等方案同样满足前述三条原则即可。
 Sani 要求文件下载使用 **不同的主机名**，以隔离上传内容与管理后台。仅换路径不能隔离浏览器来源；仅换端口也不被接受，因为同主机的不同端口仍共享 Cookie。子域名符合要求，Sani 的管理会话 Cookie 不会发送到子域名。上传仍经由主域名的 API 完成。
 
 不配置文件下载域名时，短链接与文本分享仍可使用，访客可在主域名的 `/p/` 页面阅读和复制文本；文件上传被禁用，文本页也不提供“原始文本”或“下载”入口。
+
+## Cloudflare 与 CDN 缓存 {#cdn-cache}
+
+短链接的计数、停用、过期和访问上限都需要请求到达 Sani。推荐对主域名和文件域名默认**绕过 CDN 缓存**，只为主域名的 `/admin/assets/` 静态资源开放缓存；只绕过文件域名还不够。
+
+| 内容 | Sani 的响应策略 | CDN 建议 |
+| --- | --- | --- |
+| 有有效期或访问上限的跳转（301、302、307、308） | `no-store` | 绕过 |
+| 无限制的临时跳转（302、307） | `private, max-age=0` | 绕过 |
+| 无限制的永久跳转（301、308） | `public, max-age=86400` | 仍建议绕过；浏览器本地可缓存一天 |
+| 分享页面、文件域名、失效与不存在页面 | `no-store` | 绕过 |
+| `/api/` | JSON 与导出禁止缓存，图标为私有缓存 | 整段绕过 |
+| 管理端 HTML | `no-cache` | 绕过 |
+| 已存在的 `/admin/assets/` 构建资源 | `public, max-age=31536000, immutable` | 尊重源站缓存头 |
+
+Cloudflare **Cache Rules** 可按下面顺序设置（替换示例域名）：
+
+1. 主域名与文件域名默认绕过：表达式 `http.host in {"s.example.com" "f.example.com"}`，Cache eligibility 选 **Bypass cache**。
+2. 主域名静态资源例外：表达式 `http.host eq "s.example.com" and starts_with(http.request.uri.path, "/admin/assets/")`，Cache eligibility 选 **Eligible for cache**；Edge TTL 选 **Use cache-control header if present, bypass cache if not**，Browser TTL 选 **Respect origin**。
+
+把这两条放在可能匹配的通用缓存规则之后，并保持静态资源例外在最后；Cloudflare 对冲突设置采用最后匹配的规则。不要再用其他规则、旧 Page Rules 或 Worker 覆盖这些路径的策略，也不要强制忽略源站头或设置状态码 TTL。不要只按 `.png` 等扩展名放行缓存：短码本身也可以带扩展名。设置名称与规则顺序见 Cloudflare 的[缓存规则设置](https://developers.cloudflare.com/cache/how-to/cache-rules/settings/)和[规则顺序](https://developers.cloudflare.com/cache/how-to/cache-rules/order/)。
+
+若希望配置最简单，只有第一条也可以，代价是管理端静态资源每次都回源。变更前已经进入 CDN 的动态响应应清除缓存。验证时检查实际短链、分享页面和文件响应：`DYNAMIC`、`BYPASS` 或未缓存的 `MISS` 本身不表示故障；受限跳转和文件不应持续出现 `HIT`、`STALE` 或 `UPDATING`。静态资源出现 `HIT` 则是预期行为。单次 `/healthz` 或 `robots.txt` 的结果不能证明其他路径的缓存策略。
+
+::: warning 永久重定向的浏览器缓存
+CDN 绕过规则不能清除浏览器已保存的 301/308 跳转。无限制永久跳转仍允许浏览器缓存一天，其间点击统计、目标修改、停用和删除无法影响未回源的请求。需要这些行为及时生效时使用默认 302；给曾经缓存的永久跳转追加限制时，必要时换一个短码。v0.8.0 起带有效期或访问上限的跳转统一发送 `no-store`，但不能撤回此前已缓存的响应。
+:::
 
 ## 管理员初始密码 {#first-password}
 

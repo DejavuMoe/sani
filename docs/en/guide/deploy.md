@@ -28,10 +28,10 @@ A few things worth knowing about `compose.yaml`:
 
 | Tag | Points at |
 |---|---|
-| `v0.7.0` | The exact version matching Git tag and GitHub Release `v0.7.0` |
-| `v0.7.0-rc.1` | The matching prerelease Git tag, available only once published |
+| `v0.8.0` | The exact version matching Git tag and GitHub Release `v0.8.0` |
+| `v0.8.0-rc.1` | The matching prerelease Git tag, available only once published |
 
-From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v0.7.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
+From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v0.8.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
 
 To upgrade, [back up](./operations#backup), change `image:` in `compose.yaml` to the target version's full tag, then run:
 
@@ -104,7 +104,7 @@ The binary is statically linked and needs no libraries on the server. On macOS, 
 ::: code-group
 
 ```sh [Download]
-base=https://github.com/DejavuMoe/sani/releases/download/v0.7.0
+base=https://github.com/DejavuMoe/sani/releases/download/v0.8.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -119,7 +119,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-The download path pins `v0.7.0`. When upgrading, replace it with the published target version's tag.
+The download path pins `v0.8.0`. When upgrading, replace it with the published target version's tag.
 
 ### Checking where a build came from {#verify}
 
@@ -127,7 +127,7 @@ Release files and images are built by GitHub Actions from the tagged commit, wit
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.7.0 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.8.0 -R DejavuMoe/sani
 ```
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:
@@ -214,6 +214,33 @@ The link copied after creating a share opens its page on the main domain. Visito
 Sani requires a **different hostname** for downloads to isolate uploaded content from the admin app. Changing only the path does not isolate browser origins. Another port is not accepted either, because browsers share cookies across the ports of one host. A subdomain works, since Sani’s session cookie is not sent to subdomains. Uploads still go through the main domain’s API.
 
 Without a download domain, short links and text shares still work: visitors can read and copy text on its `/p/` page on the main domain. File uploads are disabled, and text pages have no Raw or Download links.
+
+## Cloudflare and CDN caching {#cdn-cache}
+
+Counting, disabling, expiry and visit limits require requests to reach Sani. **Bypass CDN caching** on both the main and files hosts by default, allowing only `/admin/assets/` on the main host as a static-asset exception. Bypassing only the files host is not enough.
+
+| Content | Sani response policy | CDN recommendation |
+| --- | --- | --- |
+| Redirects with expiry or a visit limit (301, 302, 307, 308) | `no-store` | Bypass |
+| Unlimited temporary redirects (302, 307) | `private, max-age=0` | Bypass |
+| Unlimited permanent redirects (301, 308) | `public, max-age=86400` | Still bypass; browsers can cache for a day |
+| Share pages, files host, expired and missing pages | `no-store` | Bypass |
+| `/api/` | JSON and exports disallow caching; icons use private caching | Bypass the whole path |
+| Admin HTML | `no-cache` | Bypass |
+| Existing `/admin/assets/` build assets | `public, max-age=31536000, immutable` | Respect origin headers |
+
+Configure Cloudflare **Cache Rules** in this order, replacing the example hosts:
+
+1. Bypass both hosts by default: expression `http.host in {"s.example.com" "f.example.com"}`, Cache eligibility **Bypass cache**.
+2. Allow main-host static assets: expression `http.host eq "s.example.com" and starts_with(http.request.uri.path, "/admin/assets/")`, Cache eligibility **Eligible for cache**, Edge TTL **Use cache-control header if present, bypass cache if not**, and Browser TTL **Respect origin**.
+
+Place these after matching general cache rules and keep the asset exception last: Cloudflare uses the last matching rule for conflicting settings. Do not override these policies through other rules, legacy Page Rules or Workers, force origin headers to be ignored, or set status-code TTLs. Do not allow caching solely by extensions such as `.png`: slugs can have extensions too. See Cloudflare's [cache rule settings](https://developers.cloudflare.com/cache/how-to/cache-rules/settings/) and [rule order](https://developers.cloudflare.com/cache/how-to/cache-rules/order/).
+
+For the simplest setup, use only the first rule; admin assets will also reach the origin each time. Purge dynamic responses that were already cached before changing the rules. Check actual redirects, share pages and files: `DYNAMIC`, `BYPASS` or an uncached `MISS` alone do not indicate a fault; limited redirects and files should not keep returning `HIT`, `STALE` or `UPDATING`. A `HIT` on static assets is expected. One `/healthz` or `robots.txt` response cannot establish the policy for other paths.
+
+::: warning Browser caches of permanent redirects
+A CDN bypass cannot clear a 301/308 already stored in a browser. Unlimited permanent redirects still allow one day of browser caching: counting, destination edits, disabling and deletion cannot affect requests that never reach Sani. Keep the default 302 when these changes must take effect promptly; consider a new slug when adding limits to a previously cached permanent redirect. Since v0.8.0, redirects with expiry or a visit limit send `no-store`, but this cannot recall previously cached responses.
+:::
 
 ## The first password {#first-password}
 

@@ -13,6 +13,7 @@ import (
 var (
 	cacheTemporary = []string{"private, max-age=0"}
 	cachePermanent = []string{"public, max-age=86400"}
+	cacheLimited   = []string{"no-store"}
 )
 
 // redirect resolves /{slug}. It is the hot path: a cache hit costs a map
@@ -54,7 +55,9 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 	}
 	h := w.Header()
 	h["Location"] = []string{loc}
-	if e.Code == http.StatusMovedPermanently || e.Code == http.StatusPermanentRedirect {
+	if e.ExpiresAt != 0 || e.MaxClicks > 0 {
+		h["Cache-Control"] = cacheLimited
+	} else if e.Code == http.StatusMovedPermanently || e.Code == http.StatusPermanentRedirect {
 		h["Cache-Control"] = cachePermanent
 	} else {
 		h["Cache-Control"] = cacheTemporary

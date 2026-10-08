@@ -2,6 +2,21 @@
 
 <p class="lead">All of Sani’s data is in one SQLite file, plus a directory of shared files, so there isn’t much to do day to day: back up regularly, upgrade now and then, and reset the password if you forget it.</p>
 
+## Share expiry, deletion and file cleanup {#share-cleanup}
+
+Expiry, an exhausted visit limit and disabling only block further access; **they do not automatically delete records, text or files**. An administrator can adjust the limits or delete the share. A limit of 1 means one counted visit, not destruction after reading: a file counts when a valid `200`/`206` content response starts, not when the visitor finishes downloading.
+
+Deleting a URL, text or file share stops new origin requests immediately, then background cleanup works in two stages:
+
+1. Soft deletion retains the record for restoration. Maintenance checks every minute and purges records deleted more than an hour ago, together with their statistics, text and file references.
+2. A file scan runs about every ten minutes, removing files with no database reference and a modification time older than ten minutes. Leftover `.upload-*` temporary files must be older than an hour.
+
+With the service running continuously and no permission errors or active uploads delaying cleanup, ordinary files are usually reclaimed about **60–70 minutes** after deletion. This is a maintenance interval, not a deadline. Scanning excludes uploads and skips a round while an upload is writing. A stopped service does no cleanup; the first maintenance run is about a minute after restart and uses the original deletion time. Check logs for `purge deleted links`, `list files`, `list stored files` or `remove file` errors, and `removed unused files` success messages.
+
+A record can be restored until it is purged or its slug is reclaimed. Reusing the slug removes the old record early, making its file eligible for cleanup. Restoration does not reset expiry or consumed visits. Cleanup does not alter existing backups or promise secure erasure from storage.
+
+The 32-character hexadecimal names in `files/` are random storage names. Seeing one shortly after deleting a share is expected; an expired but undeleted share keeps its file. `sani.db` stores the whole instance's links, settings, account and statistics. `sani.db-wal` and `sani.db-shm` are SQLite runtime files, so their continued presence is normal too. Deleting a share does not delete the database or necessarily shrink its file. Do not manually remove active database files, WAL/SHM or files whose references are unknown; back up as described below first.
+
 ## Backups {#backup}
 
 `sani backup` writes a consistent copy of the database while Sani keeps running. It uses SQLite’s `VACUUM INTO`, so the copy is compacted as well.
@@ -156,7 +171,7 @@ SQLite waits at most 1 second per external write-lock attempt; cancellation of a
 
 **Titles and icons never show up.** The server may not reach the internet, the site may refuse the fetch, or the destination may resolve to a private address, which Sani never fetches. If the server reaches the internet through a proxy, set `HTTPS_PROXY`. `SANI_LOG_LEVEL=debug` logs the reason for each failure.
 
-**Fewer clicks than expected.** Crawlers, link previews and your own clicks from the admin app don’t count. Browsers cache permanent (301) redirects, so repeat visits from the same browser skip Sani. See [Statistics](./statistics).
+**Fewer clicks than expected.** Crawlers, link previews and your own clicks from the admin app don’t count. Unlimited permanent (301/308) redirects allow one day of browser caching, so repeat visits skip Sani. See [Statistics](./statistics) and [CDN caching](./deploy#cdn-cache).
 
 **The File tab says sharing files needs a domain of its own.** Set up a [files domain](./deploy#files-domain) and `SANI_FILES_URL`.
 

@@ -61,6 +61,9 @@ func TestDownloadsChargeOnlyContentResponses(t *testing.T) {
 				if r.status != want {
 					t.Fatalf("response: %d %s, want %d", r.status, r.body, want)
 				}
+				if got := r.header.Get("Cache-Control"); got != "no-store" {
+					t.Errorf("content response %d Cache-Control = %q", r.status, got)
+				}
 				if condition == "suffix" && string(r.body) != data {
 					t.Fatalf("suffix: %q", r.body)
 				}
@@ -79,6 +82,40 @@ func TestDownloadsChargeOnlyContentResponses(t *testing.T) {
 					t.Fatalf("next: %d, want %d", next.status, want)
 				}
 			})
+		}
+	}
+}
+
+func TestLimitedRedirectsAreNotCached(t *testing.T) {
+	e := newEnv(t, Options{})
+	e.signIn()
+	for _, code := range []int{301, 302, 307, 308} {
+		for _, limit := range []string{"none", "expiry", "visits"} {
+			slug := fmt.Sprintf("cache-%d-%s", code, limit)
+			input := map[string]any{"slug": slug, "url": "https://example.com/target", "redirect": code}
+			want := "no-store"
+			switch limit {
+			case "expiry":
+				input["expiresAt"] = time.Now().Add(time.Hour).UTC().Format(time.RFC3339)
+			case "visits":
+				input["maxClicks"] = 1
+			default:
+				want = "private, max-age=0"
+				if code == 301 || code == 308 {
+					want = "public, max-age=86400"
+				}
+			}
+			e.create(input)
+			r := e.visit("/" + slug)
+			if r.status != code || r.header.Get("Cache-Control") != want {
+				t.Errorf("%s: status=%d Cache-Control=%q, want %d %q", slug, r.status, r.header.Get("Cache-Control"), code, want)
+			}
+			if limit == "visits" {
+				r = e.visit("/" + slug)
+				if r.status != http.StatusGone || r.header.Get("Cache-Control") != "no-store" {
+					t.Errorf("exhausted %s: %d %q", slug, r.status, r.header.Get("Cache-Control"))
+				}
+			}
 		}
 	}
 }

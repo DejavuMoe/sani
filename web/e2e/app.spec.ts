@@ -580,3 +580,18 @@ test('import validation explains skipped rows in both languages', async () => {
   await expect(result).not.toContainText('tags_invalid');
   await page.getByRole('radio', { name: 'English', exact: true }).click();
 });
+
+test('imports the original Shlink CSV shape through Settings', async () => {
+  await page.goto('/admin/settings');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'short_urls.csv', mimeType: 'text/csv',
+    buffer: Buffer.from('"createdAt","domain","shortCode","shortUrl","longUrl","title","tags","visits"\n'
+      + '"2026-02-04T20:04:57+08:00","s.example.com","shlink-csv","https://s.example.com/shlink-csv","https://example.com/from-shlink","Imported from Shlink","blog|work",17\n'),
+  });
+  await expect(page.locator('.import-result')).toContainText('Imported 1 link');
+  const exported = await (await page.request.get('/api/export')).json();
+  expect(exported.links.find((link: { slug: string }) => link.slug === 'shlink-csv')).toMatchObject({
+    url: 'https://example.com/from-shlink', title: 'Imported from Shlink', clicks: 17,
+    tags: [{ name: 'blog', color: 'blue' }, { name: 'work', color: 'blue' }],
+  });
+});

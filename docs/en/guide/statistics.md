@@ -67,7 +67,7 @@ The database stores dates, not instants. Changing `TZ` later doesn’t redistrib
 
 ## Why the numbers may be lower than you expect
 
-- **Permanent redirects are cached.** Browsers cache a 301 redirect for a day, and visits from that browser skip Sani in the meantime. For links where counting matters, keep the default temporary redirect.
+- **Permanent redirects are cached.** Unlimited 301/308 redirects allow one day of browser caching, so repeat visits skip Sani. Since v0.8.0, redirects with expiry or a visit limit send `no-store`, but cannot recall previously cached responses. For links where counting matters, keep the default 302 and [bypass CDN caching of dynamic content](./deploy#cdn-cache).
 - **Previews don’t count.** When you post a link in a chat app or on social media, the platform usually fetches it once for the preview. Common platforms’ fetchers are recognized and not counted.
 - **Your own clicks don’t count.** Links opened from the admin app are left out.
 

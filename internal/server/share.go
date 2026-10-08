@@ -668,6 +668,8 @@ func (w *downloadWriter) WriteHeader(code int) {
 		return
 	}
 	w.wrote = true
+	// ServeContent removes Cache-Control on errors such as invalid ranges.
+	w.Header().Set("Cache-Control", "no-store")
 	if (code == http.StatusOK || code == http.StatusPartialContent) && !w.allow() {
 		w.denied = true
 		for _, key := range []string{"Content-Length", "Content-Range", "Content-Disposition", "ETag", "Last-Modified"} {

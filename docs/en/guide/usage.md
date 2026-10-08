@@ -46,7 +46,7 @@ Under “More options”, when creating a link or any time later:
 |---|---|
 | Expires | Never, or after 1 hour, 1 day, 7 days or 30 days, or at a time you pick. Afterwards visitors see a “no longer available” page. |
 | Visit limit | How many visits the link allows. Only visits that count toward the statistics use it up; see [Statistics](./statistics#visit-limits). |
-| Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani. **Permanent** (301): browsers cache it for a day, and repeat visits from the same browser in that time skip Sani, so they aren’t counted and see changes only later. The API also offers 307 and 308. |
+| Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani. **Permanent** (301): without expiry or a visit limit, browsers can cache it for a day; repeat visits skip Sani, so they aren’t counted and see changes only later. All redirect types disallow caching when expiry or a visit limit is set. The API also offers 307 and 308. |
 | Turned off | Visitors see a “no longer available” page until you turn the link back on. |
 
 ## Editing and deleting
@@ -54,7 +54,7 @@ Under “More options”, when creating a link or any time later:
 - **Edit.** Select a link and press <kbd>E</kbd> to change its destination, slug, title or options. The next visit follows the new settings.
 - **Renaming a slug.** The old slug stops working as soon as you save.
 - **Changing the destination.** If the title was fetched automatically, the new destination’s title is fetched.
-- **Delete.** Press <kbd>Del</kbd> (<kbd>⌘</kbd> <kbd>⌫</kbd> on a Mac). There’s no confirmation dialog; the notification offers undo instead. An hour after deletion, the link and its statistics are gone for good.
+- **Delete.** Press <kbd>Del</kbd> (<kbd>⌘</kbd> <kbd>⌫</kbd> on a Mac). There’s no confirmation dialog; the notification offers undo instead. Background maintenance purges records and statistics deleted more than an hour ago, then reclaims files asynchronously. Reusing a slug removes the old record early. See [share cleanup](./operations#share-cleanup).
 - **Reusing a slug.** A deleted link’s slug is free for a new link right away. Once a new link takes it, the old one can no longer be restored.
 
 ## Several links at once {#bulk}
@@ -74,7 +74,7 @@ Besides links, Sani shares a piece of text or a file. Switch to the Text or File
 
 A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MB. Nothing is rendered: Markdown and HTML show as written.
 
-Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Share”; for a file, the bar shows the upload’s progress and can cancel it. The address, such as `s.example.com/p/k3m9x2qv7h`, is copied as with a link. Expiry, the visit limit and the off switch work the same way; a visit limit of 1 makes a text that can be read once.
+Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Share”; for a file, the bar shows the upload’s progress and can cancel it. The address, such as `s.example.com/p/k3m9x2qv7h`, is copied as with a link. Expiry, the visit limit and the off switch work the same way. A limit of 1 means one counted visit, not automatic destruction of the content. Expired content remains until manually deleted and processed by [background cleanup](./operations#share-cleanup).
 
 Generated slugs for texts and files are 10 characters long instead of 5. Nothing lists your shares, so the address is what keeps them private, and 10 characters can’t be guessed. You can still pick a slug yourself.
 

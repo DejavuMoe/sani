@@ -2,12 +2,27 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.8.0
+
+2026-10-08 · Fix original Shlink CSV imports and caching of limited access; document CDN rules and shared-file cleanup. Database schema stays at 4 with no new migration.
 
 ### Fixed
 
+- Import the Shlink Web Client's original `short_urls.csv`, recognizing pipe-separated tags and retaining slugs, destinations, titles, creation times and total visits. Keep Sani CSV's JSON tag format and validation limits unchanged. Add import, repeated-import and admin upload regression coverage.
+- Send `Cache-Control: no-store` for redirects with expiry or a visit limit, preventing 301/308 caches from bypassing later checks. Unlimited permanent redirects still allow one day of caching. Invalid Range and other text/file download errors also retain `no-store`.
 - Default to a `./sani-data` bind directory and prevent Docker from creating it automatically. The homepage, both READMEs, quick starts, deployment pages and builder initialize permissions for `65532:65532` before startup and document repairs for existing directories. Back up and migrate existing named-volume data before changing the mount.
 - Replace the browser-native time zone dropdown with a custom searchable menu matching the site, with keyboard selection, mobile touch support and both themes.
+
+### Documentation
+
+- Document Cloudflare rules that bypass both application hosts by default and cache only admin build assets, plus the inability to recall permanent redirects already cached by browsers.
+- Clarify that expiry, exhausted visits and disabling do not delete content. Explain soft deletion, asynchronous cleanup, slug reuse, retained backups and SQLite WAL/SHM files, correcting destruction-after-reading and strict one-hour restoration claims.
+
+### Incompatible changes
+
+Redirects with expiry or a visit limit now disallow caching, so cache-dependent clients must reach the origin for validation. HTTP status codes and destinations are unchanged. The default Compose mount changes from a named volume to a bind directory that must be initialized first; do not replace an existing mount with the new example without migrating its data.
+
+- Back up the database, files and configuration, then update the image to `ghcr.io/dejavumoe/sani:v0.8.0`. Existing installations should keep their current data mount, such as `./data:/data`; changing directories to match new examples is unnecessary. Review CDN rules and purge previously cached dynamic responses; browser-cached permanent redirects may survive until their original expiry. Before importing Shlink data, review expiry, disabled state and visit limits absent from the export, then check `created` / `skipped` afterward.
 
 ## v0.7.0
 

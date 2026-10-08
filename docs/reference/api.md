@@ -189,13 +189,13 @@ curl https://s.example.com/api/links \
 
 `DELETE /api/links/{id}`
 
-返回 `204`。链接立即停止跳转，但在一小时内可以恢复，之后连同统计一起被彻底清除。删除后，这个短码可以立即分配给新的链接。
+返回 `204`。到达源站的新请求立即停止跳转。删除超过一小时的记录由后台连同统计一起清除；实际清理前仍可恢复。删除后短码可立即分配给新链接，这会提前移除旧记录。分享文件异步回收，详见[清理周期](../guide/operations#share-cleanup)。
 
 ### 恢复链接 {#restore}
 
 `POST /api/links/{id}/restore`
 
-撤销删除，返回恢复后的[链接对象](#link-object)。超过一小时，或者短码已经被新链接占用时，返回 `404`。
+撤销删除，返回恢复后的[链接对象](#link-object)。记录已经被后台清除，或者短码已经被新链接占用时，返回 `404`。恢复不会重置有效期或访问计数。
 
 ### 批量修改链接 {#bulk}
 
@@ -209,7 +209,7 @@ curl https://s.example.com/api/links \
 
 - `action` 是 `enable`、`disable`、`delete` 或 `restore` 之一，`ids` 列出 1 到 500 条链接。
 - 返回 `{"items": [...]}`：发生了变化的[链接](#link-object)。`delete` 返回删除之前的样子，其他操作返回修改之后的样子。不存在的 id、本来就处在目标状态的链接，以及[已经无法恢复](#restore)的链接都不会出现在里面，所以列表可能比 `ids` 短。
-- 删除的链接在一小时内可以恢复，和[单条删除](#delete)一样。
+- 删除的链接在记录被清理或短码被复用前可以恢复，和[单条删除](#delete)一样。
 
 ### 重新获取标题和图标 {#refresh}
 
@@ -462,7 +462,7 @@ curl https://s.example.com/api/import \
 `GET /{slug}`
 
 - 按链接设置的状态码跳转，`Location` 响应头是目标网址。非 ASCII 的域名会转换为 Punycode，其他非 ASCII 字符按百分号编码。
-- 临时跳转（302、307）带 `Cache-Control: private, max-age=0`，每次访问都会经过 Sani；永久跳转（301、308）带 `Cache-Control: public, max-age=86400`，浏览器最多缓存一天。
+- 设置有效期或访问上限的跳转（301、302、307、308）带 `Cache-Control: no-store`。未设置这两项限制时，临时跳转（302、307）带 `Cache-Control: private, max-age=0`；永久跳转（301、308）带 `Cache-Control: public, max-age=86400`，允许浏览器缓存一天，期间计数和修改无法影响未回源的请求。参见 [CDN 缓存配置](../guide/deploy#cdn-cache)。
 - 短码不存在时返回 `404`，链接停用、过期或访问次数用完时返回 `410`，都是按访问者语言显示的简单 HTML 页面。
 - 只接受 `GET` 和 `HEAD`，其他方法返回 `405`。
 - 文本和文件在这个路径下返回 `404`，它们在 `/p/` 下。

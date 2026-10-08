@@ -46,7 +46,7 @@ Sani tells the format from the content and understands:
 | Source | Format |
 |---|---|
 | Sani | Its own JSON or CSV export |
-| Shlink | The JSON of its short URL list endpoint: `{"shortUrls": {"data": [...]}}` |
+| Shlink | The unmodified `short_urls.csv` exported by Web Client, or its short URL list JSON: `{"shortUrls": {"data": [...]}}` |
 | Sink | Its JSON export: `{"links": [...]}` |
 | YOURLS, Kutt and others | A CSV with a header row and a column with the destination |
 | Anything else | A JSON array of objects, or a JSON object with such an array under `links`, `data`, `items` or `urls` |
@@ -68,6 +68,10 @@ Sani recognizes each field by its column (or JSON key) name. Names are case-inse
 | Enabled | `enabled` (`true` or `false`) |
 
 Shlink nests some values, so `visitsSummary.total`, `meta.validUntil` and `meta.maxVisits` are recognized as well.
+
+Shlink CSV is identified by the `shortCode`, `longUrl`, `shortUrl` and `domain` columns. Its `tags` cell contains names separated by `|`, such as `blog|work`; an empty cell means no tags. Import this file directly without converting tags to JSON arrays. The limits of 5 tags per link and 24 Unicode code points per name still apply, and invalid rows are skipped with `tags_invalid`. Sani's own CSV and other generic CSV files still use JSON arrays for tags; malformed JSON is not treated as a plain tag name.
+
+`shortCode` is kept as the slug. `domain` and `shortUrl` do not change the destination instance's domain; imported links use Sani's configured domain. Settings absent from Shlink's CSV cannot be recovered: missing enabled state, redirect type, expiry and visit limit default to enabled, 302, never and unlimited. Tags default to blue. Historical visit totals are preserved, without daily or referrer breakdowns. Before importing, check whether the old instance depends on any limits not included in its export.
 
 Times can be RFC 3339 (`2026-09-29T08:00:00Z`), `2026-09-29 08:00:00`, `2026-09-29`, or a Unix timestamp in seconds or milliseconds. Times without a zone are read as UTC.
 

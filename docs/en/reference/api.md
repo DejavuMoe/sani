@@ -189,13 +189,13 @@ The decision to clear an automatic title uses the latest row inside the write tr
 
 `DELETE /api/links/{id}`
 
-Returns `204`. The link stops redirecting at once but can be restored for an hour; after that it’s removed for good, with its statistics. Its slug is free for a new link right away.
+Returns `204`. New requests reaching the origin stop redirecting immediately. Background maintenance purges records deleted more than an hour ago with their statistics; restoration remains possible until that purge. The slug is free for a new link right away, which removes the old record early. Shared files are reclaimed asynchronously; see [cleanup intervals](../guide/operations#share-cleanup).
 
 ### Restore a link {#restore}
 
 `POST /api/links/{id}/restore`
 
-Undoes a delete and returns the restored [link](#link-object). Returns `404` after an hour, or when a new link has taken the slug.
+Undoes a delete and returns the restored [link](#link-object). Returns `404` once maintenance has purged the record or a new link has taken the slug. Restoration does not reset expiry or visit counts.
 
 ### Change several links at once {#bulk}
 
@@ -209,7 +209,7 @@ Turns links on or off, deletes or restores them, in one transaction:
 
 - `action` is `enable`, `disable`, `delete` or `restore`, and `ids` lists 1 to 500 links.
 - Returns `{"items": [...]}`: the [links](#link-object) that changed, as they are now, or, for `delete`, as they were before. Ids that don’t exist, links already in that state and links that can [no longer be restored](#restore) are left out, so the list can be shorter than `ids`.
-- Deleted links can be restored for an hour, as with [a single delete](#delete).
+- Deleted links can be restored until purged or their slug is reclaimed, as with [a single delete](#delete).
 
 ### Fetch the title and icon again {#refresh}
 
@@ -462,7 +462,7 @@ These paths are outside `/api/` and need no authentication.
 `GET /{slug}`
 
 - Redirects with the link’s status code and the destination in `Location`. Non-ASCII hosts are converted to Punycode, and other non-ASCII characters are percent-encoded.
-- Temporary redirects (302, 307) send `Cache-Control: private, max-age=0`, so every visit reaches Sani; permanent ones (301, 308) send `Cache-Control: public, max-age=86400`, so browsers cache them for up to a day.
+- Redirects with expiry or a visit limit (301, 302, 307, 308) send `Cache-Control: no-store`. Without either limit, temporary redirects (302, 307) send `Cache-Control: private, max-age=0`; permanent ones (301, 308) send `Cache-Control: public, max-age=86400`, allowing one day of browser caching. Counting and edits cannot affect requests that do not reach Sani. See [CDN caching](../guide/deploy#cdn-cache).
 - Unknown slugs get `404`, and turned off, expired or used-up links `410`, both as small HTML pages in the visitor’s language.
 - Only `GET` and `HEAD` are accepted; other methods get `405`.
 - A text or file at this path gets `404`: shares live under `/p/`.
