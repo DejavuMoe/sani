@@ -258,6 +258,100 @@
       "limitations": [
         "External docs do not prove this VPS settings or end-to-end upload performance."
       ]
+    },
+    {
+      "id": "r4-user-screenshots",
+      "type": "screenshot",
+      "location": "Current user attachments: page metadata native select closed/open",
+      "roles": [
+        "visual-reference",
+        "interaction-reference"
+      ],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Synthetic example.com hosts and no credentials in captures",
+      "licenseOrPermission": "User requested investigation and prototype; referenced docs not copied",
+      "localCopies": [],
+      "observations": [
+        "Native OS select popup is visible in current production. No screenshot data copied into fixtures."
+      ],
+      "inferences": [],
+      "limitations": [
+        "R4 is pending approval; prototype is not production behavior."
+      ]
+    },
+    {
+      "id": "r4-runtime-baseline",
+      "type": "code",
+      "location": "GitHub master e58de510923155978820a3cb8580836acc58d0d5; Forgejo master fc391bd1d996b18f2ecf7ad792555786d3b44446",
+      "roles": [
+        "functional-truth"
+      ],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Synthetic example.com hosts and no credentials in captures",
+      "licenseOrPermission": "User requested investigation and prototype; referenced docs not copied",
+      "localCopies": [],
+      "observations": [
+        "Production docs public response is v0.8.0 and CF-Cache-Status DYNAMIC. Woodpecker publishes on Forgejo master pushes; GitHub CI only builds docs."
+      ],
+      "inferences": [],
+      "limitations": [
+        "R4 is pending approval; prototype is not production behavior."
+      ]
+    },
+    {
+      "id": "r4-relay-research",
+      "type": "webpage",
+      "location": "https://jina.ai/reader/ ; https://duckduckgo.com/duckduckgo-help-pages/results/rduckduckgocom ; https://duckduckgo.com/duckduckgo-help-pages/privacy/favicons",
+      "roles": [
+        "inspiration-only"
+      ],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Synthetic example.com hosts and no credentials in captures",
+      "licenseOrPermission": "User requested investigation and prototype; referenced docs not copied",
+      "localCopies": [],
+      "observations": [
+        "DDG redirect does not relay titles; its favicon service is separate. Jina JSON includes title; one public example.com request returned HTTP 200 with a title. This is API feasibility evidence, not Sani integration or availability proof."
+      ],
+      "inferences": [],
+      "limitations": [
+        "R4 is pending approval; prototype is not production behavior."
+      ]
+    },
+    {
+      "id": "r5-browser-comments",
+      "type": "screenshot",
+      "location": "User browser comments 1-3 on prototype-r4.html, 1544x804; current conversation",
+      "roles": [
+        "visual-reference",
+        "interaction-reference"
+      ],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Only synthetic example.com hosts and demo fixtures are used in the revision.",
+      "licenseOrPermission": "User supplied comments and screenshots for this design correction.",
+      "localCopies": [],
+      "observations": [
+        "Comment 1: segmented label alignment. Comment 2: domain input/save height mismatch. Comment 3: redundant connection dropdown.",
+        "User rejects paid relay integration and requests the previous compact visual language.",
+        "Source measurements: field height 36px versus adjacent button 32px; widened segmented buttons lacked justify-content:center."
+      ],
+      "inferences": [
+        "Use one existing segmented choice and flat settings rows, not a new container or control family."
+      ],
+      "limitations": [
+        "R5 needs user approval; local form and connection states are simulated."
+      ]
     }
   ]
 }

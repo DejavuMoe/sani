@@ -22,13 +22,35 @@
       "prototype": {
         "entry": "foundations.html",
         "assetPath": "foundations.html",
-        "files": ["src/gen/tokens.css", "src/fonts.css", "src/gen/icons.js", "src/components.jsx", "src/boards/foundations.jsx"],
-        "states": ["light", "dark"],
-        "stableIds": ["colors", "type", "shape", "motion", "fields", "icons", "logo"]
+        "files": [
+          "src/gen/tokens.css",
+          "src/fonts.css",
+          "src/gen/icons.js",
+          "src/components.jsx",
+          "src/boards/foundations.jsx"
+        ],
+        "states": [
+          "light",
+          "dark"
+        ],
+        "stableIds": [
+          "colors",
+          "type",
+          "shape",
+          "motion",
+          "fields",
+          "icons",
+          "logo"
+        ]
       },
       "production": {
         "routeOrWindow": null,
-        "files": ["web/src/app.css", "web/src/components/Icon.svelte", "web/src/components/Logo.svelte", "web/index.html"],
+        "files": [
+          "web/src/app.css",
+          "web/src/components/Icon.svelte",
+          "web/src/components/Logo.svelte",
+          "web/index.html"
+        ],
         "interfaces": [],
         "tests": []
       },
@@ -40,7 +62,12 @@
       "prototype": {
         "entry": "components.html",
         "assetPath": "components.html",
-        "files": ["src/components.jsx", "src/css/components.css", "src/lib.jsx", "src/boards/components.jsx"],
+        "files": [
+          "src/components.jsx",
+          "src/css/components.css",
+          "src/lib.jsx",
+          "src/boards/components.jsx"
+        ],
         "states": [
           "button-variants-sizes-loading-disabled",
           "segmented",
@@ -54,7 +81,19 @@
           "charts-active-empty",
           "qr"
         ],
-        "stableIds": ["button", "segmented", "switch", "menu", "dialog", "toaster", "slug", "expiry", "favicon", "charts", "qr"]
+        "stableIds": [
+          "button",
+          "segmented",
+          "switch",
+          "menu",
+          "dialog",
+          "toaster",
+          "slug",
+          "expiry",
+          "favicon",
+          "charts",
+          "qr"
+        ]
       },
       "production": {
         "routeOrWindow": null,
@@ -76,8 +115,13 @@
           "web/src/lib/toast.svelte.ts",
           "web/src/lib/qr.ts"
         ],
-        "interfaces": ["GET /api/slugs/{slug}", "GET /api/favicons/{host}"],
-        "tests": ["web/e2e/app.spec.ts"]
+        "interfaces": [
+          "GET /api/slugs/{slug}",
+          "GET /api/favicons/{host}"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts"
+        ]
       },
       "status": "implemented"
     },
@@ -87,7 +131,13 @@
       "prototype": {
         "entry": "patterns.html",
         "assetPath": "patterns.html",
-        "files": ["src/patterns.jsx", "src/css/patterns.css", "src/store.jsx", "src/fixtures.js", "src/boards/patterns.jsx"],
+        "files": [
+          "src/patterns.jsx",
+          "src/css/patterns.css",
+          "src/store.jsx",
+          "src/fixtures.js",
+          "src/boards/patterns.jsx"
+        ],
         "states": [
           "composer-url-idle",
           "composer-url-more",
@@ -126,7 +176,16 @@
           "header-scrolled",
           "header-settings"
         ],
-        "stableIds": ["creator", "summary", "rows", "picking", "detail", "editor", "list", "header"]
+        "stableIds": [
+          "creator",
+          "summary",
+          "rows",
+          "picking",
+          "detail",
+          "editor",
+          "list",
+          "header"
+        ]
       },
       "production": {
         "routeOrWindow": "/admin/",
@@ -158,7 +217,9 @@
           "POST /api/files",
           "GET /api/overview"
         ],
-        "tests": ["web/e2e/app.spec.ts"]
+        "tests": [
+          "web/e2e/app.spec.ts"
+        ]
       },
       "status": "implemented"
     },
@@ -168,9 +229,71 @@
       "prototype": {
         "entry": "prototype.html",
         "assetPath": "prototype.html",
-        "files": ["src/app.jsx", "src/scenes.jsx", "src/screens.jsx", "src/css/screens.css", "src/patterns.jsx", "src/store.jsx", "src/lib.jsx", "src/fixtures.js"],
-        "states": ["setup","setup-filled","setup-error","login","login-expired","login-wrong","login-rate","offline","dashboard","dashboard-empty","dashboard-loading","dashboard-error","dashboard-search","dashboard-noresults","dashboard-texts","dashboard-sort-clicks","dashboard-picking","dashboard-selected","detail-url","detail-text","detail-file","detail-expired","detail-limit","edit-url","edit-text","composer-more","composer-error","composer-pasted","composer-text","composer-code","composer-file","composer-file-picked","composer-file-uploading","composer-file-off","shortcuts","toasts","settings","settings-token","settings-import","settings-env","new","new-result"],
-        "stableIds": ["setup", "login", "offline", "dashboard", "link-detail", "link-editor", "shortcuts", "settings", "new-link"]
+        "files": [
+          "src/app.jsx",
+          "src/scenes.jsx",
+          "src/screens.jsx",
+          "src/css/screens.css",
+          "src/patterns.jsx",
+          "src/store.jsx",
+          "src/lib.jsx",
+          "src/fixtures.js"
+        ],
+        "states": [
+          "setup",
+          "setup-filled",
+          "setup-error",
+          "login",
+          "login-expired",
+          "login-wrong",
+          "login-rate",
+          "offline",
+          "dashboard",
+          "dashboard-empty",
+          "dashboard-loading",
+          "dashboard-error",
+          "dashboard-search",
+          "dashboard-noresults",
+          "dashboard-texts",
+          "dashboard-sort-clicks",
+          "dashboard-picking",
+          "dashboard-selected",
+          "detail-url",
+          "detail-text",
+          "detail-file",
+          "detail-expired",
+          "detail-limit",
+          "edit-url",
+          "edit-text",
+          "composer-more",
+          "composer-error",
+          "composer-pasted",
+          "composer-text",
+          "composer-code",
+          "composer-file",
+          "composer-file-picked",
+          "composer-file-uploading",
+          "composer-file-off",
+          "shortcuts",
+          "toasts",
+          "settings",
+          "settings-token",
+          "settings-import",
+          "settings-env",
+          "new",
+          "new-result"
+        ],
+        "stableIds": [
+          "setup",
+          "login",
+          "offline",
+          "dashboard",
+          "link-detail",
+          "link-editor",
+          "shortcuts",
+          "settings",
+          "new-link"
+        ]
       },
       "production": {
         "routeOrWindow": "/admin/, /admin/settings, /admin/new",
@@ -200,7 +323,12 @@
           "GET /api/export",
           "POST /api/import"
         ],
-        "tests": ["web/e2e/app.spec.ts", "web/src/lib/i18n.test.ts", "web/src/lib/url.test.ts", "web/src/lib/size.test.ts"]
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/src/lib/i18n.test.ts",
+          "web/src/lib/url.test.ts",
+          "web/src/lib/size.test.ts"
+        ]
       },
       "status": "implemented"
     },
@@ -210,15 +338,44 @@
       "prototype": {
         "entry": "visitor.html",
         "assetPath": "visitor.html",
-        "files": ["visitor.html", "src/gen/visitor.js", "src/fixtures.js"],
-        "states": ["notfound", "gone", "error", "share-notfound", "share-gone", "share-code", "share-text", "share-code-until", "share-file", "share-file-off"],
-        "stableIds": ["visitor-error", "share-page"]
+        "files": [
+          "visitor.html",
+          "src/gen/visitor.js",
+          "src/fixtures.js"
+        ],
+        "states": [
+          "notfound",
+          "gone",
+          "error",
+          "share-notfound",
+          "share-gone",
+          "share-code",
+          "share-text",
+          "share-code-until",
+          "share-file",
+          "share-file-off"
+        ],
+        "stableIds": [
+          "visitor-error",
+          "share-page"
+        ]
       },
       "production": {
         "routeOrWindow": "/{slug}, /p/{slug}",
-        "files": ["internal/server/web.go", "internal/server/sharepage.go", "internal/server/redirect.go"],
-        "interfaces": ["GET /{slug}", "GET /p/{slug}"],
-        "tests": ["web/e2e/app.spec.ts", "internal/server/server_test.go", "internal/server/share_test.go"]
+        "files": [
+          "internal/server/web.go",
+          "internal/server/sharepage.go",
+          "internal/server/redirect.go"
+        ],
+        "interfaces": [
+          "GET /{slug}",
+          "GET /p/{slug}"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "internal/server/server_test.go",
+          "internal/server/share_test.go"
+        ]
       },
       "status": "needs-review"
     },
@@ -392,6 +549,127 @@
       },
       "status": "implemented",
       "notes": "Implemented from approved R3 design commit 81e5609929cc8f9674b20c89cce64e5d438f5c8f for v0.9.0. Local check/test/e2e/smoke/docs/bench passed; 27 Chromium flows include 26 MB chunk retry and 1280/390/320 horizontal geometry. Real HTTP/HTTPS/SOCKS5 fixtures cover authentication, Host/SNI, NO_PROXY, mixed DNS and rebinding. Original private Shlink CSV verified only in a temporary database: 82 links, 10 tags, 38234 clicks, repeat import 0. Bilingual light/dark axe checks cover desktop and narrow tag create/edit and settings. Cloudflare live transfer and VPS upgrade require instance validation; not performed here."
+    },
+    {
+      "id": "r4-metadata-controls",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r4.html",
+        "assetPath": "prototype-r4.html",
+        "files": [
+          "src/r4/settings.jsx",
+          "src/r4/controls.jsx",
+          "src/r4/controls.css",
+          "src/r4/scenes.jsx",
+          "src/r4/app.jsx"
+        ],
+        "states": [
+          "relay",
+          "http-https",
+          "socks5",
+          "direct",
+          "off",
+          "credentials-empty-saved-replace-remove",
+          "invalid",
+          "testing-success-failure-retry",
+          "environment-locked",
+          "menu-keyboard",
+          "color-rgb-hex-hsl",
+          "calendar",
+          "zh-en-light-dark-1280-390-320"
+        ],
+        "stableIds": [
+          "r4-meta"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/settings, /admin/",
+        "files": [
+          "web/src/views/Settings.svelte",
+          "web/src/components/Menu.svelte",
+          "web/src/components/Segmented.svelte",
+          "web/src/components/ColorEditor.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/lib/api.ts",
+          "internal/server/settings.go",
+          "internal/meta/proxy.go",
+          "internal/meta/meta.go"
+        ],
+        "interfaces": [
+          "GET /api/config",
+          "PATCH /api/config",
+          "metadata connection test API (proposed; exact route decided after approval)"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/scripts/a11y.mjs",
+          "internal/server/r3_test.go",
+          "internal/meta/proxy_test.go"
+        ]
+      },
+      "status": "prototype",
+      "notes": "Historical R4, changes requested by user: misaligned controls, redundant connection selector/card, unwanted Jina integration. Superseded by R5. See _d_meta.json for review status; do not implement R4."
+    },
+    {
+      "id": "r5-compact-settings",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r5.html",
+        "assetPath": "prototype-r5.html",
+        "files": [
+          "src/r5/settings.jsx",
+          "src/r5/settings.css",
+          "src/r5/controls.css",
+          "src/r5/scenes.jsx",
+          "src/r5/app.jsx",
+          "src/r4/controls.jsx"
+        ],
+        "states": [
+          "http-https",
+          "socks5",
+          "direct",
+          "off",
+          "credentials-empty-saved-replace-remove-cancel",
+          "invalid",
+          "testing-success-failure-retry",
+          "environment-locked",
+          "segmented-keyboard",
+          "settings-input-action-alignment",
+          "zh-en-light-dark-1544-390-320"
+        ],
+        "stableIds": [
+          "r5-meta"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/settings, /admin/",
+        "files": [
+          "web/src/views/Settings.svelte",
+          "web/src/components/Menu.svelte",
+          "web/src/components/Segmented.svelte",
+          "web/src/components/ColorEditor.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/lib/api.ts",
+          "internal/server/settings.go",
+          "internal/meta/proxy.go",
+          "internal/meta/meta.go"
+        ],
+        "interfaces": [
+          "GET /api/config",
+          "PATCH /api/config",
+          "metadata connection test API (proposed; exact route decided after approval)"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/scripts/a11y.mjs",
+          "internal/server/r3_test.go",
+          "internal/meta/proxy_test.go"
+        ]
+      },
+      "status": "approved",
+      "notes": "R5 removes the hosted relay and nested route/card. Reuses flat settings rows and one Direct/HTTP(S)/SOCKS5 Segmented. Fixes paired controls across Settings and centers segmented labels. Prototype save/test only; no production endpoints or credentials. See r5-handoff.md."
     }
   ]
 }

@@ -13,9 +13,13 @@
    "content/dom-tags-production-zh.json",
    "content/dom-tags-production-en.json",
    "content/dom-r3-zh.json",
-   "content/dom-r3-en.json"
+   "content/dom-r3-en.json",
+   "content/dom-r4-zh.json",
+   "content/dom-r4-en.json",
+   "content/dom-r5-zh.json",
+   "content/dom-r5-en.json"
   ],
-  "capturedAt": "2026-10-08T15:59:53Z",
+  "capturedAt": "2026-10-08T22:30:38Z",
   "surfaces": [
    {
     "source": "content/dom-app-zh.json",
@@ -40824,6 +40828,3735 @@
    },
    "flags": [],
    "notes": "Reviewed for operational relevance. Prototype approval remains pending; simulated behavior is documented in the handoff."
+  },
+  {
+   "id": "content-28dae7c8bde2f3ca",
+   "text": "115",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-en-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(2) > output",
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(2) > output"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c0bec6f048ee7734",
+   "text": "2026-10-08",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(8)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(8)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c894114fbc6a6bec",
+   "text": "2026-10-09",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(9)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(9)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-462d5a35048be905",
+   "text": "2026-10-10",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(10)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(10)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-71ff362cc834012b",
+   "text": "2026-10-11",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(11)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(11)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-04c17ac53fcbb205",
+   "text": "2026-10-12",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(12)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(12)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-25b8fb449a1b1d76",
+   "text": "2026-10-13",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(13)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(13)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-cf1ac2a9beae735e",
+   "text": "2026-10-14",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(14)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(14)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e85c5195b5dcc29e",
+   "text": "2026-10-15",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(15)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(15)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-05c5e3bcb722fd40",
+   "text": "2026-10-16",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(16)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(16)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-23ab569e4844b1a6",
+   "text": "2026-10-17",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(17)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(17)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-aa66931ec9add42a",
+   "text": "2026-10-18",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(18)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(18)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-0612bf54f17f599c",
+   "text": "2026-10-19",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(19)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(19)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-f39a418bad47ff70",
+   "text": "2026-10-20",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(20)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(20)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-cb377837061e51a8",
+   "text": "2026-10-21",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(21)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(21)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-06e45b4dfbddf8fc",
+   "text": "2026-10-22",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(22)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(22)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-9a5028763b8b5525",
+   "text": "2026-10-23",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(23)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(23)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-fe6225c1ad164429",
+   "text": "2026-10-24",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(24)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(24)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-473ff37b532c9ee4",
+   "text": "2026-10-25",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-bf044a2c29d5517b",
+   "text": "2026-10-26",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-7491dd33aafb5e7c",
+   "text": "2026-10-27",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-58beca76ab87ec97",
+   "text": "2026-10-28",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-5ef2d8c8a905e881",
+   "text": "2026-10-29",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(29)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(29)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c9c37f3f041ea469",
+   "text": "2026-10-30",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(30)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(30)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-95d17cab42b9c0ff",
+   "text": "2026-10-31",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(31)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(31)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-cdb0761e35a65e04",
+   "text": "2026年10月",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-b7a56873cd771f2c",
+   "text": "25",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-5f9c4ab08cac7457",
+   "text": "26",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-670671cd97404156",
+   "text": "27",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-59e19706d51d39f6",
+   "text": "28",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)",
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c6b26673f701d98b",
+   "text": "A key is optional. Limits and availability depend on the provider.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c52dc612ce3ab0e2",
+   "text": "API key (optional)",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-735965ae601be60d",
+   "text": "API 密钥（可选）",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-3c2a35a7444bb8e8",
+   "text": "Apply date and time",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > button.btn.btn-secondary > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-66880d2d8216260d",
+   "text": "Authentication",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] button#r4-auth",
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(3) > label",
+    "[socks-en-dark-390] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-343b5a9c7fd6dcc0",
+   "text": "Choose date",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-639a40e82b9a96f0",
+   "text": "Connection",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > button.field.r4-choice",
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e657633b464d74d6",
+   "text": "Connection failures never fall back to direct requests.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > p.hint.r4-policy"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-75d3c9d7f83ec737",
+   "text": "Create “Demo”",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-en-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-28d0ad5455688db8",
+   "text": "Direct connection",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] div#menu-r3 > button.mi:nth-of-type(1) > span.mi-label:nth-of-type(1)",
+    "[menu-en-light-1280] div#menu-r3 > button.mi:nth-of-type(1) > span.mi-label:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e074c5fb883d149f",
+   "text": "Encrypt connection to proxy (HTTPS)",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] button#r4-tls",
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > div > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c13e8abb4d0fbeb7",
+   "text": "Fetch page metadata",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] button#r4-enabled",
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting:nth-of-type(1) > div > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-677a551606f733fe",
+   "text": "Fetch titles and site icons when creating links.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting:nth-of-type(1) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-7f135aeded40ff90",
+   "text": "HH:mm",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[calendar-en-390] input#r4-expiry-time",
+    "[calendar-zh-390] input#r4-expiry-time"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-ed95b294a92763e9",
+   "text": "HTTP(S)",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(2)",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c578198962b22ecf",
+   "text": "Jina Reader",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-provider:nth-of-type(1) > span:nth-of-type(1)",
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-provider:nth-of-type(1) > span:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-74e53211fef4b4d4",
+   "text": "Next month",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-4e27aae2f9b2a5a4",
+   "text": "October 2026",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-22768b4b72f9c268",
+   "text": "Page titles",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-provider:nth-of-type(1) > span.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-ec116342c6998ca9",
+   "text": "Pick a time",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > button.opt > span.v:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-72e9a59f5a1d6289",
+   "text": "Port",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-address:nth-of-type(1) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6a2769502a5dda78",
+   "text": "Previous month",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-669c364ca8408eed",
+   "text": "Proxy host",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-address:nth-of-type(1) > div.r4-input:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6f38d5187e9d69c1",
+   "text": "Proxy method",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-87508aab102ca7f7",
+   "text": "proxy.example.com",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[http-en-light-1280] input#r4-host",
+    "[http-zh-light-1280] input#r4-host"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c226b0485361a7d1",
+   "text": "Relay",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-4ec401a4e6a97db2",
+   "text": "Relay or proxy",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] div#menu-r3 > button.mi:nth-of-type(2) > span.mi-label:nth-of-type(1)",
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > button.field.r4-choice > span",
+    "[menu-en-light-1280] div#menu-r3 > button.mi:nth-of-type(2) > span.mi-label:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e96df4805ae6900b",
+   "text": "Relay or proxy settings",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > legend.sr-only"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c3812fc4acb861d5",
+   "text": "Remove",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-en-dark-390] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-ghost:nth-of-type(2) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-95e154398a4bc009",
+   "text": "Replace",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-en-dark-390] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-secondary:nth-of-type(1) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-367afe73a155c137",
+   "text": "Requires an HTTPS proxy. Turn off to use HTTP.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-8de0b3c47f112c59",
+   "text": "S",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(6)",
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(7)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-8dec3185165c758b",
+   "text": "Saved. New requests will use these settings.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-remove] section#r4-meta > form.st-body.r4-form > div.r4-feedback.hint:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "completion",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-0df6f1cad36c49da",
+   "text": "Show",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-ghost > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-a71f282f6e571c08",
+   "text": "SOCKS5",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(3)",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(3)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-d69e65463f049029",
+   "text": "SOCKS5 does not encrypt the connection to the proxy. Credentials provide authentication only.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-en-dark-390] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-7799ea69ffd49ead",
+   "text": "SOCKS5 不加密到代理的连接。账号密码仅用于认证。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[keyboard-menu-and-method] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-5bcf311b19d80c56",
+   "text": "Test connection",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r4-actions:nth-of-type(3) > button.btn.btn-secondary:nth-of-type(2) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-56b78965fa871820",
+   "text": "The relay receives the full destination URL. This mode fetches titles only; icons use local initials.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-33b93476cf597a33",
+   "text": "Time",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-a710c2b90913b537",
+   "text": "Unsaved changes",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-en-light-1280] section#r4-meta > form.st-body.r4-form > div.r4-feedback.hint:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e3b89e9d33f88e52",
+   "text": "Username",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-en-dark-390] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(3) > div.r4-input:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-ac6560b86746adb6",
+   "text": "Uses this device’s time zone.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-fcb5f40df9be6bae",
+   "text": "W",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-en-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(3)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6c48580bf8e9c9fd",
+   "text": "YYYY-MM-DD",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[calendar-en-390] input#r4-expiry-date",
+    "[calendar-zh-390] input#r4-expiry-date"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-en.json",
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-51a75f4634dfa859",
+   "text": "一",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(1)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-a4c3313deb180960",
+   "text": "三",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(3)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-f9e727223456b717",
+   "text": "上个月",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-3e0b634699d4c912",
+   "text": "下个月",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-12cd72d16befd9ed",
+   "text": "不再发起网页信息请求。你仍可手动填写标题。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[r4-off] section#r4-meta > form.st-body.r4-form > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-8c8a3f32457e4796",
+   "text": "不填密钥也可使用，额度与可用性由服务商决定。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-715ce81251a45319",
+   "text": "中继",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1) > button:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c271c265f487896e",
+   "text": "中继会收到完整目标网址。此模式只获取标题，图标使用本地字母图标。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > p.hint:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-8882a34e00061d8c",
+   "text": "中继或代理",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] div#menu-r3 > button.mi:nth-of-type(2) > span.mi-label:nth-of-type(1)",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > button.field.r4-choice > span",
+    "[menu-zh-light-1280] div#menu-r3 > button.mi:nth-of-type(2) > span.mi-label:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible",
+    "visually-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-aa4b64d734132030",
+   "text": "中继或代理设置",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > legend.sr-only"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-217947ddad57b0e8",
+   "text": "主题: 深色",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[http-zh-dark-1280] div#app > header.hd.scrolled > div.hd-inner > nav.hd-tools > span.r4-tip:nth-of-type(2) > button.hd-tool"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-084b42f6e95e4e65",
+   "text": "二",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(2)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c9b87f516a38ea36",
+   "text": "五",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(5)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-2fb1439352aca41c",
+   "text": "代理主机",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-address:nth-of-type(1) > div.r4-input:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6d1876364ac6457d",
+   "text": "代理方式",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.seg.seg-md:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-5b979e3260b31051",
+   "text": "代理服务需要支持 HTTPS。关闭后使用 HTTP。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-b94245b0bc48a49d",
+   "text": "使用当前设备的时区。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-de07b5383874b2a3",
+   "text": "六",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(6)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-848559bcf0dbf835",
+   "text": "创建短链接时获取标题与网站图标。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting:nth-of-type(1) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-70107792cb416cee",
+   "text": "加密连接到代理（HTTPS）",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] button#r4-tls",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > div > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-ca70a08ae1de5f1f",
+   "text": "取消替换",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-replace] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(4) > div.r4-input:nth-of-type(2) > button.btn.btn-ghost > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-754a9d5828d502f1",
+   "text": "四",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(4)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-1517e5e5f4f07852",
+   "text": "填写主机名或 IP，不包含协议、路径或凭据。",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[empty-validation] input#r4-host",
+    "[empty-validation] p#r4-host-error"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-44251e1ff33334a2",
+   "text": "已保存，新请求将使用此设置。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-saved] section#r4-meta > form.st-body.r4-form > div.r4-feedback.hint:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "completion",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-ab503d4b843f03eb",
+   "text": "应用时间",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > button.btn.btn-secondary > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e7823962096cd2ef",
+   "text": "当前连接方式由环境变量固定，后台显示有效值。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[r4-env-locked] section#r4-meta > form.st-body.r4-form > p.hint.r4-notice"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "disabled",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-acd6ba34b9fac0ab",
+   "text": "新建「Demo」",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-85217f7aff778414",
+   "text": "日",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2) > span:nth-of-type(7)"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-8b6ff498515bcc2f",
+   "text": "时间",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-4e1449e7d5e50593",
+   "text": "显示",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-replace] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(4) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-ghost > span.btn-text",
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-ghost > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-131b13aa265996df",
+   "text": "替换",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-saved] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(4) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-secondary:nth-of-type(1) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-b31640e590dd972a",
+   "text": "有尚未保存的更改",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r4-feedback.hint:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-0a98a48eaaac4175",
+   "text": "测试连接",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r4-actions:nth-of-type(3) > button.btn.btn-secondary:nth-of-type(2) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-1a3f0617d6de8e52",
+   "text": "用户名",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-saved] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(4) > div.r4-input:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-534927f7606e137d",
+   "text": "留空保留已保存的凭据",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[credentials-replace] input#\\:r4\\:"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6135d4159e892541",
+   "text": "移除",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[credentials-saved] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-auth-fields:nth-of-type(4) > div.r4-input:nth-of-type(2) > div.r4-secret > button.btn.btn-ghost:nth-of-type(2) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e71ac32b544b0ebf",
+   "text": "端口",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-address:nth-of-type(1) > div.r4-input:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-2750765892d147be",
+   "text": "端口须为 1–65535。",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[empty-validation] input#r4-port",
+    "[empty-validation] p#r4-port-error"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-0eb7ee7e38effcf3",
+   "text": "红",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(1)",
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(1) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-84b34ffba5aa3e3e",
+   "text": "绿",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(2)",
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(2) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-e614518eba7b607e",
+   "text": "网页标题",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[relay-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r4-provider:nth-of-type(1) > span.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-9e12f6fdecabdb28",
+   "text": "自动获取网页信息",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] button#r4-enabled",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting:nth-of-type(1) > div > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-4ac5f3d55da7c15f",
+   "text": "自定义时间",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > button.opt > span.v:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-52f354ecfccbb8e6",
+   "text": "蓝",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(3)",
+    "[color-zh-390] div#tag-picker-r4 > div.tag-choices:nth-of-type(2) > div.tag-new > div.r3-color > div.r4-sliders:nth-of-type(3) > label:nth-of-type(3) > input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-3efd4df0293abcc9",
+   "text": "身份认证",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] button#r4-auth",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(3) > label",
+    "[keyboard-menu-and-method] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > div.r4-method-body:nth-of-type(2) > div.r3-setting:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-77a04f5a2c9c2b43",
+   "text": "连接失败时不自动回退到直连。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > fieldset.r4-panel > p.hint.r4-policy"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-23437205dba458de",
+   "text": "连接成功，已获取测试页面标题。尚未保存的设置不会生效。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[connection-retry-success] section#r4-meta > form.st-body.r4-form > div.r4-feedback.hint:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "completion",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-485a26050ce57431",
+   "text": "连接方式",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > button.field.r4-choice",
+    "[http-zh-light-1280] section#r4-meta > form.st-body.r4-form > div.r3-setting.r4-route:nth-of-type(2) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-6c227d4d8c35e2ba",
+   "text": "连接超时。请检查地址、端口和认证后重试。当前设置未改变。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[connection-failed] section#r4-meta > form.st-body.r4-form > div.r4-feedback.error-text:nth-of-type(4)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "error",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-680c78ec60f463de",
+   "text": "选择日期",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "[calendar-zh-390] div#create-panel-url > form.cmp > div.cmp-options:nth-of-type(2) > span.expiry:nth-of-type(3) > div.r4-date:nth-of-type(2) > div.r4-calendar:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-c059b61c6a282487",
+   "text": "重试连接",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[connection-failed] section#r4-meta > form.st-body.r4-form > div.r4-actions:nth-of-type(3) > button.btn.btn-secondary:nth-of-type(2) > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r4-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r4/settings.jsx; designs/sani/src/r4/controls.jsx",
+    "reference": "Rendered R4 controls and states; proposed domain fields, actions, validation or necessary help. Reviewed against r4-handoff.md; no approval implied."
+   },
+   "flags": [],
+   "notes": "R4 proposal; no claim that production already supports these settings."
+  },
+  {
+   "id": "content-083bbe0438393c60",
+   "text": "Connection encryption",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-auth-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-7014aff13517c407",
+   "text": "Enter password",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[socks-auth-en-dark-1544] input#\\:r3\\:",
+    "[socks-auth-en-dark-320] input#\\:r3\\:",
+    "[socks-auth-en-dark-390] input#\\:r3\\:",
+    "[socks-auth-en-light-1544] input#\\:r3\\:",
+    "[socks-auth-en-light-320] input#\\:r3\\:",
+    "[socks-auth-en-light-390] input#\\:r3\\:"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-8628e326e3023c1a",
+   "text": "Metadata connection settings",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-e90148024bf162f3",
+   "text": "Not provided by SOCKS5",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-auth-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-5d3f38b6e536e060",
+   "text": "Sites see the proxy’s outgoing IP. No direct fallback on failure.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[http-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-82016fd072050f92",
+   "text": "SOCKS5 不提供加密",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-auth-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)",
+    "[socks-auth-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.hint:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "state",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-384de8c1f14b4c98",
+   "text": "Use HTTPS proxy",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[http-en-dark-1544] button#r5-tls",
+    "[http-en-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-en-dark-320] button#r5-tls",
+    "[http-en-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-en-dark-390] button#r5-tls",
+    "[http-en-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-en-light-1544] button#r5-tls",
+    "[http-en-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-en-light-320] button#r5-tls",
+    "[http-en-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-en-light-390] button#r5-tls",
+    "[http-en-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-en.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-7616db162f097ca6",
+   "text": "使用 HTTPS 代理",
+   "channels": [
+    "aria-label",
+    "text"
+   ],
+   "locations": [
+    "[connection-failed] button#r5-tls",
+    "[connection-failed] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[connection-retry-success] button#r5-tls",
+    "[connection-retry-success] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[credentials-cancel] button#r5-tls",
+    "[credentials-cancel] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[credentials-remove] button#r5-tls",
+    "[credentials-remove] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[credentials-replace] button#r5-tls",
+    "[credentials-replace] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[credentials-saved] button#r5-tls",
+    "[credentials-saved] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[empty-validation] button#r5-tls",
+    "[empty-validation] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-unencrypted] button#r5-tls",
+    "[http-unencrypted] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-dark-1544] button#r5-tls",
+    "[http-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-dark-320] button#r5-tls",
+    "[http-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-dark-390] button#r5-tls",
+    "[http-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-light-1544] button#r5-tls",
+    "[http-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-light-320] button#r5-tls",
+    "[http-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[http-zh-light-390] button#r5-tls",
+    "[http-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k",
+    "[r5-env-locked] button#r5-tls",
+    "[r5-env-locked] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > label.k"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-e9e8797ca8b9cf08",
+   "text": "留空保留已保存的密码",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[credentials-replace] input#\\:r3\\:"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-2c672b69e7d305b7",
+   "text": "目标网站看到代理出口 IP。连接失败时不自动直连。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[connection-failed] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[connection-retry-success] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[credentials-cancel] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[credentials-remove] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[credentials-replace] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[credentials-saved] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[empty-validation] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint:nth-of-type(3)",
+    "[http-unencrypted] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[http-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[r5-env-locked] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint",
+    "[socks-auth-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-7bde5bc88f33aa0f",
+   "text": "网页信息连接设置",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[connection-failed] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[connection-retry-success] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[credentials-cancel] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[credentials-remove] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[credentials-replace] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[credentials-saved] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[direct-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[empty-validation] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-unencrypted] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[http-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[r5-env-locked] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only",
+    "[socks-auth-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > legend.sr-only"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-7673702e6ff62144",
+   "text": "输入密码",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[socks-auth-zh-dark-1544] input#\\:r3\\:",
+    "[socks-auth-zh-dark-320] input#\\:r3\\:",
+    "[socks-auth-zh-dark-390] input#\\:r3\\:",
+    "[socks-auth-zh-light-1544] input#\\:r3\\:",
+    "[socks-auth-zh-light-320] input#\\:r3\\:",
+    "[socks-auth-zh-light-390] input#\\:r3\\:"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-475ebf9f8ba39010",
+   "text": "连接加密",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[socks-auth-zh-dark-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-zh-dark-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-zh-dark-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-zh-light-1544] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-zh-light-320] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)",
+    "[socks-auth-zh-light-390] section#r5-meta > form.st-body.r5-form > fieldset.r5-connection > div.st-row.r5-option:nth-of-type(3) > span.k:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "D:\\Forgejo\\sani\\designs\\sani\\content\\dom-r5-zh.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "designs/sani/src/r5/settings.jsx",
+    "reference": "Rendered R5 proposed fields, states or necessary connection help; reviewed against r5-handoff.md. Approval pending."
+   },
+   "flags": [],
+   "notes": "R5 proposal. No real credentials or production API calls."
   }
  ]
 }

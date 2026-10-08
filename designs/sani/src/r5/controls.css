@@ -1,0 +1,35 @@
+/* App-drawn controls retained from R4; metadata layout lives in settings.css. */
+:root { --success: #167640; }
+:root[data-theme="dark"] { --success: #4cc584; }
+input, textarea { appearance: none; }
+input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.r4-color-preview { width: 34px; height: 34px; flex: none; border: 1px solid var(--line-2); border-radius: var(--radius-sm); background: var(--chosen-color); }
+.r4-sliders { display: grid; gap: 8px; margin: 12px 0; }
+.r4-sliders label { display: grid; grid-template-columns: 44px minmax(0,1fr) 34px; gap: 8px; align-items: center; font-size: 11px; color: var(--text-2); }
+.r4-sliders output { text-align: right; font-variant-numeric: tabular-nums; }
+.r4-sliders input[type="range"] { width: 100%; min-width: 0; height: 24px; padding: 0; margin: 0; background: transparent; cursor: pointer; }
+.r4-sliders input::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: var(--range-color, var(--surface-3)); border: 1px solid var(--line-2); }
+.r4-sliders input::-moz-range-track { height: 6px; border-radius: 6px; background: var(--range-color, var(--surface-3)); border: 1px solid var(--line-2); }
+.r4-sliders input::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; margin-top: -6px; border: 2px solid var(--surface); border-radius: 50%; background: var(--text-2); box-shadow: 0 0 0 1px var(--line-2); }
+.r4-sliders input::-moz-range-thumb { width: 12px; height: 12px; border: 2px solid var(--surface); border-radius: 50%; background: var(--text-2); box-shadow: 0 0 0 1px var(--line-2); }
+.r4-date { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; max-width: 280px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.r4-date-fields { display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 8px; }
+.r4-date .field { width: 100%; min-width: 0; }
+.r4-date .hint, .r4-date .error-text { font-size: 11px; }
+.r4-calendar-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.r4-calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.r4-calendar > span { text-align: center; font-size: 10px; color: var(--text-3); padding: 5px 0; }
+.r4-calendar button { border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
+.r4-calendar button:hover { background: var(--surface-2); }
+.r4-calendar button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.expiry:has(.r4-date) { flex-wrap: wrap; }
+.r4-date { flex-basis: 100%; }
+.r4-tip { position: relative; display: inline-flex; }
+.r4-tip-content { position: absolute; z-index: 40; top: calc(100% + 7px); right: 0; padding: 6px 9px; max-width: min(240px, calc(100vw - 32px)); width: max-content; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-pop); font-size: 12px; line-height: 1.5; }
+@media (max-width: 640px) {
+  .tag-pop { left: 16px !important; width: min(336px, calc(100vw - 48px)); }
+  .r4-date .field { font-size: 16px; }
+  .r4-calendar button { min-height: 36px; }
+}

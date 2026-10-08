@@ -1,0 +1,72 @@
+/* R4 overrides are scoped by the entry point; approved R1–R3 assets stay intact. */
+:root { --success: #167640; }
+:root[data-theme="dark"] { --success: #4cc584; }
+button, input, textarea { font: inherit; }
+input, textarea { appearance: none; }
+input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.r4-form { gap: 20px; }
+#r4-meta { scroll-margin-top: 76px; }
+.r4-form .hint, .r4-form .error-text { margin: 0; line-height: 1.65; }
+.r4-form .r3-setting .hint { margin-top: 6px; }
+.r4-form .r4-choice { width: auto; min-width: 176px; max-width: 100%; }
+.r4-choice { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; text-align: start; }
+.r4-choice:hover:not(:disabled) { border-color: var(--text-3); background: var(--surface-2); }
+.r4-route { align-items: center; }
+.r4-panel { display: grid; gap: 20px; padding: 18px; margin: 0; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.r4-panel > .seg { width: fit-content; max-width: 100%; }
+.r4-panel > .seg button { min-width: 84px; }
+.r4-method-body { display: grid; gap: 18px; min-height: 225px; align-content: start; }
+.r4-address { display: grid; grid-template-columns: minmax(0,1fr) 100px; gap: 12px; }
+.r4-input { display: grid; gap: 7px; min-width: 0; }
+.r4-input label { font-size: 13px; color: var(--text-2); }
+.r4-input .field { width: 100%; min-width: 0; min-height: 36px; }
+.r4-secret { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+.r4-secret .hint { margin-right: auto; }
+.r4-auth-fields { display: grid; gap: 16px; }
+.r4-provider { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 500; }
+.r4-provider .hint { font-weight: 400; }
+.r4-policy, .r4-notice { display: flex; align-items: flex-start; gap: 7px; }
+.r4-policy .icon, .r4-notice .icon { flex: none; margin-top: 3px; }
+.r4-policy { padding-top: 14px; border-top: 1px solid var(--line); }
+.r4-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.r4-feedback { min-height: 42px; font-size: 12px; }
+.r4-panel:disabled .field, .r4-panel:disabled .seg, .r4-panel:disabled .switch { cursor: not-allowed; }
+.r4-panel:disabled button { color: var(--text-4); }
+.r4-color-preview { width: 34px; height: 34px; flex: none; border: 1px solid var(--line-2); border-radius: var(--radius-sm); background: var(--chosen-color); }
+.r4-sliders { display: grid; gap: 8px; margin: 12px 0; }
+.r4-sliders label { display: grid; grid-template-columns: 44px minmax(0,1fr) 34px; gap: 8px; align-items: center; font-size: 11px; color: var(--text-2); }
+.r4-sliders output { text-align: right; font-variant-numeric: tabular-nums; }
+.r4-sliders input[type="range"] { width: 100%; min-width: 0; height: 24px; padding: 0; margin: 0; background: transparent; cursor: pointer; }
+.r4-sliders input::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: var(--range-color, var(--surface-3)); border: 1px solid var(--line-2); }
+.r4-sliders input::-moz-range-track { height: 6px; border-radius: 6px; background: var(--range-color, var(--surface-3)); border: 1px solid var(--line-2); }
+.r4-sliders input::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; margin-top: -6px; border: 2px solid var(--surface); border-radius: 50%; background: var(--text-2); box-shadow: 0 0 0 1px var(--line-2); }
+.r4-sliders input::-moz-range-thumb { width: 12px; height: 12px; border: 2px solid var(--surface); border-radius: 50%; background: var(--text-2); box-shadow: 0 0 0 1px var(--line-2); }
+.r4-date { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; max-width: 280px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.r4-date-fields { display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 8px; }
+.r4-date .field { width: 100%; min-width: 0; }
+.r4-date .hint, .r4-date .error-text { font-size: 11px; }
+.r4-calendar-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.r4-calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.r4-calendar > span { text-align: center; font-size: 10px; color: var(--text-3); padding: 5px 0; }
+.r4-calendar button { border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
+.r4-calendar button:hover { background: var(--surface-2); }
+.r4-calendar button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.expiry:has(.r4-date) { flex-wrap: wrap; }
+.r4-date { flex-basis: 100%; }
+.tweaks-panel .r4-choice { min-width: 160px; }
+.r4-tip { position: relative; display: inline-flex; }
+.r4-tip-content { position: absolute; z-index: 40; top: calc(100% + 7px); right: 0; padding: 6px 9px; max-width: min(240px, calc(100vw - 32px)); width: max-content; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-pop); font-size: 12px; line-height: 1.5; }
+@media (max-width: 640px) {
+  .tag-pop { left: 16px !important; width: min(336px, calc(100vw - 48px)); }
+  .r4-choice, .r4-input .field, .r4-secret, .r4-actions .btn, .r4-panel .seg button { min-height: 44px; }
+  .r4-input .field, .r4-date .field { font-size: 16px; }
+  .r4-panel { padding: 14px; }
+  .r4-panel > .seg { width: 100%; }
+  .r4-panel > .seg button { flex: 1; min-width: 0; }
+  .r4-address { grid-template-columns: minmax(0,1fr) 76px; }
+  .r4-route { flex-wrap: wrap; }
+  .r4-method-body { min-height: 270px; }
+  .r4-calendar button { min-height: 36px; }
+}

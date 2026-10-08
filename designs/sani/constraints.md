@@ -53,8 +53,16 @@ They do not replace those files.
 
 ## Visual and interaction constraints
 
+- **不得出现浏览器默认控件样式，包括展开后的浮层。** 所有应用自有控件必须使用 Sani 的字体、色彩、边框、圆角、间距和状态样式；覆盖默认、hover、focus-visible、按下、展开、选中、错误、忙碌和禁用状态，明暗主题一致。
+- 禁止以原生 `<select>` 的系统选项弹层、`input[type=color/date/time/datetime-local]` 的系统取色/日期面板、数字输入箭头、浏览器校验气泡或 `title` 提示作为产品界面。下拉复用 Menu，互斥选择复用 Segmented，颜色/日期用应用内编辑器。保留语义 HTML、键盘操作、可见焦点与辅助技术信息；`appearance: none` 不能替代展开状态验收。
+- 系统文件选择窗口及权限对话框不属于应用可绘制界面，不仿制；应用内入口仍需统一样式。以上规则同样用于新原型的评审工具条。
+- 视觉验收必须实际打开每个受影响控件，检查鼠标与键盘操作、中英文明暗主题、桌面及窄屏。只有收起截图、构建通过或 axe 通过均不足以证明符合设计；历史原型保留作为记录，新实现必须遵守当前约束。
+
 - Typography: Inter Variable for text, IBM Plex Mono for slugs, URLs and code. Chinese uses the system CJK fonts in `--font-sans`. Body text is 14px.
 - Density and layout: one 920px column with hairline-separated surfaces. Shadows only on floating layers (menus, dialogs, toasts). One accent on warm neutrals.
+- 新设置沿用现有的行布局、控件尺寸和间距；不为几个字段新增嵌套卡片、大块保底高度或重复的选择层级。互斥选项使用同一组 Segmented，按钮文字居中。同一行输入框与操作按钮必须等高、顶边对齐；桌面为 36px，窄屏触控为 44px。独立按钮保留原有紧凑尺寸。
+- 控件验收包含实际几何检查：成组输入框与按钮的高度、顶边，以及分段按钮中文字的水平和垂直居中。必须在整页上下文中检查同类控件，不能仅凭局部截图或无障碍检测通过判定视觉一致。
+- 网页信息获取不引入付费或依赖免费额度的商业中继。R5 去除 Jina，保留后台配置 HTTP(S) / SOCKS5；未经验证的第三方服务不能作为可用功能展示。
 - Interaction: everything is reachable by keyboard, with the shortcuts in `capabilities.md`. Destructive actions offer undo rather than confirmation dialogs. Copying gives a toast with the copied value.
 - Forbidden: icon fonts or icon libraries, UI kits, opacity for dimming text (use the text tokens), new modal flows where an inline state works.
 - Accessibility: WCAG AA text contrast in both themes, axe clean, labels on every control, live regions for status changes.

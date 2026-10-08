@@ -8,7 +8,8 @@ reviewed, then implement it in `web/`.
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
-(`_d_meta.json`). Revisions 1 and 2 are approved and implemented.
+(`_d_meta.json`). Revisions 1–3 are approved and implemented; R4 needs changes;
+R5 is approved for implementation.
 
 ## Revisions
 
@@ -16,6 +17,29 @@ becomes the visual and interaction truth once a version is approved
 |---|---|---|---|---|
 | r1 — detail polish | `f01fe22` | 10 | `c28d7ef` | `0ea9e05` |
 | r2 — link tags | `61d2a5f` | Create, edit, filter | `99109ac` | Implemented 2026-10-07; schema 4 |
+| r3 — admin refinements | `fc391bd` | Colors, defaults, uploads, metadata | `81e5609` | `e58de51` / v0.9.0 |
+| r4 — metadata connections | `e58de51` | In-admin relay/HTTP/SOCKS and custom controls | Changes requested | Not implemented |
+| r5 — compact settings | R4 | One connection selector, aligned controls, no hosted relay | Approved 2026-10-09 | Not implemented |
+
+### R5 — compact settings (approved)
+
+Open [R5 settings](http://127.0.0.1:4311/sani/prototype-r5.html?scene=r5-settings&lang=zh&theme=light&chrome=0).
+The connection selector is one existing Segmented control: Direct / HTTP(S) /
+SOCKS5. Fields use the original flat settings layout. Jina, its API key and the
+nested connection dropdown/card are removed. Input/action pairs use equal
+heights throughout Settings, including the domain and API token forms.
+See [r5-handoff.md](r5-handoff.md) for the three comment fixes and verification.
+R5 keeps R1–R4 snapshots intact. Saves and connection tests remain in-memory
+simulations; production implementation is authorized.
+
+### R4 — metadata connections (changes requested)
+
+Open [R4 settings](http://127.0.0.1:4311/sani/prototype-r4.html?scene=r4-settings&lang=zh&theme=light&chrome=0).
+See [r4-handoff.md](r4-handoff.md) for the verified docs deployment mismatch,
+relay capabilities, interaction states, production implementation boundary and checks.
+The no-browser-default-controls rule is in [constraints.md](constraints.md) and root `AGENTS.md`.
+R4 preserves the approved R3 assets and adds only overrides under `src/r4/`.
+Connection tests are simulated; there are no production API calls or saved credentials.
 
 ### R2 — tags (implemented)
 
@@ -201,10 +225,11 @@ node designs/sani/tools/content.mjs classify
 python .agents/skills/prototype-first-ui/scripts/content_audit.py check --inventory designs/sani/content-inventory.json
 ```
 
-The inventory now contains 975 reviewed strings, including 447 strings captured
+The inventory now contains 1221 reviewed strings, including 447 strings captured
 from the implemented tag flow in both languages. Sources include production
 i18n/server copy, formatted values, sanitized demo records and approved R2 mock
-copy. The 26 warnings are reviewed `data-*` metadata values (link IDs, theme and
+copy and the R3–R5 proposals. Historical proposal strings stay traceable even
+when a later revision removes them. The 26 warnings are reviewed `data-*` metadata values (link IDs, theme and
 screen labels). No strings remain unclassified.
 
 ### Production quirks found at the baseline
@@ -235,6 +260,6 @@ These live in `designs/sani/` rather than the skill's default `docs/ui/` and
 `docs/product/`. Everything under `docs/` is the published VitePress site, and
 its sync check rejects pages that aren't in its sidebar.
 
-## R3（2026-10-08，待评审）
+## R3（2026-10-08，已批准并实施）
 
-`prototype-r3.html` 在保留 R2 的基础上扩展标签颜色、创建默认值、网页信息获取方式、导入示例和交互细节。打开 `?lang=zh&theme=light&chrome=0` 或 `?scene=r3-settings`。技术取舍、范围、场景和后续验收见 [r3-handoff.md](r3-handoff.md)。仅内存演示；没有生产代码或数据库改动。
+`prototype-r3.html` 在保留 R2 的基础上扩展标签颜色、创建默认值、网页信息获取方式、导入示例和交互细节。打开 `?lang=zh&theme=light&chrome=0` 或 `?scene=r3-settings`。技术取舍、范围、场景和验收见 [r3-handoff.md](r3-handoff.md)。原型使用内存演示；其批准范围已在 v0.9.0 实施。

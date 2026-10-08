@@ -37,6 +37,26 @@
             "height": 900
           },
           "section": "Screens"
+        },
+        {
+          "path": "prototype-r4.html",
+          "createdAt": "2026-10-08T22:12:21.232Z",
+          "status": "changes-requested",
+          "subtitle": "Revision 4: in-admin metadata connections and custom controls",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
+        },
+        {
+          "path": "prototype-r5.html",
+          "createdAt": "2026-10-08T23:10:30.987Z",
+          "status": "approved",
+          "subtitle": "Revision 5: compact settings, aligned controls, no hosted relay",
+          "viewport": {
+            "width": 1544,
+            "height": 804
+          }
         }
       ]
     },
@@ -102,5 +122,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-08T16:12:55.870Z"
+  "updatedAt": "2026-10-08T23:22:55.750Z"
 }
