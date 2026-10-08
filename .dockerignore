@@ -1,6 +1,7 @@
 .git
 bin
 data
+sani-data
 node_modules
 web/node_modules
 docs/*

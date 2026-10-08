@@ -209,6 +209,18 @@ function checkBenchmark(): Check {
 
 function checkBuilder(): Check {
   const problems: string[] = [];
+  const compose = read('compose.yaml');
+  for (const line of ['type: bind', 'source: ./sani-data', 'target: /data', 'create_host_path: false']) {
+    if (!compose.includes(line)) problems.push(`compose.yaml: missing ${line}`);
+  }
+  if (/^volumes:/m.test(compose)) problems.push('compose.yaml: default must not create named volumes');
+  for (const file of ['README.md', 'README.zh-CN.md',
+    'docs/.vitepress/theme/components/HomePage.vue', 'docs/.vitepress/theme/components/ConfigBuilder.vue',
+    ...locales.flatMap(({ dir }) => [`docs/${dir}guide/deploy.md`, `docs/${dir}guide/quick-start.md`])]) {
+    if (!read(file).includes('sudo install -d -m 750 -o 65532 -g 65532 ./sani-data')) {
+      problems.push(`${file}: missing bind-directory permission initialization`);
+    }
+  }
   // Include hosts containing the template names: replacements must not cascade.
   const domains = [
     ['go.example.org', 'files.example.org'],

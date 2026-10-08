@@ -37,8 +37,9 @@ The documentation, in English and Chinese, lives in [docs/](docs/): guides for [
 
 ```sh
 mkdir sani && cd sani
-curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/v0.7.0/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml
 # Set SANI_BASE_URL (and TZ) in compose.yaml, then:
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker compose up -d
 ```
 
@@ -46,7 +47,7 @@ Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first vis
 
 The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
-The template pins `v0.7.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. The default named volume handles permissions. For a host directory such as `./sani-data:/data`, [prepare ownership as `65532:65532` first](docs/en/guide/deploy.md#data-permissions).
+The template pins `v0.7.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 

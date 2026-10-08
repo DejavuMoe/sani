@@ -37,8 +37,9 @@ Sani 面向单实例、单管理员使用，不提供多用户托管或多实例
 
 ```sh
 mkdir sani && cd sani
-curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/v0.7.0/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/DejavuMoe/sani/master/compose.yaml
 # 在 compose.yaml 里设置 SANI_BASE_URL（以及 TZ），然后：
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker compose up -d
 ```
 
@@ -46,7 +47,7 @@ docker compose up -d
 
 镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
 
-模板固定使用 `v0.7.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。默认命名卷会处理权限；若改用 `./sani-data:/data` 这类宿主机目录，请先[初始化 `65532:65532` 所有权](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v0.7.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 

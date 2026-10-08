@@ -14,6 +14,7 @@ coverage.out
 
 # Runtime data
 /data/
+/sani-data/
 *.db
 *.db-shm
 *.db-wal

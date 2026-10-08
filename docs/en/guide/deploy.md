@@ -10,16 +10,17 @@ The builder edits the repository’s actual `compose.yaml`, `deploy/sani.service
 
 ## With Docker Compose
 
-Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64`, `linux/arm64` and `linux/arm/v7` (a Raspberry Pi, for example). Create a directory on the server, save the generated `compose.yaml` in it, and start Sani:
+Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64`, `linux/arm64` and `linux/arm/v7` (a Raspberry Pi, for example). Create a directory on the server and save the generated `compose.yaml` in it. **Before starting, create `./sani-data` and grant the container user `65532:65532` write access.** Run these commands beside the Compose file:
 
 ```sh
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker compose up -d
 ```
 
 A few things worth knowing about `compose.yaml`:
 
 - **Localhost only.** The port is published as `127.0.0.1:8080:8080`, so outside traffic has to come through the reverse proxy.
-- **Data in a volume.** The database and shared files live in the `sani-data` volume, mounted at `/data`. Removing or recreating the container keeps it.
+- **Data in a local directory.** The database and shared files live in `./sani-data` beside the Compose file, bound to `/data` in the container. Recreating the container keeps this directory. The default does not use a named volume.
 - **A tiny image.** It’s built `FROM scratch`, about 25 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
@@ -43,15 +44,13 @@ To build the image from source instead, replace the `image:` line with `build: .
 
 ### Data directory permissions {#data-permissions}
 
-The default `sani-data:/data` is a Docker named volume. A new volume inherits the image's `/data` ownership, `65532:65532`; no host directory needs to be created manually. Recreating the container preserves it. Do not upgrade with `docker compose down -v`, which deletes named volumes.
-
-To keep the data beside the Compose file instead, run this in that directory **before** switching to `./sani-data:/data`:
+The default binds `./sani-data` beside the Compose file and needs no top-level `volumes:` declaration. The container runs as `65532:65532` regardless of which user runs Docker on the host. Run this beside the Compose file **before the first start**:
 
 ```sh
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 ```
 
-Then use the service mount below and remove the unused top-level `volumes:` declaration. `create_host_path: false` prevents Docker from silently creating a `root:root` directory if initialization was missed:
+The template and builder both use this bind mount. On ordinary Linux Docker Engine, `create_host_path: false` makes a missing directory fail immediately instead of creating an unwritable `root:root` directory. Docker Desktop's file-sharing layer may still create it, so do not skip permission initialization in any environment:
 
 ```yaml
     volumes:
@@ -61,6 +60,8 @@ Then use the service mount below and remove the unused top-level `volumes:` decl
         bind:
           create_host_path: false
 ```
+
+For an existing instance using a named volume, [back up](./operations#backup) and migrate the data into the bind directory before changing the mount. Pointing to an empty directory starts a fresh instance.
 
 If startup already reports `sani: open database: unable to open database file (14)`, inspect the actual mount and permissions first:
 

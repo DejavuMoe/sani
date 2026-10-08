@@ -2,6 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+### Fixed
+
+- Default to a `./sani-data` bind directory and prevent Docker from creating it automatically. The homepage, both READMEs, quick starts, deployment pages and builder initialize permissions for `65532:65532` before startup and document repairs for existing directories. Back up and migrate existing named-volume data before changing the mount.
+- Replace the browser-native time zone dropdown with a custom searchable menu matching the site, with keyboard selection, mobile touch support and both themes.
+
 ## v0.7.0
 
 2026-10-08 · Align release and image tags, fix the deployment configuration builder, and document container data directory permissions. Database schema remains at 4.

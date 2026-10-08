@@ -10,16 +10,17 @@
 
 ## Docker Compose 部署
 
-官方发布的多平台镜像 `ghcr.io/dejavumoe/sani` 原生支持 `linux/amd64`、`linux/arm64` 与 `linux/arm/v7`（如树莓派）。在服务器新建目录并保存生成的 `compose.yaml`，随后启动：
+官方发布的多平台镜像 `ghcr.io/dejavumoe/sani` 原生支持 `linux/amd64`、`linux/arm64` 与 `linux/arm/v7`（如树莓派）。在服务器新建目录并保存生成的 `compose.yaml`。**启动前必须创建 `./sani-data` 并授予容器用户 `65532:65532` 写权限**，在 Compose 文件所在目录执行：
 
 ```sh
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker compose up -d
 ```
 
 `compose.yaml` 的关键特性：
 
 - **仅监听本地回环**：端口映射为 `127.0.0.1:8080:8080`，外部请求全部经由反代转发。
-- **持久化数据卷**：SQLite 数据库与文件上传保存在 `sani-data` 数据卷中（挂载于 `/data`），容器重建或销毁不丢失数据。
+- **绑定本地目录**：SQLite 数据库与文件上传保存在 Compose 文件旁的 `./sani-data`，绑定到容器内 `/data`，容器重建不删除这个目录。默认不使用命名卷。
 - **极小基础镜像**：基于 `scratch` 构建，大小仅约 25 MB，仅含 `sani` 可执行文件与 CA 证书。以 `65532` 非特权用户运行且无 shell。如需执行命令可直接调用 `/sani`（例如 `docker exec -it sani /sani passwd`）。
 - **内置健康检查**：已配置 `HEALTHCHECK`，可通过 `docker ps` 查看容器 `healthy` 状态。
 
@@ -43,15 +44,13 @@ docker compose up -d
 
 ### 数据目录权限 {#data-permissions}
 
-默认配置使用 Docker 命名卷 `sani-data:/data`。新卷会继承镜像内 `/data` 的所有权 `65532:65532`，无需手动创建服务器目录。容器重建保留数据；不要用 `docker compose down -v` 升级，它会删除命名卷。
-
-如果要把数据直接放在 Compose 文件旁边，改用 `./sani-data:/data` **之前**，先在该目录执行：
+默认配置绑定 Compose 文件旁的 `./sani-data`，不需要顶层 `volumes:` 声明。容器以 `65532:65532` 运行，宿主机登录用户是否为 root 不会改变容器身份。**第一次启动前**，在 Compose 文件所在目录执行：
 
 ```sh
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 ```
 
-然后把服务的挂载改为下面的写法，并删除文件末尾不再使用的顶层 `volumes:` 声明。`create_host_path: false` 可避免 Docker 在忘记初始化时自动创建 `root:root` 目录：
+模板和生成器都使用下面的绑定写法。普通 Linux Docker Engine 下，`create_host_path: false` 让缺少目录时直接报错，避免自动创建容器无法写入的 `root:root` 目录。Docker Desktop 的文件共享层可能仍创建目录，因此任何环境都不要省略权限初始化：
 
 ```yaml
     volumes:
@@ -61,6 +60,8 @@ sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
         bind:
           create_host_path: false
 ```
+
+此前使用命名卷的实例，应先[备份](./operations#backup)并将数据迁移到绑定目录，再切换挂载；直接改指向空目录会显示为全新实例。
 
 如果已经出现 `sani: open database: unable to open database file (14)`，先检查实际挂载和目录权限：
 

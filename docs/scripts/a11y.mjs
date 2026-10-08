@@ -49,7 +49,7 @@ for (const theme of ['light', 'dark']) {
       }
     }
   }
-  await checkBuilder(page, base, theme);
+  await checkBuilder(page, base, theme, axe);
   if (theme === 'light') await checkComments(page, base, comments);
   await ctx.close();
 }

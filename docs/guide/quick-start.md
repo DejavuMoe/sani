@@ -7,7 +7,10 @@
 ::: code-group
 
 ```sh [Docker]
-docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data ghcr.io/dejavumoe/sani:v0.7.0
+mkdir -p ~/sani && cd ~/sani
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
+docker run -d --name sani -p 127.0.0.1:8080:8080 \
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v0.7.0
 ```
 
 ```sh [二进制文件]
@@ -22,6 +25,8 @@ SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # 数据保存在 ./data 目录
 ```
 
 :::
+
+Docker 数据保存在 `~/sani/sani-data`，启动前必须运行上面的权限初始化命令，否则容器用户 `65532:65532` 无法写入数据库；已有 root 目录请按[数据目录权限](./deploy#data-permissions)修复。
 
 其他平台架构的预编译文件请见[部署](./deploy#binaries)。仓库中的 `compose.yaml` 面向生产部署（已预设域名与反代）；本地体验直接使用 `docker run` 更快捷。
 

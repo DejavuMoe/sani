@@ -88,9 +88,9 @@ const steps = computed<{ title: string; note: string; lines: Line[]; copy: boole
     copy: false,
   },
   {
-    title: pick('启动，然后打开 /admin/', 'Start it, then open /admin/'),
-    note: pick('第一次打开时，填上日志里的设置码，再设置密码。', 'On the first visit, enter the setup code from the log and choose a password.'),
-    lines: [{ text: 'docker compose up -d' }, { text: 'docker logs sani 2>&1 | grep setup_code', dim: true }],
+    title: pick('初始化数据目录，再启动', 'Prepare the data directory, then start'),
+    note: pick('先授权 ./sani-data 给容器用户。打开 /admin/，用日志里的设置码设置密码。', 'Grant the container access to ./sani-data first. Open /admin/ and use the setup code from the log to choose a password.'),
+    lines: [{ text: 'sudo install -d -m 750 -o 65532 -g 65532 ./sani-data' }, { text: 'docker compose up -d' }, { text: 'docker logs sani 2>&1 | grep setup_code', dim: true }],
     copy: true,
   },
 ]);

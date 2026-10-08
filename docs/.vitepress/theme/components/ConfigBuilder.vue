@@ -10,6 +10,7 @@ import service from '../../../../deploy/sani.service?raw';
 import { buildCompose, buildProxy, buildService, EXAMPLE_DOMAIN, type Built } from '../../sync/builder';
 import { useLang } from '../i18n';
 import Icon from './Icon.vue';
+import TimeZonePicker from './TimeZonePicker.vue';
 
 const { pick } = useLang();
 
@@ -200,7 +201,11 @@ const steps = computed(() => {
   if (compose) {
     list.push({
       text: pick('在服务器上新建一个目录，把上面的 compose.yaml 保存进去：', 'Create a directory on the server and save the compose.yaml above in it:'),
-      code: 'mkdir ~/sani && cd ~/sani',
+      code: 'mkdir -p ~/sani && cd ~/sani',
+    });
+    list.push({
+      text: pick('先创建绑定目录并授权给容器用户（65532:65532），否则数据库无法写入：', 'Create the bind directory and grant access to the container user (65532:65532) before starting, so SQLite can write:'),
+      code: 'sudo install -d -m 750 -o 65532 -g 65532 ./sani-data',
     });
     list.push({
       text: pick('拉取镜像并启动：', 'Pull the image and start it:'),
@@ -329,15 +334,13 @@ const steps = computed(() => {
         </span>
       </label>
 
-      <label class="field">
-        <span class="k">{{ pick('统计时区', 'Time zone for statistics') }}</span>
-        <select v-model="tzInput" class="input mono" aria-describedby="b-zone-hint">
-          <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
-        </select>
+      <div class="field">
+        <span id="b-zone-label" class="k">{{ pick('统计时区', 'Time zone for statistics') }}</span>
+        <TimeZonePicker v-model="tzInput" :zones="zones" />
         <span id="b-zone-hint" class="hint" :class="{ bad: !tz }">
           {{ tz ? pick('“今天”和每日统计按这个时区划分', 'Days in the statistics follow this zone') : pick('无法识别这个时区', 'Unknown time zone') }}
         </span>
-      </label>
+      </div>
 
       <div class="field">
         <span class="k" id="b-password">{{ pick('管理员密码', 'Admin password') }}</span>
@@ -491,11 +494,6 @@ const steps = computed(() => {
 .input.mono {
   font-family: var(--sn-font-mono);
   font-size: 13px;
-}
-
-select.input {
-  appearance: auto;
-  cursor: pointer;
 }
 
 .input:focus {

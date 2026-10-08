@@ -7,7 +7,10 @@
 ::: code-group
 
 ```sh [Docker]
-docker run -d --name sani -p 127.0.0.1:8080:8080 -v sani-data:/data ghcr.io/dejavumoe/sani:v0.7.0
+mkdir -p ~/sani && cd ~/sani
+sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
+docker run -d --name sani -p 127.0.0.1:8080:8080 \
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v0.7.0
 ```
 
 ```sh [Binary]
@@ -22,6 +25,8 @@ SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # keeps its data in ./data
 ```
 
 :::
+
+Docker data lives in `~/sani/sani-data`. Run the permission initialization above before starting: the container user `65532:65532` must be able to write the database. For an existing root-owned directory, follow [Data directory permissions](./deploy#data-permissions).
 
 Binaries for other systems and architectures are listed under [Deployment](./deploy#binaries). The repository’s `compose.yaml` is meant for a real deployment, with a domain and a reverse proxy in mind; for a local try, `docker run` is simpler.
 
