@@ -1,0 +1,125 @@
+[
+  {
+    "width": 1280,
+    "positions": [
+      {
+        "active": "短链接",
+        "bodyWidth": 1265,
+        "creatorWidth": 920,
+        "creatorX": 172.5,
+        "logoX": 168.5,
+        "scrollWidth": 1265,
+        "summaryTop": 287
+      },
+      {
+        "active": "文本",
+        "bodyWidth": 1265,
+        "creatorWidth": 920,
+        "creatorX": 172.5,
+        "logoX": 168.5,
+        "scrollWidth": 1265,
+        "summaryTop": 381.9765625
+      },
+      {
+        "active": "文件",
+        "bodyWidth": 1265,
+        "creatorWidth": 920,
+        "creatorX": 172.5,
+        "logoX": 168.5,
+        "scrollWidth": 1265,
+        "summaryTop": 350
+      },
+      {
+        "active": "短链接",
+        "bodyWidth": 1265,
+        "creatorWidth": 920,
+        "creatorX": 172.5,
+        "logoX": 168.5,
+        "scrollWidth": 1265,
+        "summaryTop": 287
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "positions": [
+      {
+        "active": "短链接",
+        "bodyWidth": 375,
+        "creatorWidth": 343,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 375,
+        "summaryTop": 314
+      },
+      {
+        "active": "文本",
+        "bodyWidth": 375,
+        "creatorWidth": 343,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 375,
+        "summaryTop": 463.96875
+      },
+      {
+        "active": "文件",
+        "bodyWidth": 375,
+        "creatorWidth": 343,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 375,
+        "summaryTop": 386
+      },
+      {
+        "active": "短链接",
+        "bodyWidth": 375,
+        "creatorWidth": 343,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 375,
+        "summaryTop": 314
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "positions": [
+      {
+        "active": "短链接",
+        "bodyWidth": 305,
+        "creatorWidth": 273,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 305,
+        "summaryTop": 314
+      },
+      {
+        "active": "文本",
+        "bodyWidth": 305,
+        "creatorWidth": 273,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 305,
+        "summaryTop": 497.96875
+      },
+      {
+        "active": "文件",
+        "bodyWidth": 305,
+        "creatorWidth": 273,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 305,
+        "summaryTop": 420
+      },
+      {
+        "active": "短链接",
+        "bodyWidth": 305,
+        "creatorWidth": 273,
+        "creatorX": 16,
+        "logoX": 12,
+        "scrollWidth": 305,
+        "summaryTop": 314
+      }
+    ]
+  }
+]

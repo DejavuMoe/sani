@@ -26,6 +26,17 @@
             "height": 900
           },
           "section": "Screens"
+        },
+        {
+          "path": "prototype-r3.html",
+          "createdAt": "2026-10-08T15:45:18.431Z",
+          "status": "approved",
+          "subtitle": "Revision 3: colors, creation defaults, metadata privacy and interaction refinements",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          },
+          "section": "Screens"
         }
       ]
     },
@@ -91,5 +102,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-07T08:34:09.549Z"
+  "updatedAt": "2026-10-08T16:12:55.870Z"
 }

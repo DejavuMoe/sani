@@ -303,6 +303,78 @@
       },
       "status": "implemented",
       "notes": "Approved 2026-10-07 in 99109ac. Implemented in Svelte and the authenticated API with schema 4 (tags, link_tags, foreign keys and a filter index). Up to 5 private tags per link, 24 Unicode code points per name, 1,000 catalog entries; trim/NFC/lowercase deduplication. One active tag filter intersects search/kind. Creation clears filters to reveal the result. Creation time remains in details only; creation and last-visit sorting remain available. JSON/CSV portability and upgrade/rollback steps are documented. The prototype keeps its mock fixtures; production persists tags in SQLite."
+    },
+    {
+      "id": "admin-refinements-r3",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r3.html",
+        "assetPath": "prototype-r3.html",
+        "files": [
+          "src/r3/app.jsx",
+          "src/r3/colors.js",
+          "src/r3/overrides.js",
+          "src/r3/patterns.jsx",
+          "src/r3/refinements.css",
+          "src/r3/scenes.jsx",
+          "src/r3/screens.jsx",
+          "src/r3/settings.jsx",
+          "src/r3/store.jsx",
+          "src/r3/tags.jsx"
+        ],
+        "states": [
+          "colors-create-edit-invalid",
+          "settings-defaults-saved-invalid",
+          "proxy-direct-off-configured-missing",
+          "environment-locked",
+          "upload-idle-progress-error-retry-cancel-over-limit",
+          "import-examples-and-unsupported",
+          "menus-dialog-focus",
+          "light-dark-zh-en-desktop-mobile"
+        ],
+        "stableIds": [
+          "r3-defaults",
+          "r3-meta",
+          "r3-data",
+          "create-panel-url",
+          "create-panel-text",
+          "create-panel-file"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/, /admin/new, /admin/settings",
+        "files": [
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/TagBadge.svelte",
+          "web/src/components/TagFilters.svelte",
+          "web/src/components/Creator.svelte",
+          "web/src/components/Icon.svelte",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/views/Settings.svelte",
+          "web/src/lib/i18n.svelte.ts",
+          "internal/links/links.go",
+          "internal/config/config.go",
+          "internal/meta/meta.go",
+          "internal/server/api_misc.go",
+          "internal/store/tags.go"
+        ],
+        "interfaces": [
+          "GET /api/config",
+          "PATCH /api/config",
+          "POST /api/import",
+          "GET /api/export",
+          "POST /api/files"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "internal/server/api_test.go",
+          "internal/store/tags_test.go",
+          "internal/meta/meta_test.go"
+        ]
+      },
+      "status": "approved",
+      "notes": "R3 only; production remains v0.8.0. Review exact asset before implementation. r3-handoff.md records scope, compatibility, mocked behavior and required acceptance tests."
     }
   ]
 }

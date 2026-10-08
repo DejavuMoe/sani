@@ -234,3 +234,7 @@ prototype and in production:
 These live in `designs/sani/` rather than the skill's default `docs/ui/` and
 `docs/product/`. Everything under `docs/` is the published VitePress site, and
 its sync check rejects pages that aren't in its sidebar.
+
+## R3（2026-10-08，待评审）
+
+`prototype-r3.html` 在保留 R2 的基础上扩展标签颜色、创建默认值、网页信息获取方式、导入示例和交互细节。打开 `?lang=zh&theme=light&chrome=0` 或 `?scene=r3-settings`。技术取舍、范围、场景和后续验收见 [r3-handoff.md](r3-handoff.md)。仅内存演示；没有生产代码或数据库改动。

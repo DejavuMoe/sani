@@ -1,0 +1,23 @@
+{
+  "app": "sani",
+  "version": 1,
+  "links": [
+    {
+      "slug": "guide",
+      "url": "https://example.com/guide",
+      "title": "Example guide",
+      "redirect": 302,
+      "enabled": true,
+      "expires_at": null,
+      "max_clicks": null,
+      "clicks": 0,
+      "created_at": "2026-10-08T00:00:00Z",
+      "tags": [
+        {
+          "name": "Docs",
+          "color": "blue"
+        }
+      ]
+    }
+  ]
+}

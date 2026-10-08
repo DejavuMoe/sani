@@ -1,0 +1,67 @@
+/* R3 only: the approved R2 entry keeps its original assets. */
+.cmp:focus-within, .cmp.dragging { border-color: var(--accent); box-shadow: 0 1px 2px rgb(28 27 25 / .04); }
+.cmp.dragging { background: color-mix(in oklab, var(--accent) 3%, var(--surface)); }
+.cmp.invalid { border-color: var(--danger); }
+.cmp.pulse { animation: none; }
+.cmp-body:focus { outline: none; }
+.cmp-options .opt:hover, .tag-add:hover, .tag-add[aria-expanded="true"] { background: var(--surface-2); color: var(--text); }
+.st-drop { background: var(--surface); border-color: var(--line-2); }
+.st-drop:hover, .st-drop.over { background: var(--surface-2); border-color: var(--text-3); }
+.st-drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tag-pop { width: min(336px, calc(100vw - 16px)); }
+.tag-choices { max-height: 390px; }
+.tag-choice-row { display: flex; align-items: center; }
+.tag-choice-row .tag-choice { flex: 1; min-width: 0; }
+.tag-edit-button { width: 34px; height: 34px; flex: none; display: grid; place-items: center; color: var(--text-3); border-radius: var(--radius-sm); }
+.tag-edit-button:hover { background: var(--surface-2); color: var(--text); }
+.r3-color { padding: 4px 8px 10px; }
+.r3-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.r3-swatches button { width: 100%; height: 36px; border-radius: var(--radius-sm); display: grid; place-items: center; }
+.r3-swatches button:hover, .r3-swatches button[aria-pressed="true"] { background: var(--surface-2); }
+.r3-swatches .tag-swatch { width: 23px; height: 23px; background: var(--tag-color); box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }
+.r3-swatches button[aria-pressed="true"] .tag-swatch { outline: 2px solid var(--text); outline-offset: 3px; }
+.r3-color-label { display: block; font-size: 12px; color: var(--text-2); margin: 12px 0 6px; }
+.r3-color-input { display: flex; align-items: center; gap: 8px; }
+.r3-color-input .field { min-width: 0; flex: 1; font-family: var(--font-mono); font-size: 12px; }
+.r3-native-color { flex: none; width: 34px; height: 34px; padding: 3px; border: 1px solid var(--line-2); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; }
+.r3-color .hint { font-size: 11px; margin: 6px 0 0; line-height: 1.6; }
+.r3-color .error-text { font-size: 11px; }
+.r3-tag-edit { padding: 14px; min-height: 0; overflow-y: auto; }
+.r3-tag-edit > .field { width: 100%; }
+.r3-tag-edit .r3-color { padding: 8px 0; }
+.r3-tag-edit h3 { font-size: 13px; margin: 0 0 12px; }
+.r3-form { display: grid; gap: 16px; }
+.r3-setting { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.r3-setting h3, .r3-setting label { display: block; font-size: 13px; font-weight: 500; margin: 0; }
+.st .r3-setting .hint { margin: 6px 0 0; line-height: 1.6; }
+.r3-form > .hint { line-height: 1.65; }
+.st-about { grid-template-columns: minmax(0, 1fr); }
+.st-about dd { min-width: 0; overflow-wrap: anywhere; }
+.r3-setting .switch { flex: none; margin-top: 2px; }
+.r3-setting .field { width: 82px; flex: none; }
+.r3-unit { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; }
+.r3-setting input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; margin: 3px 0; }
+.r3-setting select.field { width: 144px; }
+.r3-examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
+.r3-examples a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
+.r3-preview { display: flex; gap: 12px; align-items: center; font-size: 12px; color: var(--text-3); }
+.r3-preview code { color: var(--text-2); }
+.r3-save { display: flex; align-items: center; gap: 12px; min-height: 32px; }
+.r3-saved { font-size: 12px; color: var(--success); }
+.r3-meta-status { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 12px; }
+.r3-meta-status .icon { color: var(--success); }
+.ld-short-actions { align-items: center; }
+.ld-short-actions .btn { min-height: 30px; }
+.cr-tabs button { min-width: 74px; }
+@media (max-width: 640px) {
+  .r3-swatches button, .tag-edit-button { min-height: 44px; }
+  .tag-edit-button { width: 44px; }
+  .r3-native-color { width: 44px; height: 44px; }
+  .r3-color-input .field { font-size: 16px; }
+  .r3-setting { gap: 12px; }
+  .r3-setting select.field { width: 126px; }
+  .r3-setting .field { min-height: 44px; }
+  .r3-setting input[type="checkbox"] { margin: 12px 0; }
+  .r3-examples a { display: inline-flex; align-items: center; min-height: 44px; }
+  .ld-short-actions .btn { min-height: 44px; }
+}

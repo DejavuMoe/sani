@@ -161,6 +161,103 @@
       "limitations": [
         "A static crop does not establish creation, editing, filtering or responsive behavior. Existing approved Sani tokens remain the visual authority."
       ]
+    },
+    {
+      "id": "r3-current-code",
+      "type": "code",
+      "location": "fc391bd / v0.8.0: web/src, internal/config, internal/meta, internal/server/api_misc.go, internal/store/tags.go",
+      "roles": [
+        "functional-truth"
+      ],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source",
+      "localCopies": [],
+      "observations": [
+        "Five tag colors; metadata fetcher reads environment proxies; upload units use MiB; import accepts generic aliases; scrollbar-gutter is already stable."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Source inspection only; no production VPS or Cloudflare account access."
+      ]
+    },
+    {
+      "id": "r3-user-screenshots",
+      "type": "screenshot",
+      "location": "User-provided screenshots 1-5 in the 2026-10-08 request",
+      "roles": [
+        "visual-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": true,
+      "sanitization": "Raw screenshots remain outside the repository. Only observed visual defects are recorded; demo fixtures are reused.",
+      "licenseOrPermission": "Provided by the user for this review",
+      "localCopies": [],
+      "observations": [
+        "Five tag colors, heavy composer halo, unequal copy/open actions, keyboard icon and tab-change concern."
+      ],
+      "inferences": [
+        "The halo is focus-within based on source, not evidence of hover in the still image."
+      ],
+      "limitations": [
+        "Screenshots do not establish hidden behavior or approve new copy/layout."
+      ]
+    },
+    {
+      "id": "r3-requirements",
+      "type": "copy-brief",
+      "location": "2026-10-08 user request; r3-handoff.md",
+      "roles": [
+        "interaction-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "User requested this prototype",
+      "localCopies": [
+        "r3-handoff.md"
+      ],
+      "observations": [
+        "Add tag colors, defaults and optional metadata proxy; preserve established visual direction; only Sani/Shlink imports; seek prototype approval before implementation."
+      ],
+      "inferences": [
+        "New product copy is proposed for approval and describes necessary settings/actions/states."
+      ],
+      "limitations": [
+        "This authorizes a prototype, not approval of the resulting asset."
+      ]
+    },
+    {
+      "id": "r3-official-research",
+      "type": "webpage",
+      "location": "Cloudflare Error 413 docs; Go net/http Transport docs; DuckDuckGo rduckduckgocom help; tabler.io/icons",
+      "roles": [
+        "inspiration-only",
+        "visual-reference"
+      ],
+      "trust": "external-untrusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Referenced public documentation; icon paths hand-drawn locally",
+      "localCopies": [],
+      "observations": [
+        "Cloudflare documents 100 MB on Free/Pro and separate requests for larger uploads. Tabler uses coherent outline geometry. DDG referrer redirect is not a metadata relay."
+      ],
+      "inferences": [
+        "25 MB sequential application chunks are a project recommendation, not a measured production implementation."
+      ],
+      "limitations": [
+        "External docs do not prove this VPS settings or end-to-end upload performance."
+      ]
     }
   ]
 }
