@@ -2,12 +2,15 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.1
+
+2026-10-09 · Fix admin proxy configuration and control styling with approved R5. Database schema stays at 5 with no new migration.
 
 - Implement approved R5: restore compact Settings rows with one centered Direct/HTTP(S)/SOCKS5 segmented control. Align paired domain, token and password actions, retaining touch sizes on narrow screens.
 - Configure proxy hosts, ports and optional authentication directly in Settings, effective for new requests after saving. Never return saved passwords; changing a proxy or account requires re-entry. Add real connection testing without saving or direct fallback, preserving environment overrides.
 - Replace native controls with app-styled RGB sliders, a calendar with date/time text fields, and hover/focus tooltips. Keep HEX/RGB/HSL entry, keyboard access and both themes. Record the no-browser-default-visuals rule in design and development constraints.
 - Align bilingual settings, API and credential-storage documentation. Saved proxy passwords are included in the database and backups without encryption; this change does not alter the database schema.
+- Document Forgejo as the push destination for branches and tags, mirrored to GitHub for builds. Forgejo master pushes trigger Woodpecker documentation deployment; verify both remotes and the live site after publishing.
 
 ## v0.9.0
 
