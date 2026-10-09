@@ -763,7 +763,7 @@
         ]
       },
       "status": "implemented",
-      "notes": "Approved R6 implemented: independent lengths and persisted legacy migration; stable primitive preview dependencies with retry and stale-response protection. WSL make check test e2e docs passed; 61 Chromium E2E tests, including 36 R6 accessibility states. See r6-handoff.md."
+      "notes": "Approved R6 implemented with user-authorized responsive sizing corrections: independent lengths, legacy migration and stable previews; width-independent controls, consistent create/edit typography and separate touch input sizing. WSL make check test e2e passed (69 Chromium tests); docs build passed. Prototype verified across 28 language/theme/width combinations. See r6-handoff.md."
     }
   ]
 }
