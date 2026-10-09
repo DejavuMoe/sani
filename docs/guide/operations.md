@@ -24,7 +24,7 @@
 ::: code-group
 
 ```sh [Docker]
-docker exec sani /sani backup - > sani-$(date +%F).db
+(umask 077; set -C; docker exec sani /sani backup - > sani-$(date +%F).db)
 ```
 
 ```sh [systemd]
@@ -38,14 +38,15 @@ sani backup ~/backups/sani-$(date +%F).db
 :::
 
 - 指定文件名为 `-` 时直接流式输出至标准输出，便于容器备份（注意 `docker exec` 不要添加 `-t`，避免终端控制符损坏二进制文件）。
-- 若目标文件已存在，将自动终止以防覆盖。
-- 备份包含密码哈希与全部统计明细，应严格限制访问权限。
+- 直接指定文件时，以 `0600` 创建备份并拒绝已有文件或符号链接；失败时清理未完成副本。Windows 需通过目录 ACL 限制访问；备份目录应仅允许受信任的用户写入。
+- 标准输出重定向由宿主 shell 创建文件，示例中的 `umask 077` 与 `set -C` 分别限制权限和禁止覆盖。失败的重定向可能留下不完整文件，不可用作恢复。
+- 备份包含密码哈希、会话与令牌哈希、保存的代理密码和统计数据。旧备份的权限不会随升级改变，应单独检查；文件限制为 `0600`，目录可用 `0700`，Windows 使用对应 ACL。
 
 通过 cron 配置每日备份并保留最近 14 天副本：
 
 ```sh
 # crontab -e
-15 4 * * * docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
+15 4 * * * (umask 077; set -C; docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db) && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
 ```
 
 若仅需可导入其他服务的纯链接列表，可在管理后台通过 设置 → 数据 → 导出（详见[导入与导出](./import-export)）。导出数据不含每日走势、来源排行、令牌、文本与文件，不可作为容灾备份。

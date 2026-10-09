@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -44,6 +46,13 @@ func TestBackup(t *testing.T) {
 	if err := Backup(ctx, path, dst); err != nil {
 		t.Fatal(err)
 	}
+	info, err := os.Stat(dst)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o077 != 0 {
+		t.Errorf("backup exposes credentials with mode %o", info.Mode().Perm())
+	}
 	if err := Backup(ctx, path, dst); err == nil {
 		t.Fatal("Backup overwrote an existing file")
 	}
@@ -58,6 +67,56 @@ func TestBackup(t *testing.T) {
 	defer b.Close()
 	if _, err := b.Resolve(ctx, "kept"); err != nil {
 		t.Fatalf("link missing from the backup: %v", err)
+	}
+}
+
+func TestBackupRejectsExistingTargetsAndCleansFailures(t *testing.T) {
+	ctx := context.Background()
+	dir := t.TempDir()
+	source := filepath.Join(dir, "source.db")
+	s, err := Open(ctx, source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	empty := filepath.Join(dir, "empty.db")
+	if err := os.WriteFile(empty, nil, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := Backup(ctx, source, empty); err == nil {
+		t.Fatal("backup accepted an existing empty file")
+	}
+	if info, err := os.Stat(empty); err != nil || info.Size() != 0 {
+		t.Fatalf("existing file changed: %v %v", info, err)
+	}
+	t.Run("symlink", func(t *testing.T) {
+		dst, target := filepath.Join(dir, "link.db"), filepath.Join(dir, "absent.db")
+		if err := os.Symlink(target, dst); err != nil {
+			if runtime.GOOS == "windows" {
+				t.Skip("symlink privileges unavailable:", err)
+			}
+			t.Fatal(err)
+		}
+		if err := Backup(ctx, source, dst); err == nil {
+			t.Fatal("backup followed a dangling symlink")
+		}
+		if _, err := os.Stat(target); !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("symlink target was written: %v", err)
+		}
+		if _, err := os.Lstat(dst); err != nil {
+			t.Fatal("existing symlink removed:", err)
+		}
+	})
+	invalid := filepath.Join(dir, "invalid.db")
+	if err := os.WriteFile(invalid, []byte("not a database"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	dst := filepath.Join(dir, "failed.db")
+	if err := Backup(ctx, invalid, dst); err == nil {
+		t.Fatal("backup accepted invalid input")
+	}
+	if _, err := os.Stat(dst); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("failed backup left a partial file: %v", err)
 	}
 }
 

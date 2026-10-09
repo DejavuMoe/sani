@@ -2,6 +2,14 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## v0.9.2
+
+2026-10-09 · Fix environment proxy isolation and backup file permissions with reproducible security regressions. Database schema stays at 5 with no new migration.
+
+- Fix direct requests borrowing the environment proxy's address exemption. Requests matching `NO_PROXY` use a separate connection pool and always check the public IP at dial time, blocking DNS rebinding to the configured private proxy address and port. Only requests actually routed through a proxy may delegate failed local DNS lookups. Dedicated metadata proxy IP pinning is unchanged.
+- Create `sani backup FILE` with `0600` permissions from the start, atomically reject existing files and symlinks, and remove incomplete output on failure. The host shell still controls stdout backup permissions; bilingual examples now use `umask 077` and prevent overwrites. Existing backup permissions are unchanged and should be reviewed after upgrading.
+- Add regression tests for proxy/direct DNS rebinding, backup permissions and failure cleanup, plus 308 HTTP checks that forwarded queries cannot replace the saved redirect scheme or authority. CodeQL #7 is dismissed as a false positive; the raw scan still reports this data flow and is not claimed to be clean.
+
 ## v0.9.1
 
 2026-10-09 · Fix admin proxy configuration and control styling with approved R5. Database schema stays at 5 with no new migration.

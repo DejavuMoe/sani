@@ -407,7 +407,7 @@ curl https://s.example.com/api/import \
 
 ```json
 {
-  "version": "v0.9.1",
+  "version": "v0.9.2",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

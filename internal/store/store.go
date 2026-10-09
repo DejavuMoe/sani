@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -92,8 +93,23 @@ func Backup(ctx context.Context, path, dst string) error {
 	if _, err := os.Stat(path); err != nil {
 		return fmt.Errorf("no database at %s", path)
 	}
-	if _, err := os.Stat(dst); err == nil {
-		return fmt.Errorf("%s already exists", dst)
+	dst, err := filepath.Abs(dst)
+	if err != nil {
+		return err
+	}
+	// Reserve a private empty file before SQLite writes any credentials.
+	file, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return fmt.Errorf("create backup: %w", err)
+	}
+	complete := false
+	defer func() {
+		if !complete {
+			os.Remove(dst)
+		}
+	}()
+	if err := file.Close(); err != nil {
+		return err
 	}
 	db, err := sql.Open("sqlite", dsn(path, false))
 	if err != nil {
@@ -102,6 +118,7 @@ func Backup(ctx context.Context, path, dst string) error {
 	defer db.Close()
 	db.SetMaxOpenConns(1)
 	_, err = db.ExecContext(ctx, "VACUUM INTO ?", dst)
+	complete = err == nil
 	return err
 }
 

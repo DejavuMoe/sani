@@ -160,7 +160,7 @@ Default: the system time zone. “Today” and the daily statistics follow it. T
 
 ### `HTTPS_PROXY` and `HTTP_PROXY`
 
-Outbound proxies for title and icon fetching use the standard library’s `http.ProxyFromEnvironment`, including `NO_PROXY`. Targets still pass through `checkHost`; with a proxy configured, failed local DNS lookups may be left to it, and the proxy itself may be private. Sani does not inspect the address the proxy ultimately connects to. Use a trusted proxy with its own DNS and outbound restrictions; see the [fetching trust boundary](../internals/security#fetching).
+Outbound proxies for title and icon fetching use the standard library’s `http.ProxyFromEnvironment`, including `NO_PROXY`. Targets still pass through `checkHost`; only requests actually routed through a proxy may delegate failed local DNS lookups. Direct requests, including `NO_PROXY`, use a separate connection pool and always enforce the public-IP dial check. The proxy itself may be private. Sani does not inspect the address the proxy ultimately connects to. Use a trusted proxy with its own DNS and outbound restrictions; see the [fetching trust boundary](../internals/security#fetching).
 
 Creation defaults are stored in SQLite when edited in Settings. Priority is built-in defaults → saved settings → explicitly set environment variables, per field. No configuration file is required.
 

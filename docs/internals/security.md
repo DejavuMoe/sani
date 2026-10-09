@@ -69,7 +69,7 @@ API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。�
 - 网页上限读取 1 MB，图标上限 256 KB，单请求超时 12 秒，全局单任务上限 20 秒；
 - 最多保留 32 个 HTML 图标候选；base 与 HTTP(S) 图标地址在展开前后均限制为 8,192 字节；
 - 后台自动抓取最多同时运行 3 个任务，限制批量创建链接的并发出站请求；手动刷新不使用这组任务槽位；
-- `HTTP_PROXY`、`HTTPS_PROXY` 与 `NO_PROXY` 由标准库处理。目标仍经过 `checkHost` 校验；配置代理时，本机解析失败可交由代理解析，代理自身也允许位于私网。代理的远端 DNS 与最终出站连接不在 Sani 的拨号检查范围内，应使用可信代理并在代理端限制可达地址；
+- `HTTP_PROXY`、`HTTPS_PROXY` 与 `NO_PROXY` 由标准库处理。目标仍经过 `checkHost` 校验；仅实际经代理的请求可将本机 DNS 失败交给代理处理。直连与代理使用独立连接池，`NO_PROXY` 请求不会继承代理的私网地址例外。代理自身允许位于私网，其远端 DNS 与最终出站连接不在 Sani 的拨号检查范围内，应使用可信代理并在代理端限制可达地址；
 - 抓取请求附加 `X-Sani-Preview`，避免嵌套请求污染目标 Sani 计数。
 
 外部网站提取的图标进行文件头 Magic Number 校验，响应附加 `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` 与 `nosniff`，阻断 SVG 内部脚本执行。

@@ -69,7 +69,7 @@ More limits:
 - pages are read up to 1 MB and icons up to 256 KB, a single request times out after 12 seconds, and fetching for one link takes 20 seconds at most;
 - at most 32 HTML icon candidates are retained; base and HTTP(S) icon URLs are limited to 8,192 bytes before and after resolution;
 - background automatic fetching runs at most 3 jobs at once, limiting outgoing requests from bulk link creation; manual refreshes do not use these job slots;
-- the standard library handles `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. Targets still pass through `checkHost`; with a proxy configured, failed local DNS lookups may be left to it, and its own address may be private. Sani’s dial checks do not inspect the proxy’s remote DNS or final outbound connection: use a trusted proxy and restrict reachable addresses there;
+- the standard library handles `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. Targets still pass through `checkHost`; only requests actually routed through a proxy may delegate failed local DNS lookups. Direct and proxied requests use separate connection pools, so `NO_PROXY` requests never inherit the proxy's private-address exemption. The proxy itself may be private; Sani's dial checks do not inspect its remote DNS or final outbound connection. Use a trusted proxy and restrict reachable addresses there;
 - fetches carry an `X-Sani-Preview` header, so if the destination is a short link on another Sani instance, the fetch isn’t counted as a click.
 
 Fetched icons come from third-party sites. Sani checks from the content that they really are images and serves them with `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` and `nosniff`. Even someone opening an SVG icon directly can’t make it run scripts.

@@ -52,7 +52,6 @@ type Page struct {
 
 type Fetcher struct {
 	client      *http.Client
-	proxied     bool
 	environment bool
 }
 
@@ -66,38 +65,26 @@ func (f *Fetcher) CloseIdleConnections() { f.client.CloseIdleConnections() }
 func (f *Fetcher) EnvironmentProxyConfigured() bool { return f.environment }
 
 func newFetcher(environment bool) *Fetcher {
-	// Every connection is checked at dial time, after DNS, so a name that
-	// resolves differently the second time cannot reach a private address.
-	// The one exception is a configured proxy, which may well be local.
-	proxies := map[string]struct{}{}
-	var proxy func(*http.Request) (*url.URL, error)
 	configured := false
 	if environment {
-		proxies = proxyAddrs()
-		proxy = http.ProxyFromEnvironment
 		for _, k := range []string{"HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"} {
 			configured = configured || os.Getenv(k) != ""
 		}
 	}
 	dialer := &net.Dialer{Timeout: 5 * time.Second, KeepAlive: 30 * time.Second}
-	dialer.Control = func(network, address string, c syscall.RawConn) error {
-		if _, ok := proxies[address]; ok {
-			return nil
-		}
-		return guardDial(network, address, c)
+	dialer.Control = guardDial
+	transport := &http.Transport{
+		DialContext:           dialer.DialContext,
+		TLSHandshakeTimeout:   6 * time.Second,
+		ResponseHeaderTimeout: 8 * time.Second,
+		MaxIdleConns:          16,
+		IdleConnTimeout:       30 * time.Second,
+		ForceAttemptHTTP2:     true,
 	}
-	f := &Fetcher{proxied: len(proxies) > 0, environment: configured}
+	f := &Fetcher{environment: configured}
 	f.client = &http.Client{
-		Timeout: 12 * time.Second,
-		Transport: &http.Transport{
-			Proxy:                 proxy,
-			DialContext:           dialer.DialContext,
-			TLSHandshakeTimeout:   6 * time.Second,
-			ResponseHeaderTimeout: 8 * time.Second,
-			MaxIdleConns:          16,
-			IdleConnTimeout:       30 * time.Second,
-			ForceAttemptHTTP2:     true,
-		},
+		Timeout:   12 * time.Second,
+		Transport: transport,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= 6 {
 				return errors.New("too many redirects")
@@ -105,41 +92,34 @@ func newFetcher(environment bool) *Fetcher {
 			return f.checkHost(req.Context(), req.URL)
 		},
 	}
+	if environment {
+		proxied := transport.Clone()
+		proxied.Proxy = http.ProxyFromEnvironment
+		proxied.DialContext = (&net.Dialer{Timeout: 5 * time.Second, KeepAlive: 30 * time.Second}).DialContext
+		f.client.Transport = &environmentTransport{direct: transport, proxied: proxied}
+	}
 	return f
 }
 
-// proxyAddrs resolves the proxies http.ProxyFromEnvironment would use to
-// the "ip:port" addresses the dialer will see.
-func proxyAddrs() map[string]struct{} {
-	out := map[string]struct{}{}
-	for _, k := range []string{"HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy"} {
-		v := os.Getenv(k)
-		if v == "" {
-			continue
-		}
-		if !strings.Contains(v, "://") {
-			v = "http://" + v
-		}
-		u, err := url.Parse(v)
-		if err != nil || u.Hostname() == "" {
-			continue
-		}
-		port := u.Port()
-		if port == "" {
-			port = map[string]string{"https": "443", "socks5": "1080", "socks5h": "1080"}[u.Scheme]
-			if port == "" {
-				port = "80"
-			}
-		}
-		ips, err := net.LookupIP(u.Hostname())
-		if err != nil {
-			continue
-		}
-		for _, ip := range ips {
-			out[net.JoinHostPort(ip.String(), port)] = struct{}{}
-		}
+// Separate pools keep the trusted proxy's dialer out of direct/NO_PROXY requests.
+type environmentTransport struct {
+	direct, proxied *http.Transport
+}
+
+func (t *environmentTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	p, err := t.proxied.Proxy(r)
+	if err != nil {
+		return nil, err
 	}
-	return out
+	if p == nil {
+		return t.direct.RoundTrip(r)
+	}
+	return t.proxied.RoundTrip(r)
+}
+
+func (t *environmentTransport) CloseIdleConnections() {
+	t.direct.CloseIdleConnections()
+	t.proxied.CloseIdleConnections()
 }
 
 // Ranges that are not public even though netip does not call them private.
@@ -208,8 +188,10 @@ func (f *Fetcher) checkHost(ctx context.Context, u *url.URL) error {
 	}
 	addrs, err := net.DefaultResolver.LookupNetIP(ctx, "ip", host)
 	if err != nil {
-		if f.proxied {
-			return nil // the proxy may resolve names this host cannot
+		if f.environment {
+			if p, proxyErr := http.ProxyFromEnvironment(&http.Request{URL: u}); proxyErr == nil && p != nil {
+				return nil // only a selected proxy may resolve names this host cannot
+			}
 		}
 		return err
 	}

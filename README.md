@@ -47,14 +47,14 @@ Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first vis
 
 The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
-The template pins `v0.9.1`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
+The template pins `v0.9.2`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.1/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.2/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -177,7 +177,7 @@ make load             # the benchmark above
 Links and texts live in `sani.db` in `SANI_DATA_DIR`, a regular SQLite file in WAL mode; shared files are in `files/` next to it. `sani backup FILE` writes a consistent database-only copy while Sani keeps running; it excludes file bytes and pending in-memory clicks. With `-` as the file name the copy goes to standard output, which is how it works with Docker, since the image has no shell:
 
 ```sh
-docker exec sani /sani backup - > sani-backup.db
+(umask 077; set -C; docker exec sani /sani backup - > sani-backup.db)
 ```
 
 For a complete backup including files, stop all writers before copying the database and `files/` together. Restore into an empty directory, without mixing in the old instance’s WAL or files; [Operations](docs/en/guide/operations.md) has the paired backup, restore and upgrade steps. For a portable list of your links, use Settings → Data → Export (it leaves texts and files out).

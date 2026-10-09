@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -16,6 +17,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"os/exec"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -281,7 +284,9 @@ func fixtureResolver(t *testing.T) {
 			q := m.Questions[0]
 			m.Header.Response = true
 			m.Header.RecursionAvailable = true
-			if q.Type == dnsmessage.TypeA {
+			if strings.HasPrefix(q.Name.String(), "no-dns-") {
+				m.Header.RCode = dnsmessage.RCodeNameError
+			} else if q.Type == dnsmessage.TypeA {
 				ips := [][4]byte{{1, 1, 1, 1}}
 				if q.Name.String() == "mixed.test." {
 					ips = append(ips, [4]byte{127, 0, 0, 1})
@@ -320,5 +325,52 @@ func TestProxyRejectsMixedAndRebindingDNS(t *testing.T) {
 	}
 	if attempts.Load() != 0 {
 		t.Fatal("unsafe DNS reached proxy")
+	}
+}
+
+func TestEnvironmentProxyDoesNotExemptDirectTargets(t *testing.T) {
+	// ProxyFromEnvironment caches process-wide settings; isolate this fixture.
+	if os.Getenv("SANI_TEST_ENV_PROXY") != "1" {
+		cmd := exec.Command(os.Args[0], "-test.run=^TestEnvironmentProxyDoesNotExemptDirectTargets$")
+		cmd.Env = append(os.Environ(), "SANI_TEST_ENV_PROXY=1")
+		if output, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("environment proxy fixture: %v\n%s", err, output)
+		}
+		return
+	}
+	fixtureResolver(t)
+	var requests atomic.Int32
+	p := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests.Add(1)
+		io.WriteString(w, "<title>Local proxy</title>")
+	}))
+	defer p.Close()
+	for _, key := range []string{"HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"} {
+		t.Setenv(key, p.URL)
+	}
+	for _, key := range []string{"NO_PROXY", "no_proxy"} {
+		t.Setenv(key, "rebind.test,no-dns-direct.test")
+	}
+	t.Setenv("REQUEST_METHOD", "")
+	f := New()
+	defer f.CloseIdleConnections()
+	_, port, _ := net.SplitHostPort(p.Listener.Addr().String())
+	// Preflight resolves publicly, then the direct dial resolves to the proxy's IP:port.
+	if _, err := f.Page(context.Background(), "http://rebind.test:"+port+"/private", ""); !errors.Is(err, ErrBlocked) {
+		t.Errorf("direct request escaped the SSRF guard: %v", err)
+	}
+	if requests.Load() != 0 {
+		t.Fatal("direct request reached the private proxy listener")
+	}
+	for _, host := range []string{"target.test", "no-dns-proxy.test"} {
+		if page, err := f.Page(context.Background(), "http://"+host+"/", ""); err != nil || page.Title != "Local proxy" {
+			t.Fatalf("configured proxy stopped working for %s: page=%+v err=%v", host, page, err)
+		}
+	}
+	if _, err := f.Page(context.Background(), "http://no-dns-direct.test/", ""); err == nil {
+		t.Fatal("direct request ignored failed local DNS")
+	}
+	if requests.Load() != 2 {
+		t.Fatalf("unexpected proxy requests: %d", requests.Load())
 	}
 }

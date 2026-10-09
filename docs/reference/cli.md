@@ -37,12 +37,13 @@ echo 'a-new-password' | sani passwd
 
 ```sh
 sani backup /backups/sani-2026-09-29.db
-docker exec sani /sani backup - > sani-2026-09-29.db
+(umask 077; set -C; docker exec sani /sani backup - > sani-2026-09-29.db)
 ```
 
 - 底层使用 SQLite 原生 `VACUUM INTO`，输出的副本经过自动整理压缩，体积通常优于原始数据库。
 - 目标路径设为 `-` 时直接流式输出至标准输出；若标准输出直连 TTY 终端将拒绝执行，防止乱码冲毁屏幕。
-- 目标文件已存在时拒绝覆写。
+- 直接指定文件时，以 `0600` 权限创建备份（Windows 仍需配置目录 ACL），拒绝已有文件及符号链接，失败时清理未完成副本。备份目录应仅允许受信任的用户写入。
+- 标准输出重定向的权限和覆盖行为由宿主 shell 决定，需像示例一样设置 `umask 077` 与 `set -C`。这些设置不会修复旧备份的权限。
 - 仅执行只读读取，不触发表结构升级，支持使用任意版本的 `sani` 备份正在运行的旧版本实例。
 - 仅备份已提交的数据库数据；分享文件与内存待刷盘点击不包含在内。完整灾备请停机执行[配套备份](../guide/operations#backup-files)。
 

@@ -24,7 +24,7 @@ The 32-character hexadecimal names in `files/` are random storage names. Seeing 
 ::: code-group
 
 ```sh [Docker]
-docker exec sani /sani backup - > sani-$(date +%F).db
+(umask 077; set -C; docker exec sani /sani backup - > sani-$(date +%F).db)
 ```
 
 ```sh [systemd]
@@ -38,14 +38,15 @@ sani backup ~/backups/sani-$(date +%F).db
 :::
 
 - With `-` as the file name, the copy goes to standard output, which suits containers. Don’t add `-t` to `docker exec`: a terminal would mangle the output.
-- An existing file is never overwritten.
-- The backup holds the password hash and every link’s statistics; keep it as safe as the database itself.
+- Named backups are created with `0600` permissions, refuse existing files or symlinks, and remove incomplete output on failure. Use directory ACLs on Windows; only trusted users should be able to write to the backup directory.
+- The host shell creates stdout redirection files. The examples use `umask 077` to restrict permissions and `set -C` to prevent overwrites. Failed redirection may leave an incomplete file; do not restore it.
+- Backups contain password, session and token hashes, saved proxy passwords and statistics. Upgrading does not change permissions on old backups: review them separately, using `0600` for files, `0700` for directories, or equivalent Windows ACLs.
 
 A daily backup with cron that keeps the last 14:
 
 ```sh
 # crontab -e
-15 4 * * * docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
+15 4 * * * (umask 077; set -C; docker exec sani /sani backup - > /srv/backup/sani-$(date +\%F).db) && find /srv/backup -name 'sani-*.db' -mtime +14 -delete
 ```
 
 For a list of links you can import elsewhere, use Settings → Data → Export (see [Import and export](./import-export)). An export leaves out daily statistics, referrers, tokens, texts and files, so it doesn’t replace a backup.

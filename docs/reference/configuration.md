@@ -158,7 +158,7 @@ https://s.example.com/gh?utm_source=weekly
 
 ### `HTTPS_PROXY` 与 `HTTP_PROXY`
 
-用于拉取网页元数据与 Favicon 时的出站代理设置，由标准库 `http.ProxyFromEnvironment` 处理，支持 `NO_PROXY` 旁路规则。目标仍经过 `checkHost` 校验；配置代理后，本机解析失败的域名可交由代理解析，代理地址本身也允许位于私网。Sani 不验证代理最终连接的地址，代理必须可信，并在代理端落实 DNS 与出站访问限制，详见[抓取安全边界](../internals/security#fetching)。
+用于拉取网页元数据与 Favicon 时的出站代理设置，由标准库 `http.ProxyFromEnvironment` 处理，支持 `NO_PROXY` 旁路规则。目标仍经过 `checkHost` 校验；仅实际经代理的请求可将本机 DNS 失败交给代理处理。直连请求（包括 `NO_PROXY`）使用独立连接池，并始终执行拨号时的公网 IP 校验。代理地址本身允许位于私网；Sani 不验证代理最终连接的地址，代理必须可信，并在代理端落实 DNS 与出站访问限制，详见[抓取安全边界](../internals/security#fetching)。
 
 ## 配置错误拦截
 

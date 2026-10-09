@@ -47,14 +47,14 @@ docker compose up -d
 
 镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
 
-模板固定使用 `v0.9.1`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v0.9.2`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
 每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS、Windows 和 FreeBSD 的压缩包，附校验和与构建来源证明：
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.1/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.2/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -177,7 +177,7 @@ make load             # 上面的压测
 链接和文本都在 `SANI_DATA_DIR` 下的 `sani.db` 里，这是一个普通的 SQLite 文件（WAL 模式）；分享的文件在旁边的 `files/` 目录里。`sani backup FILE` 会在服务运行时写出一致的数据库副本，不包含分享文件和内存中的点击；文件名写 `-` 时，副本输出到标准输出。镜像里没有 shell，所以 Docker 下这样备份：
 
 ```sh
-docker exec sani /sani backup - > sani-backup.db
+(umask 077; set -C; docker exec sani /sani backup - > sani-backup.db)
 ```
 
 完整备份需要先停止所有写入者，再把数据库与 `files/` 配套复制。恢复到新的空目录，不混入旧实例的 WAL 或文件；配套备份、恢复和升级步骤见[运维](docs/guide/operations.md)。想要可移植的链接列表，用设置 → 数据 → 导出（不包含文本和文件）。

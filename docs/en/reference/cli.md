@@ -37,12 +37,13 @@ Writes a consistent copy of the database to a file while the service keeps runni
 
 ```sh
 sani backup /backups/sani-2026-09-29.db
-docker exec sani /sani backup - > sani-2026-09-29.db
+(umask 077; set -C; docker exec sani /sani backup - > sani-2026-09-29.db)
 ```
 
 - It uses SQLite’s `VACUUM INTO`, so the copy is compacted and usually smaller than the original.
 - With `-` as the file name, the copy goes to standard output. If standard output is a terminal, it refuses, rather than print binary data to your screen.
-- An existing file is never overwritten.
+- A named backup is created with `0600` permissions (configure directory ACLs on Windows). Existing files and symlinks are refused, and incomplete output is removed on failure. Only trusted users should be able to write to the backup directory.
+- The host shell controls stdout redirection permissions and overwrites: use `umask 077` and `set -C` as shown. These settings do not repair permissions on old backups.
 - It only reads the database and never upgrades its schema, so any version of `sani` can back up a running instance.
 
 - Only committed database data is included; uploaded files and in-memory clicks are excluded. For a complete backup, stop the service and follow the [paired backup procedure](../guide/operations#backup-files).

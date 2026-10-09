@@ -2,7 +2,7 @@ services:
   sani:
     # Keep the full release tag, including v. To build from a checkout,
     # replace this line with `build: .`
-    image: ghcr.io/dejavumoe/sani:v0.9.1
+    image: ghcr.io/dejavumoe/sani:v0.9.2
     container_name: sani
     restart: unless-stopped
     stop_grace_period: 30s
