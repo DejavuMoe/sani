@@ -41,6 +41,16 @@ Sani 面向**单管理员、单个服务进程、本地持久化数据目录**�
 
 上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
 
+## v0.9.3 短码与界面修复验收入口 {#r6-acceptance}
+
+已实施批准的 R6，原型与产品同步修复。以下回归覆盖独立短码配置、稳定预览和响应式控件；触屏检查使用浏览器模拟，尚不代表 iOS/Android 真机及 Firefox/WebKit 验收。
+
+| 能力 | 验收入口 |
+|---|---|
+| 三类长度、3–32 边界、环境锁定、旧设置初始化与重启持久化 | `internal/config/slug_lengths_test.go`、`internal/server/slug_lengths_test.go`、`cmd/sani/slug_lengths_test.go` |
+| 实际生成、统计刷新保留正文与滚动位置、失败重试及编辑后刷新 | `web/e2e/r6.spec.ts` |
+| 721/720、641/640、502/390/320px 控件尺寸，中英文、明暗、鼠标/触屏、展开状态与无障碍 | `web/e2e/metadata.spec.ts` |
+
 ## v0.5.0 标签管理验收入口 {#tags-acceptance}
 
 | 能力 | 验收入口 |

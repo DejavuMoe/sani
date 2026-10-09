@@ -2,13 +2,17 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.3
+
+2026-10-09 · Fix share slug lengths not matching their settings, detail preview jitter and controls abruptly growing on narrow screens. Implements approved R6. Database schema stays at 5; the first startup only initializes missing independent share-length settings, with no new schema migration.
 
 - Fix admin inputs, save buttons and tag controls abruptly growing at the 640px breakpoint. Keep text/code creation and editing typography consistent, with separate touch-input font sizing and switch hit areas that preserve the compact layout.
 
 - Configure generated slug lengths independently by type: new installations default to 5 for URL `slugLength`, 10 for text/code `textSlugLength` and 10 for `fileSlugLength`. Each accepts integers 3–32 and persists independently. Add the fields to config GET/PATCH and `configSources`; `SANI_TEXT_SLUG_LENGTH` and `SANI_FILE_SLUG_LENGTH` each override and lock their own setting.
 - On the initial upgrade, save missing share-length settings as `max(10, legacy effective URL slug length)`, preserving longer legacy values. Later URL-length edits no longer affect shares. Existing and manually chosen slugs stay unchanged; shares always exclude look-alikes. Values below 10 are honored with a guessing-risk advisory, without silently raising them to 10.
 - Fix text/code detail preview jitter when statistics ranges change or list/timer refreshes run: retain loaded content and scroll position instead of repeatedly clearing the body. Content-version changes still refresh the body, with explicit initial-loading and failure/retry states.
+
+Before upgrading from v0.9.2, stop the service cleanly and back up the database, files and configuration as described in [backup and restore](../guide/operations#backup). Replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.3`, then check all three lengths in Settings → Creation defaults. To generate five-character text/code share slugs, set that field to 5 independently. Existing links and content stay unchanged.
 
 ## v0.9.2
 

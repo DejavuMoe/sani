@@ -41,6 +41,16 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
+## v0.9.3 slug and interface fix acceptance {#r6-acceptance}
+
+Approved R6 is implemented, with matching prototype and production fixes. These regressions cover independent slug settings, stable previews and responsive controls. Touch checks use browser emulation; they do not establish acceptance on physical iOS/Android devices or Firefox/WebKit.
+
+| Capability | Acceptance entry point |
+|---|---|
+| Three lengths, 3–32 bounds, environment locks, legacy settings initialization and persistence across restarts | `internal/config/slug_lengths_test.go`, `internal/server/slug_lengths_test.go`, `cmd/sani/slug_lengths_test.go` |
+| Generated lengths, body and scroll retention during statistics refreshes, failure retry and refresh after editing | `web/e2e/r6.spec.ts` |
+| Control sizing at 721/720, 641/640, 502/390/320px; both languages and themes, mouse/touch, expanded controls and accessibility | `web/e2e/metadata.spec.ts` |
+
 ## v0.5.0 tag verification {#tags-acceptance}
 
 | Capability | Acceptance entry point |
