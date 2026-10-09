@@ -54,7 +54,7 @@
 
   function overlayOpen(): boolean {
     try {
-      return !!document.querySelector('dialog[open], :popover-open');
+      return !!document.querySelector('dialog[open], :popover-open:not([role="tooltip"])');
     } catch {
       return !!document.querySelector('dialog[open]');
     }

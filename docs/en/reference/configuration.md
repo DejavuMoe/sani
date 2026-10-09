@@ -95,7 +95,9 @@ Default `true`. Omits `0`, `o`, `1`, `i`, `l`. `false` uses lowercase letters an
 
 ### `SANI_META_PROXY`
 
-No default. Accepts `http://`, `https://` or `socks5://` proxy URLs, optionally with username/password. Credentials belong only in the server environment; the API returns a configured boolean, never the URL. When enabled without a stored mode, a dedicated proxy is selected automatically.
+No default. Accepts `http://`, `https://` or `socks5://` proxy URLs, optionally with username/password. This variable overrides the saved proxy and locks proxy fields and connection testing in Settings. Leave it unset to configure the host, port and optional authentication in the admin app. When fetching is enabled without a saved mode, a configured dedicated proxy is selected automatically. The API returns the effective host, port, username and password-set flag, never the password.
+
+Admin proxy settings are stored in the instance database. The password is recoverable for connections, not encrypted; protect the database and backups as credential-bearing files. Connection testing uses the current form without saving it. Changing the scheme, host, port or username requires entering a password again so a saved secret cannot be sent to a different proxy.
 
 Connections tunnel to a locally resolved, verified public IP through CONNECT or SOCKS5, preserving the destination Host and TLS SNI. Failures never fall back to direct connections and `NO_PROXY` does not apply. Private targets, unsafe redirects and fake-IP DNS answers (`198.18.0.0/15`) are rejected in this strict mode. DNS runs locally, so this does not promise DNS privacy. The configured proxy endpoint itself may be private. HTTP proxies must support CONNECT for HTTP as well as HTTPS targets.
 
@@ -103,7 +105,7 @@ HTTPS encrypts the server-to-proxy hop; ordinary HTTP/SOCKS5 do not. Password au
 
 ### `SANI_FETCH_META`
 
-Default `true`. Enables title and icon fetching. `false` also disables manual refresh; existing cached metadata remains available. An explicit value locks the metadata mode in the admin app. With no explicit value, choose Off, Direct or Use proxy in Settings. Direct ignores environment proxies; an unchanged legacy deployment still uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`, shown as Environment proxy. Requests already in progress may finish after a mode change.
+Default `true`. Enables title and icon fetching. `false` also disables manual refresh; existing cached metadata remains available. An explicit value locks the metadata mode, proxy fields and connection testing in the admin app. With no explicit value, toggle fetching and choose Direct, HTTP(S) or SOCKS5 in Settings. Direct ignores environment proxies; an unchanged legacy deployment still uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. The app describes that inherited mode without labeling it Direct. Requests already in progress may finish after a mode change.
 
 ### `SANI_FORWARD_QUERY`
 

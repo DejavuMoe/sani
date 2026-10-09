@@ -46,3 +46,9 @@ export function sameExpiry(a: Expiry, b: Expiry): boolean {
   if ('at' in a && 'at' in b) return a.at === b.at;
   return false;
 }
+
+/** Round-trip validation rejects rollover dates and nonexistent local DST times. */
+export function validLocalExpiry(value: string, now = Date.now()): boolean {
+  const date = new Date(value);
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value) && !Number.isNaN(+date) && toLocalInput(date) === value && +date > now;
+}

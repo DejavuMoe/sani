@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import type { Link } from '../lib/api';
   import { copyText } from '../lib/clipboard';
   import { formatCompact, formatNumber, t, type MessageKey } from '../lib/i18n.svelte';
@@ -127,14 +128,14 @@
       </span>
       <span class="tags"><TagList ids={link.tags} limit={2} /></span>
     </button>
-    <span class="spark" title={t('list.spark', { n: sparkTotal })}>
+    <span class="spark" use:tooltip={t('list.spark', { n: sparkTotal })}>
       <Sparkline values={spark} label={t('list.spark', { n: sparkTotal })} />
     </span>
-    <span class="clicks" title={formatNumber(link.clicks)}>{formatCompact(link.clicks)}</span>
+    <span class="clicks" use:tooltip={formatNumber(link.clicks)}>{formatCompact(link.clicks)}</span>
     <button
       class={['copy', copied && 'done']}
       aria-label={t('list.copyShort')}
-      title={t('list.copyShort')}
+      use:tooltip={t('list.copyShort')}
       onclick={(e) => {
         e.stopPropagation();
         copy();

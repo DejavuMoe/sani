@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import { onDestroy, tick } from 'svelte';
   import { slide } from 'svelte/transition';
   import { ApiError, UPLOAD_CHUNK_SIZE, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
@@ -262,7 +263,7 @@
             <span class="fmeta">{formatSize(file.size)}{file.type ? ` · ${file.type}` : ''}</span>
           </span>
           {#if busy && progress !== null}
-            <button type="button" class="x" aria-label={t('share.cancel')} title={t('share.cancel')} onclick={() => upload?.abort()}>
+            <button type="button" class="x" aria-label={t('share.cancel')} use:tooltip={t('share.cancel')} onclick={() => upload?.abort()}>
               <Icon name="x" />
             </button>
           {:else}
@@ -270,7 +271,7 @@
               type="button"
               class="x"
               aria-label={t('share.fileRemove')}
-              title={t('share.fileRemove')}
+              use:tooltip={t('share.fileRemove')}
               disabled={busy}
               onclick={() => {
                 void cancelFileUpload(resume); resume = { offset: 0 }; uploadFailed = false;

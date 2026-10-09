@@ -75,7 +75,7 @@ Everything is set through environment variables. See [.env.example](.env.example
 | `SANI_TRUST_PROXY` | `false` | Honor `X-Forwarded-*` and `X-Real-IP`; the client address is the last `X-Forwarded-For` entry. Enable only behind a proxy that sets them. |
 | `SANI_SLUG_LENGTH` | `5` | Length of generated slugs. By default they use `23456789abcdefghjkmnpqrstuvwxyz`, with no 0/o or 1/l/i, so they survive being read aloud. |
 | `SANI_EXCLUDE_CONFUSABLE` | `true` | Exclude 0/o and 1/i/l from generated URL slugs. |
-| `SANI_META_PROXY` | — | Optional HTTP/HTTPS/SOCKS5 metadata proxy; credentials stay on the server. |
+| `SANI_META_PROXY` | — | Optional HTTP/HTTPS/SOCKS5 metadata proxy override; otherwise configure it in Settings. |
 | `SANI_FETCH_META` | `true` | Fetch the page title and icon for new links. Private and loopback addresses are never fetched. |
 | `SANI_FORWARD_QUERY` | `true` | Append the visitor's query string to the destination (`/gh?utm_source=x`). |
 | `SANI_CACHE_SIZE` | `100000` | Redirect targets kept in memory. |

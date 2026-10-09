@@ -13,14 +13,17 @@ import (
 )
 
 type creationSettings struct {
-	SlugLength        *int    `json:"slugLength,omitempty"`
-	ExcludeConfusable *bool   `json:"excludeConfusable,omitempty"`
-	MaxFileSize       *int64  `json:"maxFileSize,omitempty"`
-	MetaMode          *string `json:"metaMode,omitempty"`
+	SlugLength        *int           `json:"slugLength,omitempty"`
+	ExcludeConfusable *bool          `json:"excludeConfusable,omitempty"`
+	MaxFileSize       *int64         `json:"maxFileSize,omitempty"`
+	MetaMode          *string        `json:"metaMode,omitempty"`
+	MetaProxy         *metadataProxy `json:"metaProxy,omitempty"`
 }
 
 type runtimeSettings struct {
 	stored            creationSettings
+	proxy             *metadataProxy
+	proxyFetcher      *meta.Fetcher
 	slugLength        int
 	excludeConfusable bool
 	maxFileSize       int64
@@ -28,18 +31,33 @@ type runtimeSettings struct {
 	sources           map[string]string
 }
 
-func (s *Server) settingsFor(v creationSettings) *runtimeSettings {
+func (s *Server) settingsFor(v creationSettings) (*runtimeSettings, error) {
 	c := &runtimeSettings{stored: v, slugLength: s.opt.SlugLength, excludeConfusable: !s.opt.IncludeConfusable, maxFileSize: s.opt.MaxFileBytes, metaMode: "off", sources: map[string]string{}}
+	c.proxy = v.MetaProxy
+	c.proxyFetcher = s.proxyFetcher
+	if s.opt.MetaProxy != "" {
+		c.proxy = environmentMetadataProxy(s.opt.MetaProxy)
+	} else if c.proxy != nil {
+		if old := s.settings.Load(); old != nil && old.proxy != nil && *old.proxy == *c.proxy {
+			c.proxyFetcher = old.proxyFetcher
+		} else {
+			var err error
+			c.proxyFetcher, err = meta.NewProxy(c.proxy.url())
+			if err != nil {
+				return nil, errors.New("invalid stored metadata proxy")
+			}
+		}
+	}
 	if s.opt.FetchMeta {
 		c.metaMode = "direct"
 		if s.fetcher.EnvironmentProxyConfigured() {
 			c.metaMode = "environment"
 		}
-		if s.proxyFetcher != nil {
+		if c.proxyFetcher != nil {
 			c.metaMode = "proxy"
 		}
 	}
-	for _, key := range []string{"slugLength", "excludeConfusable", "maxFileSize", "metaMode"} {
+	for _, key := range []string{"slugLength", "excludeConfusable", "maxFileSize", "metaMode", "metaProxy"} {
 		c.sources[key] = "default"
 	}
 	if v.SlugLength != nil {
@@ -77,13 +95,19 @@ func (s *Server) settingsFor(v creationSettings) *runtimeSettings {
 			if s.fetcher.EnvironmentProxyConfigured() {
 				c.metaMode = "environment"
 			}
-			if s.proxyFetcher != nil {
+			if c.proxyFetcher != nil {
 				c.metaMode = "proxy"
 			}
 		}
 		c.sources["metaMode"] = "env"
 	}
-	return c
+	if v.MetaProxy != nil {
+		c.sources["metaProxy"] = "settings"
+	}
+	if s.opt.MetaProxy != "" {
+		c.sources["metaProxy"] = "env"
+	}
+	return c, nil
 }
 
 func (s *Server) loadSettings() error {
@@ -100,13 +124,18 @@ func (s *Server) loadSettings() error {
 	if !validCreation(v) {
 		return errors.New("invalid stored creation settings")
 	}
-	s.settings.Store(s.settingsFor(v))
+	next, err := s.settingsFor(v)
+	if err != nil {
+		return err
+	}
+	s.replaceSettings(next)
 	return nil
 }
 
 func validCreation(v creationSettings) bool {
 	return (v.SlugLength == nil || *v.SlugLength >= 3 && *v.SlugLength <= 32) &&
 		(v.MaxFileSize == nil || *v.MaxFileSize >= 1_000_000 && *v.MaxFileSize <= 4_096_000_000 && *v.MaxFileSize%1_000_000 == 0) &&
+		(v.MetaProxy == nil || v.MetaProxy.valid()) &&
 		(v.MetaMode == nil || *v.MetaMode == "off" || *v.MetaMode == "direct" || *v.MetaMode == "proxy")
 }
 
@@ -121,7 +150,7 @@ func (s *Server) metadataFetcher() *meta.Fetcher {
 	case "environment":
 		return s.fetcher
 	case "proxy":
-		return s.proxyFetcher
+		return cfg.proxyFetcher
 	default:
 		return nil
 	}
@@ -131,6 +160,7 @@ func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		BaseURL nullable[string] `json:"baseUrl"`
 		creationSettings
+		MetaProxy *metadataProxyInput `json:"metaProxy"`
 	}
 	if !decodeJSONMax(w, r, &in, 4096) {
 		return
@@ -174,23 +204,50 @@ func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 	if in.MetaMode != nil {
 		v.MetaMode = in.MetaMode
 	}
+	if in.MetaProxy != nil {
+		if current.sources["metaProxy"] == "env" || current.sources["metaMode"] == "env" {
+			writeError(w, http.StatusConflict, "config_env", "this setting is fixed by an environment variable")
+			return
+		}
+		var inputErr *inputError
+		v.MetaProxy, inputErr = mergeMetadataProxy(*in.MetaProxy, v.MetaProxy)
+		if inputErr != nil {
+			writeError(w, inputErr.status, inputErr.code, inputErr.msg)
+			return
+		}
+	}
 	if !validCreation(v) {
 		writeError(w, http.StatusBadRequest, "config_invalid", "invalid creation settings")
 		return
 	}
-	if in.MetaMode != nil && *in.MetaMode == "proxy" && s.proxyFetcher == nil {
-		writeError(w, http.StatusConflict, "proxy_missing", "configure SANI_META_PROXY first")
+	if in.MetaMode != nil && *in.MetaMode == "proxy" && s.proxyFetcher == nil && v.MetaProxy == nil {
+		writeError(w, http.StatusConflict, "proxy_missing", "configure a metadata proxy first")
+		return
+	}
+	next, err := s.settingsFor(v)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "config_invalid", "invalid proxy configuration")
 		return
 	}
 	b, _ := json.Marshal(v)
 	values[store.SettingCreation] = string(b)
 	if err := s.store.SetSettings(r.Context(), values); err != nil {
+		if next.proxyFetcher != nil && next.proxyFetcher != current.proxyFetcher {
+			next.proxyFetcher.CloseIdleConnections()
+		}
 		s.internalError(w, r, err)
 		return
 	}
 	if in.BaseURL.Set {
 		s.storedBase.Store(&base)
 	}
-	s.settings.Store(s.settingsFor(v))
+	s.replaceSettings(next)
 	s.getConfig(w, r)
+}
+
+func (s *Server) replaceSettings(next *runtimeSettings) {
+	old := s.settings.Swap(next)
+	if old != nil && old.proxyFetcher != nil && old.proxyFetcher != next.proxyFetcher {
+		old.proxyFetcher.CloseIdleConnections()
+	}
 }

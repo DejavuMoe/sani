@@ -4,6 +4,7 @@
   import AppHeader from '../components/AppHeader.svelte';
   import Button from '../components/Button.svelte';
   import Icon from '../components/Icon.svelte';
+  import MetadataSettings from '../components/MetadataSettings.svelte';
   import Switch from '../components/Switch.svelte';
   import Segmented from '../components/Segmented.svelte';
   import { api, ApiError, type ImportResult, type Token } from '../lib/api';
@@ -42,10 +43,9 @@
   let slugLength = $state(untrack(() => session.config?.slugLength ?? 5));
   let excludeConfusable = $state(untrack(() => session.config?.excludeConfusable ?? true));
   let maxFileMB = $state(untrack(() => (session.config?.maxFileSize ?? 99_000_000) / 1_000_000));
-  let metaMode = $state(untrack(() => session.config?.metaMode ?? 'off'));
-  let defaultsBusy = $state(false), metaBusy = $state(false);
-  let defaultsError = $state(''), metaError = $state('');
-  let defaultsSaved = $state(false), metaSaved = $state(false);
+  let defaultsBusy = $state(false);
+  let defaultsError = $state('');
+  let defaultsSaved = $state(false);
   const locked = (key: 'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode') => config?.configSources[key] === 'env';
   const defaultsValid = $derived(Number.isInteger(slugLength) && slugLength >= 3 && slugLength <= 32 && (locked('maxFileSize') || Number.isInteger(maxFileMB) && maxFileMB >= 1 && maxFileMB <= 4096));
   const defaultsChanged = $derived(slugLength !== config?.slugLength || excludeConfusable !== config?.excludeConfusable || maxFileMB * 1_000_000 !== config?.maxFileSize);
@@ -61,13 +61,6 @@
     } catch (err) { defaultsError = errorText(err instanceof ApiError ? err.code : 'unknown'); }
     finally { defaultsBusy = false; }
   }
-  async function saveMetadata(e: SubmitEvent) {
-    e.preventDefault(); metaBusy = true; metaError = ''; metaSaved = false;
-    try { session.config = await api.setConfig({ metaMode }); metaSaved = true; }
-    catch (err) { metaError = errorText(err instanceof ApiError ? err.code : 'unknown'); }
-    finally { metaBusy = false; }
-  }
-
   // Tokens
   let tokens = $state<Token[] | null>(null);
   let tokenName = $state('');
@@ -238,7 +231,7 @@
       {#if config?.baseUrlSource === 'env'}
         <p class="text">{t('settings.domainEnv', { url: config.baseUrl })}</p>
       {:else}
-        <form class="inline-form" onsubmit={saveBase}>
+        <form novalidate class="inline-form" onsubmit={saveBase}>
           <input
             class="field mono"
             bind:value={baseUrl}
@@ -262,7 +255,7 @@
 
   <section>
     <header><h2>{t('settings.defaults')}</h2></header>
-    <form class="body defaults-form" onsubmit={saveDefaults}>
+    <form novalidate class="body defaults-form" onsubmit={saveDefaults}>
       {#if ['slugLength', 'excludeConfusable', 'maxFileSize'].some(key => config?.configSources[key as 'slugLength'] === 'env')}<p class="hint">{t('settings.defaultsEnv')}</p>{/if}
       <div class="setting"><div><label for="default-length">{t('settings.slugLength')}</label><p class="hint">{t('settings.slugLengthHint')}</p></div><input id="default-length" class="field" type="number" min="3" max="32" step="1" bind:value={slugLength} disabled={locked('slugLength') || defaultsBusy} /></div>
       <div class="setting"><div><label for="default-exclude">{t('settings.exclude')}</label><p class="hint">{t('settings.excludeHint')}</p></div><Switch id="default-exclude" label={t('settings.exclude')} checked={excludeConfusable} onchange={v => excludeConfusable = v} disabled={locked('excludeConfusable') || defaultsBusy} /></div>
@@ -275,17 +268,7 @@
   </section>
   <section>
     <header><h2>{t('settings.metadata')}</h2></header>
-    <form class="body defaults-form" onsubmit={saveMetadata}>
-      {#if locked('metaMode')}<p class="hint">{t('settings.defaultsEnv')}</p>{/if}
-      <div class="setting"><div><label for="metadata-mode">{t('settings.metadataLabel')}</label><p class="hint">{t('settings.metadataHint')}</p></div><select id="metadata-mode" class="field" bind:value={metaMode} disabled={locked('metaMode') || metaBusy}>
-        {#if config?.metaMode === 'environment'}<option value="environment">{t('settings.metaEnvironment')}</option>{/if}
-        <option value="off">{t('settings.metaOff')}</option><option value="direct">{t('settings.metaDirect')}</option><option value="proxy" disabled={!config?.metaProxyConfigured}>{t('settings.metaProxy')}</option>
-      </select></div>
-      <p class="hint">{t(metaMode === 'off' ? 'settings.metaOffHint' : metaMode === 'direct' ? 'settings.metaDirectHint' : metaMode === 'environment' ? 'settings.metaEnvironmentHint' : 'settings.metaProxyHint')}</p>
-      <div class="meta-status"><Icon name={config?.metaProxyConfigured ? 'check' : 'lock'} size={14} />{t(config?.metaProxyConfigured ? 'settings.proxyReady' : 'settings.proxyMissing')}</div>
-      {#if metaError}<p class="error-text" role="alert">{metaError}</p>{/if}
-      <div class="settings-save"><Button type="submit" loading={metaBusy} disabled={locked('metaMode') || metaMode === config?.metaMode || metaMode === 'environment' || metaMode === 'proxy' && !config?.metaProxyConfigured}>{t('act.save')}</Button><span class="saved" role="status">{metaSaved && metaMode === config?.metaMode ? t('settings.saved') : ''}</span></div>
-    </form>
+    <MetadataSettings />
   </section>
 
   <section>
@@ -294,7 +277,7 @@
       <p>{t('settings.tokensHint')}</p>
     </header>
     <div class="body">
-      <form class="inline-form" onsubmit={createToken}>
+      <form novalidate class="inline-form" onsubmit={createToken}>
         <input
           class="field"
           bind:value={tokenName}
@@ -452,7 +435,7 @@
       {#if config?.passwordFromEnv}
         <p class="text">{t('settings.passwordEnv')}</p>
       {:else}
-        <form class="password" onsubmit={changePassword}>
+        <form novalidate class="password" onsubmit={changePassword}>
           <h3>{t('settings.passwordChange')}</h3>
           <input class="sr-only" type="text" autocomplete="username" value="sani" readonly tabindex="-1" aria-hidden="true" />
           <div class="pw-grid">
@@ -575,11 +558,15 @@
   }
 
   .inline-form {
+    align-items: center;
     display: flex;
     gap: 8px;
   }
 
+  .inline-form :global(.btn) { height: 36px; }
+
   .inline-form .field {
+    min-width: 0;
     flex: 1;
   }
 
@@ -930,18 +917,17 @@
   .setting .hint { margin: 6px 0 0; line-height: 1.6; }
   .defaults-form > .hint { margin: 0; line-height: 1.65; }
   .setting .field { width: 82px; flex: none; }
-  .setting select.field { width: 144px; }
   .unit { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; }
   .slug-preview { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-3); }
   .slug-preview code { color: var(--text-2); overflow-wrap: anywhere; }
   .settings-save { display: flex; gap: 12px; align-items: center; min-height: 32px; }
   .saved { color: var(--success); font-size: 12px; }
-  .meta-status { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 12px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
   .examples a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
   @media (max-width: 640px) {
+    .inline-form .field, .inline-form :global(.btn) { height: 44px; }
+    .inline-form .field { font-size: 16px; }
     .setting { gap: 12px; }
-    .setting select.field { width: 126px; }
     .setting .field { min-height: 44px; }
     .examples a { display: inline-flex; align-items: center; min-height: 44px; }
   }

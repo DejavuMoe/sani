@@ -46,7 +46,7 @@
   --on-ink: #fafaf8;
   --danger: #c23a2c;
   --danger-soft: #fbefed;
-  --success: #1b8a4c;
+  --success: #167640;
   --warning: #a86200;
   --toast: #1f1e1c;
   --on-toast: #f3f2ee;
@@ -299,3 +299,10 @@ kbd {
 .theme-switching *::after {
   transition: none !important;
 }
+
+/* Keep numeric editing semantic without exposing native spinner controls. */
+input, textarea { appearance: none; }
+input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+
+.sani-tooltip { position: fixed; inset: auto; margin: 0; padding: 6px 9px; max-width: min(360px, calc(100vw - 32px)); width: max-content; overflow-wrap: anywhere; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-pop); font-family: var(--font-sans); font-size: 12px; line-height: 1.5; }

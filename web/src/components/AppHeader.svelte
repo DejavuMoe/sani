@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import { t } from '../lib/i18n.svelte';
   import { prefs } from '../lib/prefs.svelte';
   import { router } from '../lib/router.svelte';
@@ -20,12 +21,12 @@
       <Logo />
     </a>
     <nav class="tools" aria-label={t('menu.label')}>
-      <button class="tool hide-touch" title="{t('menu.shortcuts')} (?)" aria-label={t('menu.shortcuts')} onclick={() => (ui.shortcuts = true)}>
+      <button class="tool hide-touch" use:tooltip={`${t('menu.shortcuts')} (?)`} aria-label={t('menu.shortcuts')} onclick={() => (ui.shortcuts = true)}>
         <Icon name="keyboard" />
       </button>
       <button
         class="tool"
-        title="{t('menu.theme')}: {themeName}"
+        use:tooltip={`${t('menu.theme')}: ${themeName}`}
         aria-label="{t('menu.theme')}: {themeName}"
         onclick={() => prefs.cycleTheme()}
       >
@@ -35,7 +36,7 @@
         class={['tool', router.current.name === 'settings' && 'on']}
         href="/admin/settings"
         onclick={router.link}
-        title={t('menu.settings')}
+        use:tooltip={t('menu.settings')}
         aria-label={t('menu.settings')}
         aria-current={router.current.name === 'settings' ? 'page' : undefined}
       >

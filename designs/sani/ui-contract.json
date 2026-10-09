@@ -654,22 +654,33 @@
           "web/src/lib/api.ts",
           "internal/server/settings.go",
           "internal/meta/proxy.go",
-          "internal/meta/meta.go"
+          "internal/meta/meta.go",
+          "web/src/components/MetadataSettings.svelte",
+          "web/src/components/DateEditor.svelte",
+          "web/src/lib/tooltip.ts",
+          "web/src/views/Dashboard.svelte",
+          "web/src/tags.css",
+          "web/src/app.css",
+          "internal/server/metadata_settings.go",
+          "internal/server/api_misc.go"
         ],
         "interfaces": [
           "GET /api/config",
           "PATCH /api/config",
-          "metadata connection test API (proposed; exact route decided after approval)"
+          "POST /api/config/metadata/test"
         ],
         "tests": [
           "web/e2e/app.spec.ts",
           "web/scripts/a11y.mjs",
           "internal/server/r3_test.go",
-          "internal/meta/proxy_test.go"
+          "internal/meta/proxy_test.go",
+          "web/e2e/metadata.spec.ts",
+          "web/src/lib/i18n.test.ts",
+          "internal/server/metadata_settings_test.go"
         ]
       },
-      "status": "approved",
-      "notes": "R5 removes the hosted relay and nested route/card. Reuses flat settings rows and one Direct/HTTP(S)/SOCKS5 Segmented. Fixes paired controls across Settings and centers segmented labels. Prototype save/test only; no production endpoints or credentials. See r5-handoff.md."
+      "status": "implemented",
+      "notes": "Implemented unchanged R5 approval 81a17629c016cc75997fadb7ff7a5e4c67c7f693. Local make check/test/e2e/smoke/docs passed, with 44 Chromium flows and 52 frontend unit tests. Settings geometry and axe: zh/en, light/dark, 1544/390/320. Custom colors, calendar and pointer/focus tooltips checked in both languages/themes. Proxy persistence, redaction, atomic updates, credential identity binding, real local CONNECT routing, failure/no-fallback, environment locks and race tests pass. Connection-test API failure is exercised end-to-end; a user-supplied external proxy has not been tested. No VPS, release or remote docs deployment."
     }
   ]
 }

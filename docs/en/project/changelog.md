@@ -2,6 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Implement approved R5: restore compact Settings rows with one centered Direct/HTTP(S)/SOCKS5 segmented control. Align paired domain, token and password actions, retaining touch sizes on narrow screens.
+- Configure proxy hosts, ports and optional authentication directly in Settings, effective for new requests after saving. Never return saved passwords; changing a proxy or account requires re-entry. Add real connection testing without saving or direct fallback, preserving environment overrides.
+- Replace native controls with app-styled RGB sliders, a calendar with date/time text fields, and hover/focus tooltips. Keep HEX/RGB/HSL entry, keyboard access and both themes. Record the no-browser-default-visuals rule in design and development constraints.
+- Align bilingual settings, API and credential-storage documentation. Saved proxy passwords are included in the database and backups without encryption; this change does not alter the database schema.
+
 ## v0.9.0
 
 2026-10-09 · Implement approved R3: editable tag colors, creation defaults, a dedicated metadata proxy and chunked file uploads, with consistent admin interactions. First startup migrates to schema 5; read the upgrade notes below.

@@ -55,6 +55,7 @@ curl https://s.example.com/api/links \
 | `POST` | `/api/import` | [Import links](#import) |
 | `GET` | `/api/config` | [Read settings](#config) |
 | `PATCH` | `/api/config` | [Change the short domain](#config) |
+| `POST` | `/api/config/metadata/test` | [Test a proxy](#metadata-test) |
 | `GET` | `/api/tokens` | [List API tokens](#tokens) |
 | `POST` | `/api/tokens` | [Create an API token](#tokens) |
 | `DELETE` | `/api/tokens/{id}` | [Revoke an API token](#tokens) |
@@ -419,7 +420,8 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
   "excludeConfusable": true,
   "metaMode": "direct",
   "metaProxyConfigured": false,
-  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default"},
+  "metaProxy": null,
+  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
   "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
@@ -437,7 +439,26 @@ Changes the short domain stored in Settings:
 
 `null` or an empty string clears it. The files domain can’t be the short domain too. Returns `409` when `SANI_BASE_URL` is set, and the updated settings on success.
 
-The creation fields `slugLength` (integer 3–32), `excludeConfusable` (boolean), `maxFileSize` (integer decimal MB expressed in bytes: 1,000,000–4,096,000,000, multiple of 1,000,000) and `metaMode` (`off`, `direct`, `proxy`) can also be patched. Omitted/null creation fields are unchanged. All supplied settings, including the base URL, validate and commit together. Effective values come from defaults → saved settings → explicit environment variables; `configSources` gives `default`, `settings` or `env` for each creation field. An environment-locked patch returns `409 config_env`. Invalid values return `400 config_invalid`. Proxy mode requires `SANI_META_PROXY`, otherwise `409 proxy_missing`. `metaProxyConfigured` is a boolean; credentials and the proxy URL are never returned. A legacy inherited process proxy is reported as `metaMode: "environment"`; it is not an accepted patch value. `fetchMeta` reports whether a fetcher is currently available. When fetching is off or a saved proxy mode has no configured proxy, refresh preserves existing metadata without a network request. The request limit is 4 KiB.
+The creation fields `slugLength` (integer 3–32), `excludeConfusable` (boolean), `maxFileSize` (integer decimal MB expressed in bytes: 1,000,000–4,096,000,000, multiple of 1,000,000) and `metaMode` (`off`, `direct`, `proxy`) can also be patched. Omitted/null creation fields are unchanged. All supplied settings, including the base URL, validate and commit together. Effective values come from defaults → saved settings → explicit environment variables; `configSources` gives `default`, `settings` or `env` for each field. An environment-locked patch returns `409 config_env`; invalid values return `400 config_invalid`. Proxy mode requires a saved proxy or `SANI_META_PROXY`, otherwise `409 proxy_missing`. A legacy inherited process proxy is reported as `metaMode: "environment"`; it is not an accepted patch value. `fetchMeta` reports whether a fetcher is available; disabled fetching preserves cached metadata without a network request. The request limit is 4 KiB.
+
+`metaProxy` is `null` if unconfigured; otherwise GET returns `{scheme, host, port, auth, username, passwordSet}` without a password. `metaProxyConfigured` also reports whether a dedicated proxy exists. PATCH accepts the complete proxy object with an optional `password`:
+
+```json
+{
+  "metaMode": "proxy",
+  "metaProxy": {"scheme":"https","host":"proxy.example.com","port":443,"auth":false,"username":""}
+}
+```
+
+Allowed schemes: `http`, `https`, `socks5`. Supply a hostname or unbracketed IP, port 1–65535, and `auth`. Authentication requires a username and password (each at most 255 UTF-8 bytes; no colon or line breaks in the username). An omitted/null password retains the saved secret only for the same scheme, host, port and username; changing any of those requires a password (`400 proxy_password_required`). An explicit empty password removes it, and is invalid while authentication is enabled; use `auth:false` to clear the stored username and password. An omitted/null `metaProxy` leaves the proxy unchanged. `SANI_META_PROXY` overrides saved values; explicit `SANI_FETCH_META` also locks proxy editing. Neither GET nor error responses return secrets. See [storage and transport limits](./configuration#sani-meta-proxy).
+
+## Test a metadata proxy {#metadata-test}
+
+`POST /api/config/metadata/test`
+
+Requires an authenticated session or API token and the same cross-origin protection as other mutations. Body: `{"metaProxy": {...}}`, using the PATCH proxy fields and password-retention rules above; limit 4 KiB. This tests the supplied form without saving it or changing the active fetcher. It fetches the title of the fixed HTTPS target `https://example.com`, through the same public-IP checks and proxy transport, with no direct fallback. The total deadline is 12 seconds; an earlier transport timeout can fail sooner. At most one test runs per instance, and starts are at least 5 seconds apart (`429 rate_limited`, `Retry-After: 5`). Request cancellation or shutdown cancels the test.
+
+Success: `200 {"ok":true}`. Connection/title failure: `502 proxy_test_failed`, without transport details or credentials. Invalid fields return `400 config_invalid` (or `proxy_password_required`). An environment-locked mode or proxy returns `409 config_env`. Responses use `Cache-Control: no-store`.
 
 ## API tokens {#tokens}
 
@@ -568,6 +589,8 @@ Returns `200` with `ok`, for health checks.
 | `config_env` | 409 | Setting fixed by environment |
 | `config_invalid` | 400 | Invalid creation settings |
 | `proxy_missing` | 409 | Dedicated proxy is not configured |
+| `proxy_password_required` | 400 | Re-enter the password for the changed proxy/account |
+| `proxy_test_failed` | 502 | Could not fetch the test page through the proxy |
 | `tag_taken` | 409 | Tag name already exists |
 | `upload_limit` | 429 | Pending upload quota exceeded |
 | `upload_not_found` | 404 | Upload unavailable or expired |

@@ -77,6 +77,7 @@ const httpStatus: Record<string, number> = {
   RequestEntityTooLarge: 413,
   TooManyRequests: 429,
   InternalServerError: 500,
+  BadGateway: 502,
 };
 
 /** Every error code the API can answer with, and its HTTP status. */

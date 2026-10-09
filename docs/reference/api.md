@@ -55,6 +55,7 @@ curl https://s.example.com/api/links \
 | `POST` | `/api/import` | [导入链接](#import) |
 | `GET` | `/api/config` | [读取设置](#config) |
 | `PATCH` | `/api/config` | [修改域名与创建设置](#config) |
+| `POST` | `/api/config/metadata/test` | [测试代理连接](#metadata-test) |
 | `GET` | `/api/tokens` | [列出 API 令牌](#tokens) |
 | `POST` | `/api/tokens` | [创建 API 令牌](#tokens) |
 | `DELETE` | `/api/tokens/{id}` | [撤销 API 令牌](#tokens) |
@@ -420,7 +421,8 @@ curl https://s.example.com/api/import \
   "excludeConfusable": true,
   "metaMode": "direct",
   "metaProxyConfigured": false,
-  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default"},
+  "metaProxy": null,
+  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
   "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
@@ -438,7 +440,26 @@ curl https://s.example.com/api/import \
 
 传 `null` 或空字符串表示清除。短链接域名不能和文件域名相同。设置了 `SANI_BASE_URL` 时返回 `409`。成功时返回修改后的设置。
 
-创建设置也可修改：`slugLength`（3–32 的整数）、`excludeConfusable`（布尔值）、`maxFileSize`（以字节表示的整数十进制 MB，范围 1,000,000–4,096,000,000，须为 1,000,000 的倍数）、`metaMode`（`off`、`direct`、`proxy`）。省略或为 null 的创建字段不变。所有提交字段连同基础域名统一校验并原子保存。有效值按默认值 → 已保存设置 → 显式环境变量取值；`configSources` 逐项返回 `default`、`settings` 或 `env`。修改环境变量锁定项返回 `409 config_env`，非法值返回 `400 config_invalid`，未配置 `SANI_META_PROXY` 却选择代理返回 `409 proxy_missing`。`metaProxyConfigured` 仅是布尔值，不返回代理地址或凭据。旧部署沿用的系统代理显示为 `metaMode: "environment"`，该值不可写入。`fetchMeta` 表示当前是否有可用抓取器；关闭或已保存代理模式却缺少代理配置时，刷新不会联网，也不清空已有元数据。请求体限制 4 KiB。
+创建设置也可修改：`slugLength`（3–32 的整数）、`excludeConfusable`（布尔值）、`maxFileSize`（以字节表示的整数十进制 MB，范围 1,000,000–4,096,000,000，须为 1,000,000 的倍数）、`metaMode`（`off`、`direct`、`proxy`）。省略或为 null 的创建字段不变。所有提交字段连同基础域名统一校验并原子保存。有效值按默认值 → 已保存设置 → 显式环境变量取值；`configSources` 逐项返回 `default`、`settings` 或 `env`。修改环境变量锁定项返回 `409 config_env`，非法值返回 `400 config_invalid`。代理模式需要已保存的代理或 `SANI_META_PROXY`，否则返回 `409 proxy_missing`。旧部署沿用的系统代理显示为 `metaMode: "environment"`，该值不可写入。`fetchMeta` 表示当前是否有可用抓取器；关闭抓取后刷新不会联网，也不清空已有元数据。请求体限制 4 KiB。
+
+未配置时 `metaProxy` 为 `null`；否则 GET 返回 `{scheme, host, port, auth, username, passwordSet}`，不返回密码。`metaProxyConfigured` 同时表示是否存在专用代理。PATCH 接受完整代理对象和可选的 `password`：
+
+```json
+{
+  "metaMode": "proxy",
+  "metaProxy": {"scheme":"https","host":"proxy.example.com","port":443,"auth":false,"username":""}
+}
+```
+
+协议限 `http`、`https`、`socks5`；主机填写域名或不带方括号的 IP，端口为 1–65535，`auth` 控制认证。启用认证需要用户名和密码，各不超过 255 个 UTF-8 字节；用户名不能包含冒号或换行。密码省略或为 null 时，仅在协议、主机、端口和用户名都不变时保留旧密码；更换这些字段需重新输入密码（`400 proxy_password_required`）。显式空密码表示移除，认证仍开启时会被拒绝；使用 `auth:false` 可清除已保存的用户名与密码。省略或为 null 的 `metaProxy` 不修改代理。`SANI_META_PROXY` 覆盖后台设置；显式 `SANI_FETCH_META` 也锁定代理编辑。GET 和错误响应均不返回密码。存储与传输边界见[代理配置](./configuration#sani-meta-proxy)。
+
+## 测试网页信息代理 {#metadata-test}
+
+`POST /api/config/metadata/test`
+
+需已登录会话或 API 令牌，并遵循与其他写操作相同的跨站保护。请求体 `{"metaProxy": {...}}` 沿用上述 PATCH 字段及密码保留规则，限制 4 KiB。只测试当前表单，不保存设置，也不替换生效中的抓取器。通过相同的公网 IP 校验及代理传输访问固定 HTTPS 目标 `https://example.com` 并获取标题，失败不直连。总截止时间 12 秒，传输层可能更早超时；每个实例同时最多一个测试，两次启动至少间隔 5 秒（`429 rate_limited`，`Retry-After: 5`）。请求取消或服务关闭会取消测试。
+
+成功返回 `200 {"ok":true}`；连接或标题获取失败返回 `502 proxy_test_failed`，不包含传输细节或凭据。字段非法返回 `400 config_invalid`（或 `proxy_password_required`）；模式或代理由环境变量锁定时返回 `409 config_env`。响应使用 `Cache-Control: no-store`。
 
 ## API 令牌 {#tokens}
 
@@ -569,6 +590,8 @@ curl https://s.example.com/api/import \
 | `config_env` | 409 | 设置由环境变量固定 |
 | `config_invalid` | 400 | 创建默认值不合法 |
 | `proxy_missing` | 409 | 未配置专用代理 |
+| `proxy_password_required` | 400 | 更换代理或账号后需重新输入密码 |
+| `proxy_test_failed` | 502 | 无法通过代理获取测试页面 |
 | `tag_taken` | 409 | 标签名称已存在 |
 | `upload_limit` | 429 | 待完成上传超过额度 |
 | `upload_not_found` | 404 | 上传会话不可用或过期 |

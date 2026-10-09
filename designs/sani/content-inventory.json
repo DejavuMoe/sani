@@ -17,9 +17,11 @@
    "content/dom-r4-zh.json",
    "content/dom-r4-en.json",
    "content/dom-r5-zh.json",
-   "content/dom-r5-en.json"
+   "content/dom-r5-en.json",
+   "content/dom-r5-production-zh.json",
+   "content/dom-r5-production-en.json"
   ],
-  "capturedAt": "2026-10-08T22:30:38Z",
+  "capturedAt": "2026-10-08T23:58:54Z",
   "surfaces": [
    {
     "source": "content/dom-app-zh.json",
@@ -120,6 +122,28 @@
      "height": 844,
      "width": 390
     }
+   },
+   {
+    "source": "content/dom-r5-production-zh.json",
+    "url": "http://127.0.0.1:18769/admin/ (9 states, zh)",
+    "title": "Sani production implementation",
+    "language": "zh",
+    "viewport": {
+     "width": 1544,
+     "height": 1040,
+     "devicePixelRatio": 1
+    }
+   },
+   {
+    "source": "content/dom-r5-production-en.json",
+    "url": "http://127.0.0.1:18769/admin/ (9 states, en)",
+    "title": "Sani production implementation",
+    "language": "en",
+    "viewport": {
+     "width": 1544,
+     "height": 1040,
+     "devicePixelRatio": 1
+    }
    }
   ],
   "limitations": [
@@ -134,7 +158,8 @@
    "CUA read-only DOM does not expose createTreeWalker; equivalent text-node and attribute capture used.",
    "Only the current DOM state is captured.",
    "Pseudo-elements, client JSON, comments, OS color picker and browser chrome are not captured.",
-   "R3 repeated strings retain representative DOM locations; full captures remain in the ignored content directory."
+   "R3 repeated strings retain representative DOM locations; full captures remain in the ignored content directory.",
+   "R5 production: captured 9 states per language from an isolated current build; existing reviewed strings retain their classifications. Raw captures and screenshots also retained outside the repository."
   ]
  },
  "briefSources": [],
@@ -44557,6 +44582,517 @@
    },
    "flags": [],
    "notes": "R5 proposal. No real credentials or production API calls."
+  },
+  {
+   "id": "content-40906bec21316f2f",
+   "text": "/k7mx9",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(3) > form.body.defaults-form > div.slug-preview.svelte-1xc311x:nth-of-type(3) > code.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(3) > form.body.defaults-form > div.slug-preview.svelte-1xc311x:nth-of-type(3) > code.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(3) > form.body.defaults-form > div.slug-preview.svelte-1xc311x:nth-of-type(3) > code.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(3) > form.body.defaults-form > div.slug-preview.svelte-1xc311x:nth-of-type(3) > code.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/views/Settings.svelte",
+    "reference": "runtime settings example or current local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-5e7b98578eb983a7",
+   "text": "127.0.0.1:18769/",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-invalid] div#create-panel-url > form.composer.svelte-1n8df3y > div.options.svelte-1n8df3y:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[calendar] div#create-panel-url > form.composer.svelte-1n8df3y > div.options.svelte-1n8df3y:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color-invalid] div#create-panel-url > form.composer.svelte-1n8df3y > div.options.svelte-1n8df3y:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color] div#create-panel-url > form.composer.svelte-1n8df3y > div.options.svelte-1n8df3y:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[tooltip] div#create-panel-url > form.composer.svelte-1n8df3y > div.options.svelte-1n8df3y:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/views/Settings.svelte",
+    "reference": "runtime settings example or current local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-22f3f91d9587d1b1",
+   "text": "127.0.0.1:18769/p/",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[calendar-invalid] div#create-panel-file > form.composer.file > div.options.svelte-higpgd:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[calendar-invalid] div#create-panel-text > form.composer.text > div.options.svelte-higpgd:nth-of-type(1) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[calendar] div#create-panel-file > form.composer.file > div.options.svelte-higpgd:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[calendar] div#create-panel-text > form.composer.text > div.options.svelte-higpgd:nth-of-type(1) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color-invalid] div#create-panel-file > form.composer.file > div.options.svelte-higpgd:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color-invalid] div#create-panel-text > form.composer.text > div.options.svelte-higpgd:nth-of-type(1) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color] div#create-panel-file > form.composer.file > div.options.svelte-higpgd:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[color] div#create-panel-text > form.composer.text > div.options.svelte-higpgd:nth-of-type(1) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[tooltip] div#create-panel-file > form.composer.file > div.options.svelte-higpgd:nth-of-type(2) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9",
+    "[tooltip] div#create-panel-text > form.composer.text > div.options.svelte-higpgd:nth-of-type(1) > span.slug.inline:nth-of-type(1) > label.box.svelte-4moun9 > span.prefix.svelte-4moun9"
+   ],
+   "visibility": [
+    "hidden"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/views/Settings.svelte",
+    "reference": "runtime settings example or current local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-bc52dd634277c4a3",
+   "text": "165",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-invalid] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > div.color-editor > div.color-sliders:nth-of-type(3) > label:nth-of-type(3) > output",
+    "[color] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > div.color-editor > div.color-sliders:nth-of-type(3) > label:nth-of-type(3) > output"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/components/ColorEditor.svelte",
+    "reference": "RGB channel value"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-083077e3ccfcf65b",
+   "text": "Add Sani to your phone’s home screen. On Android, share a URL from any app, then review and confirm it in Sani.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.installHint"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-fd1802e20d4d0f31",
+   "text": "Choose a valid future date and time.",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[calendar-invalid] input#c5-date",
+    "[calendar-invalid] input#c5-time",
+    "[calendar-invalid] p#c5-error"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "validation",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "calendar.invalid; R5 inherited calendar"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-1914c25b1db97ee4",
+   "text": "Create “Preview”",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-invalid] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span",
+    "[color] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "user-action",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "tags.create with synthetic Preview tag"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-2d27cba25be53f78",
+   "text": "Drag the button to your bookmarks bar. Click it on any page, review the URL, then click “Shorten”.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.bookmarkletHint"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-1ab98ea49006d129",
+   "text": "http://127.0.0.1:18769",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > form.inline-form.svelte-1xc311x > input.field.mono",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > form.inline-form.svelte-1xc311x > input.field.mono",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > form.inline-form.svelte-1xc311x > input.field.mono",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > form.inline-form.svelte-1xc311x > input.field.mono"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/views/Settings.svelte",
+    "reference": "runtime settings example or current local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-8c31e6e7223097e2",
+   "text": "Local",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(9) > div.body.svelte-1xc311x > dl.about.svelte-1xc311x > div.svelte-1xc311x:nth-of-type(2) > dd.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(9) > div.body.svelte-1xc311x > dl.about.svelte-1xc311x > div.svelte-1xc311x:nth-of-type(2) > dd.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(9) > div.body.svelte-1xc311x > dl.about.svelte-1xc311x > div.svelte-1xc311x:nth-of-type(2) > dd.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(9) > div.body.svelte-1xc311x > dl.about.svelte-1xc311x > div.svelte-1xc311x:nth-of-type(2) > dd.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json",
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/views/Settings.svelte",
+    "reference": "runtime settings example or current local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-174ce8a5a89c832b",
+   "text": "No tokens yet",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.tokensEmpty"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-6e484e3b6625efa5",
+   "text": "The address short links are built from. Leave it empty to use the one you’re visiting (http://127.0.0.1:18769).",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.domainHint with local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-ae3d4651bb608421",
+   "text": "在手机浏览器中把 Sani 添加到主屏幕。在 Android 上，可从任意应用的“分享”菜单填入网址，确认后缩短。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(2) > div > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.installHint"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-9c809b6dbb6ebda1",
+   "text": "把按钮拖到浏览器的书签栏。在网页上点它，核对网址后点击“缩短”。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(6) > div.body.svelte-1xc311x > div.tool.svelte-1xc311x:nth-of-type(1) > div > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.bookmarkletHint"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-bcb710963d45b91d",
+   "text": "新建「Preview」",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[color-invalid] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span",
+    "[color] div#c1 > div.tag-choices:nth-of-type(2) > div.tag-new > button.tag-create > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "user-action",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "tags.create with synthetic Preview tag"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-70e235ddc29237ed",
+   "text": "生成短链接时使用的地址。留空则使用你当前访问的地址（http://127.0.0.1:18769）。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(2) > div.body.svelte-1xc311x > p.hint.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.domainHint with local origin"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-28c0d951ee48b927",
+   "text": "请选择有效的未来日期与时间。",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "[calendar-invalid] input#c5-date",
+    "[calendar-invalid] input#c5-time",
+    "[calendar-invalid] p#c5-error"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "validation",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "calendar.invalid; R5 inherited calendar"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-abad6ed5e90cb2dd",
+   "text": "还没有创建令牌",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "[direct] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[http-auth] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[off] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x",
+    "[socks] div#app > main.page.svelte-1xc311x > section.svelte-1xc311x:nth-of-type(5) > div.body.svelte-1xc311x > p.empty.svelte-1xc311x"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "content/dom-r5-production-zh.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "existing-approved-ui-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "web/src/lib/i18n.svelte.ts",
+    "reference": "settings.tokensEmpty"
+   },
+   "flags": [],
+   "notes": "Reviewed against actual R5 implementation on a disposable local instance."
   }
  ]
 }

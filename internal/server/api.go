@@ -27,6 +27,7 @@ func (s *Server) routes() http.Handler {
 
 	mux.Handle("GET /api/config", a(s.getConfig))
 	mux.Handle("PATCH /api/config", a(s.patchConfig))
+	mux.Handle("POST /api/config/metadata/test", a(s.testMetadataProxy))
 	mux.Handle("GET /api/overview", a(s.overview))
 	mux.Handle("GET /api/tags", a(s.listTags))
 	mux.Handle("POST /api/tags", a(s.createTag))

@@ -52,7 +52,7 @@
 </script>
 
 <AuthShell>
-  <form class="form" onsubmit={submit}>
+  <form novalidate class="form" onsubmit={submit}>
     <h1 class="sr-only">Sani</h1>
     {#if session.expired}<p class="notice">{t('auth.expired')}</p>{/if}
     <!-- Lets password managers file the credential under a stable name. -->

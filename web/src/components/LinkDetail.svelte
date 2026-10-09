@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import TagList from './TagList.svelte';
   import { untrack } from 'svelte';
   import { slide } from 'svelte/transition';
@@ -145,7 +146,7 @@
             <span class="finfo">
               <span class="fname">{c.name}</span>
               <span class="fmeta">{mediaType(c.type)} · {formatSize(c.size)}</span>
-              <span class="sum" title={c.sha256}>SHA-256 {c.sha256?.slice(0, 16)}…</span>
+              <span class="sum" use:tooltip={c.sha256}>SHA-256 {c.sha256?.slice(0, 16)}…</span>
             </span>
             {#if c.rawUrl}
               <Button size="sm" variant="ghost" icon="link" onclick={copyRaw}>{t('share.copyRaw')}</Button>

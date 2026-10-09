@@ -38,6 +38,17 @@
 
 本地原始证据位于 `C:/Users/ice/.codex/visualizations/2026/10/08/01a11bc7-f4ef-77f2-99be-470476e91c41/sani-r5/`：`results.json`、`controls-results.json`、`r5-review.png`、`settings-top.png`、窄屏截图和中英文 DOM 采集。验证脚本为其上级目录的 `r5-check.mjs`、`r5-controls-check.mjs`。DOM 新文案已逐条分类并加入内容清单；设计映射与来源记录同步更新。
 
-## 实施边界
+## 实施结果（2026-10-09）
 
-这一轮只更新设计文件与记录，不修改 `web/`、`internal/`、生产文档或部署。后台代理持久化、凭据保护、SSRF 边界和真实连接测试仍需在原型批准后实现与验证。文档站版本调查仍见 R4 handoff；没有执行 Forgejo 同步或部署。
+用户批准后，以设计提交 `81a17629c016cc75997fadb7ff7a5e4c67c7f693` 通过 implementation gate，实施 `web/`、`internal/` 和双语文档。原型文件未改动。
+
+- `MetadataSettings.svelte` 复用原有 Segmented、Switch、Button；后台可保存 HTTP/HTTPS/SOCKS5 主机、端口及可选认证。GET 只返回 `passwordSet`，更换代理或账号不能携带旧密码。密码在受限数据库中可恢复存储，未加密，备份同样包含凭据。
+- `POST /api/config/metadata/test` 访问固定 HTTPS 测试页；有鉴权、跨站保护、4 KiB 请求限制、12 秒截止、单并发及 5 秒启动间隔。测试不保存配置，失败不直连。
+- 应用内 RGB、日历、日期时间文本输入与 tooltip 覆盖创建和编辑的共用控件。手动应用日期同步日历月份；Enter 不会误提交外层创建表单；tooltip 不再阻挡后台编辑快捷键。
+- `make check test e2e smoke docs` 通过；最后的日期修复后再次通过 `make check test e2e`。前端单元测试 52 项、Chromium 44 项。Go race 覆盖设置原子提交、重启恢复、密码不回显和端点绑定、并发快照、环境锁定、测试限流，以及真实本地 CONNECT 抓取与失败不回退。
+- 设置页中英文 × 明暗 × 1544/390/320px 的成组控件高度、顶边、文字中心及横向稳定性断言通过；颜色、日历、提示覆盖中英文和明暗，含指针及键盘。新增矩阵的 axe 无违规。人工检查桌面完整设置上下文、窄屏认证、颜色和日历，另在 Codex 浏览器打开真实本地实例复核。
+- 生产构建双语各 9 个状态重新采集内容，共新增 18 条已审阅文案，内容清单 1239 项，保留 26 个已有 DOM 元数据提示。测试页面无 JavaScript 错误。
+
+原始日志、截图及双语 DOM 采集保存在 `C:/Users/ice/.codex/visualizations/2026/10/08/01a11bc7-f4ef-77f2-99be-470476e91c41/sani-r5-implementation/`。`web/e2e/metadata.spec.ts` 是可重复的产品回归；外部 `r5-production-capture.mjs` 采集本地隔离实例。
+
+尚未验证用户实际代理、VPS 部署或 Firefox/WebKit；连接测试接口的失败路径已端到端验证，协议成功路径由现有 HTTP/HTTPS/SOCKS5 传输夹具和本地 CONNECT 抓取验证。没有发布新版本或执行 Forgejo 同步。线上文档版本调查仍见 R4 handoff。

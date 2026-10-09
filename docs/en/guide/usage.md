@@ -146,4 +146,12 @@ A token has full access and keeps working after a password change. It’s shown 
 - **Texts and files.** They open at `/p/{slug}` on a page in the visitor’s language; `/{slug}` without the `/p/` doesn’t find them.
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.
 
-Creation defaults in Settings control generated slug length (3–32), look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, a color picker and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
+Creation defaults in Settings control generated slug length (3–32), look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
+
+## Page metadata and proxies
+
+In Settings → Page metadata, enable fetching and choose Direct, HTTP(S) or SOCKS5. Enter the proxy host, port and optional authentication in the admin app. The HTTPS toggle encrypts the hop to an HTTP(S) proxy; SOCKS5 does not provide that encryption. There is no built-in public commercial relay. Test connection checks the current form; new requests use it only after Save. Failures never fall back to direct connections. With fetching off, titles can still be entered manually.
+
+Saved passwords are never displayed. Replace one or cancel the replacement; turn authentication off and save to clear stored credentials. Changing the proxy address, scheme, port or account requires entering the password again. Environment-locked settings are read-only; see [configuration](../reference/configuration#sani-meta-proxy) for precedence and password storage.
+
+Custom expiry uses an app calendar with editable date and time fields; choose Apply date and time, then save the link. It uses the device time zone and rejects invalid or past times. Tooltips also work on keyboard focus and close with Escape.

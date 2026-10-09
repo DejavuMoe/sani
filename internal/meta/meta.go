@@ -61,6 +61,8 @@ func New() *Fetcher { return newFetcher(true) }
 // NewDirect ignores process-wide proxy settings.
 func NewDirect() *Fetcher { return newFetcher(false) }
 
+func (f *Fetcher) CloseIdleConnections() { f.client.CloseIdleConnections() }
+
 func (f *Fetcher) EnvironmentProxyConfigured() bool { return f.environment }
 
 func newFetcher(environment bool) *Fetcher {

@@ -75,7 +75,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 | `SANI_TRUST_PROXY` | `false` | 信任 `X-Forwarded-*` 和 `X-Real-IP`，客户端地址取 `X-Forwarded-For` 的最后一项。只在会设置这些请求头的反向代理之后开启。 |
 | `SANI_SLUG_LENGTH` | `5` | 自动生成的短码长度。默认字符集为 `23456789abcdefghjkmnpqrstuvwxyz`，去掉了 0/o、1/l/i，念出来也不会弄错。 |
 | `SANI_EXCLUDE_CONFUSABLE` | `true` | 自动网址短码排除 0/o、1/i/l。 |
-| `SANI_META_PROXY` | — | 可选网页信息 HTTP/HTTPS/SOCKS5 专用代理，凭据仅在服务器配置。 |
+| `SANI_META_PROXY` | — | 可选网页信息 HTTP/HTTPS/SOCKS5 代理覆盖值；未设置时可在后台配置。 |
 | `SANI_FETCH_META` | `true` | 为新链接获取网页标题和图标。不会访问内网、本机等私有地址。 |
 | `SANI_FORWARD_QUERY` | `true` | 把访问者的查询参数带到目标链接上（`/gh?utm_source=x`）。 |
 | `SANI_CACHE_SIZE` | `100000` | 内存中缓存的跳转目标数量。 |

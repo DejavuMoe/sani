@@ -263,3 +263,7 @@ its sync check rejects pages that aren't in its sidebar.
 ## R3（2026-10-08，已批准并实施）
 
 `prototype-r3.html` 在保留 R2 的基础上扩展标签颜色、创建默认值、网页信息获取方式、导入示例和交互细节。打开 `?lang=zh&theme=light&chrome=0` 或 `?scene=r3-settings`。技术取舍、范围、场景和验收见 [r3-handoff.md](r3-handoff.md)。原型使用内存演示；其批准范围已在 v0.9.0 实施。
+
+## R5（2026-10-09，已批准并实施）
+
+`prototype-r5.html?scene=r5-settings&lang=zh&theme=light&chrome=0` 恢复紧凑设置布局；后台直接配置 HTTP(S)/SOCKS5，移除公共商业中继，并统一应用内颜色、日期和提示控件。对应设计提交 `81a1762`，实现与本地验证记录见 [r5-handoff.md](r5-handoff.md)。R4 保留为被要求修改的历史方案；本次实现尚未发布或部署。

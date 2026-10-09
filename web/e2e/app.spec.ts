@@ -632,7 +632,7 @@ test('creation defaults persist and environment metadata stays locked', async ()
   await page.reload();
   await expect(page.getByLabel('Generated slug length')).toHaveValue('7');
   await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
-  await expect(page.locator('#metadata-mode')).toBeDisabled();
+  await expect(page.locator('#metadata-enabled')).toBeDisabled();
   const created = await page.request.post('/api/links', {data:{url:'https://example.com/r3-settings'}});
   expect((await created.json()).slug).toHaveLength(7);
   for (const format of ['csv', 'json']) {

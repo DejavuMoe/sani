@@ -67,6 +67,9 @@ type Server struct {
 
 	settings                    atomic.Pointer[runtimeSettings]
 	settingsMu                  sync.Mutex
+	metaTestMu                  sync.Mutex
+	metaTesting                 bool
+	metaTestNext                time.Time
 	directFetcher, proxyFetcher *meta.Fetcher
 	uploadsMu                   sync.Mutex
 	uploads                     map[string]*uploadSession

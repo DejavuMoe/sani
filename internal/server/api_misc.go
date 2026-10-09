@@ -23,6 +23,10 @@ import (
 
 func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
 	cfg := s.settings.Load()
+	var proxy any
+	if cfg.proxy != nil {
+		proxy = cfg.proxy.dto()
+	}
 	var files *string
 	if s.opt.FilesURL != "" {
 		files = &s.opt.FilesURL
@@ -32,7 +36,8 @@ func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
 		"maxFileSize":         cfg.maxFileSize,
 		"excludeConfusable":   cfg.excludeConfusable,
 		"metaMode":            cfg.metaMode,
-		"metaProxyConfigured": s.proxyFetcher != nil,
+		"metaProxyConfigured": cfg.proxyFetcher != nil,
+		"metaProxy":           proxy,
 		"configSources":       cfg.sources,
 		"uploadChunkSize":     uploadChunkSize,
 		"maxTextSize":         links.MaxTextBytes,

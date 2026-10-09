@@ -7,6 +7,7 @@
     onchange,
     label,
     size = 'md',
+    disabled = false,
   }: {
     value: T;
     options: { value: T; label: string; icon?: IconName }[];
@@ -14,11 +15,13 @@
     label: string;
     /** `lg` matches the 36px text fields of a form. */
     size?: 'sm' | 'md' | 'lg';
+    disabled?: boolean;
   } = $props();
 
   let root = $state<HTMLDivElement>();
 
   function onkeydown(e: KeyboardEvent) {
+    if (disabled) return;
     const i = options.findIndex((o) => o.value === value);
     let next = -1;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % options.length;
@@ -34,9 +37,10 @@
   {#each options as o (o.value)}
     <button
       type="button"
+      {disabled}
       role="radio"
       aria-checked={o.value === value}
-      tabindex={o.value === value ? 0 : -1}
+      tabindex={o.value === value || !options.some(x => x.value === value) && o === options[0] ? 0 : -1}
       onclick={() => onchange(o.value)}
     >
       {#if o.icon}<Icon name={o.icon} size={14} />{/if}
@@ -58,6 +62,8 @@
   button {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    line-height: 1;
     gap: 6px;
     height: 28px;
     padding: 0 11px;

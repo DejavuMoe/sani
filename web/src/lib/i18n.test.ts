@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { formatCompact, formatRelative, i18n, t } from './i18n.svelte';
-import { fromISO, sameExpiry, toISO, toLocalInput } from './expiry';
+import { fromISO, sameExpiry, toISO, toLocalInput, validLocalExpiry } from './expiry';
 
 afterEach(() => {
   i18n.lang = 'zh';
@@ -48,6 +48,13 @@ describe('formatCompact', () => {
 });
 
 describe('expiry', () => {
+  it('rejects malformed, rolled-over and past local dates before applying them', () => {
+    const now = +new Date(2028, 0, 1);
+    expect(validLocalExpiry('2028-02-29T12:30', now)).toBe(true);
+    for (const value of ['2027-02-29T12:30', '2028-02-30T12:30', '2028-02-29T24:00', '2028-13-01T12:30', '2028-02-29T12:60', '2028-02-29', '2028-02-29T12:30Z', '2028-01-01T00:00']) {
+      expect(validLocalExpiry(value, now), value).toBe(false);
+    }
+  });
   it('resolves presets when saved', () => {
     const before = Date.now();
     const iso = toISO({ preset: '1d' })!;

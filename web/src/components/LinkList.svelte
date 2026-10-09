@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
   import type { LinkKind, Sort } from '../lib/api';
@@ -105,7 +106,7 @@
       class={['pick', links.picking && 'on']}
       aria-pressed={links.picking}
       aria-label={t('bulk.startLabel')}
-      title={t('bulk.startLabel')}
+      use:tooltip={t('bulk.startLabel')}
       onclick={() => (links.picking ? links.stopPicking() : links.startPicking())}
     >
       <Icon name="select" size={14} />
@@ -156,7 +157,7 @@
         role="checkbox"
         aria-checked={allPicked ? true : nonePicked ? false : 'mixed'}
         aria-label={t('bulk.all')}
-        title={t('bulk.all')}
+        use:tooltip={t('bulk.all')}
         onclick={() => links.togglePickAll()}
       >
         <span class={['box', !nonePicked && 'on']} aria-hidden="true">
