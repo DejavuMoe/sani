@@ -1,7 +1,7 @@
 /* Keep earlier prototype revisions intact while correcting the current one. */
 input, textarea { font-size: var(--input-font-size, inherit); }
 .field { font-size: var(--input-font-size, 14px); }
-.login-form .field { font-size: var(--input-font-size, 15px); }
+.login-form .field, .setup-form .field { font-size: var(--input-font-size, 15px); }
 .st-inline-form > .field, .r5-input .field, .r3-setting .field,
 .r6-length-input .field { height: 36px; min-height: 36px; font-size: var(--input-font-size, 14px); }
 .st-inline-form > .btn, .r5-secret:not(.r5-secret-saved) > .btn { height: 36px; }
@@ -12,6 +12,7 @@ input, textarea { font-size: var(--input-font-size, inherit); }
 .ld-short-actions .btn { min-height: 0; }
 
 .tag-label, .tag-add, .tag-selected .tag-badge, .tag-filter, .tag-done { min-height: 30px; }
+.tag-filter { padding: 0 9px; }
 .tag-badge button { width: 26px; min-height: 26px; }
 .tag-choice, .tag-create { min-height: 38px; }
 .tag-search { min-height: 0; }
@@ -34,5 +35,5 @@ input, textarea { font-size: var(--input-font-size, inherit); }
 /* Touch input compatibility follows the device, not a narrow desktop pane. */
 @media (pointer: coarse) {
   :root { --input-font-size: 16px; }
-  .switch::before { content: ''; position: absolute; inset: -12px -5px; }
+  .switch::before { content: ''; position: absolute; inset: -10px -3px; }
 }
