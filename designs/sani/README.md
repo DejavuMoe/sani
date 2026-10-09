@@ -13,6 +13,8 @@ R5 is approved for implementation.
 
 ## Revisions
 
+R6 is ready for review: [independent slug lengths](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-settings&lang=zh&theme=light&chrome=0&focus=defaults), [text preview](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-text&lang=zh&theme=light&chrome=0), and [code preview](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-code&lang=zh&theme=dark&chrome=0). See [r6-handoff.md](r6-handoff.md) for the observed preview jitter, proposed behavior, implementation scope and verification. Production code is unchanged by R6.
+
 | Revision | Base | Items | Approved | Implemented |
 |---|---|---|---|---|
 | r1 — detail polish | `f01fe22` | 10 | `c28d7ef` | `0ea9e05` |
@@ -20,6 +22,7 @@ R5 is approved for implementation.
 | r3 — admin refinements | `fc391bd` | Colors, defaults, uploads, metadata | `81e5609` | `e58de51` / v0.9.0 |
 | r4 — metadata connections | `e58de51` | In-admin relay/HTTP/SOCKS and custom controls | Changes requested | Not implemented |
 | r5 — compact settings | R4 | One connection selector, aligned controls, no hosted relay | Approved 2026-10-09 | Not implemented |
+| r6 — creation defaults and text preview | R5 | Independent URL/text/file lengths, stable content preview | Needs review | Not implemented |
 
 ### R5 — compact settings (approved)
 

@@ -19,9 +19,32 @@
    "content/dom-r5-zh.json",
    "content/dom-r5-en.json",
    "content/dom-r5-production-zh.json",
-   "content/dom-r5-production-en.json"
+   "content/dom-r5-production-en.json",
+   "review-r6/dom-0.json",
+   "review-r6/dom-1.json",
+   "review-r6/dom-10.json",
+   "review-r6/dom-11.json",
+   "review-r6/dom-12.json",
+   "review-r6/dom-13.json",
+   "review-r6/dom-14.json",
+   "review-r6/dom-15.json",
+   "review-r6/dom-16.json",
+   "review-r6/dom-17.json",
+   "review-r6/dom-18.json",
+   "review-r6/dom-19.json",
+   "review-r6/dom-2.json",
+   "review-r6/dom-20.json",
+   "review-r6/dom-21.json",
+   "review-r6/dom-22.json",
+   "review-r6/dom-3.json",
+   "review-r6/dom-4.json",
+   "review-r6/dom-5.json",
+   "review-r6/dom-6.json",
+   "review-r6/dom-7.json",
+   "review-r6/dom-8.json",
+   "review-r6/dom-9.json"
   ],
-  "capturedAt": "2026-10-08T23:58:54Z",
+  "capturedAt": "2026-10-09T04:48:37Z",
   "surfaces": [
    {
     "source": "content/dom-app-zh.json",
@@ -45093,6 +45116,1951 @@
    },
    "flags": [],
    "notes": "Reviewed against actual R5 implementation on a disposable local instance."
+  },
+  {
+   "id": "content-20c94c80399c018a",
+   "text": "1.3 KB",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-11.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-4.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-d7389571b1d80d59",
+   "text": "10 characters by default",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > p.hint",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-label:nth-of-type(1) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-dc5bfd6d55063fd6",
+   "text": "271 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-640b31a0e06b4d6e",
+   "text": "36 lines",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-11.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-562b53a96845a41a",
+   "text": "36 行",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-4.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-e21e5024f74d70d5",
+   "text": "5 characters by default",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-label:nth-of-type(1) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-28c8995346f2e79f",
+   "text": "5 lines",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-24f3d26b298f18cb",
+   "text": "5 行",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > section.ld-content > div.ld-content-head:nth-of-type(1) > span.ld-content-meta"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-13b7994fae9387c2",
+   "text": "9001",
+   "channels": [
+    "data-*"
+   ],
+   "locations": [
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr",
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr.expanded"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "machine-identifier",
+   "origin": "framework-runtime",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [
+    "dom-metadata"
+   ],
+   "notes": null
+  },
+  {
+   "id": "content-e609d533127c0ec8",
+   "text": "9002",
+   "channels": [
+    "data-*"
+   ],
+   "locations": [
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr",
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr.expanded"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "machine-identifier",
+   "origin": "framework-runtime",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [
+    "dom-metadata"
+   ],
+   "notes": null
+  },
+  {
+   "id": "content-1ce93dacbcf499b5",
+   "text": "chars",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-input:nth-of-type(2) > span",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-input:nth-of-type(2) > span",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-input:nth-of-type(2) > span"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-8017e1f5caf9ed66",
+   "text": "Code · 36 lines · 1.3 KB",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)",
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-facaded51b7d1c96",
+   "text": "compose.yaml",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title:nth-of-type(2)",
+    "section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-3a2a7b3bcb2860ed",
+   "text": "Enter a whole number from 3 to 32.",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "div#r6-slugLength-help > span.error-text",
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-27a4046c282822b0",
+   "text": "Example/k7mx9",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-a9957b9e6b430088",
+   "text": "Example/k7mx9p",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-48810072b490cb8e",
+   "text": "Example/p/k7mx9",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-textSlugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-17bdd8acea2bd4fa",
+   "text": "Example/p/k7mx9p4w2r",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-fileSlugLength",
+    "input#r6-textSlugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-5bc43fb8e95a0032",
+   "text": "File shares",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-a2f980eee52734f6",
+   "text": "k7mx9p4w2r",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)",
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)",
+    "div#r6-fileSlugLength-help > code",
+    "div#r6-textSlugLength-help > code"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-2.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-7190bff881c3f9ff",
+   "text": "m4rq8v2x7p",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)",
+    "div#app > main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-slug:nth-of-type(1)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-aa32d0536bab7e63",
+   "text": "No visits yet",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > div.chart:nth-of-type(4) > p.chart-empty",
+    "div#detail-9002 > div.ld-grid > div.ld-main > div.chart:nth-of-type(4) > p.chart-empty"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/gen/i18n.js",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-adb85cf22bfc3254",
+   "text": "None yet",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > div.ld-stats-head:nth-of-type(3) > dl.ld-figs > div:nth-of-type(3) > dd.soft",
+    "div#detail-9002 > div.ld-grid > div.ld-main > div.ld-stats-head:nth-of-type(3) > dl.ld-figs > div:nth-of-type(3) > dd.soft"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/gen/i18n.js",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-871bf69c0e891faa",
+   "text": "Omit 0, o, 1, i and l from URL slugs. Text and file shares always omit them.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-setting:nth-of-type(1) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-27fccc98c83164e8",
+   "text": "p/",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#r6-fileSlugLength-help > code",
+    "div#r6-textSlugLength-help > code"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-2.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-1e318349ab93344f",
+   "text": "Plain text · 5 lines · 271 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)",
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-c61625ac42af794c",
+   "text": "QR code for s.example.com/p/k7mx9p4w2r",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > aside.ld-side > div.ld-qr > svg.qr"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-f479e6a24e15ef48",
+   "text": "QR code for s.example.com/p/m4rq8v2x7p",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > aside.ld-side > div.ld-qr > svg.qr"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-11.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-71fdfa790e509d2d",
+   "text": "Retry save",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-save:nth-of-type(3) > button.btn.btn-secondary > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-18.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-90f9c750a4d00d74",
+   "text": "s.example.com/p/k7mx9p4w2r",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > div.ld-short:nth-of-type(1) > a.ld-short-url"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-3d6340e0a67bf0ce",
+   "text": "s.example.com/p/k7mx9p4w2r 的二维码",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > aside.ld-side > div.ld-qr > svg.qr"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-755aa9139e51e5e9",
+   "text": "s.example.com/p/m4rq8v2x7p",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > div.ld-main > div.ld-short:nth-of-type(1) > a.ld-short-url"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-11.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-4.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-ab92792350a05ee3",
+   "text": "s.example.com/p/m4rq8v2x7p 的二维码",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > aside.ld-side > div.ld-qr > svg.qr"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-4.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-74957cfb96d8690a",
+   "text": "Save failed. Changes have not been applied. Try again.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-save:nth-of-type(3) > span.error-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-18.json"
+   ],
+   "purpose": "error",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-16a0b4980bb031cf",
+   "text": "services: app: image: example/app:1.0.0 ports: - \"127.0.0.1:8080:8080\" environment: APP_BASE_URL: \"https://s.example.com\" EXAMPLE_SETTING_1: \"sample-1\" EXAMPLE_SETTING_2: \"sample-2\" EXAMPLE_SETTING_3: \"sample-3\" EXAMPLE_SETTING_4: \"sample-4\" EXAMPLE_SETTING_5: \"sample-5\" EXAMPLE_SETTING_6: \"sample-6\" EXAMPLE_SETTING_7: \"sample-7\" EXAMPLE_SETTING_8: \"sample-8\" EXAMPLE_SETTING_9: \"sample-9\" EXAMPLE_SETTING_10: \"sample-10\" EXAMPLE_SETTING_11: \"sample-11\" EXAMPLE_SETTING_12: \"sample-12\" EXAMPLE_SETTING_13: \"sample-13\" EXAMPLE_SETTING_14: \"sample-14\" EXAMPLE_SETTING_15: \"sample-15\" EXAMPLE_SETTING_16: \"sample-16\" EXAMPLE_SETTING_17: \"sample-17\" EXAMPLE_SETTING_18: \"sample-18\" EXAMPLE_SETTING_19: \"sample-19\" EXAMPLE_SETTING_20: \"sample-20\" EXAMPLE_SETTING_21: \"sample-21\" EXAMPLE_SETTING_22: \"sample-22\" EXAMPLE_SETTING_23: \"sample-23\" EXAMPLE_SETTING_24: \"sample-24\" EXAMPLE_SETTING_25: \"sample-25\" EXAMPLE_SETTING_26: \"sample-26\" EXAMPLE_SETTING_27: \"sample-27\" EXAMPLE_SETTING_28: \"sample-28\" command: [\"serve\", \"--description\", \"Weekly planning notes, project schedules, meeting summaries, reference documents and shared resources for everyone on the team.\"]",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9002 > div.ld-grid > div.ld-main > section.ld-content > div.r6-preview-shell:nth-of-type(2) > pre.ld-preview.code"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b66f14f81661ef26",
+   "text": "Set by environment",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > p.hint > span.r6-lock"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-8.json"
+   ],
+   "purpose": "disabled",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-af4e5cae016c2b6c",
+   "text": "Set each type independently (3–32 characters). Only future generated slugs change; existing links stay the same.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > p.hint.r6-length-help"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b8eb566f4bdc0a67",
+   "text": "Shorter share slugs are easier to guess. We recommend 10 or more characters for text and file shares.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > p.hint.r6-short-help"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-c2f1b956ebea7ff9",
+   "text": "Text / code shares",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b5bea41b6c623f7c",
+   "text": "true",
+   "channels": [
+    "data-*"
+   ],
+   "locations": [
+    "div#codex-browser-sidebar-comments-root ::shadow >> div > div"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-2.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "machine-identifier",
+   "origin": "framework-runtime",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [
+    "dom-metadata"
+   ],
+   "notes": null
+  },
+  {
+   "id": "content-68c52726985445d9",
+   "text": "URL links",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-17.json",
+    "review-r6/dom-18.json",
+    "review-r6/dom-19.json",
+    "review-r6/dom-7.json",
+    "review-r6/dom-8.json",
+    "review-r6/dom-9.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b2c0b4c58a4bbb97",
+   "text": "代码 · 36 行 · 1.3 KB",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)",
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(1) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-1aa9c4170bddb16e",
+   "text": "位",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-input:nth-of-type(2) > span",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-input:nth-of-type(2) > span",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-input:nth-of-type(2) > span"
+   ],
+   "visibility": [
+    "accessibility-hidden"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-c9da7f19d70b3da0",
+   "text": "保存失败，更改尚未生效。请重试。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-save:nth-of-type(3) > span.error-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-15.json"
+   ],
+   "purpose": "error",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-1091c1d1acd951ac",
+   "text": "分享短码越短，越容易被猜中。文本和文件分享建议使用 10 位或更长。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > p.hint.r6-short-help"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-6b06f0fab3f69d50",
+   "text": "分别设置三类短码的长度（3–32 位）。仅影响之后自动生成的短码，已有链接不变。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > p.hint.r6-length-help"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-8ed6780c77acbf66",
+   "text": "周五分享会",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title:nth-of-type(2)",
+    "section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-title-line:nth-of-type(1) > span.lr-title:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-10.json",
+    "review-r6/dom-11.json",
+    "review-r6/dom-12.json",
+    "review-r6/dom-13.json",
+    "review-r6/dom-20.json",
+    "review-r6/dom-21.json",
+    "review-r6/dom-22.json",
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-66adff8c5bc1fcef",
+   "text": "周五分享会 下午三点在会议室见。请提前整理本周的进展、遇到的问题和下周安排。每人预留五分钟，讨论结束后把结论补充到团队文档。 远程同事可以通过会议链接参加，相关材料会在会后统一归档。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > section.ld-content > div.r6-preview-shell:nth-of-type(2) > pre.ld-preview"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-20.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-72821271ca52597d",
+   "text": "文件分享",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-9e7e6e4861acccae",
+   "text": "文本 / 代码分享",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-4487d48f2705f278",
+   "text": "普通网址",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-label:nth-of-type(1) > label"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-field",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-b336a174cd1fad05",
+   "text": "暂无",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > div.ld-stats-head:nth-of-type(3) > dl.ld-figs > div:nth-of-type(3) > dd.soft",
+    "div#detail-9002 > div.ld-grid > div.ld-main > div.ld-stats-head:nth-of-type(3) > dl.ld-figs > div:nth-of-type(3) > dd.soft"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/gen/i18n.js",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-28f4ec788d7b363b",
+   "text": "环境变量固定",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > p.hint > span.r6-lock"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-1.json"
+   ],
+   "purpose": "disabled",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-0d53f08678d8101b",
+   "text": "示例",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#r6-fileSlugLength-help > span",
+    "div#r6-slugLength-help > span",
+    "div#r6-textSlugLength-help > span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-a990d11aec6eb29f",
+   "text": "示例/k7mx9",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-ca807957ace4b6c1",
+   "text": "示例/k7mx9p",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-be794421dfc07b9a",
+   "text": "示例/p/k7mx9",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-textSlugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-35c067d32f8a11d6",
+   "text": "示例/p/k7mx9p4w2r",
+   "channels": [
+    "aria-describedby"
+   ],
+   "locations": [
+    "input#r6-fileSlugLength",
+    "input#r6-textSlugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-a419bfc8d4a5c950",
+   "text": "纯文本 · 5 行 · 271 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr > div.lr-line > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)",
+    "main.dash > section.ll:nth-of-type(3) > div.ll-card:nth-of-type(3) > ul > li:nth-of-type(2) > div.lr.expanded > div.lr-line:nth-of-type(1) > button.lr-main:nth-of-type(1) > span.lr-target:nth-of-type(2) > span.lr-dest:nth-of-type(2)"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/scenes.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-dd3bf160da9ac0a1",
+   "text": "网址短码不使用 0、o、1、i、l。文本和文件分享始终排除这些字符。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-setting:nth-of-type(1) > div > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "task-help",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-72b0bf11c170637e",
+   "text": "请输入 3–32 的整数。",
+   "channels": [
+    "aria-describedby",
+    "text"
+   ],
+   "locations": [
+    "div#r6-slugLength-help > span.error-text",
+    "input#r6-slugLength"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-14.json"
+   ],
+   "purpose": "validation",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-5751457093ee4bba",
+   "text": "还没有访问记录",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "div#detail-9001 > div.ld-grid > div.ld-main > div.chart:nth-of-type(4) > p.chart-empty",
+    "div#detail-9002 > div.ld-grid > div.ld-main > div.chart:nth-of-type(4) > p.chart-empty"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-3.json",
+    "review-r6/dom-4.json",
+    "review-r6/dom-5.json",
+    "review-r6/dom-6.json"
+   ],
+   "purpose": "empty-state",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/gen/i18n.js",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-917e75040547cc9f",
+   "text": "重试保存",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > div.r3-save:nth-of-type(3) > button.btn.btn-secondary > span.btn-text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-15.json"
+   ],
+   "purpose": "user-action",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-5e16358b465c62c4",
+   "text": "默认 10 位",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(2) > div.r6-length-label:nth-of-type(1) > p.hint",
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(3) > div.r6-length-label:nth-of-type(1) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-85ae54ec4d52b26a",
+   "text": "默认 5 位",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "section#r6-defaults > form.st-body.r6-defaults > fieldset.r6-lengths > div.r6-length-row:nth-of-type(1) > div.r6-length-label:nth-of-type(1) > p.hint"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "review-r6/dom-0.json",
+    "review-r6/dom-1.json",
+    "review-r6/dom-14.json",
+    "review-r6/dom-15.json",
+    "review-r6/dom-16.json",
+    "review-r6/dom-2.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "agent-generated-task-copy",
+   "decision": "allow",
+   "evidence": {
+    "source": "src/r6/settings.jsx",
+    "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
+   },
+   "flags": [],
+   "notes": null
   }
  ]
 }

@@ -352,6 +352,37 @@
       "limitations": [
         "R5 needs user approval; local form and connection states are simulated."
       ]
+    },
+    {
+      "id": "r6-preview-and-config-evidence",
+      "type": "runtime",
+      "location": "User-provided settings/list/detail screenshots; existing authenticated admin tab; web/src/components/LinkDetail.svelte; internal/server/api_links.go; approved prototype-r5.html",
+      "roles": [
+        "functional-truth",
+        "visual-reference",
+        "interaction-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": true,
+      "sanitization": "Screenshots and live records are not copied into the repository. Runtime observation stores only preview height and loading state. R6 uses example.com URLs and synthetic text/code/file fixtures.",
+      "licenseOrPermission": "User-provided UI references and repository-owned code",
+      "localCopies": [
+        "prototype-r6.html",
+        "src/r6/scenes.jsx"
+      ],
+      "observations": [
+        "Switching stats from 30 to 7 days replaces the body with loading text and shrinks the live preview from about 90.78px to 47.59px before restoring it. The original 30-day range was restored.",
+        "Stats load calls links.upsert, replacing link identity; the body effect reads the link and sets body to null.",
+        "Existing generation clamps text/file slugs to at least ten; independent lengths are requested behavior, not current API capability."
+      ],
+      "inferences": [
+        "Periodic list refresh and visibility refresh use the same object replacement path and can trigger the body reset."
+      ],
+      "limitations": [
+        "Live observation is one Chrome desktop text share, not a cross-browser diagnosis. R6 persistence and upload are simulated. Production fix is pending review and implementation."
+      ]
     }
   ]
 }

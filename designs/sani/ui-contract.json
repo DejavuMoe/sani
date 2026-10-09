@@ -681,6 +681,67 @@
       },
       "status": "implemented",
       "notes": "Implemented unchanged R5 approval 81a17629c016cc75997fadb7ff7a5e4c67c7f693. Local make check/test/e2e/smoke/docs passed, with 44 Chromium flows and 52 frontend unit tests. Settings geometry and axe: zh/en, light/dark, 1544/390/320. Custom colors, calendar and pointer/focus tooltips checked in both languages/themes. Proxy persistence, redaction, atomic updates, credential identity binding, real local CONNECT routing, failure/no-fallback, environment locks and race tests pass. Connection-test API failure is exercised end-to-end; a user-supplied external proxy has not been tested. No VPS, release or remote docs deployment."
+    },
+    {
+      "id": "r6-independent-lengths-and-preview",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r6.html",
+        "assetPath": "prototype-r6.html",
+        "files": [
+          "src/r6/settings.jsx",
+          "src/r6/refinements.css",
+          "src/r6/detail.jsx",
+          "src/r6/store.jsx",
+          "src/r6/scenes.jsx",
+          "src/r6/app.jsx"
+        ],
+        "states": [
+          "independent-url-text-file-lengths",
+          "defaults-5-10-10",
+          "integer-3-32-validation",
+          "short-share-advice",
+          "individual-environment-lock",
+          "saving-success-error-retry",
+          "text-loading-error-retry",
+          "plain-and-code-preview",
+          "stats-range-preserves-content-and-scroll",
+          "zh-en-light-dark-desktop-mobile"
+        ],
+        "stableIds": [
+          "r6-defaults",
+          "detail-9001",
+          "detail-9002"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/settings, /admin/",
+        "files": [
+          "web/src/views/Settings.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/lib/links.svelte.ts",
+          "web/src/lib/api.ts",
+          "web/src/lib/i18n.svelte.ts",
+          "internal/server/settings.go",
+          "internal/server/api_misc.go",
+          "internal/server/api_links.go",
+          "internal/server/share.go",
+          "internal/config/config.go"
+        ],
+        "interfaces": [
+          "GET /api/config",
+          "PATCH /api/config (proposed textSlugLength and fileSlugLength)",
+          "GET /api/links/{id}/text",
+          "GET /api/links/{id}/stats"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "internal/server/r3_test.go",
+          "internal/server/share_test.go"
+        ]
+      },
+      "status": "approved",
+      "notes": "R6 needs review. Three independently configurable lengths; previous implicit share minimum becomes explicit defaults/advice. Existing installations must preserve their effective share length on migration. Source and live DOM confirm stats upsert triggers text reset. Prototype only, production unchanged; see r6-handoff.md."
     }
   ]
 }
