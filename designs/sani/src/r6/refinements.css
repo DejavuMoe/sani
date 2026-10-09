@@ -19,9 +19,7 @@
 .r6-preview-shell[aria-busy="true"] .ld-preview { opacity: 1; }
 .r6-preview-update { color: var(--text-3); font-size: 12px; }
 @media (max-width: 640px) {
-  .r6-length-input .field { min-height: 44px; font-size: 16px; }
-  .r6-length-row { grid-template-columns: minmax(0, 1fr) 98px; gap: 6px 10px; }
-  .r6-length-input .field { width: 66px; }
+  .r6-length-row { gap: 6px 10px; }
   .r6-defaults .r3-setting > div { min-width: 0; }
   .r6-defaults .r3-save { flex-wrap: wrap; }
 }

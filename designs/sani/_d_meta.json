@@ -62,7 +62,7 @@
           "path": "prototype-r6.html",
           "createdAt": "2026-10-09T04:47:45.710Z",
           "status": "approved",
-          "subtitle": "Revision 6: independent slug lengths and stable text previews",
+          "subtitle": "Revision 6: independent slug lengths, stable previews and responsive sizing fixes",
           "viewport": {
             "width": 1280,
             "height": 900
@@ -132,5 +132,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-09T05:07:31.368Z"
+  "updatedAt": "2026-10-09T06:01:15.383Z"
 }

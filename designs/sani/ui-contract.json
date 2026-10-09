@@ -691,6 +691,7 @@
         "files": [
           "src/r6/settings.jsx",
           "src/r6/refinements.css",
+          "src/r6/responsive.css",
           "src/r6/detail.jsx",
           "src/r6/store.jsx",
           "src/r6/scenes.jsx",

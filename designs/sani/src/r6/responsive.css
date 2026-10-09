@@ -1,0 +1,38 @@
+/* Keep earlier prototype revisions intact while correcting the current one. */
+input, textarea { font-size: var(--input-font-size, inherit); }
+.field { font-size: var(--input-font-size, 14px); }
+.login-form .field { font-size: var(--input-font-size, 15px); }
+.st-inline-form > .field, .r5-input .field, .r3-setting .field,
+.r6-length-input .field { height: 36px; min-height: 36px; font-size: var(--input-font-size, 14px); }
+.st-inline-form > .btn, .r5-secret:not(.r5-secret-saved) > .btn { height: 36px; }
+.r5-secret-saved > .btn { height: 28px; }
+.r5-actions > .btn { height: 32px; }
+.r5-route .seg > button { height: 28px; }
+.r3-examples a { display: inline-flex; align-items: center; min-height: 28px; }
+.ld-short-actions .btn { min-height: 0; }
+
+.tag-label, .tag-add, .tag-selected .tag-badge, .tag-filter, .tag-done { min-height: 30px; }
+.tag-badge button { width: 26px; min-height: 26px; }
+.tag-choice, .tag-create { min-height: 38px; }
+.tag-search { min-height: 0; }
+.tag-search input { font-size: var(--input-font-size, 13px); }
+.tag-edit-button { width: 34px; min-height: 34px; }
+.r3-swatches button { min-height: 36px; }
+.r3-color-input .field { font-size: var(--input-font-size, 12px); }
+.r4-date .field { font-size: var(--input-font-size, 14px); }
+.r4-calendar button { min-height: 36px; }
+
+.cmp-main { height: 56px; }
+.cmp-url { font-size: var(--input-font-size, 15.5px); }
+.cmp-body, .le-body { font-size: var(--input-font-size, 14.5px); }
+.cmp-body.mono, .le-body.mono { font-size: var(--input-font-size, 13px); }
+.le-url { font-size: var(--input-font-size, 13px); }
+.cmp-inline { font-size: var(--input-font-size, 13px); }
+.slugf-inline input { font-size: var(--input-font-size, 13px); }
+.slugf-boxed input, .ll-search input { font-size: var(--input-font-size, 13.5px); }
+
+/* Touch input compatibility follows the device, not a narrow desktop pane. */
+@media (pointer: coarse) {
+  :root { --input-font-size: 16px; }
+  .switch::before { content: ''; position: absolute; inset: -12px -5px; }
+}
