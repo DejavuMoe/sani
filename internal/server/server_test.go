@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -816,6 +817,69 @@ func TestReferrerHost(t *testing.T) {
 		if got := referrerHost(in); got != want {
 			t.Errorf("referrerHost(%q) = %q, want %q", in, got, want)
 		}
+	}
+}
+
+func TestRedirectQueryCannotChangeDestination(t *testing.T) {
+	for _, forward := range []bool{true, false} {
+		t.Run(fmt.Sprintf("forward=%t", forward), func(t *testing.T) {
+			e := newEnv(t, Options{ForwardQuery: forward})
+			e.signIn()
+			targets := []struct {
+				location string
+				code     int
+				slug     string
+			}{
+				{location: "https://example.com", code: 301},
+				{location: "http://example.com:8080/path", code: 302},
+				{location: "https://user@example.com/path?fixed=1#saved", code: 307},
+				{location: "https://example.com/path?#saved", code: 308},
+				{location: "https://example.com/path?fixed=1&#saved", code: 302},
+				{location: "weixin://dl/business/?fixed=1#saved", code: 302},
+				{location: "mailto:owner@example.com?subject=saved", code: 302},
+			}
+			for i := range targets {
+				l := e.create(map[string]any{"url": targets[i].location, "redirect": targets[i].code})
+				targets[i].slug = l["slug"].(string)
+			}
+			if r := e.req("DELETE", "/api/session", nil); r.status != 204 {
+				t.Fatalf("logout: %d", r.status)
+			}
+			for _, target := range targets {
+				before, err := url.Parse(target.location)
+				if err != nil {
+					t.Fatal(err)
+				}
+				for _, query := range []string{
+					"https://evil.example/path", "//evil.example/path", `\\evil.example\path`,
+					"@evil.example", "javascript:alert(1)", "next=https://evil.example/",
+					"%2f%2fevil.example", "%5c%5cevil.example", "%23//evil.example",
+					"%0d%0aLocation:%20https://evil.example/", "x=1&x=2&signed=a%2Bb%2Fc%3D",
+				} {
+					for _, method := range []string{http.MethodGet, http.MethodHead} {
+						r := e.req(method, "/"+target.slug+"?"+query, nil)
+						locations := r.header.Values("Location")
+						if r.status != target.code || len(locations) != 1 {
+							t.Fatalf("%s %q with query %q: status=%d Location=%q", method, target.location, query, r.status, locations)
+						}
+						after, err := url.Parse(locations[0])
+						if err != nil {
+							t.Fatal(err)
+						}
+						if after.Scheme != before.Scheme || after.Host != before.Host || after.User.String() != before.User.String() || after.Path != before.Path || after.Opaque != before.Opaque || after.Fragment != before.Fragment {
+							t.Fatalf("query %q changed destination %q to %q", query, target.location, locations[0])
+						}
+						if forward {
+							if !strings.HasSuffix(after.RawQuery, query) || !strings.HasPrefix(after.RawQuery, before.RawQuery) {
+								t.Fatalf("query bytes were changed: %q", locations[0])
+							}
+						} else if locations[0] != target.location {
+							t.Fatalf("query forwarded while disabled: %q", locations[0])
+						}
+					}
+				}
+			}
+		})
 	}
 }
 

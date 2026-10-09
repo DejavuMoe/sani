@@ -163,7 +163,7 @@ func fromAdmin(ref, host string) bool {
 }
 
 // mergeQuery appends the visitor's query string to the destination, before
-// any fragment.
+// any fragment. The separator keeps query out of the saved scheme and authority.
 func mergeQuery(loc, query string) string {
 	frag := ""
 	if i := strings.IndexByte(loc, '#'); i >= 0 {
