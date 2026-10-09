@@ -14,7 +14,7 @@ COPY web web
 RUN pnpm --filter sani-web build
 
 # 2. One static binary with the app embedded.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27.2-alpine AS build
 RUN apk add --no-cache ca-certificates
 WORKDIR /src
 ENV CGO_ENABLED=0

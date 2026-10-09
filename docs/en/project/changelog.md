@@ -11,6 +11,7 @@
 - Replace native controls with app-styled RGB sliders, a calendar with date/time text fields, and hover/focus tooltips. Keep HEX/RGB/HSL entry, keyboard access and both themes. Record the no-browser-default-visuals rule in design and development constraints.
 - Align bilingual settings, API and credential-storage documentation. Saved proxy passwords are included in the database and backups without encryption; this change does not alter the database schema.
 - Document Forgejo as the push destination for branches and tags, mirrored to GitHub for builds. Forgejo master pushes trigger Woodpecker documentation deployment; verify both remotes and the live site after publishing.
+- Update the Go toolchain and Docker builder to 1.27.2 and `golang.org/x/net` to 0.60.0 to fix known security vulnerabilities found by release checks.
 
 ## v0.9.0
 
