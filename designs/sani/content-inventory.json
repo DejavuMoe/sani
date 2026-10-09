@@ -42,7 +42,12 @@
    "review-r6/dom-6.json",
    "review-r6/dom-7.json",
    "review-r6/dom-8.json",
-   "review-r6/dom-9.json"
+   "review-r6/dom-9.json",
+   "production-r6/settings-zh.json",
+   "production-r6/settings-zh-saved.json",
+   "production-r6/settings-en.json",
+   "production-r6/text-zh.json",
+   "production-r6/text-en.json"
   ],
   "capturedAt": "2026-10-09T04:48:37Z",
   "surfaces": [
@@ -182,7 +187,8 @@
    "Only the current DOM state is captured.",
    "Pseudo-elements, client JSON, comments, OS color picker and browser chrome are not captured.",
    "R3 repeated strings retain representative DOM locations; full captures remain in the ignored content directory.",
-   "R5 production: captured 9 states per language from an isolated current build; existing reviewed strings retain their classifications. Raw captures and screenshots also retained outside the repository."
+   "R5 production: captured 9 states per language from an isolated current build; existing reviewed strings retain their classifications. Raw captures and screenshots also retained outside the repository.",
+   "R6 production: full collector is unsupported by the read-only browser bridge; main text and accessible attributes were captured directly and supplemented with DOM snapshots, screenshots, source review and axe."
   ]
  },
  "briefSources": [],
@@ -47059,6 +47065,416 @@
     "source": "src/r6/settings.jsx",
     "reference": "R6 rendered DOM; operational field/state/help or synthetic share fixture, reviewed for prototype scope"
    },
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-96508b8d6af73c7c",
+   "text": "/p/k7mx9",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "code"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-0bb067667b8896bb",
+   "text": "/p/k7mx9p4w2r",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "code"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-10297c3c9fd3c496",
+   "text": "10月9日 13:23",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "dd"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-f7d948eacaee88ef",
+   "text": "127.0.0.1:18866/",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-6bd816a622a4778b",
+   "text": "127.0.0.1:18866/p/",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-97ef9a63aae6fa4a",
+   "text": "127.0.0.1:18866/p/7a67y",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "a"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-3ff75f0e8da55b44",
+   "text": "127.0.0.1:18866/p/7a67y 的二维码",
+   "channels": [
+    "aria-label"
+   ],
+   "locations": [
+    "svg"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-08ff2b56766560e6",
+   "text": "7a67y",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-99ab6397e9124ee1",
+   "text": "9月10日",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "text"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-095569131be60b17",
+   "text": "Environment variables lock the current connection settings.",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json"
+   ],
+   "purpose": "disabled",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-27d6b6bf4d2a6c24",
+   "text": "http://127.0.0.1:18866",
+   "channels": [
+    "placeholder"
+   ],
+   "locations": [
+    "input"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-50874c3706e1ac1f",
+   "text": "http://localhost:18866",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "dd"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-2e9f74bd894ac45d",
+   "text": "Plain text · 1 line · 75 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-en.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-6abd716bf521cbfe",
+   "text": "The address short links are built from. Leave it empty to use the one you’re visiting (http://127.0.0.1:18866).",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-en.json"
+   ],
+   "purpose": "task-help",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-389f379003ed70fc",
+   "text": "下周安排：整理会议记录、核对日程，并更新项目清单。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "pre",
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-en.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-bc3330c350e47419",
+   "text": "当前连接设置由环境变量固定，后台显示有效值。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh.json"
+   ],
+   "purpose": "disabled",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-4fccfab92dfc6929",
+   "text": "生成短链接时使用的地址。留空则使用你当前访问的地址（http://127.0.0.1:18866）。",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "p"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh-saved.json",
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\settings-zh.json"
+   ],
+   "purpose": "task-help",
+   "origin": "production-behavior",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
+   "flags": [],
+   "notes": null
+  },
+  {
+   "id": "content-5fc6437628ddf812",
+   "text": "纯文本 · 1 行 · 75 B",
+   "channels": [
+    "text"
+   ],
+   "locations": [
+    "span"
+   ],
+   "visibility": [
+    "visible"
+   ],
+   "captures": [
+    "C:\\Users\\ice\\.codex\\visualizations\\2026\\10\\09\\01a11ee3-8745-7313-be3c-c22da22a86e0\\sani-r6-production\\text-zh.json"
+   ],
+   "purpose": "domain-value",
+   "origin": "production-domain",
+   "decision": "allow",
+   "evidence": "Rendered local R6 implementation; sanitized fixture and existing product copy, reviewed against approved prototype-r6.html.",
    "flags": [],
    "notes": null
   }

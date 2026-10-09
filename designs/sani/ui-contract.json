@@ -726,22 +726,27 @@
           "internal/server/api_misc.go",
           "internal/server/api_links.go",
           "internal/server/share.go",
-          "internal/config/config.go"
+          "internal/config/config.go",
+          "cmd/sani/main.go"
         ],
         "interfaces": [
           "GET /api/config",
-          "PATCH /api/config (proposed textSlugLength and fileSlugLength)",
+          "PATCH /api/config (slugLength, textSlugLength, fileSlugLength)",
           "GET /api/links/{id}/text",
           "GET /api/links/{id}/stats"
         ],
         "tests": [
           "web/e2e/app.spec.ts",
           "internal/server/r3_test.go",
-          "internal/server/share_test.go"
+          "internal/server/share_test.go",
+          "web/e2e/r6.spec.ts",
+          "cmd/sani/slug_lengths_test.go",
+          "internal/config/slug_lengths_test.go",
+          "internal/server/slug_lengths_test.go"
         ]
       },
-      "status": "approved",
-      "notes": "R6 needs review. Three independently configurable lengths; previous implicit share minimum becomes explicit defaults/advice. Existing installations must preserve their effective share length on migration. Source and live DOM confirm stats upsert triggers text reset. Prototype only, production unchanged; see r6-handoff.md."
+      "status": "implemented",
+      "notes": "Approved R6 implemented: independent lengths and persisted legacy migration; stable primitive preview dependencies with retry and stale-response protection. WSL make check test e2e docs passed; 61 Chromium E2E tests, including 36 R6 accessibility states. See r6-handoff.md."
     }
   ]
 }

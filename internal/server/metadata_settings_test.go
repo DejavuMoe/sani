@@ -136,6 +136,10 @@ func TestMetadataProxyValidationLocksAndTestBoundary(t *testing.T) {
 		}
 	}
 	e := newEnv(t, Options{})
+	before, err := e.srv.store.Setting(context.Background(), store.SettingCreation)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if r := e.req("POST", "/api/config/metadata/test", `{}`); r.status != 401 {
 		t.Fatal(r.status)
 	}
@@ -158,7 +162,7 @@ func TestMetadataProxyValidationLocksAndTestBoundary(t *testing.T) {
 	if r := e.req("POST", "/api/config/metadata/test", input); r.code() != "proxy_test_failed" || r.header.Get("Cache-Control") != "no-store" {
 		t.Fatal(r.status, string(r.body))
 	}
-	if _, err := e.srv.store.Setting(context.Background(), store.SettingCreation); err != store.ErrNotFound {
+	if after, err := e.srv.store.Setting(context.Background(), store.SettingCreation); err != nil || after != before {
 		t.Fatal("test changed saved settings", err)
 	}
 	locked := newEnv(t, Options{MetaProxy: "http://demo:env-only-secret@127.0.0.1:8080", FetchMeta: true})

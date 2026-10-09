@@ -28,7 +28,7 @@ Tags are private to administrators. Undoing deletion restores assignments. Tag n
 
 ## Slugs {#slugs}
 
-Leave the slug empty and Sani makes one up. By default, generated slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. Settings controls the length and look-alike exclusion; an explicit [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) takes priority.
+Leave the slug empty and Sani makes one up. By default, generated URL slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. Settings controls the URL length (3–32) and look-alike exclusion; an explicit [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) takes priority and locks the URL length. Shares have independent length settings, described below.
 
 When you pick a slug yourself, the field tells you as you type whether it’s free. The rules:
 
@@ -76,7 +76,9 @@ A text is **plain text**, shown as running text that wraps, or **code**, shown m
 
 Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Share”; for a file, the bar shows the upload’s progress and can cancel it. The address, such as `s.example.com/p/k3m9x2qv7h`, is copied as with a link. Expiry, the visit limit and the off switch work the same way. A limit of 1 means one counted visit, not automatic destruction of the content. Expired content remains until manually deleted and processed by [background cleanup](./operations#share-cleanup).
 
-Generated slugs for texts and files are 10 characters long instead of 5. Nothing lists your shares, so the address is what keeps them private, and 10 characters can’t be guessed. You can still pick a slug yourself.
+On new installations, generated text/code and file share slugs each default to 10 characters. Set each independently from 3 to 32 in Settings → Creation defaults; lengths exclude `/p/`. Explicit [`SANI_TEXT_SLUG_LENGTH` and `SANI_FILE_SLUG_LENGTH`](../reference/configuration#sani-text-slug-length) values each lock only their own field; values saved in Settings survive restarts. Shares always exclude look-alikes such as 0/o and 1/l/i, regardless of the URL character setting. Values below 10 can be saved and used without a hidden minimum of 10. Settings warns that shorter slugs are easier to guess. Shares have no public listing, but anyone with the address can open them. You can still pick a slug yourself.
+
+On an existing instance’s initial upgrade, missing share-length settings are saved as `max(10, legacy effective URL slug length)`: an old URL length of 12 still generates 12-character share slugs. Later URL-length edits no longer affect text or file shares. Existing and manually chosen slugs, collision retries and automatic growth stay unchanged.
 
 Visitors open the address and see a page with the text, a Copy button and, if you set up a [files domain](./deploy#files-domain), Raw and Download buttons. A file’s page shows its name, type, size and SHA-256, and a Download button. The bytes always come from the files domain, never from your short domain, so a file can’t pose as a page of your site; that’s why sharing files needs one.
 
@@ -146,7 +148,7 @@ A token has full access and keeps working after a password change. It’s shown 
 - **Texts and files.** They open at `/p/{slug}` on a page in the visitor’s language; `/{slug}` without the `/p/` doesn’t find them.
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.
 
-Creation defaults in Settings control generated slug length (3–32), look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
+Creation defaults in Settings control URL, text/code and file slug lengths independently (each 3–32), URL look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
 
 ## Page metadata and proxies
 

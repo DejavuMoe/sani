@@ -56,20 +56,30 @@
     link.kind === 'text' ? t('detail.views') : link.kind === 'file' ? t('detail.downloads') : t('detail.clicks'),
   );
 
-  // A text's body isn't part of the link; fetch it, and again after an edit.
-  let body = $state<string | null>(null);
+  // Object replacements from stats/list refreshes must not reload an unchanged body.
+  const kind = $derived(link.kind);
+  const updatedAt = $derived(link.updatedAt);
+  let loadedBody = $state<{ id: number; text: string } | null>(null);
+  const body = $derived(loadedBody?.id === id ? loadedBody.text : null);
+  let bodyLoading = $state(false);
+  let bodyFailed = $state(false);
+  let bodyRetry = $state(0);
   $effect(() => {
-    if (link.kind !== 'text') return;
+    if (kind !== 'text') return;
     const linkId = id;
-    void link.updatedAt;
+    void updatedAt;
+    void bodyRetry;
     let current = true;
-    body = null;
+    bodyLoading = true;
+    bodyFailed = false;
     untrack(async () => {
       try {
         const r = await api.linkText(linkId);
-        if (current && linkId === id) body = r.text;
+        if (current) loadedBody = { id: linkId, text: r.text };
       } catch {
-        /* the list notices a deleted link on its own */
+        if (current) bodyFailed = true;
+      } finally {
+        if (current) bodyLoading = false;
       }
     });
     return () => { current = false; };
@@ -136,8 +146,20 @@
               </span>
               <Button size="sm" variant="ghost" icon="copy" disabled={body === null} onclick={copyBody}>{t('share.copyText')}</Button>
             </div>
-            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-            <pre class={['preview', c.format === 'code' && 'code']} tabindex="0">{body ?? t('share.loading')}</pre>
+            <div class="preview-shell" aria-busy={bodyLoading}>
+              {#if body !== null}
+                <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                <pre class={['preview', c.format === 'code' && 'code']} tabindex="0">{body}</pre>
+              {/if}
+              {#if body === null || bodyFailed || bodyLoading}
+                <div class={body === null ? 'preview-state' : 'preview-update'} role="status">
+                  <span>{bodyFailed ? t('detail.bodyLoadFailed') : body === null ? t('share.loading') : t('detail.bodyUpdating')}</span>
+                  {#if bodyFailed}
+                    <Button size="sm" onclick={() => bodyRetry++}>{t('act.retry')}</Button>
+                  {/if}
+                </div>
+              {/if}
+            </div>
           </section>
         {:else if link.kind === 'file' && link.content}
           {@const c = link.content}
@@ -352,6 +374,7 @@
     margin: 0;
     padding: 12px 14px;
     overflow: auto;
+    scrollbar-gutter: stable;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--surface-2);
@@ -361,6 +384,29 @@
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+
+  .preview-state {
+    min-height: 92px;
+    padding: 18px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+  }
+
+  .preview-state,
+  .preview-update {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-2);
+    font-size: 13px;
+  }
+
+  .preview-update {
+    color: var(--text-3);
+    font-size: 12px;
   }
 
   .preview.code {

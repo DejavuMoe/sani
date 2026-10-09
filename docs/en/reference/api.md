@@ -262,7 +262,7 @@ Tells whether a slug can be used:
 
 ## Texts and files {#shares}
 
-A share is a link that shows something instead of redirecting: visitors open it at `/p/{slug}`, and its bytes come from the [files domain](./configuration#sani-files-url). Shares and short links have one slug namespace, so `gh` can’t be both. They have the same `title`, `enabled`, `expiresAt` and `maxClicks`, and the same [statistics](#stats); the list, delete, restore and bulk endpoints treat them like any link. Generated slugs for shares are at least 10 characters long, because nothing else keeps them private.
+A share is a link that shows something instead of redirecting: visitors open it at `/p/{slug}`, and its bytes come from the [files domain](./configuration#sani-files-url). Shares and short links have one slug namespace, so `gh` can’t be both. They have the same `title`, `enabled`, `expiresAt` and `maxClicks`, and the same [statistics](#stats); the list, delete, restore and bulk endpoints treat them like any link. Generated text/code and file share slugs use [`textSlugLength` and `fileSlugLength`](#config) respectively: each defaults to 10 on a new installation and independently accepts 3–32, excluding `/p/`. Shares always exclude look-alike characters, regardless of the URL length or `excludeConfusable`; generation retries and collision growth are unchanged. Values below 10 are honored. Shorter slugs are easier to guess, and anyone with the address can open a share. Manually chosen slugs keep their existing rules.
 
 A share’s `content`:
 
@@ -411,6 +411,8 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
   "slugLength": 5,
+  "textSlugLength": 10,
+  "fileSlugLength": 10,
   "fetchMeta": true,
   "forwardQuery": true,
   "passwordFromEnv": false,
@@ -421,13 +423,25 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
   "metaMode": "direct",
   "metaProxyConfigured": false,
   "metaProxy": null,
-  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
+  "configSources": {"slugLength":"default","textSlugLength":"default","fileSlugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
   "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
 ```
 
 `baseUrlSource` says where the short domain comes from: `env` for `SANI_BASE_URL`, `setting` for Settings, `request` for the current request’s address. `filesUrl` is the [files domain](./configuration#sani-files-url), or `null` without one; `maxFileSize` and `maxTextSize` are the limits for a file and a text, in bytes.
+
+The three length fields return the effective generated slug length for each type, all integers from 3 to 32:
+
+| Field | Used for | New-install default | Environment variable that overrides and locks this field |
+|---|---|---|---|
+| `slugLength` | URLs | `5` | `SANI_SLUG_LENGTH` |
+| `textSlugLength` | Text/code shares | `10` | `SANI_TEXT_SLUG_LENGTH` |
+| `fileSlugLength` | File shares (ordinary and chunked uploads) | `10` | `SANI_FILE_SLUG_LENGTH` |
+
+All three persist independently across restarts. `configSources` includes these three fields plus `excludeConfusable`, `maxFileSize`, `metaMode` and `metaProxy`. Each reports `default` (built-in), `settings` (saved in the database) or `env` (explicit environment value), in increasing priority. Locking one field leaves the other length fields independent.
+
+On an existing instance’s initial upgrade, each missing share-length setting is initialized and persisted as `max(10, legacy effective URL slug length)`: an old length of 12 keeps both share lengths at 12. Later URL-length edits no longer affect share lengths; each share-length environment variable still takes priority. Migrated values report `settings`, or `env` while overridden; removing the override restores the saved value without following the URL length again. Lengths exclude `/p/` and affect only future generated slugs; existing and manually chosen slugs stay unchanged.
 
 `PATCH /api/config`
 
@@ -439,7 +453,15 @@ Changes the short domain stored in Settings:
 
 `null` or an empty string clears it. The files domain can’t be the short domain too. Returns `409` when `SANI_BASE_URL` is set, and the updated settings on success.
 
-The creation fields `slugLength` (integer 3–32), `excludeConfusable` (boolean), `maxFileSize` (integer decimal MB expressed in bytes: 1,000,000–4,096,000,000, multiple of 1,000,000) and `metaMode` (`off`, `direct`, `proxy`) can also be patched. Omitted/null creation fields are unchanged. All supplied settings, including the base URL, validate and commit together. Effective values come from defaults → saved settings → explicit environment variables; `configSources` gives `default`, `settings` or `env` for each field. An environment-locked patch returns `409 config_env`; invalid values return `400 config_invalid`. Proxy mode requires a saved proxy or `SANI_META_PROXY`, otherwise `409 proxy_missing`. A legacy inherited process proxy is reported as `metaMode: "environment"`; it is not an accepted patch value. `fetchMeta` reports whether a fetcher is available; disabled fetching preserves cached metadata without a network request. The request limit is 4 KiB.
+The creation fields `slugLength`, `textSlugLength`, `fileSlugLength` (each an integer 3–32), `excludeConfusable` (boolean), `maxFileSize` (integer decimal MB expressed in bytes: 1,000,000–4,096,000,000, multiple of 1,000,000) and `metaMode` (`off`, `direct`, `proxy`) can also be patched. Omitted/`null` creation fields are unchanged. All supplied settings, including the base URL, validate and commit together. An environment-locked patch returns `409 config_env`; invalid values return `400 config_invalid`. Proxy mode requires a saved proxy or `SANI_META_PROXY`, otherwise `409 proxy_missing`. A legacy inherited process proxy is reported as `metaMode: "environment"`; it is not an accepted patch value. `fetchMeta` reports whether a fetcher is available; disabled fetching preserves cached metadata without a network request. The request limit is 4 KiB.
+
+For example, use 5 characters for URLs, 5 for text/code shares and 12 for files:
+
+```json
+{ "slugLength": 5, "textSlugLength": 5, "fileSlugLength": 12 }
+```
+
+Shares have no hidden minimum of 10. The advisory for shorter values does not block saving. `excludeConfusable` only controls URLs; shares always use the look-alike-free alphabet.
 
 `metaProxy` is `null` if unconfigured; otherwise GET returns `{scheme, host, port, auth, username, passwordSet}` without a password. `metaProxyConfigured` also reports whether a dedicated proxy exists. PATCH accepts the complete proxy object with an optional `password`:
 

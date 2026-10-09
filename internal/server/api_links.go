@@ -428,8 +428,11 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 func (s *Server) createGenerated(r *http.Request, l *store.Link) error {
 	cfg := s.settings.Load()
 	n := cfg.slugLength
-	if l.Kind != store.KindURL {
-		n = max(n, sharedSlugLength)
+	switch l.Kind {
+	case store.KindText:
+		n = cfg.textSlugLength
+	case store.KindFile:
+		n = cfg.fileSlugLength
 	}
 	for attempt := 0; ; attempt++ {
 		l.Slug = links.GenerateWithAlphabet(n, cfg.excludeConfusable || l.Kind != store.KindURL)

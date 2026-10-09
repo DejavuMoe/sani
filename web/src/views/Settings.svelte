@@ -7,7 +7,7 @@
   import MetadataSettings from '../components/MetadataSettings.svelte';
   import Switch from '../components/Switch.svelte';
   import Segmented from '../components/Segmented.svelte';
-  import { api, ApiError, type ImportResult, type Token } from '../lib/api';
+  import { api, ApiError, type Config, type ImportResult, type Token } from '../lib/api';
   import { clock } from '../lib/clock.svelte';
   import { copyText } from '../lib/clipboard';
   import { errorText, formatDate, formatRelative, i18n, t, type Lang, type MessageKey } from '../lib/i18n.svelte';
@@ -40,24 +40,44 @@
     }
   }
 
-  let slugLength = $state(untrack(() => session.config?.slugLength ?? 5));
+  const lengthFields = [
+    ['slugLength', 'settings.urlLength', 5, ''],
+    ['textSlugLength', 'settings.textLength', 10, 'p/'],
+    ['fileSlugLength', 'settings.fileLength', 10, 'p/'],
+  ] as const;
+  let lengths = $state(untrack(() => ({
+    slugLength: String(session.config?.slugLength ?? 5),
+    textSlugLength: String(session.config?.textSlugLength ?? 10),
+    fileSlugLength: String(session.config?.fileSlugLength ?? 10),
+  })));
   let excludeConfusable = $state(untrack(() => session.config?.excludeConfusable ?? true));
-  let maxFileMB = $state(untrack(() => (session.config?.maxFileSize ?? 99_000_000) / 1_000_000));
+  let maxFileMB = $state(untrack(() => String((session.config?.maxFileSize ?? 99_000_000) / 1_000_000)));
   let defaultsBusy = $state(false);
   let defaultsError = $state('');
   let defaultsSaved = $state(false);
-  const locked = (key: 'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode') => config?.configSources[key] === 'env';
-  const defaultsValid = $derived(Number.isInteger(slugLength) && slugLength >= 3 && slugLength <= 32 && (locked('maxFileSize') || Number.isInteger(maxFileMB) && maxFileMB >= 1 && maxFileMB <= 4096));
-  const defaultsChanged = $derived(slugLength !== config?.slugLength || excludeConfusable !== config?.excludeConfusable || maxFileMB * 1_000_000 !== config?.maxFileSize);
+  const locked = (key: keyof Config['configSources']) => config?.configSources[key] === 'env';
+  const validInteger = (value: string, min: number, max: number) => /^\d+$/.test(value) && +value >= min && +value <= max;
+  const maxFileValid = $derived(locked('maxFileSize') || validInteger(maxFileMB, 1, 4096));
+  const defaultsValid = $derived(lengthFields.every(([key]) => locked(key) || validInteger(lengths[key], 3, 32)) && maxFileValid);
+  const defaultsPatch = $derived.by(() => {
+    const values: Parameters<typeof api.setConfig>[0] = {};
+    for (const [key] of lengthFields) {
+      if (!locked(key) && +lengths[key] !== config?.[key]) values[key] = +lengths[key];
+    }
+    if (!locked('excludeConfusable') && excludeConfusable !== config?.excludeConfusable) values.excludeConfusable = excludeConfusable;
+    if (!locked('maxFileSize') && +maxFileMB * 1_000_000 !== config?.maxFileSize) values.maxFileSize = +maxFileMB * 1_000_000;
+    return values;
+  });
+  const defaultsChanged = $derived(Object.keys(defaultsPatch).length > 0);
+  const shortShare = $derived(lengthFields.some(([key]) => key !== 'slugLength' && validInteger(lengths[key], 3, 32) && +lengths[key] < 10));
+  function editDefaults() {
+    defaultsError = ''; defaultsSaved = false;
+  }
   async function saveDefaults(e: SubmitEvent) {
-    e.preventDefault(); if (!defaultsValid) return;
+    e.preventDefault(); if (defaultsBusy || !defaultsValid || !defaultsChanged) return;
     defaultsBusy = true; defaultsError = ''; defaultsSaved = false;
     try {
-      session.config = await api.setConfig({
-        ...(!locked('slugLength') && { slugLength }),
-        ...(!locked('excludeConfusable') && { excludeConfusable }),
-        ...(!locked('maxFileSize') && { maxFileSize: maxFileMB * 1_000_000 }),
-      }); defaultsSaved = true;
+      session.config = await api.setConfig(defaultsPatch); defaultsSaved = true;
     } catch (err) { defaultsError = errorText(err instanceof ApiError ? err.code : 'unknown'); }
     finally { defaultsBusy = false; }
   }
@@ -255,15 +275,40 @@
 
   <section>
     <header><h2>{t('settings.defaults')}</h2></header>
-    <form novalidate class="body defaults-form" onsubmit={saveDefaults}>
-      {#if ['slugLength', 'excludeConfusable', 'maxFileSize'].some(key => config?.configSources[key as 'slugLength'] === 'env')}<p class="hint">{t('settings.defaultsEnv')}</p>{/if}
-      <div class="setting"><div><label for="default-length">{t('settings.slugLength')}</label><p class="hint">{t('settings.slugLengthHint')}</p></div><input id="default-length" class="field" type="number" min="3" max="32" step="1" bind:value={slugLength} disabled={locked('slugLength') || defaultsBusy} /></div>
-      <div class="setting"><div><label for="default-exclude">{t('settings.exclude')}</label><p class="hint">{t('settings.excludeHint')}</p></div><Switch id="default-exclude" label={t('settings.exclude')} checked={excludeConfusable} onchange={v => excludeConfusable = v} disabled={locked('excludeConfusable') || defaultsBusy} /></div>
-      <div class="slug-preview"><span>{t('settings.slugExample')}</span><code>/{(excludeConfusable ? 'k7mx9p4w2r6h8q3t' : 'k0mi9p1o2r6h8q3t').repeat(2).slice(0, Math.max(3, Math.min(32, slugLength || 5)))}</code></div>
-      <div class="setting"><div><label for="default-max-file">{t('settings.maxFile')}</label><p class="hint">{t('settings.maxFileHint')}</p></div><span class="unit"><input id="default-max-file" class="field" type="number" min="1" max="4096" step="1" bind:value={maxFileMB} disabled={locked('maxFileSize') || defaultsBusy} />MB</span></div>
-      {#if !defaultsValid}<p class="error-text" role="alert">{t('settings.defaultsInvalid')}</p>{/if}
-      {#if defaultsError}<p class="error-text" role="alert">{defaultsError}</p>{/if}
-      <div class="settings-save"><Button type="submit" loading={defaultsBusy} disabled={!defaultsValid || !defaultsChanged}>{t('act.save')}</Button><span class="saved" role="status">{defaultsSaved && !defaultsChanged ? t('settings.saved') : ''}</span></div>
+    <form novalidate class="body defaults-form creation-form" onsubmit={saveDefaults} oninput={editDefaults} aria-busy={defaultsBusy}>
+      <fieldset class="lengths" disabled={defaultsBusy}>
+        <legend>{t('settings.slugLength')}</legend>
+        <p class="hint length-help">{t('settings.slugLengthHint')}</p>
+        {#each lengthFields as [key, label, fallback, prefix] (key)}
+          {@const valid = validInteger(lengths[key], 3, 32)}
+          <div class="length-row">
+            <div class="length-label">
+              <label for={'default-' + key}>{t(label)}</label>
+              <p class="hint" id={'default-' + key + '-default'}>{t('settings.lengthDefault', { n: fallback })}{#if locked(key)}<span class="env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</span>{/if}</p>
+            </div>
+            <div class="length-input">
+              <input id={'default-' + key} class="field" inputmode="numeric" autocomplete="off" spellcheck="false" bind:value={lengths[key]} disabled={locked(key)} aria-invalid={!valid} aria-describedby={'default-' + key + '-default default-' + key + '-help'} />
+              <span aria-hidden="true">{t('settings.lengthUnit')}</span>
+            </div>
+            <div id={'default-' + key + '-help'} class="length-example">
+              {#if valid}
+                <span>{t('settings.slugExample')}</span><code>/{prefix}{(key === 'slugLength' && !excludeConfusable ? 'k0mi9p1o2r6h8q3t' : 'k7mx9p4w2r6h8q3t').repeat(2).slice(0, +lengths[key])}</code>
+              {:else}
+                <span class="error-text" role="alert">{t('settings.lengthInvalid')}</span>
+              {/if}
+            </div>
+          </div>
+        {/each}
+      </fieldset>
+      {#if shortShare}<p class="hint short-help">{t('settings.shortShareHint')}</p>{/if}
+      <div class="setting"><div><label for="default-exclude">{t('settings.exclude')}</label><p class="hint">{t('settings.excludeHint')}</p>{#if locked('excludeConfusable')}<p class="hint env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</p>{/if}</div><Switch id="default-exclude" label={t('settings.exclude')} checked={excludeConfusable} onchange={v => { excludeConfusable = v; editDefaults(); }} disabled={locked('excludeConfusable') || defaultsBusy} /></div>
+      <div class="setting"><div><label for="default-max-file">{t('settings.maxFile')}</label><p class="hint" id="default-max-file-help">{t('settings.maxFileHint')}{#if locked('maxFileSize')}<span class="env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</span>{/if}</p></div><span class="unit"><input id="default-max-file" class="field" inputmode="numeric" autocomplete="off" spellcheck="false" bind:value={maxFileMB} disabled={locked('maxFileSize') || defaultsBusy} aria-invalid={!maxFileValid} aria-describedby={maxFileValid ? 'default-max-file-help' : 'default-max-file-help default-max-file-error'} />MB</span></div>
+      {#if !maxFileValid}<p id="default-max-file-error" class="error-text" role="alert">{t('settings.maxFileInvalid')}</p>{/if}
+      <div class="settings-save">
+        <Button type="submit" loading={defaultsBusy} disabled={!defaultsValid || !defaultsChanged}>{t(defaultsError ? 'settings.retrySave' : 'act.save')}</Button>
+        {#if defaultsError}<span class="error-text save-error" role="alert">{t('settings.defaultsSaveFailed')} {defaultsError}</span>{/if}
+        <span class="saved" role="status">{defaultsSaved && !defaultsChanged ? t('settings.saved') : ''}</span>
+      </div>
     </form>
   </section>
   <section>
@@ -911,16 +956,30 @@
       gap: 8px;
     }
   }
-  .defaults-form { gap: 16px; }
+  .defaults-form { gap: 22px; }
+  .lengths { min-width: 0; padding: 0; border: 0; margin: 0; }
+  .lengths legend { padding: 0; font-size: 13px; font-weight: 500; }
+  .length-help { margin: 6px 0 16px; line-height: 1.65; }
+  .length-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 4px 16px; padding: 13px 0; border-top: 1px solid var(--line); }
+  .length-label label { font-size: 13px; font-weight: 500; }
+  .length-label .hint { margin: 3px 0 0; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .env-lock { display: inline-flex; align-items: center; gap: 4px; }
+  .length-input { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-3); }
+  .length-input .field { width: 76px; min-width: 0; font-variant-numeric: tabular-nums; }
+  .length-example { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; min-height: 20px; font-size: 12px; color: var(--text-3); }
+  .length-example > span { flex: none; }
+  .length-example code { min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
+  .length-example .error-text { margin: 0; flex: 1; min-width: 0; }
   .setting { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .setting > div { min-width: 0; }
   .setting label { display: block; font-size: 13px; font-weight: 500; }
   .setting .hint { margin: 6px 0 0; line-height: 1.6; }
   .defaults-form > .hint { margin: 0; line-height: 1.65; }
+  .defaults-form > .short-help { margin-top: -14px; }
   .setting .field { width: 82px; flex: none; }
   .unit { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; }
-  .slug-preview { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-3); }
-  .slug-preview code { color: var(--text-2); overflow-wrap: anywhere; }
-  .settings-save { display: flex; gap: 12px; align-items: center; min-height: 32px; }
+  .settings-save { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; min-height: 32px; }
+  .save-error { margin: 0; }
   .saved { color: var(--success); font-size: 12px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
   .examples a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
@@ -928,7 +987,9 @@
     .inline-form .field, .inline-form :global(.btn) { height: 44px; }
     .inline-form .field { font-size: 16px; }
     .setting { gap: 12px; }
-    .setting .field { min-height: 44px; }
+    .setting .field, .length-input .field { min-height: 44px; font-size: 16px; }
+    .length-row { grid-template-columns: minmax(0, 1fr) 98px; gap: 6px 10px; }
+    .length-input .field { width: 66px; }
     .examples a { display: inline-flex; align-items: center; min-height: 44px; }
   }
 </style>

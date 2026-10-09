@@ -1,6 +1,8 @@
 # Configuration
 
-<p class="lead">Sani is configured entirely through environment variables; there’s no configuration file. An empty value counts as unset. At startup every variable is checked, and all problems are reported together.</p>
+<p class="lead">Server configuration uses environment variables; creation defaults can also be saved in Settings. An empty value counts as unset. At startup every variable is checked, and all problems are reported together.</p>
+
+Creation defaults are stored in SQLite when edited in Settings. Priority is built-in defaults → saved settings → explicitly set environment variables, per field. No configuration file is required.
 
 ## Overview
 
@@ -13,8 +15,10 @@
 | [`SANI_SETUP_CODE`](#sani-setup-code) | random | Code for choosing the first password |
 | [`SANI_ROOT_REDIRECT`](#sani-root-redirect) | — | Where the bare domain goes |
 | [`SANI_TRUST_PROXY`](#sani-trust-proxy) | `false` | Trust the reverse proxy’s headers |
-| [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | Length of generated slugs |
-| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | Exclude look-alike characters |
+| [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | Generated URL slug length (3–32) |
+| [`SANI_TEXT_SLUG_LENGTH`](#sani-text-slug-length) | `10` | Generated text/code share slug length (3–32) |
+| [`SANI_FILE_SLUG_LENGTH`](#sani-file-slug-length) | `10` | Generated file share slug length (3–32) |
+| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | Exclude look-alike characters from URL slugs |
 | [`SANI_META_PROXY`](#sani-meta-proxy) | — | Dedicated HTTP/HTTPS/SOCKS5 metadata proxy |
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | Fetch titles and icons automatically |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | Pass query strings on to destinations |
@@ -85,13 +89,25 @@ Set it when an automated setup needs to know the code in advance.
 
 ### `SANI_SLUG_LENGTH`
 
-Default `5`, from 3 to 32. The length of generated slugs.
+Default `5`, integer from 3 to 32. Controls only generated URL slugs, as `slugLength` in Settings and the API. Leave it unset to save this field in Settings; an explicit environment value takes priority and locks the field.
 
-Generated slugs use only the 31 characters of `23456789abcdefghjkmnpqrstuvwxyz`; 5 of them make about 28.6 million combinations. Existing links aren’t affected. When there are so many links that random slugs start colliding, new ones grow automatically.
+By default, generated URL slugs use the 31 characters of `23456789abcdefghjkmnpqrstuvwxyz`, controlled by `SANI_EXCLUDE_CONFUSABLE`; 5 of them make about 28.6 million combinations. Existing links aren’t affected. When there are so many links that random slugs start colliding, new ones grow automatically.
+
+### `SANI_TEXT_SLUG_LENGTH`
+
+Default `10` on a new installation, integer from 3 to 32. Controls generated text and code share slugs, as `textSlugLength`. The length excludes the `/p/` prefix.
+
+### `SANI_FILE_SLUG_LENGTH`
+
+Default `10` on a new installation, integer from 3 to 32. Controls generated file share slugs, as `fileSlugLength`, for both ordinary and chunked uploads. The length excludes the `/p/` prefix.
+
+Text and file lengths are saved independently in SQLite and survive restarts. Each follows built-in defaults → saved settings → explicit environment variables. Each variable locks only its own field; leaving it empty keeps that field editable. Shares always use the look-alike-free alphabet above, regardless of `SANI_EXCLUDE_CONFUSABLE`. Lengths below 10 are allowed without a hidden minimum of 10; Settings warns that shorter slugs are easier to guess. Shares have no access password: anyone with the address can open them.
+
+**Upgrading an existing instance:** on the initial upgrade, each missing share-length setting is initialized and persisted as `max(10, legacy effective URL slug length)`, using the previous settings/environment precedence. An old effective URL length of 12 keeps both share lengths at 12; a length of 5 keeps them at 10. Later URL-length edits no longer affect shares; explicit share-length environment variables still take priority. All three settings affect only future generated slugs; existing, manually chosen and preserved imported slugs stay unchanged.
 
 ### `SANI_EXCLUDE_CONFUSABLE`
 
-Default `true`. Omits `0`, `o`, `1`, `i`, `l`. `false` uses lowercase letters and digits. Only future generated URL slugs change; existing, manual and imported slugs stay intact. Shared text/file IDs retain the safe alphabet and at least 10 characters. Explicit values lock the corresponding setting.
+Default `true`. Omits `0`, `o`, `1`, `i`, `l`. `false` uses lowercase letters and digits. Only future generated URL slugs change; existing, manual and imported slugs stay intact. Text/code and file shares always exclude these characters and use their own length settings. Explicit values lock the corresponding setting.
 
 ### `SANI_META_PROXY`
 
@@ -161,8 +177,6 @@ Default: the system time zone. “Today” and the daily statistics follow it. T
 ### `HTTPS_PROXY` and `HTTP_PROXY`
 
 Outbound proxies for title and icon fetching use the standard library’s `http.ProxyFromEnvironment`, including `NO_PROXY`. Targets still pass through `checkHost`; only requests actually routed through a proxy may delegate failed local DNS lookups. Direct requests, including `NO_PROXY`, use a separate connection pool and always enforce the public-IP dial check. The proxy itself may be private. Sani does not inspect the address the proxy ultimately connects to. Use a trusted proxy with its own DNS and outbound restrictions; see the [fetching trust boundary](../internals/security#fetching).
-
-Creation defaults are stored in SQLite when edited in Settings. Priority is built-in defaults → saved settings → explicitly set environment variables, per field. No configuration file is required.
 
 ## Configuration errors
 

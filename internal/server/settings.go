@@ -13,7 +13,10 @@ import (
 )
 
 type creationSettings struct {
+	Version           int            `json:"version,omitempty"`
 	SlugLength        *int           `json:"slugLength,omitempty"`
+	TextSlugLength    *int           `json:"textSlugLength,omitempty"`
+	FileSlugLength    *int           `json:"fileSlugLength,omitempty"`
 	ExcludeConfusable *bool          `json:"excludeConfusable,omitempty"`
 	MaxFileSize       *int64         `json:"maxFileSize,omitempty"`
 	MetaMode          *string        `json:"metaMode,omitempty"`
@@ -25,6 +28,8 @@ type runtimeSettings struct {
 	proxy             *metadataProxy
 	proxyFetcher      *meta.Fetcher
 	slugLength        int
+	textSlugLength    int
+	fileSlugLength    int
 	excludeConfusable bool
 	maxFileSize       int64
 	metaMode          string
@@ -32,7 +37,7 @@ type runtimeSettings struct {
 }
 
 func (s *Server) settingsFor(v creationSettings) (*runtimeSettings, error) {
-	c := &runtimeSettings{stored: v, slugLength: s.opt.SlugLength, excludeConfusable: !s.opt.IncludeConfusable, maxFileSize: s.opt.MaxFileBytes, metaMode: "off", sources: map[string]string{}}
+	c := &runtimeSettings{stored: v, slugLength: s.opt.SlugLength, textSlugLength: s.opt.TextSlugLength, fileSlugLength: s.opt.FileSlugLength, excludeConfusable: !s.opt.IncludeConfusable, maxFileSize: s.opt.MaxFileBytes, metaMode: "off", sources: map[string]string{}}
 	c.proxy = v.MetaProxy
 	c.proxyFetcher = s.proxyFetcher
 	if s.opt.MetaProxy != "" {
@@ -57,12 +62,20 @@ func (s *Server) settingsFor(v creationSettings) (*runtimeSettings, error) {
 			c.metaMode = "proxy"
 		}
 	}
-	for _, key := range []string{"slugLength", "excludeConfusable", "maxFileSize", "metaMode", "metaProxy"} {
+	for _, key := range []string{"slugLength", "textSlugLength", "fileSlugLength", "excludeConfusable", "maxFileSize", "metaMode", "metaProxy"} {
 		c.sources[key] = "default"
 	}
 	if v.SlugLength != nil {
 		c.slugLength = *v.SlugLength
 		c.sources["slugLength"] = "settings"
+	}
+	if v.TextSlugLength != nil {
+		c.textSlugLength = *v.TextSlugLength
+		c.sources["textSlugLength"] = "settings"
+	}
+	if v.FileSlugLength != nil {
+		c.fileSlugLength = *v.FileSlugLength
+		c.sources["fileSlugLength"] = "settings"
 	}
 	if v.ExcludeConfusable != nil {
 		c.excludeConfusable = *v.ExcludeConfusable
@@ -79,6 +92,14 @@ func (s *Server) settingsFor(v creationSettings) (*runtimeSettings, error) {
 	if s.opt.SlugLengthFromEnv {
 		c.slugLength = s.opt.SlugLength
 		c.sources["slugLength"] = "env"
+	}
+	if s.opt.TextSlugLengthFromEnv {
+		c.textSlugLength = s.opt.TextSlugLength
+		c.sources["textSlugLength"] = "env"
+	}
+	if s.opt.FileSlugLengthFromEnv {
+		c.fileSlugLength = s.opt.FileSlugLength
+		c.sources["fileSlugLength"] = "env"
 	}
 	if s.opt.ExcludeConfusableFromEnv {
 		c.excludeConfusable = !s.opt.IncludeConfusable
@@ -124,16 +145,42 @@ func (s *Server) loadSettings() error {
 	if !validCreation(v) {
 		return errors.New("invalid stored creation settings")
 	}
+	migrate := v.Version == 0
+	if migrate {
+		// Freeze the old effective length even under a new share env override,
+		// so removing the override cannot make shares follow URL settings again.
+		n := s.opt.SlugLength
+		if v.SlugLength != nil && !s.opt.SlugLengthFromEnv {
+			n = *v.SlugLength
+		}
+		n = max(10, n)
+		if v.TextSlugLength == nil {
+			v.TextSlugLength = &n
+		}
+		if v.FileSlugLength == nil {
+			v.FileSlugLength = &n
+		}
+		v.Version = 1
+	}
 	next, err := s.settingsFor(v)
 	if err != nil {
 		return err
+	}
+	if migrate {
+		b, _ := json.Marshal(v)
+		if err := s.store.SetSetting(context.Background(), store.SettingCreation, string(b)); err != nil {
+			return fmt.Errorf("initialize independent slug lengths: %w", err)
+		}
 	}
 	s.replaceSettings(next)
 	return nil
 }
 
 func validCreation(v creationSettings) bool {
-	return (v.SlugLength == nil || *v.SlugLength >= 3 && *v.SlugLength <= 32) &&
+	return v.Version >= 0 && v.Version <= 1 &&
+		(v.SlugLength == nil || *v.SlugLength >= 3 && *v.SlugLength <= 32) &&
+		(v.TextSlugLength == nil || *v.TextSlugLength >= 3 && *v.TextSlugLength <= 32) &&
+		(v.FileSlugLength == nil || *v.FileSlugLength >= 3 && *v.FileSlugLength <= 32) &&
 		(v.MaxFileSize == nil || *v.MaxFileSize >= 1_000_000 && *v.MaxFileSize <= 4_096_000_000 && *v.MaxFileSize%1_000_000 == 0) &&
 		(v.MetaProxy == nil || v.MetaProxy.valid()) &&
 		(v.MetaMode == nil || *v.MetaMode == "off" || *v.MetaMode == "direct" || *v.MetaMode == "proxy")
@@ -186,7 +233,7 @@ func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 		}
 		values[store.SettingBaseURL] = base
 	}
-	for key, set := range map[string]bool{"slugLength": in.SlugLength != nil, "excludeConfusable": in.ExcludeConfusable != nil, "maxFileSize": in.MaxFileSize != nil, "metaMode": in.MetaMode != nil} {
+	for key, set := range map[string]bool{"slugLength": in.SlugLength != nil, "textSlugLength": in.TextSlugLength != nil, "fileSlugLength": in.FileSlugLength != nil, "excludeConfusable": in.ExcludeConfusable != nil, "maxFileSize": in.MaxFileSize != nil, "metaMode": in.MetaMode != nil} {
 		if set && current.sources[key] == "env" {
 			writeError(w, http.StatusConflict, "config_env", "this setting is fixed by an environment variable")
 			return
@@ -194,6 +241,12 @@ func (s *Server) patchConfig(w http.ResponseWriter, r *http.Request) {
 	}
 	if in.SlugLength != nil {
 		v.SlugLength = in.SlugLength
+	}
+	if in.TextSlugLength != nil {
+		v.TextSlugLength = in.TextSlugLength
+	}
+	if in.FileSlugLength != nil {
+		v.FileSlugLength = in.FileSlugLength
 	}
 	if in.ExcludeConfusable != nil {
 		v.ExcludeConfusable = in.ExcludeConfusable

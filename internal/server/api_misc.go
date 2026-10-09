@@ -46,6 +46,8 @@ func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
 		"baseUrlSource":       s.baseSource(),
 		"requestOrigin":       s.requestOrigin(r),
 		"slugLength":          cfg.slugLength,
+		"textSlugLength":      cfg.textSlugLength,
+		"fileSlugLength":      cfg.fileSlugLength,
 		"fetchMeta":           s.metadataFetcher() != nil,
 		"forwardQuery":        s.opt.ForwardQuery,
 		"passwordFromEnv":     s.opt.PasswordFromEnv,

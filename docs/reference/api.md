@@ -263,7 +263,7 @@ curl https://s.example.com/api/links \
 
 ## 文本和文件 {#shares}
 
-分享是一种不跳转、而是展示内容的链接：访问者在 `/p/{slug}` 打开它，原始内容从[文件域名](./configuration#sani-files-url)提供。分享和短链接共用同一套短码，`gh` 不能既是短链接又是分享。它们同样有 `title`、`enabled`、`expiresAt` 和 `maxClicks`，同样有[统计](#stats)；列表、删除、恢复和批量接口对它们一视同仁。分享没有列表可以翻，短码就是唯一的保护，所以自动生成的短码至少 10 位。
+分享是一种不跳转、而是展示内容的链接：访问者在 `/p/{slug}` 打开它，原始内容从[文件域名](./configuration#sani-files-url)提供。分享和短链接共用短码命名空间，`gh` 不能既是短链接又是分享。它们同样有 `title`、`enabled`、`expiresAt` 和 `maxClicks`，同样有[统计](#stats)；列表、删除、恢复和批量接口对它们一视同仁。自动生成的文本／代码和文件分享短码分别使用 [`textSlugLength`、`fileSlugLength`](#config)，新安装均默认 10 位，可独立设为 3–32 位，不含 `/p/`。分享始终排除易混淆字符，不受网址长度或 `excludeConfusable` 影响；生成重试与碰撞扩长规则不变。低于 10 位仍会按设置生成，较短的短码更容易被猜中，知道地址的人即可访问。手动指定的短码沿用原有规则。
 
 分享的 `content`：
 
@@ -412,6 +412,8 @@ curl https://s.example.com/api/import \
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
   "slugLength": 5,
+  "textSlugLength": 10,
+  "fileSlugLength": 10,
   "fetchMeta": true,
   "forwardQuery": true,
   "passwordFromEnv": false,
@@ -422,13 +424,25 @@ curl https://s.example.com/api/import \
   "metaMode": "direct",
   "metaProxyConfigured": false,
   "metaProxy": null,
-  "configSources": {"slugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
+  "configSources": {"slugLength":"default","textSlugLength":"default","fileSlugLength":"default","excludeConfusable":"default","maxFileSize":"default","metaMode":"default","metaProxy":"default"},
   "uploadChunkSize": 25000000,
   "maxTextSize": 1048576
 }
 ```
 
 `baseUrlSource` 表示短链接域名的来源：`env` 来自 `SANI_BASE_URL`，`setting` 来自设置页，`request` 来自当前请求的地址。`filesUrl` 是[文件域名](./configuration#sani-files-url)，没有设置时为 `null`；`maxFileSize` 和 `maxTextSize` 是文件和文本的大小上限，单位是字节。
+
+三个长度字段返回各类型当前生效的自动短码长度，均为 3–32 的整数：
+
+| 字段 | 用途 | 新安装默认值 | 优先且锁定该字段的环境变量 |
+|---|---|---|---|
+| `slugLength` | 网址 | `5` | `SANI_SLUG_LENGTH` |
+| `textSlugLength` | 文本／代码分享 | `10` | `SANI_TEXT_SLUG_LENGTH` |
+| `fileSlugLength` | 文件分享（普通及分片上传） | `10` | `SANI_FILE_SLUG_LENGTH` |
+
+三项独立持久化，重启后保留。`configSources` 包含上述三项及 `excludeConfusable`、`maxFileSize`、`metaMode`、`metaProxy`，逐字段返回 `default`（内置默认）、`settings`（数据库保存值）或 `env`（显式环境变量）。优先级依次升高，锁定一个字段不影响其他长度字段。
+
+旧实例首次升级时，将缺少独立设置的分享长度按 `max(10, 旧版有效网址短码长度)` 初始化并保存；例如旧值为 12 时两类分享保留 12 位。之后修改网址长度不会改变分享长度，各自环境变量仍优先。迁移保存值的来源为 `settings`，被显式环境变量覆盖时为 `env`；移除覆盖后恢复已保存值，不重新跟随网址长度。长度不含 `/p/`，只影响后续自动生成；已有短码和手动指定的短码不变。
 
 `PATCH /api/config`
 
@@ -440,7 +454,15 @@ curl https://s.example.com/api/import \
 
 传 `null` 或空字符串表示清除。短链接域名不能和文件域名相同。设置了 `SANI_BASE_URL` 时返回 `409`。成功时返回修改后的设置。
 
-创建设置也可修改：`slugLength`（3–32 的整数）、`excludeConfusable`（布尔值）、`maxFileSize`（以字节表示的整数十进制 MB，范围 1,000,000–4,096,000,000，须为 1,000,000 的倍数）、`metaMode`（`off`、`direct`、`proxy`）。省略或为 null 的创建字段不变。所有提交字段连同基础域名统一校验并原子保存。有效值按默认值 → 已保存设置 → 显式环境变量取值；`configSources` 逐项返回 `default`、`settings` 或 `env`。修改环境变量锁定项返回 `409 config_env`，非法值返回 `400 config_invalid`。代理模式需要已保存的代理或 `SANI_META_PROXY`，否则返回 `409 proxy_missing`。旧部署沿用的系统代理显示为 `metaMode: "environment"`，该值不可写入。`fetchMeta` 表示当前是否有可用抓取器；关闭抓取后刷新不会联网，也不清空已有元数据。请求体限制 4 KiB。
+创建设置也可修改：`slugLength`、`textSlugLength`、`fileSlugLength`（各为 3–32 的整数）、`excludeConfusable`（布尔值）、`maxFileSize`（以字节表示的整数十进制 MB，范围 1,000,000–4,096,000,000，须为 1,000,000 的倍数）、`metaMode`（`off`、`direct`、`proxy`）。省略或为 `null` 的创建字段不变。所有提交字段连同基础域名统一校验并原子保存。修改环境变量锁定项返回 `409 config_env`，非法值返回 `400 config_invalid`。代理模式需要已保存的代理或 `SANI_META_PROXY`，否则返回 `409 proxy_missing`。旧部署沿用的系统代理显示为 `metaMode: "environment"`，该值不可写入。`fetchMeta` 表示当前是否有可用抓取器；关闭抓取后刷新不会联网，也不清空已有元数据。请求体限制 4 KiB。
+
+例如将网址设为 5 位、文本／代码设为 5 位、文件设为 12 位：
+
+```json
+{ "slugLength": 5, "textSlugLength": 5, "fileSlugLength": 12 }
+```
+
+分享没有隐藏的 10 位下限，低于 10 位的提示不阻止保存。`excludeConfusable` 只控制网址；分享始终使用无歧义字符集。
 
 未配置时 `metaProxy` 为 `null`；否则 GET 返回 `{scheme, host, port, auth, username, passwordSet}`，不返回密码。`metaProxyConfigured` 同时表示是否存在专用代理。PATCH 接受完整代理对象和可选的 `password`：
 

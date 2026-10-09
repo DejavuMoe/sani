@@ -43,6 +43,10 @@ func newEnv(t *testing.T, opt Options) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := st.SetSetting(context.Background(), store.SettingCreation, `{"version":1}`); err != nil {
+		st.Close()
+		t.Fatal(err)
+	}
 	rec := clicks.New(st, time.UTC)
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	if opt.CacheSize == 0 {

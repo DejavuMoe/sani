@@ -15,8 +15,10 @@
 | [`SANI_SETUP_CODE`](#sani-setup-code) | 随机生成 | 首次设置密码时的设置码 |
 | [`SANI_ROOT_REDIRECT`](#sani-root-redirect) | — | 访问根路径时跳转到哪里 |
 | [`SANI_TRUST_PROXY`](#sani-trust-proxy) | `false` | 是否信任反向代理的请求头 |
-| [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | 自动生成的短码长度 |
-| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | 排除易混淆字符 |
+| [`SANI_SLUG_LENGTH`](#sani-slug-length) | `5` | 自动生成的网址短码长度（3–32） |
+| [`SANI_TEXT_SLUG_LENGTH`](#sani-text-slug-length) | `10` | 自动生成的文本／代码分享短码长度（3–32） |
+| [`SANI_FILE_SLUG_LENGTH`](#sani-file-slug-length) | `10` | 自动生成的文件分享短码长度（3–32） |
+| [`SANI_EXCLUDE_CONFUSABLE`](#sani-exclude-confusable) | `true` | 网址短码排除易混淆字符 |
 | [`SANI_META_PROXY`](#sani-meta-proxy) | — | 网页信息专用 HTTP/HTTPS/SOCKS5 代理 |
 | [`SANI_FETCH_META`](#sani-fetch-meta) | `true` | 是否自动获取网页标题和图标 |
 | [`SANI_FORWARD_QUERY`](#sani-forward-query) | `true` | 是否把查询参数带到目标网址 |
@@ -83,13 +85,25 @@
 
 ### `SANI_SLUG_LENGTH`
 
-默认 `5`（取值范围 3–32）。自动生成随机短码的字符长度。
+默认 `5`（3–32 的整数）。只控制自动生成的网址短码长度，对应后台设置及 API 的 `slugLength`。未设置时可在后台保存；显式环境变量优先，并锁定该字段。
 
-短码采用安全无歧义字符集 `23456789abcdefghjkmnpqrstuvwxyz`（31 个字符）。5 位长度具备约 2,860 万种排列组合。修改该项不影响已有短链接；当存储量上升且随机生成碰撞频次升高时，系统会自动在此基础上扩充一位。
+短码默认采用无歧义字符集 `23456789abcdefghjkmnpqrstuvwxyz`（31 个字符），可由 `SANI_EXCLUDE_CONFUSABLE` 调整。5 位长度具备约 2,860 万种排列组合。修改该项不影响已有短链接；当存储量上升且随机生成碰撞频次升高时，系统会自动在此基础上扩充一位。
+
+### `SANI_TEXT_SLUG_LENGTH`
+
+新安装默认 `10`（3–32 的整数）。控制自动生成的文本和代码分享短码长度，对应 `textSlugLength`；长度不包含 `/p/` 前缀。
+
+### `SANI_FILE_SLUG_LENGTH`
+
+新安装默认 `10`（3–32 的整数）。控制自动生成的文件分享短码长度，对应 `fileSlugLength`；长度不包含 `/p/` 前缀，普通上传与分片上传均使用该设置。
+
+文本与文件的长度分别保存在 SQLite 中，重启后保留，均按“内置默认值 → 已保存设置 → 显式环境变量”取值。两个变量分别锁定自己的字段；留空不会锁定后台。分享始终使用上述无歧义字符集，不受 `SANI_EXCLUDE_CONFUSABLE` 影响。可保存低于 10 位的长度，没有隐藏的 10 位下限；后台会提示短码越短越容易被猜中。分享地址不提供访问密码，知道地址的人即可访问。
+
+**旧实例升级：** 首次升级时，缺少独立设置的分享类型按 `max(10, 旧版有效网址短码长度)` 初始化并持久化；该旧值按原有设置与环境变量优先级计算。例如原有效长度为 12，两类分享均保留 12 位；原值为 5 则保留 10 位。此后修改网址长度不再影响分享；各自的显式环境变量仍优先。三类长度设置只影响后续自动生成的短码，已有、手动指定与导入保留的短码不变。
 
 ### `SANI_EXCLUDE_CONFUSABLE`
 
-默认 `true`，排除 `0`、`o`、`1`、`i`、`l`。`false` 使用全部小写字母和数字。只影响未来自动生成的网址短码，已有、手动与导入短码不变。文本/文件分享仍使用安全字符集且至少 10 位。显式值锁定后台相应设置。
+默认 `true`，排除 `0`、`o`、`1`、`i`、`l`。`false` 使用全部小写字母和数字。只影响未来自动生成的网址短码，已有、手动与导入短码不变。文本／代码和文件分享始终排除这些字符，长度由各自的独立设置决定。显式值锁定后台相应设置。
 
 ### `SANI_META_PROXY`
 

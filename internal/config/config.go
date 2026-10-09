@@ -21,6 +21,8 @@ type Config struct {
 	RootRedirect             string
 	TrustProxy               bool
 	SlugLength               int
+	TextSlugLength           int
+	FileSlugLength           int
 	FetchMeta                bool
 	ForwardQuery             bool
 	CacheSize                int
@@ -30,6 +32,8 @@ type Config struct {
 	MetaProxy                string
 	ExcludeConfusable        bool
 	SlugLengthFromEnv        bool
+	TextSlugLengthFromEnv    bool
+	FileSlugLengthFromEnv    bool
 	ExcludeConfusableFromEnv bool
 	MaxFileFromEnv           bool
 	FetchMetaFromEnv         bool
@@ -147,7 +151,13 @@ func Load() (*Config, error) {
 	collect(err)
 	c.SlugLength, err = envInt("SANI_SLUG_LENGTH", 5, 3, 32)
 	collect(err)
+	c.TextSlugLength, err = envInt("SANI_TEXT_SLUG_LENGTH", 10, 3, 32)
+	collect(err)
+	c.FileSlugLength, err = envInt("SANI_FILE_SLUG_LENGTH", 10, 3, 32)
+	collect(err)
 	c.SlugLengthFromEnv = env("SANI_SLUG_LENGTH", "") != ""
+	c.TextSlugLengthFromEnv = env("SANI_TEXT_SLUG_LENGTH", "") != ""
+	c.FileSlugLengthFromEnv = env("SANI_FILE_SLUG_LENGTH", "") != ""
 	c.ExcludeConfusableFromEnv = env("SANI_EXCLUDE_CONFUSABLE", "") != ""
 	c.MaxFileFromEnv = env("SANI_MAX_FILE_MB", "") != ""
 	c.FetchMetaFromEnv = env("SANI_FETCH_META", "") != ""

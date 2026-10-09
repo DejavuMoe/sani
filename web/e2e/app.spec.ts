@@ -625,12 +625,12 @@ test('custom tag colors validate, edit existing references and keep Enter inside
 
 test('creation defaults persist and environment metadata stays locked', async () => {
   await page.goto('/admin/settings');
-  await page.getByLabel('Generated slug length').fill('7');
+  await page.getByLabel('URL links', { exact: true }).fill('7');
   await page.getByLabel('Maximum file size', { exact: true }).fill('200');
   await page.locator('section', {has:page.getByRole('heading', {name:'Creation defaults'})}).getByRole('button', {name:'Save',exact:true}).click();
   await expect(page.locator('.saved').first()).toContainText('Saved');
   await page.reload();
-  await expect(page.getByLabel('Generated slug length')).toHaveValue('7');
+  await expect(page.getByLabel('URL links', { exact: true })).toHaveValue('7');
   await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
   await expect(page.locator('#metadata-enabled')).toBeDisabled();
   const created = await page.request.post('/api/links', {data:{url:'https://example.com/r3-settings'}});

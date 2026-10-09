@@ -1,6 +1,6 @@
 # R6：按类型配置短码长度与稳定的文本预览
 
-2026-10-09。根据用户要求，先迭代原型。R6 基于已批准的 R5，状态为 needs-review；R1–R5 文件保持原样。本轮不实施产品代码，也不更改线上配置。
+2026-10-09。根据用户要求，先迭代原型。R6 基于已批准的 R5，用户已批准并授权实施。设计批准提交为 `a4a77b7`；产品实现已完成本地验收，R1–R5 文件保持原样。线上配置和部署未更改。
 
 入口：[创建默认值](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-settings&lang=zh&theme=light&chrome=0&focus=defaults)、[文本详情](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-text&lang=zh&theme=light&chrome=0)、[代码详情](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-code&lang=zh&theme=dark&chrome=0)。移除 `chrome=0` 可使用场景切换面板。
 
@@ -25,13 +25,13 @@
 
 原型内保存会影响后续创建：已验证网址 32 位、文本 5 位、文件 12 位。数据只存在当前页面内存中，刷新恢复示例。文件场景的上传过程也是模拟，不向服务端上传文件。
 
-## 待实施范围
+## 实施范围
 
-- 配置建议保留 `slugLength` 表示网址，新增 `textSlugLength`、`fileSlugLength`；对应 GET/PATCH、`configSources`、持久化、重启读取和各自环境优先级都需同步。当前接口尚未支持新增字段。
+- 配置保留 `slugLength` 表示网址，新增 `textSlugLength`、`fileSlugLength`；对应 GET/PATCH、`configSources`、持久化、重启读取和各自环境优先级都需同步。GET/PATCH 已支持新增字段。
 - 升级应保留既有行为：没有独立分享设置的旧实例，先按旧逻辑计算分享的有效长度 `max(10, legacySlugLength)` 作为迁移值；新增独立设置后不再跟随网址长度。不能把原先使用更长分享短码的实例静默降回 10 位。
 - 后端涉及 `internal/server/settings.go`、`api_misc.go`、`api_links.go`、`share.go`，以及 `internal/config` 和命令入口的环境配置。普通上传、分片上传完成、API 创建和导入必须按各自现有语义检查；生成重试与碰撞扩长规则保留。
 - 前端涉及 `web/src/views/Settings.svelte`、`web/src/lib/api.ts`、双语 i18n 与 `LinkDetail.svelte`。测试需要覆盖每类长度、边界、环境锁定、持久化、旧实例迁移，以及统计/列表刷新时不重新请求正文、不清空预览、不丢失滚动位置，编辑后仍能刷新正文。
-- 双语配置/API/使用文档、README 配置表和 Unreleased changelog 随实施更新。原型不修改这些生产行为说明。
+- 双语配置/API/使用文档、README 配置表和 Unreleased changelog 随实施更新。相关生产行为说明已同步更新。
 
 ## 原型验证
 
@@ -41,4 +41,17 @@
 - `linux-task.ps1 -Mode build -Project 'D:\Forgejo\sani' -Command 'make check test'` 成功：Svelte 0 错误/警告、文档同步与类型检查、Go race 测试（缓存命中）、52 项前端单元测试通过。这是现有产品基线检查，不代表新增配置或预览修复已进入产品。
 - 原始 DOM 采集、截图、交互结果在本机本轮 visualizations 的 `sani-r6/` 目录。QA 使用单独的 localhost 服务临时加载仓库已有 axe 与 DOM collector；交付的原型不加载 QA 脚本。
 
-本轮没有运行生产 E2E、没有提交、发布或部署；没有验证 Firefox/WebKit。原型修复不等于线上抖动已经消失，实施须在本版本审阅后进行。
+原型阶段未实施产品。下列结果来自用户批准后的真实实现验收。
+
+
+## 实现验收
+
+- 设置页与 API 新增三类独立长度；新安装默认 5/10/10。`openStore` 在新建数据库时写入创建设置版本标记，覆盖先 `passwd` 后 `serve` 的初始化路径。旧数据库只在首次升级时保存此前有效分享长度；SQLite schema 仍为 5。
+- 普通文件上传与分片完成共用按类型生成逻辑。新增 Go 测试覆盖边界、逐字段环境锁、数据库失败回滚、迁移和重启、CLI 实际进程启动及导入兼容。旧分享与手动短码保持原样。
+- 预览 effect 只依赖链接 ID、类型、内容版本和显式重试，不再因统计或列表对象替换清空正文。编辑后的刷新保留当前正文，并防止过期请求覆盖新内容。
+- WSL `make check test e2e docs` 全部通过：Svelte 0 错误/警告，Go race 全部通过，前端 52 项单元测试，Chromium 61 项 E2E，文档同步和 36 页 SEO 检查。
+- R6 的 12 组中英文 × 明暗 × 1280/390/320px 场景分别检查设置、文本详情、代码详情，共 36 组 axe 无违规；额外回归验证真实生成 32/5/12 位、3 位下限、无效输入、失败重试、键盘切换、单项锁定，以及刷新后正文请求次数、预览高度和滚动位置保持。
+- 独立代码复核发现并修复 `passwd` 初始化路径及旧代理测试断言，复核后无新增问题。截图与真实 DOM 文案位于本机本轮 visualizations 的 `sani-r6-production/`，使用合成数据。完整 DOM collector 不被只读浏览器桥支持，改用主内容文本和可访问属性采集，并结合 DOM 快照、截图、源代码和 axe 检查。
+- 本地实际构建另经浏览器操作：文本长度 5 保存成功并生成 `/p/7a67y`；切换统计范围，正文高度保持 47.59375px，控制台无应用错误。已人工查看桌面与窄屏设置及长代码截图，与 R6 布局一致。
+
+未运行 Firefox/WebKit、远端 CI、发布或部署。以上是本地实现与验证结果，不表示线上实例已升级。

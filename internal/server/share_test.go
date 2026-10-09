@@ -78,7 +78,7 @@ func TestTextShare(t *testing.T) {
 	slug := l["slug"].(string)
 	c := l["content"].(map[string]any)
 	switch {
-	case l["kind"] != "text" || len(slug) != sharedSlugLength:
+	case l["kind"] != "text" || len(slug) != 10:
 		t.Fatalf("created %v", l)
 	case !strings.HasSuffix(l["shortUrl"].(string), "/p/"+slug):
 		t.Fatalf("shortUrl = %v", l["shortUrl"])

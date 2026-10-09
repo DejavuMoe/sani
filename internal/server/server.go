@@ -29,8 +29,12 @@ type Options struct {
 	RootRedirect             string // where "/" sends visitors; the admin app when empty
 	TrustProxy               bool   // honor X-Forwarded-* headers
 	SlugLength               int
+	TextSlugLength           int
+	FileSlugLength           int
 	IncludeConfusable        bool
 	SlugLengthFromEnv        bool
+	TextSlugLengthFromEnv    bool
+	FileSlugLengthFromEnv    bool
 	ExcludeConfusableFromEnv bool
 	MaxFileFromEnv           bool
 	FetchMetaFromEnv         bool
@@ -90,6 +94,12 @@ type Server struct {
 func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetcher, ui fs.FS, log *slog.Logger) (*Server, error) {
 	if opt.SlugLength <= 0 {
 		opt.SlugLength = 5
+	}
+	if opt.TextSlugLength <= 0 {
+		opt.TextSlugLength = 10
+	}
+	if opt.FileSlugLength <= 0 {
+		opt.FileSlugLength = 10
 	}
 	if opt.MaxFileBytes <= 0 {
 		opt.MaxFileBytes = 99_000_000

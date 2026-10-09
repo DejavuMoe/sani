@@ -62,7 +62,7 @@ The binary embeds the admin app and needs nothing else at runtime. To build it y
 
 ## Configuration
 
-Everything is set through environment variables. See [.env.example](.env.example) and the [configuration reference](docs/en/reference/configuration.md).
+Server configuration uses environment variables; creation defaults can also be saved in Settings and survive restarts. Each field uses built-in defaults → saved settings → explicit environment values. Leave creation variables empty to keep their Settings controls editable. See [.env.example](.env.example) and the [configuration reference](docs/en/reference/configuration.md).
 
 | Variable | Default | What it does |
 |---|---|---|
@@ -73,7 +73,9 @@ Everything is set through environment variables. See [.env.example](.env.example
 | `SANI_SETUP_CODE` | random | The code the first visit asks for. By default a new one is generated at each start, until a password exists, and printed to the log. |
 | `SANI_ROOT_REDIRECT` | — | Where the bare domain `/` goes. Defaults to the admin app. |
 | `SANI_TRUST_PROXY` | `false` | Honor `X-Forwarded-*` and `X-Real-IP`; the client address is the last `X-Forwarded-For` entry. Enable only behind a proxy that sets them. |
-| `SANI_SLUG_LENGTH` | `5` | Length of generated slugs. By default they use `23456789abcdefghjkmnpqrstuvwxyz`, with no 0/o or 1/l/i, so they survive being read aloud. |
+| `SANI_SLUG_LENGTH` | `5` | Generated URL slug length (integer 3–32). By default uses `23456789abcdefghjkmnpqrstuvwxyz`, excluding 0/o and 1/l/i. |
+| `SANI_TEXT_SLUG_LENGTH` | `10` | Generated text/code share slug length (integer 3–32), independent of URL and file lengths; always excludes look-alikes. |
+| `SANI_FILE_SLUG_LENGTH` | `10` | Generated file share slug length (integer 3–32), independent of URL and text lengths; always excludes look-alikes. |
 | `SANI_EXCLUDE_CONFUSABLE` | `true` | Exclude 0/o and 1/i/l from generated URL slugs. |
 | `SANI_META_PROXY` | — | Optional HTTP/HTTPS/SOCKS5 metadata proxy override; otherwise configure it in Settings. |
 | `SANI_FETCH_META` | `true` | Fetch the page title and icon for new links. Private and loopback addresses are never fetched. |
@@ -105,7 +107,9 @@ curl -X POST https://s.example.com/api/links \
 
 The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
 
-**Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. Generated slugs for shares are 10 characters long, since nothing else keeps them private.
+**Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. On new installations, generated text/code and file slugs each default to 10 characters, independently configurable from 3 to 32, excluding `/p/`. Shares always exclude look-alikes. Values below 10 are allowed with an advisory: shorter slugs are easier to guess, and anyone with the address can open a share.
+
+On the initial upgrade, missing share-length settings are saved as `max(10, legacy effective URL slug length)`, preserving longer legacy values. Later URL-length edits do not affect shares. Existing and manually chosen slugs stay unchanged; see the [length settings](docs/en/reference/configuration.md#sani-text-slug-length).
 
 **Import and export.** Settings → Data exports URL links and their tags as JSON or CSV; texts, files and detailed statistics require a database/files backup. Import accepts only Sani native CSV/JSON and Shlink CSV/JSON. Download native examples from Settings or the documentation. Slugs that already exist are skipped and listed. Use JSON for lossless migration: CSV export adds protective apostrophes to potential spreadsheet formulas, and reimport retains them.
 

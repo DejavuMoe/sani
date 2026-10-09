@@ -107,12 +107,14 @@ export interface Config {
   baseUrlSource: 'env' | 'setting' | 'request';
   requestOrigin: string;
   slugLength: number;
+  textSlugLength: number;
+  fileSlugLength: number;
   fetchMeta: boolean;
   excludeConfusable: boolean;
   metaMode: 'off' | 'direct' | 'proxy' | 'environment';
   metaProxyConfigured: boolean;
   metaProxy: MetadataProxy | null;
-  configSources: Record<'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode' | 'metaProxy', 'default' | 'settings' | 'env'>;
+  configSources: Record<'slugLength' | 'textSlugLength' | 'fileSlugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode' | 'metaProxy', 'default' | 'settings' | 'env'>;
   uploadChunkSize: number;
   forwardQuery: boolean;
   passwordFromEnv: boolean;
@@ -266,7 +268,7 @@ export const api = {
 
   config: () => request<Config>('GET', '/config'),
   setBaseUrl: (baseUrl: string | null) => request<Config>('PATCH', '/config', { baseUrl }),
-  setConfig: (values: Partial<Pick<Config, 'slugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode'>> & { metaProxy?: MetadataProxyInput }) => request<Config>('PATCH', '/config', values),
+  setConfig: (values: Partial<Pick<Config, 'slugLength' | 'textSlugLength' | 'fileSlugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode'>> & { metaProxy?: MetadataProxyInput }) => request<Config>('PATCH', '/config', values),
   testMetadataProxy: (metaProxy: MetadataProxyInput, signal?: AbortSignal) => request<{ ok: boolean }>('POST', '/config/metadata/test', { metaProxy }, { signal }),
   updateTag: (id: number, name: string, color: TagColor) => request<Tag>('PATCH', `/tags/${id}`, { name, color }),
   overview: (days = 30) => request<Overview>('GET', `/overview?days=${days}`),

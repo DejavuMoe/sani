@@ -88,7 +88,24 @@ func openStore(ctx context.Context, cfg *config.Config) (*store.Store, error) {
 	if err := os.MkdirAll(cfg.DataDir, 0o750); err != nil {
 		return nil, fmt.Errorf("create data directory: %w", err)
 	}
-	return store.Open(ctx, filepath.Join(cfg.DataDir, "sani.db"))
+	path := filepath.Join(cfg.DataDir, "sani.db")
+	info, err := os.Stat(path)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, fmt.Errorf("stat database: %w", err)
+	}
+	newDatabase := errors.Is(err, os.ErrNotExist) || info.Size() == 0
+	st, err := store.Open(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	// Mark new installs even when passwd opens the database before serve.
+	if newDatabase {
+		if err := st.SetSetting(ctx, store.SettingCreation, `{"version":1}`); err != nil {
+			st.Close()
+			return nil, fmt.Errorf("initialize creation settings: %w", err)
+		}
+	}
+	return st, nil
 }
 
 func serve() error {
@@ -137,8 +154,12 @@ func serve() error {
 		RootRedirect:             cfg.RootRedirect,
 		TrustProxy:               cfg.TrustProxy,
 		SlugLength:               cfg.SlugLength,
+		TextSlugLength:           cfg.TextSlugLength,
+		FileSlugLength:           cfg.FileSlugLength,
 		IncludeConfusable:        !cfg.ExcludeConfusable,
 		SlugLengthFromEnv:        cfg.SlugLengthFromEnv,
+		TextSlugLengthFromEnv:    cfg.TextSlugLengthFromEnv,
+		FileSlugLengthFromEnv:    cfg.FileSlugLengthFromEnv,
 		ExcludeConfusableFromEnv: cfg.ExcludeConfusableFromEnv,
 		MaxFileFromEnv:           cfg.MaxFileFromEnv,
 		FetchMetaFromEnv:         cfg.FetchMetaFromEnv,

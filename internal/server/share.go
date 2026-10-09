@@ -33,11 +33,6 @@ import (
 	"github.com/DejavuMoe/sani/internal/store"
 )
 
-// sharedSlugLength is the shortest generated slug for a text or a file.
-// Nothing lists them, so the slug is all that keeps them private, and ten
-// characters from the 31-letter alphabet are far beyond guessing.
-const sharedSlugLength = 10
-
 // maxDownloads bounds the file transfers running at once; each holds a file
 // and a connection open for as long as the slowest reader needs.
 const maxDownloads = 32
