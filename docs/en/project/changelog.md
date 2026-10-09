@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Fix admin inputs, save buttons and tag controls abruptly growing at the 640px breakpoint. Keep text/code creation and editing typography consistent, with separate touch-input font sizing and switch hit areas that preserve the compact layout.
+
 - Configure generated slug lengths independently by type: new installations default to 5 for URL `slugLength`, 10 for text/code `textSlugLength` and 10 for `fileSlugLength`. Each accepts integers 3–32 and persists independently. Add the fields to config GET/PATCH and `configSources`; `SANI_TEXT_SLUG_LENGTH` and `SANI_FILE_SLUG_LENGTH` each override and lock their own setting.
 - On the initial upgrade, save missing share-length settings as `max(10, legacy effective URL slug length)`, preserving longer legacy values. Later URL-length edits no longer affect shares. Existing and manually chosen slugs stay unchanged; shares always exclude look-alikes. Values below 10 are honored with a guessing-risk advisory, without silently raising them to 10.
 - Fix text/code detail preview jitter when statistics ranges change or list/timer refreshes run: retain loaded content and scroll position instead of repeatedly clearing the body. Content-version changes still refresh the body, with explicit initial-loading and failure/retry states.

@@ -55,4 +55,13 @@
   .switch:disabled {
     opacity: 0.5;
   }
+
+  @media (pointer: coarse) {
+    .switch::before {
+      content: '';
+      position: absolute;
+      /* Stay inside the gap between adjacent settings rows. */
+      inset: -10px -3px;
+    }
+  }
 </style>

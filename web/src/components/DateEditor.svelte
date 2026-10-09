@@ -58,8 +58,7 @@
   .calendar-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
   .calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
   .calendar > span { text-align: center; font-size: 10px; color: var(--text-3); padding: 5px 0; }
-  .calendar button { border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
+  .calendar button { min-height: 36px; border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
   .calendar button:hover { background: var(--surface-2); }
   .calendar button[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line); }
-  @media (max-width: 640px) { .field { font-size: 16px; } .calendar button { min-height: 36px; } }
 </style>

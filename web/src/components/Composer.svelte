@@ -286,7 +286,7 @@
     border: 0;
     background: transparent;
     color: var(--text);
-    font-size: 15.5px;
+    font-size: var(--input-font-size, 15.5px);
   }
 
   .url:focus {
@@ -416,6 +416,7 @@
   }
 
   .inline {
+    font-size: var(--input-font-size, 13px);
     min-width: 0;
     height: 28px;
     padding: 0 8px;
@@ -462,16 +463,11 @@
 
   @media (max-width: 640px) {
     .main {
-      height: 52px;
       padding-left: 14px;
     }
 
     .main :global(.lead) {
       display: none;
-    }
-
-    .url {
-      font-size: 16px; /* keeps iOS from zooming the field */
     }
 
     .go {

@@ -982,14 +982,9 @@
   .save-error { margin: 0; }
   .saved { color: var(--success); font-size: 12px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
-  .examples a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
+  .examples a { display: inline-flex; align-items: center; min-height: 28px; color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
   @media (max-width: 640px) {
-    .inline-form .field, .inline-form :global(.btn) { height: 44px; }
-    .inline-form .field { font-size: 16px; }
     .setting { gap: 12px; }
-    .setting .field, .length-input .field { min-height: 44px; font-size: 16px; }
-    .length-row { grid-template-columns: minmax(0, 1fr) 98px; gap: 6px 10px; }
-    .length-input .field { width: 66px; }
-    .examples a { display: inline-flex; align-items: center; min-height: 44px; }
+    .length-row { gap: 6px 10px; }
   }
 </style>

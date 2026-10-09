@@ -127,6 +127,11 @@ select {
   letter-spacing: inherit;
 }
 
+input,
+textarea {
+  font-size: var(--input-font-size, inherit);
+}
+
 button {
   cursor: pointer;
   background: none;
@@ -209,6 +214,7 @@ textarea::placeholder {
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
+  font-size: var(--input-font-size, 14px);
   transition:
     border-color var(--fast) var(--ease),
     box-shadow var(--fast) var(--ease);
@@ -279,6 +285,13 @@ kbd {
 @media (max-width: 640px) {
   :root {
     --gutter: 16px;
+  }
+}
+
+/* Avoid touch-keyboard focus zoom without enlarging narrow desktop panes. */
+@media (pointer: coarse) {
+  :root {
+    --input-font-size: 16px;
   }
 }
 

@@ -295,7 +295,7 @@
 
   .url {
     min-height: 36px;
-    font-size: 13px;
+    font-size: var(--input-font-size, 13px);
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -314,12 +314,12 @@
 
   .body {
     min-height: 120px;
-    font-size: 13.5px;
+    font-size: var(--input-font-size, 14.5px);
     line-height: 1.6;
   }
 
   .body.mono {
-    font-size: 12.5px;
+    font-size: var(--input-font-size, 13px);
     tab-size: 4;
     white-space: pre;
     overflow-x: auto;

@@ -314,7 +314,7 @@
     border: 0;
     background: transparent;
     color: var(--text);
-    font-size: 13.5px;
+    font-size: var(--input-font-size, 13.5px);
   }
 
   .search input:focus {

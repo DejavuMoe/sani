@@ -150,7 +150,7 @@
 
   .field {
     height: 40px;
-    font-size: 15px;
+    font-size: var(--input-font-size, 15px);
   }
 
   .code {

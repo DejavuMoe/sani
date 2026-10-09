@@ -13,7 +13,7 @@ let server: ChildProcess;
 test.beforeAll(async () => {
   const env = { ...process.env };
   for (const key of ['SANI_FETCH_META', 'SANI_META_PROXY', 'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy']) delete env[key];
-  server = spawn('../bin/sani', [], { env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-r5-e2e-')), SANI_LISTEN: '127.0.0.1:18767', SANI_PASSWORD: password, SANI_LOG_LEVEL: 'error' }, stdio: 'ignore' });
+  server = spawn('../bin/sani', [], { env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-r5-e2e-')), SANI_LISTEN: '127.0.0.1:18767', SANI_FILES_URL: 'http://localhost:18767', SANI_PASSWORD: password, SANI_LOG_LEVEL: 'error' }, stdio: 'ignore' });
   await expect.poll(async () => { try { return (await fetch(`${base}/healthz`)).status; } catch { return 0; } }).toBe(200);
 });
 test.afterAll(async () => {
@@ -24,6 +24,7 @@ async function login(page: Page, lang = 'en', theme = 'light') {
   await page.addInitScript(({ lang, theme }) => { localStorage.setItem('sani.lang', lang); localStorage.setItem('sani.theme', theme); }, { lang, theme });
   expect((await page.request.post(`${base}/api/session`, { data: { password } })).ok()).toBe(true);
 }
+
 async function audit(page: Page) {
   await page.evaluate(axe);
   const violations = await page.evaluate(async () => {
@@ -101,7 +102,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
       return { rows, centers };
     });
     for (const row of geometry.rows) for (const control of row) {
-      expect(control.height).toBe(width <= 640 ? 44 : 36);
+      expect(control.height).toBe(36);
       expect(Math.abs(control.top - row[0].top)).toBeLessThanOrEqual(1);
     }
     for (const center of geometry.centers) { expect(center.dx).toBeLessThan(1); expect(center.dy).toBeLessThanOrEqual(1); }
@@ -169,5 +170,118 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await audit(page);
     await page.screenshot({ path: info.outputPath('tooltip.png') });
     await page.keyboard.press('Escape'); await expect(page.getByRole('tooltip')).toHaveCount(0);
+  });
+}
+
+for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
+  test(`responsive control consistency ${touch ? 'touch' : 'mouse'}/${lang}/${theme}`, async ({ browser }, info) => {
+    test.setTimeout(60_000);
+    const context = await browser.newContext({ hasTouch: touch, viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
+    const errors: string[] = [];
+    page.on('pageerror', e => errors.push(e.message));
+    try {
+      await login(page, lang, theme);
+      expect((await page.request.patch(`${base}/api/config`, { data: { metaMode: 'direct' } })).ok()).toBe(true);
+      await page.goto(`${base}/admin/settings`);
+      expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(touch);
+      const form = page.locator('.metadata-form');
+      await form.getByRole('radio').nth(0).focus();
+      await page.keyboard.press('ArrowRight');
+      await page.locator('#metadata-auth').click();
+      const dimensions = () => page.locator('.inline-form input,.inline-form .btn,.length-input input,#default-max-file,.settings-save .btn,.metadata-form input,.metadata-form .btn,.metadata-form [role=radio]').evaluateAll(elements => elements.map(el => ({
+        height: el.getBoundingClientRect().height, font: getComputedStyle(el).fontSize,
+      })));
+      const baseline = await dimensions();
+      for (const width of [721, 720, 641, 640, 502, 390, 320]) {
+        await page.setViewportSize({ width, height: 900 });
+        expect(await dimensions(), `settings at ${width}px`).toEqual(baseline);
+        const field = page.locator('#default-fileSlugLength');
+        await expect(field).toHaveCSS('font-size', touch ? '16px' : '14px');
+        await expect(field).toHaveCSS('height', '36px');
+        await expect(page.locator('.settings-save .btn')).toHaveCSS('height', await form.locator('.actions .btn').first().evaluate(el => getComputedStyle(el).height));
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        if (width === 502 || width === 320) {
+          await field.scrollIntoViewIfNeeded();
+          await page.screenshot({ path: info.outputPath(`settings-${width}.png`) });
+        }
+      }
+      const toggle = page.locator('#default-exclude');
+      if (touch) {
+        const targets = await page.locator('#metadata-tls,#metadata-auth').evaluateAll(elements => elements.map(el => {
+          const rect = el.getBoundingClientRect(), hit = getComputedStyle(el, '::before');
+          return { top: rect.top + parseFloat(hit.top), bottom: rect.bottom - parseFloat(hit.bottom) };
+        }));
+        expect(targets[0].bottom).toBeLessThanOrEqual(targets[1].top);
+      }
+      await toggle.scrollIntoViewIfNeeded();
+      const checked = await toggle.getAttribute('aria-checked');
+      if (touch) {
+        const rect = (await toggle.boundingBox())!;
+        // The track stays compact; tapping just above it must hit its larger target.
+        await page.touchscreen.tap(rect.x + rect.width / 2, rect.y - 8);
+      } else {
+        await toggle.focus();
+        await page.keyboard.press('Space');
+      }
+      await expect(toggle).toHaveAttribute('aria-checked', checked === 'true' ? 'false' : 'true');
+      await audit(page);
+
+      await page.goto(`${base}/admin/`);
+      const urlPanel = page.locator('#create-panel-url');
+      for (const width of [641, 640, 320]) {
+        await page.setViewportSize({ width, height: 900 });
+        await expect(urlPanel.locator('.tag-add')).toHaveCSS('min-height', '30px');
+        await expect(urlPanel.locator('.url')).toHaveCSS('font-size', touch ? '16px' : '15.5px');
+      }
+      await urlPanel.locator('.tag-add').press('Enter');
+      const pop = page.locator('.tag-pop:popover-open');
+      await pop.locator('.tag-search input').fill('Responsive color');
+      for (const width of [641, 640, 320]) {
+        await page.setViewportSize({ width, height: 900 });
+        await expect(pop.locator('.tag-search input')).toHaveCSS('font-size', touch ? '16px' : '13px');
+        await expect(pop.locator('.color-input input')).toHaveCSS('font-size', touch ? '16px' : '12px');
+        await expect(pop.locator('.tag-done')).toHaveCSS('min-height', '30px');
+        await expect(pop.locator('.color-swatches button').first()).toHaveCSS('height', '36px');
+      }
+      await audit(page);
+      await page.screenshot({ path: info.outputPath('tag-open.png') });
+      await page.keyboard.press('Escape');
+      await expect(urlPanel.locator('.tag-add')).toBeFocused();
+      await urlPanel.getByRole('button', { name: lang === 'zh' ? '有效期' : 'Expires', exact: true }).press('Enter');
+      await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
+      const calendar = urlPanel.locator('.date-editor');
+      await expect(page.locator('.menu:visible')).toHaveCount(0);
+      await expect(calendar.getByPlaceholder('YYYY-MM-DD')).toHaveCSS('font-size', touch ? '16px' : '14px');
+      await audit(page);
+
+      const response = await page.request.post(`${base}/api/texts`, { data: { text: 'const schedule = "weekly meeting";', format: 'code' } });
+      expect(response.ok()).toBe(true);
+      const link = await response.json();
+      await page.reload();
+      await page.getByRole('tab', { name: lang === 'zh' ? '文本' : 'Text', exact: true }).click();
+      const panel = page.locator('#create-panel-text');
+      const row = page.locator(`[data-link="${link.id}"]`);
+      await row.locator('button.main').click();
+      await row.getByRole('button', { name: lang === 'zh' ? '编辑' : 'Edit', exact: true }).click();
+      const editor = row.locator('.editor');
+      for (const format of [0, 1]) {
+        await panel.getByRole('radio').nth(format).click();
+        await editor.getByRole('radio').nth(format).click();
+        for (const width of [641, 640, 320]) {
+          await page.setViewportSize({ width, height: 900 });
+          const font = touch ? '16px' : format === 0 ? '14.5px' : '13px';
+          await expect(panel.locator('textarea')).toHaveCSS('font-size', font);
+          await expect(editor.locator('textarea')).toHaveCSS('font-size', font);
+        }
+      }
+      await audit(page);
+      await editor.locator('textarea').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: info.outputPath('editor.png') });
+      await editor.getByRole('button', { name: lang === 'zh' ? '取消' : 'Cancel', exact: true }).click();
+      expect(errors).toEqual([]);
+    } finally {
+      await context.close();
+    }
   });
 }

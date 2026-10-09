@@ -184,7 +184,7 @@
     width: 11ch;
     max-width: 32ch;
     height: 100%;
-    font-size: 13px;
+    font-size: var(--input-font-size, 13px);
   }
 
   /* Field: a full text field in forms. */
@@ -211,7 +211,7 @@
   .boxed input {
     flex: 1;
     height: 100%;
-    font-size: 13.5px;
+    font-size: var(--input-font-size, 13.5px);
   }
 
   .boxed {

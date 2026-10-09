@@ -138,8 +138,6 @@
   [role='status']:empty { display: none; }
   @media (max-width: 720px) { .route { flex-direction: column; align-items: flex-start; gap: 8px; } }
   @media (max-width: 640px) {
-    .input .field, .secret :global(.btn), .secret:not(.stored) :global(.btn), .actions :global(.btn), .route :global(.seg button) { height: 44px; }
-    .input .field { font-size: 16px; }
     .route :global(.seg) { width: 100%; }
     .route :global(.seg button) { flex: 1; min-width: 0; }
     .address { grid-template-columns: minmax(0,1fr) 76px; }

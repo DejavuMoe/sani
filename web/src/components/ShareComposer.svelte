@@ -416,14 +416,14 @@
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     background: transparent;
     color: var(--text);
-    font-size: 14.5px;
+    font-size: var(--input-font-size, 14.5px);
     line-height: 1.6;
     resize: none;
   }
 
   .body.mono {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--input-font-size, 13px);
     tab-size: 4;
     white-space: pre;
     overflow-x: auto;
@@ -714,7 +714,7 @@
     border: 1px solid var(--line-2);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    font-size: 13px;
+    font-size: var(--input-font-size, 13px);
   }
 
   .grow .inline {
@@ -753,14 +753,6 @@
   }
 
   @media (max-width: 640px) {
-    .body {
-      font-size: 16px; /* keeps iOS from zooming the field */
-    }
-
-    .body.mono {
-      font-size: 16px;
-    }
-
     .options {
       padding-left: 14px;
     }
