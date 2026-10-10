@@ -1,7 +1,20 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { behaviorProblems, imageTagProblems, runChecks } from './check.ts';
-import { read } from './source.ts';
+import { appStrings, read } from './source.ts';
+
+test('both home demos resolve every quoted app string in both languages', () => {
+  const dictionaries = appStrings();
+  for (const component of ['HomePage', 'ShortenDemo']) {
+    const source = read(`docs/.vitepress/theme/components/${component}.vue`);
+    for (const [, key] of source.matchAll(/\bs\('([\w.]+)'\)/g)) {
+      for (const lang of ['zh', 'en'] as const) assert(dictionaries[lang][key], `${lang}: ${key}`);
+    }
+  }
+  assert.equal(dictionaries.zh['composer.label'], '网址');
+  assert.equal(dictionaries.en['composer.label'], 'URL');
+  assert.equal(dictionaries.zh['composer.submit'], '缩短');
+});
 
 test('container tags retain v and cannot fall back to floating aliases', () => {
   const compose = read('compose.yaml');

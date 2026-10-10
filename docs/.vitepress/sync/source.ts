@@ -192,7 +192,7 @@ export function appStrings(): { zh: Record<string, string>; en: Record<string, s
     if (at < 0) throw new Error(`i18n dictionary not found: ${start}`);
     const body = src.slice(at, src.indexOf('\n};', at));
     const out: Record<string, string> = {};
-    for (const m of body.matchAll(/^\s*'([\w.]+)':\s*'((?:[^'\\]|\\.)*)',?$/gm)) out[m[1]] = m[2].replace(/\\(.)/g, '$1');
+    for (const m of body.matchAll(/^\s*['"]([\w.]+)['"]:\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"),?$/gm)) out[m[1]] = (m[2] ?? m[3]).replace(/\\(.)/g, '$1');
     return out;
   };
   return { zh: dict(/^const zh = \{/m), en: dict(/^const en\b[^=]*= \{/m) };
