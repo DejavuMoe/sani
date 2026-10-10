@@ -7,6 +7,7 @@ FROM --platform=$BUILDPLATFORM node:24-alpine AS web
 WORKDIR /src
 RUN npm install --global pnpm@12.5.1
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY patches patches
 COPY web/package.json web/
 COPY docs/package.json docs/
 RUN pnpm install --frozen-lockfile --filter sani-web

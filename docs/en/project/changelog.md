@@ -24,6 +24,10 @@
 - Size empty slug fields for their placeholder and shorten the English hint to avoid clipping. Refresh actual documentation and README screenshots, using English for landing images.
 - Implement approved R10: share compact sizing across buttons, fields and segmented controls; reuse numeric/unit inputs with regular weight and start alignment. Refine settings and tag spacing, bilingual typography, stable busy-button width, Home/End navigation and reduced motion.
 
+### Development tooling
+
+- Patch VitePress 1.6.4 preview to honor `--host` and default to `127.0.0.1`. Documentation builds verify the listener address, homepage and 404 responses.
+
 ## v0.9.4
 
 2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.

@@ -13,6 +13,10 @@ allowBuilds:
 overrides:
   'vitepress>vite': ^6.4.3
 
+# VitePress 1.6.4 preview ignores --host; keep local previews on loopback.
+patchedDependencies:
+  vitepress@1.6.4: patches/vitepress@1.6.4.patch
+
 # Versions both packages use, so the docs render with the app's own fonts.
 catalog:
   '@fontsource-variable/inter': 5.3.0

@@ -1,0 +1,19 @@
+diff --git a/dist/node/chunk-D3CUZ4fa.js b/dist/node/chunk-D3CUZ4fa.js
+--- a/dist/node/chunk-D3CUZ4fa.js
++++ b/dist/node/chunk-D3CUZ4fa.js
+@@ -53176,13 +53176,13 @@ async function serve(options = {}) {
+     }
+   });
+   if (base) {
+-    return polka({ onNoMatch }).use(base, compress, serve2).listen(port, () => {
++    return polka({ onNoMatch }).use(base, compress, serve2).listen(port, options.host ?? "127.0.0.1", () => {
+       config.logger.info(
+         `Built site served at http://localhost:${port}/${base}/`
+       );
+     });
+   } else {
+-    return polka({ onNoMatch }).use(compress, serve2).listen(port, () => {
++    return polka({ onNoMatch }).use(compress, serve2).listen(port, options.host ?? "127.0.0.1", () => {
+       config.logger.info(`Built site served at http://localhost:${port}/`);
+     });
+   }

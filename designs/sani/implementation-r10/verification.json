@@ -91,10 +91,13 @@
       "bash scripts/test-release-notes.sh and release-notes.sh v0.9.5: passed, including numeric link anchors",
       "verify-docs-output.sh and test-publish-docs.sh: passed",
       "web a11y: 88 clean states",
-      "docs a11y: 76 clean pages; builder and comments interactions passed"
+      "docs a11y: 76 clean pages; builder and comments interactions passed",
+      "make check test docs VERSION=v0.9.5 after the VitePress patch: passed; two listener/HTTP regression cases",
+      "Docker v0.9.5 rebuild and test-docker-storage.sh with verified v0.9.4: passed; non-root bind storage, real ENOSPC, upgrade and full-snapshot rollback"
     ],
     "screenshots": "16 regenerated real Svelte captures. Both landing pages and READMEs use English screenshots; guides keep reader-language variants. Verified theme, zoom, Escape and language changes in the Windows in-app browser with no console warnings/errors.",
     "copyFollowup": "Empty SlugField sizes for its placeholder; English hint is Auto-generated. The earlier 573-string inventory is a dated capture before this release follow-up. New English hint verified in rendered desktop and mobile UI.",
-    "ciDiagnostics": "Initial Windows CI returned HTTP 500 in one concurrent-rename subtest. It did not reproduce in 15 local repetitions or three full Windows Go runs. Server test logs are now retained with testing.T.Output; the next complete CI passed. The original underlying database error was not captured, so its cause is unconfirmed."
+    "ciDiagnostics": "Initial Windows CI returned HTTP 500 in one concurrent-rename subtest. It did not reproduce in 15 local repetitions or three full Windows Go runs. Server test logs are now retained with testing.T.Output; the next complete CI passed. The original underlying database error was not captured, so its cause is unconfirmed.",
+    "previewFix": "VitePress 1.6.4 ignored --host. A two-line pnpm patch honors it and defaults to 127.0.0.1; builds test both serving branches. No dependency version changes. Docker includes the patch before frozen installation."
   }
 }
