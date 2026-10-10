@@ -13,6 +13,8 @@ R5 and R6 are approved and implemented. R7 is approved and implemented.
 
 ## Revisions
 
+R8 is **needs-review, not implemented**: [review hub](http://127.0.0.1:4311/sani/review-r8.html), [prototype](http://127.0.0.1:4311/sani/prototype-r8.html?scene=r8-dashboard&lang=zh&theme=light&chrome=0). Scope and source evidence: [r8-handoff.md](r8-handoff.md). Browser evidence: `review-r8/`.
+
 R7 is approved: [review hub](http://127.0.0.1:4311/sani/review-r7.html), [full prototype](http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0). Scope, state contracts and implementation boundaries are in [r7-handoff.md](r7-handoff.md). Production verification and screenshots are in `implementation-r7/`.
 
 R6 is approved and implemented; see [r6-handoff.md](r6-handoff.md) for implementation and responsive verification. Approval status is authoritative in `_d_meta.json`; implementation evidence is recorded by revision below. Release or deployment must not be inferred from design approval.

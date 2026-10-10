@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "implementation-r7/content-inventory.json",
+    "inventory": "review-r8/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -856,6 +856,70 @@
       },
       "status": "implemented",
       "notes": "Approved design 2cce5c1 implemented in Svelte/Go. WSL make check test e2e passed: 57 Vitest and 79 Chromium cases. Final R7 visual/content captures passed after dialog spacing alignment; docs build and SEO passed. Evidence and limits: r7-handoff.md, implementation-r7/."
+    },
+    {
+      "id": "r8-consistency",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r8.html",
+        "assetPath": "prototype-r8.html",
+        "files": [
+          "src/r8/app.jsx",
+          "src/r8/copy.js",
+          "src/r8/defaults.jsx",
+          "src/r8/management.jsx",
+          "src/r8/refinements.css",
+          "src/r8/scenes.jsx",
+          "src/r8/tags.jsx"
+        ],
+        "states": [
+          "tag-picker-open",
+          "tag-manager",
+          "keyboard-focus-return",
+          "type-menu-open",
+          "sort-menu-open",
+          "creation-defaults",
+          "all-items-empty",
+          "type-empty",
+          "about-Local",
+          "about-long-values",
+          "about-files-disabled",
+          "setup",
+          "shortcuts",
+          "zh-en-light-dark",
+          "320-390-desktop"
+        ],
+        "stableIds": [
+          "create-tab-url",
+          "create-tab-text",
+          "create-tab-file",
+          "r6-defaults",
+          "r7-tag-manager"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/ and /admin/settings",
+        "files": [
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/TagFilters.svelte",
+          "web/src/tags.css",
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/views/Settings.svelte",
+          "web/src/components/LinkList.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/components/ShortcutsDialog.svelte"
+        ],
+        "interfaces": [
+          "Existing tag catalog and item filtering; no API changes",
+          "Existing config timezone, version, filesUrl"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/e2e/r7.spec.ts"
+        ]
+      },
+      "status": "needs-review",
+      "notes": "R8 changes action styling, vocabulary and technical-value typography only. See r8-handoff.md for evidence, preserved semantics and verification boundaries."
     }
   ]
 }

@@ -491,6 +491,63 @@
       "limitations": [
         "R7 API behavior is mocked. Existing R1-R6 snapshots are preserved."
       ]
+    },
+    {
+      "id": "r8-consistency-comments",
+      "type": "screenshot",
+      "location": "User browser comments 1–3, 2026-10-10; http://127.0.0.1:18870/admin/ and /admin/settings",
+      "roles": [
+        "visual-reference",
+        "inspiration-only"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "User screenshot is not copied; all R8 captures use existing synthetic fixtures and example domains.",
+      "licenseOrPermission": "User provided UI evidence",
+      "localCopies": [],
+      "observations": [
+        "Tag management uses blue text unlike adjacent options.",
+        "Type filter still says 短链接.",
+        "Timezone Local lacks the mono class present on neighboring technical values."
+      ],
+      "inferences": [
+        "Use shared action, terminology and value typography rules across related admin surfaces."
+      ],
+      "limitations": [
+        "Comments identify defects; they do not approve the R8 solution."
+      ]
+    },
+    {
+      "id": "r8-baseline",
+      "type": "code",
+      "location": "web/src at c9bc16d; prototype-r7.html; src/r7/; src/r6/settings.jsx",
+      "roles": [
+        "functional-truth",
+        "visual-reference",
+        "interaction-reference"
+      ],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Retains synthetic fixtures and published example domains.",
+      "licenseOrPermission": "Repository-owned code",
+      "localCopies": [
+        "src/r8/tags.jsx",
+        "src/r8/management.jsx",
+        "src/r8/defaults.jsx",
+        "src/r8/app.jsx"
+      ],
+      "observations": [
+        "R7 is approved and implemented. Sani tokens and Menu/Button primitives are reused.",
+        "Production settings backup help is inline in Data; inherited R7 prototype has a separate section."
+      ],
+      "inferences": [],
+      "limitations": [
+        "R8 is not approved. Only link appearance changes in the backup section; production structure stays in place."
+      ]
     }
   ]
 }

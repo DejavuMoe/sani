@@ -77,6 +77,16 @@
             "width": 1280,
             "height": 900
           }
+        },
+        {
+          "path": "prototype-r8.html",
+          "createdAt": "2026-10-10T05:53:57.518Z",
+          "status": "needs-review",
+          "subtitle": "Revision 8: consistent actions, vocabulary and technical values",
+          "viewport": {
+            "width": 1194,
+            "height": 804
+          }
         }
       ]
     },
@@ -153,8 +163,22 @@
           }
         }
       ]
+    },
+    "R8 Review": {
+      "versions": [
+        {
+          "path": "review-r8.html",
+          "createdAt": "2026-10-10T05:53:57.598Z",
+          "status": "needs-review",
+          "subtitle": "Consistency audit and approval entry points",
+          "viewport": {
+            "width": 1194,
+            "height": 804
+          }
+        }
+      ]
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-10T01:06:39.420Z"
+  "updatedAt": "2026-10-10T05:53:57.599Z"
 }
