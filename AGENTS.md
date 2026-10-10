@@ -13,7 +13,11 @@ make test             # go test -race ./..., vitest
 make build            # web → internal/webui/dist, then ./bin/sani
 make dist             # release archives for every platform + SHA256SUMS in dist/ (after make web)
 make e2e              # Playwright against a fresh ./bin/sani on 127.0.0.1:18765
+make smoke            # real shutdown, CLI backup and restore on disposable data
+make contract         # Sani HTTP API contract, without an external SDK
+make upgrade-drill    # OLD_BIN must point to the verified schema-5 binary
 make bench            # handler, cache and click-recorder benchmarks
+make ablation         # isolated cache/batching comparisons with count assertions
 make load             # bombardier load test; fails if clicks ≠ redirects
 make docs-dev         # the docs site on 127.0.0.1:5174
 make docs             # sync check, then the static site in docs/.vitepress/dist
@@ -25,7 +29,7 @@ Before calling a change done, run `make check test`, and `make e2e` for anything
 
 ## Layout
 
-- `cmd/sani`: entry point and subcommands (`serve`, `passwd`, `backup`, `healthcheck`, `version`).
+- `cmd/sani`: entry point and subcommands (`serve`, `passwd`, `backup`, `preflight`, `healthcheck`, `version`).
 - `internal/server`: routes, redirect hot path, JSON API, embedded app, visitor pages, shared texts and files (`share.go`, `sharepage.go`).
 - `internal/cache`, `internal/clicks`: the in-memory redirect cache and click aggregation.
 - `internal/store`: SQLite schema, migrations (`PRAGMA user_version`) and queries.

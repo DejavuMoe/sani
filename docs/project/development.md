@@ -137,8 +137,17 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。
 
-HTTP 契约与升级门槛：`make install` 后执行 `make compat`，并使用 schema 5 基线二进制执行 `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`。仍需 `make check test`、`make e2e`、`make smoke`。契约脚本使用 Node 标准库、fetch 和 FormData，不依赖 s.ee SDK。
+HTTP 契约与升级门槛：`make install` 后执行 `make contract`，并使用 schema 5 基线二进制执行 `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`。仍需 `make check test`、`make e2e`、`make smoke`。契约脚本使用 Node 标准库、fetch 和 FormData，不依赖 s.ee SDK。
 
-2026-10-10 的 SDK 消融实验在审查修复前、同一源代码和 Go 1.27.2 下，分别运行移除前 SDK 测试和移除后 15 项直接 HTTP 测试，均通过。两个 `dev` Linux 二进制均为 17,555,616 字节，SHA-256 同为 `bee156f83025009a3ad05b80188018af19319249fac6928995385c15dd639c40`，逐字节一致。移除独立 SDK Go 模块、JS 工作区及其依赖，恢复原项目锁文件；这证明 SDK 仅是可替换的测试客户端，不是运行依赖，不代表后续修复后的二进制必须具有同一摘要。
 
 Docker 存储演练：先构建本地镜像，再执行 `bash scripts/test-docker-storage.sh sani:upgrade /absolute/path/to/old-sani`。脚本从待测镜像提取真实二进制，在 UID 65532、真实绑定目录和临时 Node 测试容器中复用完整 HTTP/迁移/回滚演练；Node 仅用于测试，正式镜像仍为 scratch。额外验证只读数据库被预检拒绝，以及隔离的 16 MiB tmpfs 耗尽产生真实 ENOSPC：三次失败启动不遗留半成品副本，释放空间后旧 schema 与文件仍可预检。
+
+## 消融与依赖检查 {#ablation}
+
+`make ablation` 对缓存与点击聚合逐项消融并断言计数守恒，[实验记录](../internals/performance#ablation)保留条件、三次结果及限制。协议测试使用 Node 内置 fetch/FormData，无外部 SDK 或新增运行依赖。
+
+2026-10-10 的引用检查覆盖 36 个 Svelte 组件，均有调用，保留现有共用组件。五个直接 Go 模块分别负责 Argon2、HTML/IDNA/代理、终端密码输入、Unicode 规范化和纯 Go SQLite；`go mod tidy -diff` 与 `go mod verify` 用于验证图与校验和。前端运行依赖是本地字体和二维码编码；文档运行依赖还包括 Vue、VitePress 和评论组件 Ecoku。测试/类型检查工具归入开发依赖。删除这些依赖会改变已有能力，因此没有仅为减少数量而移除它们；`go.mod`、`go.sum` 和工作区锁文件未改变。
+
+脚本按实际用途保留：`screenshots.mjs` 生成文档所需固定文件名，`shots.mjs` 覆盖更多交互场景，`fresh-shots.mjs` 验证初始化和空状态，`icons.mjs` 生成图标。截图登录/初始化失败必须退出，不能把登录页误当业务截图。`smoke` 验证正常停机与备份；`upgrade-drill` 验证旧版升级/回滚；Docker 脚本验证权限、绑定目录、重启和磁盘满，三者各有边界。发布脚本通过 `test-release-notes.sh`、`test-publish-docs.sh` 的隔离夹具验证，不会部署站点。
+
+文档检查从源码提取路由、错误码、环境变量、CLI、保留短码、输入长度和发布平台，并用负例测试防止旧事实重新混入。历史 API 归档不参加当前路由集合比较。自然语言和交互仍需结合源码、HTTP 契约与浏览器检查，自动检查不是所有行为的形式化证明。

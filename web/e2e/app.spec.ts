@@ -263,22 +263,23 @@ test('an API token can create links and be revoked', async () => {
   await page.getByRole('button', { name: 'Create token' }).click();
   const token = (await page.locator('.secret code').textContent())!.trim();
   expect(token).toMatch(/^sani_[0-9A-Za-z]{43}$/);
-  await expect(page.locator('.reveal pre')).toContainText('/api/v1/shorten');
+  await expect(page.locator('.reveal pre')).toContainText('/api/v1/links');
   await expect(page.locator('.reveal pre')).toContainText('target_url');
 
   const api = await page.context().request;
-  const created = await api.post('/api/admin/v1/links', {
+  expect((await api.patch('/api/admin/v1/config', {data:{baseUrl:new URL(page.url()).origin}})).ok()).toBe(true);
+  const created = await api.post('/api/v1/links', {
     headers: { Authorization: `Bearer ${token}` },
-    data: { url: 'https://example.org/from-api', slug: 'from-api' },
+    data: { target_url: 'https://example.org/from-api', custom_slug: 'from-api' },
   });
   expect(created.status()).toBe(201);
 
   await page.getByRole('button', { name: 'Revoke' }).click();
   await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.locator('.tokens')).toHaveCount(0);
-  const refused = await api.post('/api/admin/v1/links', {
+  const refused = await api.post('/api/v1/links', {
     headers: { Authorization: `Bearer ${token}` },
-    data: { url: 'https://example.org/again' },
+    data: { target_url: 'https://example.org/again' },
   });
   expect(refused.status()).toBe(401);
 });

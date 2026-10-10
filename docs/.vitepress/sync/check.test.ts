@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { behaviorProblems, imageTagProblems, runChecks } from './check.ts';
+import { apiLimitProblems, behaviorProblems, imageTagProblems, runChecks } from './check.ts';
 import { appStrings, read } from './source.ts';
 
 test('both home demos resolve every quoted app string in both languages', () => {
@@ -39,5 +39,10 @@ test('current docs agree; false durability, backup and timing promises fail', ()
     assert(behaviorProblems(stats, ops + 'a copy taken after the database has every file', 2, 32).some(p => p.startsWith('backup:')));
     assert(behaviorProblems(stats, ops, 3, 32).some(p => p.includes('interval')));
     assert(behaviorProblems(stats, ops, 2, 33).some(p => p.includes('download bound')));
+    assert(behaviorProblems(stats + 'stores date strings', ops, 2, 32).some(p => p.includes('integer day')));
+    const api = read(`docs/${dir}reference/api.md`);
+    assert.deepEqual(apiLimitProblems(api), []);
+    assert(apiLimitProblems(api.replace('**8,192', '**2,000')).some(p => p.includes('MaxURLLength')));
+    assert(apiLimitProblems(api.replaceAll('text_type', 'format')).some(p => p.includes('text_type')));
   }
 });

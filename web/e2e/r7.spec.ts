@@ -33,6 +33,43 @@ async function capture(page: Page, name: string) {
 }
 const failed = {status:503,contentType:'application/json',body:JSON.stringify({error:{code:'internal',message:'temporary failure'}})};
 
+for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
+  test(`resource menus stay in the viewport with pointer and keyboard: ${lang} ${theme}`, async ({page}) => {
+    await login(page, lang, theme);
+    expect((await page.request.post(`${base}/api/admin/v1/links`, {data:{url:'https://example.org/menu'}})).ok()).toBe(true);
+    for (const viewport of [{width:1280,height:860}, {width:390,height:300}]) {
+      await page.setViewportSize(viewport);
+      await page.goto(`${base}/admin/`);
+      const trigger = page.locator('button.kind');
+      await trigger.click();
+      const menu = page.locator('.menu:popover-open');
+      await expect(menu).toBeVisible();
+      const fits = () => menu.evaluate(el => {
+        const r = el.getBoundingClientRect();
+        return r.top >= 7 && r.bottom <= innerHeight - 7 && r.left >= 7 && r.right <= innerWidth - 7;
+      });
+      await expect.poll(fits).toBe(true);
+      await page.keyboard.press('End');
+      await expect(menu.getByRole('menuitemradio').last()).toBeFocused();
+      await page.keyboard.press('Home');
+      await expect(menu.getByRole('menuitemradio').first()).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(trigger).toBeFocused();
+      await trigger.press('Enter');
+      await expect(menu).toBeVisible();
+      await expect(menu).toHaveCSS('opacity', '1');
+      await expect.poll(fits).toBe(true);
+      await audit(page);
+      await page.screenshot({path:test.info().outputPath(`menu-${viewport.width}.png`)});
+      await page.keyboard.press('Enter');
+      await expect(menu).not.toBeVisible();
+      await expect(page.locator('.menu:visible')).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+      await audit(page);
+    }
+  });
+}
+
 test('tag Enter chooses the exact normalized match; manager deletion retries and keeps all content', async ({page})=>{
   await login(page);
   for (const name of ['devops','dev','Café']) await page.request.post(`${base}/api/admin/v1/tags`,{data:{name,color:'blue'}});

@@ -18,4 +18,5 @@ test('inline prose has spaces without changing punctuation, links or code', asyn
     assert.equal(md.renderInline(source), expected);
   }
   assert.equal(md.renderInline('`a**b**[x](y)`'), '<code>a**b**[x](y)</code>');
+  assert.match(md.render('| Field | Value |\n|---|---|\n| a | b |'), /class="table-wrap" tabindex="0"/);
 });

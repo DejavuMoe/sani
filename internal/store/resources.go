@@ -15,7 +15,7 @@ func (s *Store) FileByDeleteKey(ctx context.Context, key string) (*Link, error) 
 	return scanLink(s.r.QueryRowContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+` WHERE c.delete_key = ? AND c.delete_key != '' AND l.kind = 2 AND l.deleted_at = 0`, key))
 }
 
-// FileHistory uses the protocol's fixed 30-row pages, with an ID tie breaker.
+// FileHistory uses fixed 30-row pages, with an ID tie breaker.
 func (s *Store) FileHistory(ctx context.Context, page int) ([]*Link, error) {
 	rows, err := s.r.QueryContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+` WHERE l.kind = 2 AND l.deleted_at = 0 ORDER BY l.created_at DESC, l.id DESC LIMIT 30 OFFSET ?`, int64(page-1)*30)
 	if err != nil {

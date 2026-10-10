@@ -12,6 +12,7 @@
 //
 // Files are named {scene}-{theme}-{lang}.png; the docs' Screenshot component
 // and the READMEs expect exactly these names and sizes.
+import assert from 'node:assert/strict';
 import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
@@ -35,7 +36,7 @@ async function scene(name, { lang, theme, width, height, origin = base, signIn =
     hasTouch: phone,
   });
   await ctx.addInitScript(([t, l]) => (localStorage.setItem('sani.theme', t), localStorage.setItem('sani.lang', l)), [theme, lang]);
-  if (signIn) await ctx.request.post(`${origin}/api/admin/v1/session`, { data: { password } });
+  if (signIn) assert((await ctx.request.post(`${origin}/api/admin/v1/session`, { data: { password } })).ok(), 'sign-in failed');
   const page = await ctx.newPage();
   await page.goto(`${origin}/admin/`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);

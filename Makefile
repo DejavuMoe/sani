@@ -1,4 +1,4 @@
-.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e smoke compat upgrade-drill bench load capacity docker docs docs-dev clean
+.PHONY: install check test build web binary dist dev-backend dev-frontend demo e2e smoke contract upgrade-drill bench ablation load capacity docker docs docs-dev clean
 
 # Run through mise when it is installed, so the pinned toolchain is used.
 RUN     ?= $(shell command -v mise >/dev/null 2>&1 && echo "mise exec --")
@@ -55,15 +55,19 @@ e2e: build
 smoke: build
 	$(RUN) node scripts/smoke.mjs
 
-compat: build
-	$(RUN) node scripts/compat.mjs
+contract: build
+	$(RUN) node scripts/api-contract.mjs
 
 # OLD_BIN is a verified schema-5 binary; only disposable data is used.
 upgrade-drill: build
-	$(RUN) node scripts/compat.mjs --upgrade
+	$(RUN) node scripts/api-contract.mjs --upgrade
 
 bench:
 	$(RUN) go test -run '^$$' -bench . -benchmem ./internal/...
+
+# Three isolated comparisons; every case asserts persisted clicks and referrers.
+ablation:
+	$(RUN) go test -run '^$$' -bench '^BenchmarkAblation$$' -benchmem -count=3 ./internal/server
 
 # Redirect throughput and latency against a local release build.
 load: binary

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ import (
 
 func (s *Server) routes() http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/", s.seeRoutes())
+	mux.Handle("/api/v1/", s.publicRoutes())
 	a := s.requireAuth
 
 	mux.HandleFunc("GET /api/admin/v1/session", s.getSession)
@@ -70,7 +71,7 @@ func (s *Server) routes() http.Handler {
 	cop := http.NewCrossOriginProtection()
 	cop.SetDenyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/api/v1/") {
-			seeError(w, r, &inputError{http.StatusForbidden, "cross_origin", "cross-origin request refused"})
+			publicError(w, r, &inputError{http.StatusForbidden, "cross_origin", "cross-origin request refused"})
 			return
 		}
 		writeError(w, http.StatusForbidden, "cross_origin", "cross-origin request refused")
@@ -123,16 +124,24 @@ const maxTextBody = 8 << 20
 
 func decodeJSONMax(w http.ResponseWriter, r *http.Request, v any, limit int64) bool {
 	r.Body = http.MaxBytesReader(w, r.Body, limit)
-	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	err := d.Decode(v)
+	if err == nil {
+		_, err = d.Token()
+		if errors.Is(err, io.EOF) {
+			return true
+		}
+	}
+	if err != nil {
 		var tooBig *http.MaxBytesError
 		if errors.As(err, &tooBig) {
 			writeError(w, http.StatusRequestEntityTooLarge, "too_large", "the request body is too large")
 			return false
 		}
-		writeError(w, http.StatusBadRequest, "bad_json", "request body must be a JSON object")
-		return false
 	}
-	return true
+	writeError(w, http.StatusBadRequest, "bad_json", "send one JSON object with supported fields")
+	return false
 }
 
 func pathID(w http.ResponseWriter, r *http.Request) (int64, bool) {

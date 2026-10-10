@@ -1,119 +1,20 @@
-# HTTP API
+# HTTP API 归档 · v0.9.4 及之前
 
-<p class="lead">Sani 自有 HTTP API：使用令牌创建和管理链接、文本与文件，使用同一实例的后台能力完成设置、批量操作和恢复。</p>
-
-::: warning 版本说明
-本页对应 Unreleased 源码。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
+::: warning 历史文档
+以下为 v0.9.4 的原始 API 文档；更早版本可能尚未实现其中部分能力，请以对应 tag 源码为准。新版已移除这些路由。请参阅[新版 API](./api)与[升级说明](../guide/operations#upgrade)。
 :::
 
-## 设计与约定 {#design}
 
-资源分类与 `target_url`、`custom_slug` 等命名借鉴了 [s.ee 的 API 设计](https://s.ee/docs/developers/api/)。协议由 Sani 自己定义，无需接入其 SDK。以下是 Sani 的具体设计：
+<p class="lead">Sani 管理界面的全部交互均构建于这套标准 JSON API 之上。界面具备的完整能力，均可通过脚本与自动化程序直接调用。</p>
 
-- `/api/v1` 提供 12 个资源操作；`/api/admin/v1` 提供后台需要的设置、会话、令牌、标签编辑、批量操作、导入导出和恢复等操作。两者共享 SQLite、文件目录、缓存、点击聚合与业务规则。后台可通过数字 ID 管理所有资源，资源 API 通过短码或稳定文件标识定位。
-- 遵循 [HTTP 方法和状态语义](https://www.rfc-editor.org/rfc/rfc9110.html)：POST 创建返回 **201**，`Location` 指向公开短链或分享页；PATCH 部分更新返回 **200**；DELETE 永久删除返回 **204**，没有响应体。GET 与 HEAD 不创建或删除资源。查询返回 200，错误方法返回 **405** 与 `Allow`，不存在的路径返回 **404**（均在鉴权后）。
-- `/api/v1` 只接受一个 `Authorization: Bearer sani_…` 请求头，拒绝原始令牌、重复凭据、`X-Api-Key` 和 Cookie 回退。不要把令牌放进 URL（参见 [OWASP REST 安全建议](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html)）。401 带 `WWW-Authenticate: Bearer realm="Sani"`。令牌具有完整实例权限，不是文件私有访问密码。
-- JSON 成功响应统一为 `{"data":...}`；列表另带分页字段。错误与后台共用 `{"error":{"code":"slug_taken","message":"this slug is already in use"}}`，实际 HTTP 状态承载成功或失败；程序应判断 `error.code`，不要解析说明文字。所有资源 API 响应 `Cache-Control: no-store`；拒绝浏览器跨站请求。
-- 一个全局短码空间，短码按 Unicode 规范化和大小写不敏感规则定位。新建前须设置 `SANI_BASE_URL` 或后台基础域名，否则返回 `503 domain_unconfigured`。`domain` 可省略；显式传入时只能是配置的主机名（含端口，忽略大小写），不能是完整 URL、文件源域名或任意请求 Host。不会猜测或改写旧域名。
-- 公开网址 `/{slug}`、分享页 `/p/{slug}`、文件源 `/{slug}/{filename}` 与文本原文 `/{slug}` 保持不变。文件使用稳定随机 `key`，改名后仍有效；`sha256` 才是内容摘要。文件字节仅从独立的 `SANI_FILES_URL` 提供。
-- 短码更新和删除在写事务中重新校验资源身份；并发改名为不同短码后返回 404。PATCH 省略字段保留原值，`title:""` 清空标题，`expire_at:0` 清除到期时间，`tag_ids:[]` 清空标签；空目标、空文本、空更新与所有 JSON `null` 均拒绝。只校验提交字段，不清洗旧数据。
+## 交互约定 {#conventions}
 
-JSON 使用 `application/json`，上限 **8 MiB**。拒绝未知字段、重复字段、非法 UTF-8 字节和尾随 JSON。网址上限 **8,192 字节**；标题输入上限 **300 个 Unicode 字符**，保存时合并多余空白；短码上限 **64 个 Unicode 字符**，字符集见[日常使用](../guide/usage)。文本上限 **1 MiB UTF-8 字节**，支持 `plain_text` 与 `source_code`（等宽显示，不做语法高亮）。最多五个既有标签 ID。`expire_at` 为 Unix **秒**，0 不过期，非零须在未来且不超过 `253402300799`；数据库仍为毫秒。返回的文件 `created_at` 也为秒；后台时间字段使用 RFC 3339。
-
-`password`、`is_private`（包括 0）、`expiration_redirect_url`、`text_type:"markdown"` 等未实现参数返回 400，不会忽略参数后创建公开内容。当前所有分享都是公开的；不可用这些字段表达访问保护。DELETE 不接受请求体，短链和文本删除仅允许可选查询参数 `domain`。上传只接受一个 `file` 以及可选 `domain/custom_slug` 表单字段，受实例单文件上限约束；错误字段即使出现在文件之后也会清理临时文件。
-
-```sh
-curl -i https://s.example.com/api/v1/links \
-  -H "Authorization: Bearer $SANI_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"target_url":"https://example.com/launch","custom_slug":"launch"}'
-# HTTP 201, Location: https://s.example.com/launch
-# {"data":{"slug":"launch","short_url":"https://s.example.com/launch"}}
-
-curl -X PATCH https://s.example.com/api/v1/links/launch \
-  -H "Authorization: Bearer $SANI_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Launch","expire_at":0}'
-
-curl -X DELETE https://s.example.com/api/v1/links/launch \
-  -H "Authorization: Bearer $SANI_TOKEN"
-# HTTP 204, empty body
-```
-
-## 资源操作 {#resources}
-
-| Method | Path | HTTP |
-|---|---|---|
-| `POST` | `/api/v1/links` | 201 |
-| `PATCH` | `/api/v1/links/{slug}` | 200 |
-| `DELETE` | `/api/v1/links/{slug}` | 204 |
-| `GET` | `/api/v1/links/{slug}/stats` | 200 |
-| `POST` | `/api/v1/texts` | 201 |
-| `PATCH` | `/api/v1/texts/{slug}` | 200 |
-| `DELETE` | `/api/v1/texts/{slug}` | 204 |
-| `POST` | `/api/v1/files` | 201 |
-| `GET` | `/api/v1/files` | 200 |
-| `DELETE` | `/api/v1/files/{key}` | 204 |
-| `GET` | `/api/v1/domains` | 200 |
-| `GET` | `/api/v1/tags` | 200 |
-
-`POST /api/v1/links`
-
-必填 `target_url`；可选 `domain/custom_slug/title/expire_at/tag_ids`。返回 `data.slug/short_url`。
-
-`PATCH /api/v1/links/{slug}`
-
-路径短码定位网址；可选 `domain/target_url/title/expire_at/tag_ids`，至少提交一个待修改字段。返回 `data.slug/short_url`，立即失效旧缓存。改名使用后台 ID 接口。
-
-`DELETE /api/v1/links/{slug}`
-
-永久删除网址及统计，释放短码，不可恢复。重复删除返回 404。
-
-`GET /api/v1/links/{slug}/stats`
-
-可选查询 `domain/period`，`period=day|month|all`，默认 `all`。返回 `data.visit_count`。day 是实例时区今天，month 是当前自然月；日/月查询先刷盘，失败即返回错误。
-
-`POST /api/v1/texts`
-
-必填 `content`；可选 `domain/custom_slug/title/expire_at/tag_ids/text_type`。默认 `plain_text`。返回 `data.slug/short_url`，地址为 `/p/{slug}`。
-
-`PATCH /api/v1/texts/{slug}`
-
-路径短码定位文本；可选 `domain/content/title/expire_at/tag_ids/text_type`，至少一个待修改字段。返回 `data.slug/short_url`，省略内容时保留原始字节。
-
-`DELETE /api/v1/texts/{slug}`
-
-永久删除文本及统计，不可恢复。不会把网址或文件当作文本删除。
-
-`POST /api/v1/files`
-
-multipart 上传。返回 `data` 对象：`file_id`（后台数字 ID）、`key`（48 位十六进制稳定标识）、`slug/filename/mime_type/size/sha256/created_at/url/page`。size 为字节，url 是文件源下载地址，page 是主域分享页。不返回内部存储文件名或虚构的图像尺寸。
-
-`GET /api/v1/files`
-
-可选查询 `page`（1–1000000，默认 1），每页 30 条，按创建时间及 ID 降序。返回 `{"data":[...],"page":1,"page_size":30}`，每项与上传相同；空页为 `[]`，包含旧版和后台上传文件。并发插入可能移动分页边界。
-
-`DELETE /api/v1/files/{key}`
-
-按稳定 key 定位，仍须 Bearer 令牌。永久删除记录及统计；字节由现有回收器异步清理。GET/HEAD 返回 405，绝不会触发删除。
-
-`GET /api/v1/domains`
-
-无参数。返回 `data.domains`（唯一主域名数组）和 `data.files_url`（文件源完整 URL，未配置时为空字符串）。须先配置主域名。
-
-`GET /api/v1/tags`
-
-无参数。返回 `data.tags` 数组，每项为 `id/name`。颜色、计数与标签编辑见下文后台操作。
-
-## 管理接口约定 {#conventions}
-
-- **统一前缀**：管理 API 使用 `/api/admin/v1`。默认 JSON；文件上传、CSV 导出、图标等例外见各端点。
-- **身份认证**：会话状态、登录和首次初始化按下文公开契约处理，其余管理操作需鉴权。自动化调用使用 API 令牌，在请求头中传入 `Authorization: Bearer sani_…` 或 `X-Api-Key: sani_…`；管理前端使用会话 Cookie。令牌可在后台 设置 → API 令牌 中生成，具备完全管理权限。
+- **统一前缀**：所有 API 均位于 `/api/` 路径下，请求体与响应体均为 UTF-8 编码的 JSON。
+- **身份认证**：除密码登录与首次初始化端点外，其余均需鉴权。自动化调用使用 API 令牌，在请求头中传入 `Authorization: Bearer sani_…` 或 `X-Api-Key: sani_…`；管理前端使用会话 Cookie。令牌可在后台 设置 → API 令牌 中生成，具备完全管理权限。
 - **跨站防护**：浏览器发起的跨站请求会被自动拦截（通过检查浏览器附带的 `Sec-Fetch-Site` 与 `Origin` 头）。脚本与命令行工具不发送此类浏览器标头，不受影响。
 - **时间格式**：统一采用 RFC 3339 格式的 UTC 时间戳，如 `2026-09-28T09:30:00Z`。
-- **请求体积限制**：常规 JSON 请求体上限 1 MiB。文本创建与链接更新接口上限 8 MiB（确保可容纳经过大量转义的 1 MiB 纯文本）；导入接口上限 32 MiB；文件上传上限为 [单文件上限](./configuration#sani-max-file-mb) 额外附加 1 MiB 表单开销。
-- **缓存策略**：JSON 响应返回 `Cache-Control: no-store`。
-- **输入校验**：资源创建/更新、设置、会话等常规 JSON 请求拒绝未知字段和尾随数据；multipart 上传拒绝未知表单字段。这些操作不会忽略 `password`、`is_private` 或不属于该接口的 `domain` 等参数后返回成功。导入处理已有导出文件，单独遵循[字段映射规则](../guide/import-export)，不使用常规请求的字段白名单。
+- **请求体积限制**：常规 JSON 请求体上限 1 MB。创建与更新链接接口上限 8 MB（确保可容纳经过大量转义的 1 MB 纯文本）；导入接口上限 32 MB；文件上传上限为 [单文件上限](./configuration#sani-max-file-mb) 额外附加 1 MB 表单开销。
+- **缓存策略**：所有 API 响应默认返回 `Cache-Control: no-store`。
 - **错误响应格式**：出现异常时返回对应 HTTP 状态码与结构化错误体。其中 `code` 为机器可读的持久标识，程序逻辑应以此为准；`message` 为人类可读说明。完整码表见[错误码](#errors)。
 
 ```json
@@ -123,7 +24,7 @@ multipart 上传。返回 `data` 对象：`file_id`（后台数字 ID）、`key`
 示例请求：
 
 ```sh
-curl https://s.example.com/api/admin/v1/links \
+curl https://s.example.com/api/links \
   -H "Authorization: Bearer $SANI_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/launch", "slug": "launch"}'
@@ -133,64 +34,64 @@ curl https://s.example.com/api/admin/v1/links \
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
-| `GET` | `/api/admin/v1/links` | [列出链接](#list) |
-| `PATCH` | `/api/admin/v1/tags/{id}` | [修改标签](#tags) |
-| `DELETE` | `/api/admin/v1/tags/{id}` | [删除标签](#tags) |
-| `POST` | `/api/admin/v1/uploads` | [建立分片上传](#chunk-upload) |
-| `PUT` | `/api/admin/v1/uploads/{id}` | [写入分片](#chunk-upload) |
-| `POST` | `/api/admin/v1/uploads/{id}/complete` | [完成上传](#chunk-upload) |
-| `DELETE` | `/api/admin/v1/uploads/{id}` | [取消上传](#chunk-upload) |
-| `GET` | `/api/admin/v1/tags` | [标签目录与数量](#tags) |
-| `POST` | `/api/admin/v1/tags` | [创建或取得标签](#tags) |
-| `POST` | `/api/admin/v1/links` | [创建链接](#create) |
-| `POST` | `/api/admin/v1/links/bulk` | [批量修改链接](#bulk) |
-| `GET` | `/api/admin/v1/links/{id}` | [读取一条链接](#get) |
-| `PATCH` | `/api/admin/v1/links/{id}` | [修改链接](#update) |
-| `DELETE` | `/api/admin/v1/links/{id}` | [删除链接](#delete) |
-| `POST` | `/api/admin/v1/links/{id}/restore` | [恢复刚删除的链接](#restore) |
-| `POST` | `/api/admin/v1/links/{id}/refresh` | [重新获取标题和图标](#refresh) |
-| `GET` | `/api/admin/v1/links/{id}/stats` | [一条链接的统计](#stats) |
-| `POST` | `/api/admin/v1/texts` | [分享文本](#create-text) |
-| `POST` | `/api/admin/v1/files` | [分享文件](#create-file) |
-| `GET` | `/api/admin/v1/links/{id}/text` | [读取分享的文本](#read-text) |
-| `GET` | `/api/admin/v1/slugs/{slug}` | [检查短码是否可用](#slug-check) |
-| `GET` | `/api/admin/v1/overview` | [全部链接的概览](#overview) |
-| `GET` | `/api/admin/v1/favicons/{host}` | [网站图标](#favicons) |
-| `GET` | `/api/admin/v1/export` | [导出全部链接](#export) |
-| `POST` | `/api/admin/v1/import` | [导入链接](#import) |
-| `GET` | `/api/admin/v1/config` | [读取设置](#config) |
-| `PATCH` | `/api/admin/v1/config` | [修改域名与创建设置](#config) |
-| `POST` | `/api/admin/v1/config/metadata/test` | [测试代理连接](#metadata-test) |
-| `GET` | `/api/admin/v1/tokens` | [列出 API 令牌](#tokens) |
-| `POST` | `/api/admin/v1/tokens` | [创建 API 令牌](#tokens) |
-| `DELETE` | `/api/admin/v1/tokens/{id}` | [撤销 API 令牌](#tokens) |
-| `GET` | `/api/admin/v1/session` | [登录状态](#session) |
-| `POST` | `/api/admin/v1/session` | [登录](#session) |
-| `DELETE` | `/api/admin/v1/session` | [退出登录](#session) |
-| `POST` | `/api/admin/v1/setup` | [首次设置密码](#session) |
-| `PUT` | `/api/admin/v1/password` | [修改密码](#password) |
-| `POST` | `/api/admin/v1/sessions/revoke` | [让其他设备退出登录](#password) |
+| `GET` | `/api/links` | [列出链接](#list) |
+| `PATCH` | `/api/tags/{id}` | [修改标签](#tags) |
+| `DELETE` | `/api/tags/{id}` | [删除标签](#tags) |
+| `POST` | `/api/uploads` | [建立分片上传](#chunk-upload) |
+| `PUT` | `/api/uploads/{id}` | [写入分片](#chunk-upload) |
+| `POST` | `/api/uploads/{id}/complete` | [完成上传](#chunk-upload) |
+| `DELETE` | `/api/uploads/{id}` | [取消上传](#chunk-upload) |
+| `GET` | `/api/tags` | [标签目录与数量](#tags) |
+| `POST` | `/api/tags` | [创建或取得标签](#tags) |
+| `POST` | `/api/links` | [创建链接](#create) |
+| `POST` | `/api/links/bulk` | [批量修改链接](#bulk) |
+| `GET` | `/api/links/{id}` | [读取一条链接](#get) |
+| `PATCH` | `/api/links/{id}` | [修改链接](#update) |
+| `DELETE` | `/api/links/{id}` | [删除链接](#delete) |
+| `POST` | `/api/links/{id}/restore` | [恢复刚删除的链接](#restore) |
+| `POST` | `/api/links/{id}/refresh` | [重新获取标题和图标](#refresh) |
+| `GET` | `/api/links/{id}/stats` | [一条链接的统计](#stats) |
+| `POST` | `/api/texts` | [分享文本](#create-text) |
+| `POST` | `/api/files` | [分享文件](#create-file) |
+| `GET` | `/api/links/{id}/text` | [读取分享的文本](#read-text) |
+| `GET` | `/api/slugs/{slug}` | [检查短码是否可用](#slug-check) |
+| `GET` | `/api/overview` | [全部链接的概览](#overview) |
+| `GET` | `/api/favicons/{host}` | [网站图标](#favicons) |
+| `GET` | `/api/export` | [导出全部链接](#export) |
+| `POST` | `/api/import` | [导入链接](#import) |
+| `GET` | `/api/config` | [读取设置](#config) |
+| `PATCH` | `/api/config` | [修改域名与创建设置](#config) |
+| `POST` | `/api/config/metadata/test` | [测试代理连接](#metadata-test) |
+| `GET` | `/api/tokens` | [列出 API 令牌](#tokens) |
+| `POST` | `/api/tokens` | [创建 API 令牌](#tokens) |
+| `DELETE` | `/api/tokens/{id}` | [撤销 API 令牌](#tokens) |
+| `GET` | `/api/session` | [登录状态](#session) |
+| `POST` | `/api/session` | [登录](#session) |
+| `DELETE` | `/api/session` | [退出登录](#session) |
+| `POST` | `/api/setup` | [首次设置密码](#session) |
+| `PUT` | `/api/password` | [修改密码](#password) |
+| `POST` | `/api/sessions/revoke` | [让其他设备退出登录](#password) |
 
 ## 链接 {#links}
 
 ### 标签 {#tags}
 
-`GET /api/admin/v1/tags`
+`GET /api/tags`
 
 返回 `{"items":[{"id":1,"name":"工作","color":"blue","count":3}],"total":8,"untagged":2}`。`count` 是使用该标签的未删除链接数（包含文本、文件和已停用链接）；`total` 与 `untagged` 分别是全部和未标记链接数，不受列表搜索、类型或标签筛选影响。零引用标签仍保留。
 
-`POST /api/admin/v1/tags`
+`POST /api/tags`
 
-请求 `{"name":"工作","color":"blue"}`，返回 `200` 和标签对象。名称去除首尾空白并做 NFC 规范化，限定 1–24 个 Unicode 码点，不允许控制字符；按小写名称去重。同名请求返回已有标签，不改变原名称与颜色。`color` 可省略，默认为 `blue`；可选 `blue`、`green`、`amber`、`rose`、`neutral` 或六位 HEX（如 `#5872a5`）。请求体上限 4 KiB，每个实例最多 1,000 个标签。
+请求 `{"name":"工作","color":"blue"}`，返回 `200` 和标签对象。名称去除首尾空白并做 NFC 规范化，限定 1–24 个 Unicode 码点，不允许控制字符；按小写名称去重。同名请求返回已有标签，不改变原名称与颜色。`color` 可省略，默认为 `blue`；可选 `blue`、`green`、`amber`、`rose`、`neutral` 或六位 HEX（如 `#5872a5`）。请求体上限 4 KB，每个实例最多 1,000 个标签。
 
 标签只在鉴权后的管理 API 与界面中展示，访客分享页不包含标签。
 
 
-`PATCH /api/admin/v1/tags/{id}`
+`PATCH /api/tags/{id}`
 
 传入 `name` 与 `color` 修改现有标签，返回 `200` 和更新后的标签对象；所有关联保留同一 ID。规范化后的同名冲突返回 `409 tag_taken`，不存在的 ID 返回 `404`。创建与修改均接受旧命名色或六位 HEX（如 `#5872a5`），规范化为小写。后台会把 HEX3、RGB、HSL 转为 HEX6；API 不接受任意 CSS。
 
-`DELETE /api/admin/v1/tags/{id}`
+`DELETE /api/tags/{id}`
 
 在一个事务中永久删除标签及其全部关联（包括软删除内容的关联），保留链接、文本、文件和其他标签，并单调递增关联内容的 `updatedAt`。成功返回 `204`，无响应体；不存在的标签返回 `404 not_found`。确认前显示的关联数是快照，删除作用于提交时的全部关联。需要与其他写接口相同的鉴权与跨来源保护。
 
@@ -232,7 +133,7 @@ curl https://s.example.com/api/admin/v1/links \
 | `host` | 目标网址的域名，去掉了 `www.`。`mailto:` 这类没有域名的网址为空字符串。 |
 | `title` | 标题，没有时为空字符串。 |
 | `meta` | 标题的来源：`pending` 正在获取，`ok` 从网页获取，`failed` 没有获取到，`manual` 由你设置，以后不会被自动覆盖。 |
-| `icon` | 是否保存了网站图标，图标从 [`/api/admin/v1/favicons/{host}`](#favicons) 获取。 |
+| `icon` | 是否保存了网站图标，图标从 [`/api/favicons/{host}`](#favicons) 获取。 |
 | `redirect` | 跳转使用的状态码：301、302、307 或 308。 |
 | `status` | `active` 正常，`disabled` 已停用，`expired` 已过期，`exhausted` 访问次数已用完。 |
 | `expiresAt`、`maxClicks` | 过期时间和访问上限，没有设置时为 `null`。 |
@@ -241,11 +142,11 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 创建链接 {#create}
 
-`POST /api/admin/v1/links`
+`POST /api/links`
 
 只有 `url` 是必填的。
 
-可选 `tags` 接受最多 5 个不同的、已存在的正整数标签 ID。省略时无标签；创建标签需先调用 `POST /api/admin/v1/tags`。指定 `tags`（包括 `[]`）时不使用 `reuse`，避免忽略标签设置。文本与文件分享也支持标签。
+可选 `tags` 接受最多 5 个不同的、已存在的正整数标签 ID。省略时无标签；创建标签需先调用 `POST /api/tags`。指定 `tags`（包括 `[]`）时不使用 `reuse`，避免忽略标签设置。文本与文件分享也支持标签。
 
 | 字段 | 说明 |
 |---|---|
@@ -262,7 +163,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 列出链接 {#list}
 
-`GET /api/admin/v1/links`
+`GET /api/links`
 
 | 参数 | 说明 |
 |---|---|
@@ -283,7 +184,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 读取一条链接 {#get}
 
-`GET /api/admin/v1/links/{id}`
+`GET /api/links/{id}`
 
 返回[链接对象](#link-object)。
 
@@ -291,7 +192,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 `tags` 省略时保留已有标签；传 `[]` 清空；传 ID 数组整体替换。`null`、重复、不存在的 ID 或超过 5 项会报错，整次修改回滚。
 
-`PATCH /api/admin/v1/links/{id}`
+`PATCH /api/links/{id}`
 
 接受创建时除 `reuse` 以外的全部字段，只修改请求里出现的字段：
 
@@ -307,19 +208,19 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 删除链接 {#delete}
 
-`DELETE /api/admin/v1/links/{id}`
+`DELETE /api/links/{id}`
 
 返回 `204`。到达源站的新请求立即停止跳转。删除超过一小时的记录由后台连同统计一起清除；实际清理前仍可恢复。删除后短码可立即分配给新链接，这会提前移除旧记录。分享文件异步回收，详见[清理周期](../guide/operations#share-cleanup)。
 
 ### 恢复链接 {#restore}
 
-`POST /api/admin/v1/links/{id}/restore`
+`POST /api/links/{id}/restore`
 
 撤销删除，返回恢复后的[链接对象](#link-object)。记录已经被后台清除，或者短码已经被新链接占用时，返回 `404`。恢复不会重置有效期或访问计数。
 
 ### 批量修改链接 {#bulk}
 
-`POST /api/admin/v1/links/bulk`
+`POST /api/links/bulk`
 
 在一个事务里启用、停用、删除或恢复多条链接：
 
@@ -333,13 +234,13 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 重新获取标题和图标 {#refresh}
 
-`POST /api/admin/v1/links/{id}/refresh`
+`POST /api/links/{id}/refresh`
 
 重新获取目标网页的标题和网站图标，等获取完成后返回[链接对象](#link-object)，可能需要几秒钟。你自己设置的标题会保留。文本和文件没有网页可以获取，会得到 `kind_mismatch`。
 
 ### 统计 {#stats}
 
-`GET /api/admin/v1/links/{id}/stats`
+`GET /api/links/{id}/stats`
 
 参数 `days` 是统计的天数，1 到 366，默认 30。
 
@@ -360,7 +261,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 检查短码 {#slug-check}
 
-`GET /api/admin/v1/slugs/{slug}`
+`GET /api/slugs/{slug}`
 
 检查短码能不能用：
 
@@ -408,24 +309,24 @@ curl https://s.example.com/api/admin/v1/links \
 
 ### 分享文本 {#create-text}
 
-`POST /api/admin/v1/texts`
+`POST /api/texts`
 
 ```json
 { "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
 ```
 
-`text` 必填，最多 1 MiB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
+`text` 必填，最多 1 MB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
 
 ### 分享文件 {#create-file}
 
 可选 multipart 字段 `tags` 使用 JSON 数组字符串，如 `[1,2]`；与 JSON 创建接口使用相同的标签校验。无效标签导致上传失败时会清理已接收的文件。
 
-`POST /api/admin/v1/files`
+`POST /api/files`
 
 请求体是 `multipart/form-data`：一个 `file` 部分，以及可选的 `slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 字段，值是文本，含义与[创建链接](#create)相同：
 
 ```sh
-curl https://s.example.com/api/admin/v1/files \
+curl https://s.example.com/api/files \
   -H "Authorization: Bearer $SANI_TOKEN" \
   -F file=@report.pdf -F maxClicks=10
 ```
@@ -438,13 +339,13 @@ curl https://s.example.com/api/admin/v1/files \
 
 ### 读取分享的文本 {#read-text}
 
-`GET /api/admin/v1/links/{id}/text`
+`GET /api/links/{id}/text`
 
 返回 `{"text": "…"}`，即完整的文本内容，列表里不包含它。读取不计入访问。不是文本的链接返回 `404`。
 
 ## 概览 {#overview}
 
-`GET /api/admin/v1/overview`
+`GET /api/overview`
 
 参数 `days` 与[统计](#stats)相同。
 
@@ -454,7 +355,7 @@ curl https://s.example.com/api/admin/v1/files \
 
 ## 网站图标 {#favicons}
 
-`GET /api/admin/v1/favicons/{host}`
+`GET /api/favicons/{host}`
 
 返回图标文件本身，没有图标时返回 `404`。`{host}` 就是[链接对象](#link-object)里的 `host`。图标来自第三方网站，所以返回时带有沙箱化的内容安全策略，即使是 SVG 也无法执行脚本。
 
@@ -462,7 +363,7 @@ curl https://s.example.com/api/admin/v1/files \
 
 ### 导出 {#export}
 
-`GET /api/admin/v1/export`
+`GET /api/export`
 
 以附件形式返回全部未删除的网址链接及其标签的 Sani JSON，不包含文本或文件分享；文件格式见[导入与导出](../guide/import-export#export)。加上 `?format=csv` 返回 CSV。
 
@@ -470,12 +371,12 @@ CSV 对可能触发电子表格公式的字段添加单引号前缀；重新导�
 
 ### 导入 {#import}
 
-`POST /api/admin/v1/import`
+`POST /api/import`
 
-请求体是文件本身，最大 32 MiB，最多 100,000 条链接。支持的格式和规则见[导入与导出](../guide/import-export#import)。
+请求体是文件本身，最大 32 MB，最多 100,000 条链接。支持的格式和规则见[导入与导出](../guide/import-export#import)。
 
 ```sh
-curl https://s.example.com/api/admin/v1/import \
+curl https://s.example.com/api/import \
   -H "Authorization: Bearer $SANI_TOKEN" \
   --data-binary @shlink-export.json
 ```
@@ -490,21 +391,21 @@ curl https://s.example.com/api/admin/v1/import \
 
 ### 分片上传 {#chunk-upload}
 
-四个端点均需鉴权并接受相同的同源校验。后台对超过 25,000,000 字节的文件使用此流程；较小文件继续调用 `POST /api/admin/v1/files`。
+四个端点均需鉴权并接受相同的同源校验。后台对超过 25,000,000 字节的文件使用此流程；较小文件继续调用 `POST /api/files`。
 
-`POST /api/admin/v1/uploads`
+`POST /api/uploads`
 
 发送 JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`，可选链接字段 `title`、`tags`、`expiresAt`、`maxClicks`、`enabled`。请求体限制 16 KiB。返回 `201` 和 `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`。完整文件大小不得超过当前 `maxFileSize`。会话绑定具体登录会话或令牌凭据，不使用可复用的令牌数字 ID。
 
-`PUT /api/admin/v1/uploads/{id}`
+`PUT /api/uploads/{id}`
 
 请求体为原始分片字节，`Content-Length` 为 1–25,000,000，`Upload-Offset` 等于上次确认的偏移。返回 `200` 和 `{ "offset":25000000 }`。按顺序上传；仅最近一个分片可重试，且长度与 SHA-256 必须相同。偏移或重复分片内容不符返回 `409 upload_offset`；传输失败或不完整不会推进偏移。文件流式写盘，不整体缓存在内存。
 
-`POST /api/admin/v1/uploads/{id}/complete`
+`POST /api/uploads/{id}/complete`
 
 全部字节确认后发送空请求体完成上传。服务端核验文件长度、计算 SHA-256 并原子发布分享。返回 `201` 和链接对象；完成回执尚保留时再次调用返回 `200` 和同一链接。未完成返回 `409 upload_incomplete`，完成前没有可见分享。校验或存储错误在存储条件允许时保留待完成上传供重试。
 
-`DELETE /api/admin/v1/uploads/{id}`
+`DELETE /api/uploads/{id}`
 
 取消待完成上传、删除临时字节并返回 `204`；删除已完成回执不会删除分享。其他凭据、过期或不存在的会话返回 `404 upload_not_found`，并发操作返回 `409 upload_busy`。
 
@@ -512,7 +413,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ## 设置 {#config}
 
-`GET /api/admin/v1/config`
+`GET /api/config`
 
 ```json
 {
@@ -553,7 +454,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 旧实例首次升级时，将缺少独立设置的分享长度按 `max(10, 旧版有效网址短码长度)` 初始化并保存；例如旧值为 12 时两类分享保留 12 位。之后修改网址长度不会改变分享长度，各自环境变量仍优先。迁移保存值的来源为 `settings`，被显式环境变量覆盖时为 `env`；移除覆盖后恢复已保存值，不重新跟随网址长度。长度不含 `/p/`，只影响后续自动生成；已有短码和手动指定的短码不变。
 
-`PATCH /api/admin/v1/config`
+`PATCH /api/config`
 
 修改设置页里的短链接域名：
 
@@ -586,7 +487,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ## 测试网页信息代理 {#metadata-test}
 
-`POST /api/admin/v1/config/metadata/test`
+`POST /api/config/metadata/test`
 
 需已登录会话或 API 令牌，并遵循与其他写操作相同的跨站保护。请求体 `{"metaProxy": {...}}` 沿用上述 PATCH 字段及密码保留规则，限制 4 KiB。只测试当前表单，不保存设置，也不替换生效中的抓取器。通过相同的公网 IP 校验及代理传输访问固定 HTTPS 目标 `https://example.com` 并获取标题，失败不直连。总截止时间 12 秒，传输层可能更早超时；每个实例同时最多一个测试，两次启动至少间隔 5 秒（`429 rate_limited`，`Retry-After: 5`）。请求取消或服务关闭会取消测试。
 
@@ -594,15 +495,15 @@ curl https://s.example.com/api/admin/v1/import \
 
 ## API 令牌 {#tokens}
 
-`GET /api/admin/v1/tokens`
+`GET /api/tokens`
 
 返回 `{"items": [...]}`，即令牌列表，每一项形如 `{"id": 3, "name": "iPhone 快捷指令", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`。`hint` 是令牌的开头几个字符，方便辨认；`usedAt` 是最近一次使用的时间，精确到分钟，没用过时为 `null`。
 
-`POST /api/admin/v1/tokens`
+`POST /api/tokens`
 
 请求体为 `{"name": "iPhone 快捷指令"}`，名称 1 到 60 个字符。返回 `201`，响应里的 `token` 字段是令牌本身，**只在这时返回一次**。Sani 只保存它的哈希。
 
-`DELETE /api/admin/v1/tokens/{id}`
+`DELETE /api/tokens/{id}`
 
 撤销令牌，返回 `204`。
 
@@ -610,21 +511,21 @@ curl https://s.example.com/api/admin/v1/import \
 
 这几个接口供管理界面使用，不需要认证。
 
-`GET /api/admin/v1/session`
+`GET /api/session`
 
 返回 `{"authenticated": false, "needsSetup": true}`：当前是否已登录，以及是否还没有设置密码。
 
-`POST /api/admin/v1/setup`
+`POST /api/setup`
 
 首次设置密码，请求体为 `{"code": "k7m2-p9x4-hq3d", "password": "…"}`。`code` 是[启动日志里的设置码](../guide/deploy#first-password)，不区分大小写，空格和短横线会被忽略。成功后直接登录，返回 `{"authenticated": true}`。已经有密码时返回 `409`。
 
-`POST /api/admin/v1/session`
+`POST /api/session`
 
 登录，请求体为 `{"password": "…"}`。成功后设置会话 Cookie，返回 `{"authenticated": true}`。
 
 首次设置或登录过程中若密码已被另一次修改替换，会话签发返回 `401 wrong_password`，需使用当前密码重新登录。
 
-`DELETE /api/admin/v1/session`
+`DELETE /api/session`
 
 退出登录，返回 `204`。
 
@@ -636,13 +537,13 @@ curl https://s.example.com/api/admin/v1/import \
 
 首次设置与更换密码要求至少 8 个 Unicode 码点、最多 1,024 个 UTF-8 字节，与环境变量及 CLI 限制一致。
 
-`PUT /api/admin/v1/password`
+`PUT /api/password`
 
 修改密码，请求体为 `{"current": "…", "password": "…"}`。返回 `204`，其他设备上的会话全部失效。密码由 `SANI_PASSWORD` 管理时返回 `409`。
 
 密码替换与会话撤销在同一事务中完成；撤销失败时密码也不会改变。并发改密已使 `current` 失效时返回 `400 wrong_password`。
 
-`POST /api/admin/v1/sessions/revoke`
+`POST /api/sessions/revoke`
 
 让当前会话以外的所有会话失效，返回 `204`。
 
@@ -679,11 +580,6 @@ curl https://s.example.com/api/admin/v1/import \
 
 | 错误码 | 状态码 | 含义 |
 |---|---|---|
-| `unsupported_parameter` | 400 | 当前接口不支持该参数，未执行写入。 |
-| `invalid_parameter` | 400 | 参数类型、空值、范围或查询参数不合法。 |
-| `domain_invalid` | 400 | 域名与实例主域名不符。 |
-| `domain_unconfigured` | 503 | 请先配置实例基础域名。 |
-| `content_type` | 415 | 资源 API 的 JSON 请求须使用 application/json。 |
 | `bad_json` | 400 | 请求体不是合法的 JSON 对象 |
 | `cursor_invalid` | 400 | 分页游标无效 |
 | `url_required` | 400 | 缺少目标网址 |
@@ -702,7 +598,7 @@ curl https://s.example.com/api/admin/v1/import \
 | `format_invalid` | 400 | `format` 不是 `plain` 或 `code` |
 | `kind_mismatch` | 400 | 字段不适用于这种链接，比如给文本传 `url`，或者对分享重新获取标题 |
 | `file_required` | 400 | 上传里没有 `file` 部分，或者文件是空的 |
-| `upload_invalid` | 400 | 上传不是格式正确的 `multipart/form-data`、包含多个文件，或者某个字段超过 4 KiB |
+| `upload_invalid` | 400 | 上传不是格式正确的 `multipart/form-data`、包含多个文件，或者某个字段超过 4 KB |
 | `bulk_invalid` | 400 | 批量修改的 `action` 不认识，或者 `ids` 不是 1 到 500 条 |
 | `base_url_invalid` | 400 | 域名格式不对，应该形如 `https://s.example.com` |
 | `name_invalid` | 400 | 令牌名称为空，或者超过 60 个字符 |
@@ -714,7 +610,6 @@ curl https://s.example.com/api/admin/v1/import \
 | `unauthorized` | 401 | 没有登录，也没有提供有效的令牌 |
 | `cross_origin` | 403 | 浏览器从其他网站发来的请求 |
 | `setup_code` | 403 | 设置码错误 |
-| `method_not_allowed` | 405 | 当前路径不接受该方法；支持的方法见 Allow。 |
 | `not_found` | 404 | 链接、令牌或接口不存在，或者删除的链接已经无法恢复 |
 | `slug_taken` | 409 | 短码已被占用 |
 | `already_setup` | 409 | 已经设置过密码 |
@@ -722,8 +617,8 @@ curl https://s.example.com/api/admin/v1/import \
 | `password_env` | 409 | 密码由 `SANI_PASSWORD` 管理，不能通过 API 修改 |
 | `base_url_env` | 409 | 短链接域名由 `SANI_BASE_URL` 固定，不能通过 API 修改 |
 | `files_disabled` | 409 | 没有设置文件域名，不能分享文件 |
-| `too_large` | 413 | 请求体超过[上限](#conventions)，比如导入的文件超过 32 MiB |
-| `text_too_large` | 413 | 文本超过 1 MiB |
+| `too_large` | 413 | 请求体超过[上限](#conventions)，比如导入的文件超过 32 MB |
+| `text_too_large` | 413 | 文本超过 1 MB |
 | `config_env` | 409 | 设置由环境变量固定 |
 | `config_invalid` | 400 | 创建默认值不合法 |
 | `proxy_missing` | 409 | 未配置专用代理 |

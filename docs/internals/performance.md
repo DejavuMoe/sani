@@ -16,7 +16,7 @@ const workloadNames = { list: '列表', search: '搜索', 'click-sort': '按点�
 
 执行 `make load` 触发压测套件 `scripts/load.sh`：
 
-1. 编译正式发行版二进制，挂载临时数据目录启动并关闭异步元数据抓取。
+1. 编译启用优化的本地二进制，挂载临时数据目录启动并关闭异步元数据抓取。
 2. 预设两条基准链接：`/hot` 为无限制常规链接；`/limited` 设定高访问上限以覆盖原子计数器损耗。
 3. 使用 [bombardier](https://github.com/codesenberg/bombardier) 对 `/hot`、`/limited` 及未命中路径 `/nope` 展开全量压测，每路径施加 {{ benchmark.connections }} 并发连接，持续 {{ benchmark.duration }}。请求携带完整桌面端 User-Agent 与 Referer 标头，保证每次跳转均触发统计计数。
 4. 等待内存最后一批点击安全落库后，比对 `/hot` 记录的点击总量与 bombardier 压测统计的跳转总量，二者必须绝对一致。
@@ -62,22 +62,36 @@ make bench                          # 运行 Go 微基准
 
 `make capacity` 基于临时 SQLite 库，分别在 1千、1万、10万条链接规模下对各项指标采集 200 个样本；混合场景采用 8 个并发工作协程（2 写、6 读，各 200 次）。列表、搜索与导入聚焦存储层度量；冷缓存跳转走真实 HTTP 链路（剔除物理网卡传输）。刷盘测试按每批 200 条链接记录耗时（含内存聚合与事务提交）。内存 RSS 每 10 ms 周期性采样；WAL 大小度量文件体积而非未 checkpoint 的数据量。
 
-测试时间：{{ capacity.at }}；{{ capacity.go }}，{{ capacity.os }} / WSL2，{{ capacity.cpus }} 个 Go 调度核心，Intel Core Ultra 7 255H。数据采自当前开发工作树。小样本长尾延迟与同机环境波动不可直接视作生产 SLA。
+测试时间：{{ capacity.at }}；{{ capacity.go }}，{{ capacity.os }} / WSL2，{{ capacity.cpus }} 个 Go 调度核心，Intel Core Ultra 7 255H。数据采自该时间的开发工作树。小样本长尾延迟与同机环境波动不可直接视作生产 SLA。
 
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0"><table>
 <thead><tr><th>链接数</th><th>场景</th><th>P50 (ms)</th><th>P95 (ms)</th><th>P99 (ms)</th></tr></thead>
 <tbody><template v-for="d in capacity.datasets" :key="d.links"><tr v-for="r in d.runs" :key="r.name">
 <td>{{ num(d.links) }}</td><td>{{ workloadNames[r.name] }}</td><td>{{ r.p50_ms }}</td><td>{{ r.p95_ms }}</td><td>{{ r.p99_ms }}</td>
 </tr></template></tbody>
 </table></div>
 
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0"><table>
 <thead><tr><th>链接数</th><th>整批导入 (ms)</th><th>采样 RSS 峰值 (MiB)</th><th>记录 / 落库</th><th>SQLITE_BUSY</th></tr></thead>
 <tbody><tr v-for="d in capacity.datasets" :key="d.links">
 <td>{{ num(d.links) }}</td><td>{{ d.import_ms }}</td><td>{{ (d.peak_rss_kib / 1024).toFixed(1) }}</td><td>{{ num(d.recorded_clicks) }} / {{ num(d.stored_clicks) }}</td><td>{{ d.sqlite_busy }}</td>
 </tr></tbody>
 </table></div>
 
-在 10 万条链接规模下，优化计数查询并去除冗余的内容表 JOIN 后，同机列表 P50 耗时由 5.229 ms 降至 1.085 ms。搜索当前仍使用包含匹配与全量计数，P95 为 82.170 ms；在当前个人使用场景下保持该设计，待出现交互瓶颈再评估 FTS 全文索引或调整分页契约。
+普通计数查询不连接无关的内容表；本轮 10 万条链接的列表 P50 为 1.158 ms。搜索仍使用包含匹配与全量计数，P95 为 92.477 ms；在当前个人使用场景下保持该设计，待出现交互瓶颈再评估 FTS 全文索引或调整分页契约。
 
-本轮测试中读连接池未发生等待；10 万条混合读写场景下写连接排队 399 次，累计排队耗时 149.815 ms，符合单写连接预期；测试中观测到的最大 WAL 文件为 20.2 MiB。完整 JSON 原始指标请参见 `docs/.vitepress/data/capacity.json`。日常 CI 运行 1 千档校验逻辑正确性，定时任务运行全量三档压测。
+本轮测试中读连接池未发生等待；10 万条混合读写场景下写连接排队 399 次，累计排队耗时 188.071 ms，符合单写连接预期；测试中观测到的最大 WAL 文件为 20.2 MiB。完整 JSON 原始指标请参见 `docs/.vitepress/data/capacity.json`。日常 CI 运行 1 千档校验逻辑正确性，定时任务运行全量三档压测。
+
+## 2026-10-10 消融对照 {#ablation}
+
+基线为 `2817cdc`，实验使用其后本地的 Sani 自有 API 改动、Go 1.27.2、WSL2 Linux amd64、Intel Core Ultra 7 255H、8 个 Go 调度核心。执行 `make ablation`，每组运行三次。实现位于 `internal/server/ablation_test.go`，每组使用独立临时 SQLite、相同目标、相同 User-Agent 和 Referer，只改变一个条件；无生产开关。
+
+| 条件 | 三次 ns/op | B/op | allocs/op | 每请求数据库加载 | 每请求点击写事务 |
+|---|---|---|---|---|---|
+| 缓存 + 批量聚合 | 891.3 / 891.7 / 875.9 | 440 | 5 | 0 | 一整组一次 |
+| 每次先失效缓存 | 12715 / 12537 / 12686 | 2864–2865 | 60 | 1 | 一整组一次 |
+| 每次点击后刷盘 | 52846 / 53354 / 53418 | 5672 | 92 | 0 | 1 |
+
+三组全部验证重定向目标、落库点击总数及来源计数等于请求数。中位数下，强制冷加载约慢 14.2 倍，逐次刷盘约慢 59.9 倍，因此保留现有缓存和聚合。冷加载组也包含主动失效的成本。该串行微基准把最终刷盘计入计时，不等同于并行 `BenchmarkRedirect` 或网络吞吐测试；临时 SQLite 使用项目默认 WAL/NORMAL，不能推导生产磁盘延迟或持久性 SLA。
+
+协议消融删除了 GET 创建、GET 删除、查询令牌、重复域名发现、上传字段别名及响应中的占位字段。资源操作从 15 项收敛为 12 项，使用真实 HTTP 请求覆盖状态、Location、结构、参数拒绝和公开地址；数据库 schema 6 及既有文件标识保留，不新增迁移。

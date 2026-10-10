@@ -321,6 +321,24 @@ export function behaviorProblems(statistics: string, operations: string, interva
   if (/最多丢失最后(?:这)?\s*2\s*秒|at most the last 2 seconds/i.test(statistics + operations)) problems.push('durability: the two-second loss guarantee is false');
   if (/之后复制的目录里，一定有|a copy taken after the database has every file/i.test(operations)) problems.push('backup: online copy order does not guarantee referenced files');
   if (!operations.includes('synchronous=NORMAL')) problems.push('operations: explain WAL/NORMAL durability');
+  if (/日期字串|stores date strings/i.test(statistics)) problems.push('statistics: daily buckets are integer day numbers');
+  return problems;
+}
+
+/** Public input bounds are shared with the Go rules, not an upstream SDK. */
+export function apiLimitProblems(md: string): string[] {
+  const rules = read('internal/links/links.go');
+  const problems: string[] = [];
+  for (const name of ['MaxURLLength', 'MaxTitleLength', 'MaxSlugLength']) {
+    const value = new RegExp(`${name}\\s*=\\s*(\\d+)`).exec(rules)?.[1];
+    if (!value) throw new Error(`cannot extract ${name}`);
+    if (!md.replaceAll(',', '').includes(`**${value}`)) problems.push(`API: missing ${name}=${value}`);
+  }
+  const fields = /type publicInput struct \{([^]*?)\n\}/.exec(read('internal/server/api_public.go'))?.[1];
+  if (!fields) throw new Error('cannot extract public input fields');
+  for (const [, field] of fields.matchAll(/json:"([^"]+)"/g)) {
+    if (!md.includes(field)) problems.push(`API: missing input field ${field}`);
+  }
   return problems;
 }
 
@@ -329,7 +347,8 @@ function checkBehavior(): Check {
   const downloads = Number(/const maxDownloads = (\d+)/.exec(read('internal/server/share.go'))?.[1]);
   if (!interval || !downloads) throw new Error('cannot extract counting limits from source');
   const problems = locales.flatMap(({ dir }) => behaviorProblems(doc(dir, 'guide/statistics'), doc(dir, 'guide/operations'), interval, downloads).map(p => dir + p));
-  return { id: 'behavior', count: 10, problems };
+  for (const {dir} of locales) problems.push(...apiLimitProblems(doc(dir, 'reference/api')).map(p => dir + p));
+  return { id: 'behavior', count: 22, problems };
 }
 
 function checkAssets(): Check {

@@ -1,119 +1,20 @@
-# HTTP API
+# HTTP API archive · v0.9.4 and earlier
 
-<p class="lead">Sani's HTTP API: create and manage links, texts and files with tokens, and use the same instance's admin capabilities for settings, bulk operations and recovery.</p>
-
-::: warning Version
-This page describes the Unreleased source. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
+::: warning Archived reference
+This is the unmodified v0.9.4 reference. Earlier versions may have fewer endpoints; consult their tagged source. These routes were removed in the new API. See the [current API](./api) and [upgrade guide](../guide/operations#upgrade).
 :::
 
-## Design and conventions {#design}
 
-Resource categories and names such as `target_url` and `custom_slug` draw on [s.ee's API design](https://s.ee/docs/developers/api/). Sani defines its own protocol and needs no external SDK. Its specific choices are:
+<p class="lead">Everything the admin app does goes through this JSON API, so anything the app can do, a script can do too.</p>
 
-- `/api/v1` exposes 12 resource operations; `/api/admin/v1` provides settings, sessions, tokens, tag editing, bulk operations, import/export and recovery for the admin app. Both share SQLite, files, the cache, click aggregation and business rules. Admin operations address all resources by numeric ID; resource operations use slugs or stable file keys.
-- Following [HTTP method and status semantics](https://www.rfc-editor.org/rfc/rfc9110.html), POST creates with **201** and a `Location` header pointing to the public short URL or share page; PATCH partially updates with **200**; DELETE permanently removes with **204** and no response body. GET and HEAD never create or delete resources. Reads return 200; unsupported methods return **405** with `Allow`; unknown paths return **404**, after authentication.
-- `/api/v1` accepts exactly one `Authorization: Bearer sani_…` header. Raw tokens, repeated credentials, `X-Api-Key` and cookie fallback are rejected. Keep credentials out of URLs, as recommended by the [OWASP REST Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html). A 401 includes `WWW-Authenticate: Bearer realm="Sani"`. Tokens grant full instance access; they are not private file passwords.
-- JSON success responses use `{"data":...}`; lists also include pagination fields. Errors share the admin shape `{"error":{"code":"slug_taken","message":"this slug is already in use"}}`. Use the actual HTTP status and stable `error.code`, not message text. Resource API responses use `Cache-Control: no-store` and reject cross-site browser requests.
-- Slugs share one global namespace with Unicode normalization and case-insensitive lookup. Configure `SANI_BASE_URL` or the saved base URL first, or resource creation returns `503 domain_unconfigured`. `domain` is optional; when supplied it must match the configured main host, including any port, case-insensitively. Full URLs, the files origin and arbitrary request hosts are not accepted. Old domains are neither guessed nor rewritten.
-- Public URLs remain `/{slug}`, `/p/{slug}`, files-origin `/{slug}/{filename}` and files-origin raw text `/{slug}`. Files have a stable random `key` that survives renames; `sha256` is the content digest. Shared bytes are served only from the separate `SANI_FILES_URL` origin.
-- Slug updates and deletes recheck identity inside the write transaction and return 404 after a concurrent rename to a different slug. PATCH preserves omitted fields; `title:""` clears the title, `expire_at:0` removes expiry, and `tag_ids:[]` clears tags. Empty targets, empty texts, empty updates and all JSON `null` values are rejected. Only submitted fields are validated; old data is not rewritten to fit new inputs.
+## Conventions {#conventions}
 
-Send `application/json`, at most **8 MiB**. Unknown or duplicate fields, invalid UTF-8 bytes and trailing JSON are rejected. URLs allow **8,192 bytes**; input titles allow **300 Unicode characters**, with whitespace collapsed on save. Slugs allow **64 Unicode characters**, using the [documented character rules](../guide/usage). Texts allow **1 MiB of UTF-8 bytes**, with `plain_text` and `source_code` formats (monospace display, no syntax highlighting). Tags accept at most five existing IDs. `expire_at` is Unix **seconds**: 0 means no expiry; other values must be in the future and at most `253402300799`. Storage still uses milliseconds. File `created_at` also uses seconds; admin timestamps use RFC 3339.
-
-Unimplemented inputs including `password`, `is_private` (even 0), `expiration_redirect_url` and `text_type:"markdown"` return 400 instead of silently creating public content. All shares are public. DELETE accepts no body; link/text deletion allows only an optional `domain` query parameter. Uploads accept one `file` part and optional `domain/custom_slug`, subject to the instance's file limit. Invalid trailing fields also remove the temporary upload.
-
-```sh
-curl -i https://s.example.com/api/v1/links \
-  -H "Authorization: Bearer $SANI_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"target_url":"https://example.com/launch","custom_slug":"launch"}'
-# HTTP 201, Location: https://s.example.com/launch
-# {"data":{"slug":"launch","short_url":"https://s.example.com/launch"}}
-
-curl -X PATCH https://s.example.com/api/v1/links/launch \
-  -H "Authorization: Bearer $SANI_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Launch","expire_at":0}'
-
-curl -X DELETE https://s.example.com/api/v1/links/launch \
-  -H "Authorization: Bearer $SANI_TOKEN"
-# HTTP 204, empty body
-```
-
-## Resource operations {#resources}
-
-| Method | Path | HTTP |
-|---|---|---|
-| `POST` | `/api/v1/links` | 201 |
-| `PATCH` | `/api/v1/links/{slug}` | 200 |
-| `DELETE` | `/api/v1/links/{slug}` | 204 |
-| `GET` | `/api/v1/links/{slug}/stats` | 200 |
-| `POST` | `/api/v1/texts` | 201 |
-| `PATCH` | `/api/v1/texts/{slug}` | 200 |
-| `DELETE` | `/api/v1/texts/{slug}` | 204 |
-| `POST` | `/api/v1/files` | 201 |
-| `GET` | `/api/v1/files` | 200 |
-| `DELETE` | `/api/v1/files/{key}` | 204 |
-| `GET` | `/api/v1/domains` | 200 |
-| `GET` | `/api/v1/tags` | 200 |
-
-`POST /api/v1/links`
-
-Requires `target_url`; optional `domain/custom_slug/title/expire_at/tag_ids`. Returns `data.slug/short_url`.
-
-`PATCH /api/v1/links/{slug}`
-
-Addresses a URL by path slug. Optional `domain/target_url/title/expire_at/tag_ids`; supply at least one field to change. Returns `data.slug/short_url` and invalidates cached values immediately. Rename through the admin ID endpoint.
-
-`DELETE /api/v1/links/{slug}`
-
-Permanently removes the URL and statistics and releases its slug. Not restorable. Repeating the deletion returns 404.
-
-`GET /api/v1/links/{slug}/stats`
-
-Optional `domain/period` query. `period=day|month|all`, default `all`. Returns `data.visit_count`. Day means today in the instance timezone; month means the current calendar month. Day/month queries flush first and fail if persistence fails.
-
-`POST /api/v1/texts`
-
-Requires `content`; optional `domain/custom_slug/title/expire_at/tag_ids/text_type`, default `plain_text`. Returns `data.slug/short_url` pointing to `/p/{slug}`.
-
-`PATCH /api/v1/texts/{slug}`
-
-Addresses text by path slug. Optional `domain/content/title/expire_at/tag_ids/text_type`; supply at least one field to change. Returns `data.slug/short_url`. Omitted content preserves the original bytes.
-
-`DELETE /api/v1/texts/{slug}`
-
-Permanently removes the text and statistics. Not restorable. Never deletes a URL or file as text.
-
-`POST /api/v1/files`
-
-Multipart upload. Returns `data` containing `file_id` (admin numeric ID), `key` (stable 48-character hexadecimal identifier), `slug/filename/mime_type/size/sha256/created_at/url/page`. Size is bytes, url is the files-origin download URL, and page is the main-origin share page. Internal storage names and placeholder image dimensions are not returned.
-
-`GET /api/v1/files`
-
-Optional `page` query (1–1000000, default 1). Fixed 30-row pages, ordered by creation time then ID descending. Returns `{"data":[...],"page":1,"page_size":30}`, with upload-shaped entries. Empty pages contain `[]`. Includes legacy and admin uploads. Concurrent inserts can move page boundaries.
-
-`DELETE /api/v1/files/{key}`
-
-Uses the stable key; a Bearer token is still required. Permanently removes the row and statistics; the existing sweeper reclaims bytes asynchronously. GET/HEAD return 405 and never delete.
-
-`GET /api/v1/domains`
-
-No parameters. Returns `data.domains` with the sole main host, plus `data.files_url`, the complete files origin or an empty string when disabled. Requires a configured main URL.
-
-`GET /api/v1/tags`
-
-No parameters. Returns `data.tags`, each with `id/name`. Colors, counts and tag editing are covered by admin operations below.
-
-## Management conventions {#conventions}
-
-- **Location.** Management endpoints use `/api/admin/v1`. JSON is the default; multipart uploads, CSV exports and icons are documented exceptions.
-- **Authentication.** Session status, sign-in and first-run setup follow the public contracts below; other management operations require authentication. Scripts use an API token, sent as `Authorization: Bearer sani_…` or `X-Api-Key: sani_…`; the admin app uses a session cookie. Create tokens in Settings → API tokens; they have full access.
+- **Location.** Every endpoint is under `/api/`, and requests and responses are UTF-8 JSON.
+- **Authentication.** Everything except sign-in and first-run setup needs it. Scripts use an API token, sent as `Authorization: Bearer sani_…` or `X-Api-Key: sani_…`; the admin app uses a session cookie. Create tokens in Settings → API tokens; they have full access.
 - **Cross-site requests.** Requests a browser sends from another site are refused, based on the `Sec-Fetch-Site` and `Origin` headers browsers add. Scripts and command-line tools don’t send those headers and are unaffected.
 - **Times.** RFC 3339 in UTC, such as `2026-09-28T09:30:00Z`.
-- **Sizes.** Request bodies are limited to 1 MiB; to 8 MiB for text creation and link updates, so a text at its 1 MiB limit fits even with JSON escapes; to 32 MiB for imports; and for uploads to the [file size limit](./configuration#sani-max-file-mb) plus 1 MiB for the form around it.
-- **Caching.** JSON responses have `Cache-Control: no-store`.
-- **Validation.** Ordinary JSON requests for resource creation/updates, settings and sessions reject unknown fields and trailing data; multipart uploads reject unknown parts. These operations reject unsupported `password`, `is_private` or endpoint-inappropriate `domain` inputs. Import processes existing export files under its own [field-mapping rules](../guide/import-export), rather than the ordinary request field whitelist.
+- **Sizes.** Request bodies are limited to 1 MB; to 8 MB when they create or update a link, so a text at its 1 MB limit fits even with JSON escapes; to 32 MB for imports; and for uploads to the [file size limit](./configuration#sani-max-file-mb) plus 1 MB for the form around it.
+- **Caching.** Every response has `Cache-Control: no-store`.
 - **Errors.** A failed request gets a matching HTTP status and the body below. `code` is stable and meant for programs; `message` is an English explanation for people and may change. The full list is under [Error codes](#errors).
 
 ```json
@@ -123,7 +24,7 @@ No parameters. Returns `data.tags`, each with `id/name`. Colors, counts and tag 
 A complete request:
 
 ```sh
-curl https://s.example.com/api/admin/v1/links \
+curl https://s.example.com/api/links \
   -H "Authorization: Bearer $SANI_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/launch", "slug": "launch"}'
@@ -133,63 +34,63 @@ curl https://s.example.com/api/admin/v1/links \
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/admin/v1/links` | [List links](#list) |
-| `PATCH` | `/api/admin/v1/tags/{id}` | [Edit a tag](#tags) |
-| `DELETE` | `/api/admin/v1/tags/{id}` | [Delete tag](#tags) |
-| `POST` | `/api/admin/v1/uploads` | [Start a chunked upload](#chunk-upload) |
-| `PUT` | `/api/admin/v1/uploads/{id}` | [Upload a chunk](#chunk-upload) |
-| `POST` | `/api/admin/v1/uploads/{id}/complete` | [Complete an upload](#chunk-upload) |
-| `DELETE` | `/api/admin/v1/uploads/{id}` | [Cancel an upload](#chunk-upload) |
-| `GET` | `/api/admin/v1/tags` | [Tag catalog and counts](#tags) |
-| `POST` | `/api/admin/v1/tags` | [Create or get a tag](#tags) |
-| `POST` | `/api/admin/v1/links` | [Create a link](#create) |
-| `POST` | `/api/admin/v1/links/bulk` | [Change several links at once](#bulk) |
-| `GET` | `/api/admin/v1/links/{id}` | [Read a link](#get) |
-| `PATCH` | `/api/admin/v1/links/{id}` | [Update a link](#update) |
-| `DELETE` | `/api/admin/v1/links/{id}` | [Delete a link](#delete) |
-| `POST` | `/api/admin/v1/links/{id}/restore` | [Restore a deleted link](#restore) |
-| `POST` | `/api/admin/v1/links/{id}/refresh` | [Fetch the title and icon again](#refresh) |
-| `GET` | `/api/admin/v1/links/{id}/stats` | [A link’s statistics](#stats) |
-| `POST` | `/api/admin/v1/texts` | [Share a text](#create-text) |
-| `POST` | `/api/admin/v1/files` | [Share a file](#create-file) |
-| `GET` | `/api/admin/v1/links/{id}/text` | [Read a shared text](#read-text) |
-| `GET` | `/api/admin/v1/slugs/{slug}` | [Check whether a slug is free](#slug-check) |
-| `GET` | `/api/admin/v1/overview` | [Totals across all links](#overview) |
-| `GET` | `/api/admin/v1/favicons/{host}` | [Site icons](#favicons) |
-| `GET` | `/api/admin/v1/export` | [Export every link](#export) |
-| `POST` | `/api/admin/v1/import` | [Import links](#import) |
-| `GET` | `/api/admin/v1/config` | [Read settings](#config) |
-| `PATCH` | `/api/admin/v1/config` | [Change the short domain](#config) |
-| `POST` | `/api/admin/v1/config/metadata/test` | [Test a proxy](#metadata-test) |
-| `GET` | `/api/admin/v1/tokens` | [List API tokens](#tokens) |
-| `POST` | `/api/admin/v1/tokens` | [Create an API token](#tokens) |
-| `DELETE` | `/api/admin/v1/tokens/{id}` | [Revoke an API token](#tokens) |
-| `GET` | `/api/admin/v1/session` | [Sign-in state](#session) |
-| `POST` | `/api/admin/v1/session` | [Sign in](#session) |
-| `DELETE` | `/api/admin/v1/session` | [Sign out](#session) |
-| `POST` | `/api/admin/v1/setup` | [Choose the first password](#session) |
-| `PUT` | `/api/admin/v1/password` | [Change the password](#password) |
-| `POST` | `/api/admin/v1/sessions/revoke` | [Sign out other devices](#password) |
+| `GET` | `/api/links` | [List links](#list) |
+| `PATCH` | `/api/tags/{id}` | [Edit a tag](#tags) |
+| `DELETE` | `/api/tags/{id}` | [Delete tag](#tags) |
+| `POST` | `/api/uploads` | [Start a chunked upload](#chunk-upload) |
+| `PUT` | `/api/uploads/{id}` | [Upload a chunk](#chunk-upload) |
+| `POST` | `/api/uploads/{id}/complete` | [Complete an upload](#chunk-upload) |
+| `DELETE` | `/api/uploads/{id}` | [Cancel an upload](#chunk-upload) |
+| `GET` | `/api/tags` | [Tag catalog and counts](#tags) |
+| `POST` | `/api/tags` | [Create or get a tag](#tags) |
+| `POST` | `/api/links` | [Create a link](#create) |
+| `POST` | `/api/links/bulk` | [Change several links at once](#bulk) |
+| `GET` | `/api/links/{id}` | [Read a link](#get) |
+| `PATCH` | `/api/links/{id}` | [Update a link](#update) |
+| `DELETE` | `/api/links/{id}` | [Delete a link](#delete) |
+| `POST` | `/api/links/{id}/restore` | [Restore a deleted link](#restore) |
+| `POST` | `/api/links/{id}/refresh` | [Fetch the title and icon again](#refresh) |
+| `GET` | `/api/links/{id}/stats` | [A link’s statistics](#stats) |
+| `POST` | `/api/texts` | [Share a text](#create-text) |
+| `POST` | `/api/files` | [Share a file](#create-file) |
+| `GET` | `/api/links/{id}/text` | [Read a shared text](#read-text) |
+| `GET` | `/api/slugs/{slug}` | [Check whether a slug is free](#slug-check) |
+| `GET` | `/api/overview` | [Totals across all links](#overview) |
+| `GET` | `/api/favicons/{host}` | [Site icons](#favicons) |
+| `GET` | `/api/export` | [Export every link](#export) |
+| `POST` | `/api/import` | [Import links](#import) |
+| `GET` | `/api/config` | [Read settings](#config) |
+| `PATCH` | `/api/config` | [Change the short domain](#config) |
+| `POST` | `/api/config/metadata/test` | [Test a proxy](#metadata-test) |
+| `GET` | `/api/tokens` | [List API tokens](#tokens) |
+| `POST` | `/api/tokens` | [Create an API token](#tokens) |
+| `DELETE` | `/api/tokens/{id}` | [Revoke an API token](#tokens) |
+| `GET` | `/api/session` | [Sign-in state](#session) |
+| `POST` | `/api/session` | [Sign in](#session) |
+| `DELETE` | `/api/session` | [Sign out](#session) |
+| `POST` | `/api/setup` | [Choose the first password](#session) |
+| `PUT` | `/api/password` | [Change the password](#password) |
+| `POST` | `/api/sessions/revoke` | [Sign out other devices](#password) |
 
 ## Links {#links}
 
 ### Tags {#tags}
 
-`GET /api/admin/v1/tags`
+`GET /api/tags`
 
 Returns `{"items":[{"id":1,"name":"work","color":"blue","count":3}],"total":8,"untagged":2}`. A tag's `count` includes every non-deleted URL, text and file link using it, including disabled links. `total` and `untagged` count all links and untagged links. These counts do not depend on search, type or tag filters. Unused tags remain in the catalog.
 
-`POST /api/admin/v1/tags`
+`POST /api/tags`
 
-Send `{"name":"work","color":"blue"}`; returns `200` and a tag object. Names are trimmed and NFC-normalized, with 1–24 Unicode code points and no control characters. Lowercase names identify duplicates: an existing tag is returned without changing its name or color. Color defaults to `blue`; allowed values are `blue`, `green`, `amber`, `rose`, `neutral` or six-digit HEX such as `#5872a5`. The body limit is 4 KiB and each instance holds at most 1,000 tags.
+Send `{"name":"work","color":"blue"}`; returns `200` and a tag object. Names are trimmed and NFC-normalized, with 1–24 Unicode code points and no control characters. Lowercase names identify duplicates: an existing tag is returned without changing its name or color. Color defaults to `blue`; allowed values are `blue`, `green`, `amber`, `rose`, `neutral` or six-digit HEX such as `#5872a5`. The body limit is 4 KB and each instance holds at most 1,000 tags.
 
 Tags appear only in authenticated administration APIs and screens, never on visitor share pages.
 
-`PATCH /api/admin/v1/tags/{id}`
+`PATCH /api/tags/{id}`
 
 Send both `name` and `color` to rename/recolor an existing tag; returns `200` with the updated tag. All assignments retain the same ID. A conflicting normalized name returns `409 tag_taken`, a missing ID `404`. Creation and editing accept legacy named colors or six-digit HEX (`#5872a5`), normalized to lowercase. The admin UI converts HEX3, RGB and HSL to HEX6; the API does not accept arbitrary CSS.
 
-`DELETE /api/admin/v1/tags/{id}`
+`DELETE /api/tags/{id}`
 
 Permanently removes the tag and all its associations, including associations on soft-deleted items, in one transaction. Links, shared text, files and other tags are retained. Associated items receive a monotonic `updatedAt`. Returns `204` with no body; a missing tag returns `404 not_found`. Counts shown before confirmation are a snapshot: deletion applies to all associations at commit time. Requires the same authentication and cross-origin protection as other writes.
 
@@ -231,7 +132,7 @@ Permanently removes the tag and all its associations, including associations on 
 | `host` | The destination’s host without `www.`. Empty for addresses without a host, like `mailto:`. |
 | `title` | The title, or an empty string. |
 | `meta` | Where the title came from: `pending` while fetching, `ok` fetched from the page, `failed` nothing found, `manual` set by you and never replaced automatically. |
-| `icon` | Whether a site icon is stored; get it from [`/api/admin/v1/favicons/{host}`](#favicons). |
+| `icon` | Whether a site icon is stored; get it from [`/api/favicons/{host}`](#favicons). |
 | `redirect` | The redirect status: 301, 302, 307 or 308. |
 | `status` | `active`, `disabled`, `expired`, or `exhausted` when the visit limit is used up. |
 | `expiresAt`, `maxClicks` | Expiry and visit limit, `null` when not set. |
@@ -240,9 +141,9 @@ Permanently removes the tag and all its associations, including associations on 
 
 ### Create a link {#create}
 
-Optional `tags` accepts up to 5 distinct, existing positive tag IDs. Omission creates an untagged link; create tags first through `POST /api/admin/v1/tags`. Supplying `tags` (even `[]`) disables `reuse` so tag choices are never silently discarded. Text and file shares also support tags.
+Optional `tags` accepts up to 5 distinct, existing positive tag IDs. Omission creates an untagged link; create tags first through `POST /api/tags`. Supplying `tags` (even `[]`) disables `reuse` so tag choices are never silently discarded. Text and file shares also support tags.
 
-`POST /api/admin/v1/links`
+`POST /api/links`
 
 Only `url` is required.
 
@@ -261,7 +162,7 @@ Returns `201` with the new [link](#link-object).
 
 ### List links {#list}
 
-`GET /api/admin/v1/links`
+`GET /api/links`
 
 | Parameter | Meaning |
 |---|---|
@@ -282,7 +183,7 @@ Returns `201` with the new [link](#link-object).
 
 ### Read a link {#get}
 
-`GET /api/admin/v1/links/{id}`
+`GET /api/links/{id}`
 
 Returns the [link](#link-object).
 
@@ -290,7 +191,7 @@ Returns the [link](#link-object).
 
 Omitted `tags` preserves the assignments; `[]` clears them; an ID array replaces them. `null`, duplicates, nonexistent IDs or more than 5 entries fail and roll back the entire update.
 
-`PATCH /api/admin/v1/links/{id}`
+`PATCH /api/links/{id}`
 
 Takes every field of *Create* except `reuse`, and changes only the fields present:
 
@@ -306,19 +207,19 @@ The decision to clear an automatic title uses the latest row inside the write tr
 
 ### Delete a link {#delete}
 
-`DELETE /api/admin/v1/links/{id}`
+`DELETE /api/links/{id}`
 
 Returns `204`. New requests reaching the origin stop redirecting immediately. Background maintenance purges records deleted more than an hour ago with their statistics; restoration remains possible until that purge. The slug is free for a new link right away, which removes the old record early. Shared files are reclaimed asynchronously; see [cleanup intervals](../guide/operations#share-cleanup).
 
 ### Restore a link {#restore}
 
-`POST /api/admin/v1/links/{id}/restore`
+`POST /api/links/{id}/restore`
 
 Undoes a delete and returns the restored [link](#link-object). Returns `404` once maintenance has purged the record or a new link has taken the slug. Restoration does not reset expiry or visit counts.
 
 ### Change several links at once {#bulk}
 
-`POST /api/admin/v1/links/bulk`
+`POST /api/links/bulk`
 
 Turns links on or off, deletes or restores them, in one transaction:
 
@@ -332,13 +233,13 @@ Turns links on or off, deletes or restores them, in one transaction:
 
 ### Fetch the title and icon again {#refresh}
 
-`POST /api/admin/v1/links/{id}/refresh`
+`POST /api/links/{id}/refresh`
 
 Fetches the destination’s title and icon again, waits for the result and returns the [link](#link-object). This can take a few seconds. A title you set yourself is kept. Texts and files have no page to fetch, and get `kind_mismatch`.
 
 ### Statistics {#stats}
 
-`GET /api/admin/v1/links/{id}/stats`
+`GET /api/links/{id}/stats`
 
 The `days` parameter sets how many days to return, 1 to 366, default 30.
 
@@ -359,7 +260,7 @@ The numbers are explained under [Statistics](../guide/statistics).
 
 ### Check a slug {#slug-check}
 
-`GET /api/admin/v1/slugs/{slug}`
+`GET /api/slugs/{slug}`
 
 Tells whether a slug can be used:
 
@@ -407,24 +308,24 @@ A share’s `content`:
 
 ### Share a text {#create-text}
 
-`POST /api/admin/v1/texts`
+`POST /api/texts`
 
 ```json
 { "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
 ```
 
-`text` is required: at most 1 MiB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
+`text` is required: at most 1 MB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
 
 ### Share a file {#create-file}
 
 The optional multipart `tags` field is a JSON array string such as `[1,2]`. It uses the same validation as JSON creation. A rejected tag assignment also cleans up any file received during that upload.
 
-`POST /api/admin/v1/files`
+`POST /api/files`
 
 The body is `multipart/form-data` with one `file` part and, optionally, the fields `slug`, `title`, `expiresAt`, `maxClicks` and `enabled`, as text and with the same meaning as for [a link](#create):
 
 ```sh
-curl https://s.example.com/api/admin/v1/files \
+curl https://s.example.com/api/files \
   -H "Authorization: Bearer $SANI_TOKEN" \
   -F file=@report.pdf -F maxClicks=10
 ```
@@ -437,13 +338,13 @@ Returns `201` with the new [link](#link-object).
 
 ### Read a shared text {#read-text}
 
-`GET /api/admin/v1/links/{id}/text`
+`GET /api/links/{id}/text`
 
 Returns `{"text": "…"}`, the whole body, which listings leave out. It doesn’t count as a visit. Links that aren’t texts get `404`.
 
 ## Overview {#overview}
 
-`GET /api/admin/v1/overview`
+`GET /api/overview`
 
 Takes the same `days` parameter as [Statistics](#stats).
 
@@ -453,7 +354,7 @@ Takes the same `days` parameter as [Statistics](#stats).
 
 ## Site icons {#favicons}
 
-`GET /api/admin/v1/favicons/{host}`
+`GET /api/favicons/{host}`
 
 Returns the icon itself, or `404` when there’s none. `{host}` is the `host` of a [link](#link-object). Icons come from third-party sites, so they’re served with a sandboxing Content Security Policy: not even an SVG can run scripts.
 
@@ -461,7 +362,7 @@ Returns the icon itself, or `404` when there’s none. `{host}` is the `host` of
 
 ### Export {#export}
 
-`GET /api/admin/v1/export`
+`GET /api/export`
 
 Returns all undeleted URL links and their tags as a Sani JSON attachment, excluding text and file shares. The format is described under [Import and export](../guide/import-export#export). Add `?format=csv` for CSV.
 
@@ -469,12 +370,12 @@ CSV adds an apostrophe prefix to fields that could trigger spreadsheet formulas;
 
 ### Import {#import}
 
-`POST /api/admin/v1/import`
+`POST /api/import`
 
-The request body is the file itself: up to 32 MiB and 100,000 links. Formats and rules are under [Import and export](../guide/import-export#import).
+The request body is the file itself: up to 32 MB and 100,000 links. Formats and rules are under [Import and export](../guide/import-export#import).
 
 ```sh
-curl https://s.example.com/api/admin/v1/import \
+curl https://s.example.com/api/import \
   -H "Authorization: Bearer $SANI_TOKEN" \
   --data-binary @shlink-export.json
 ```
@@ -489,21 +390,21 @@ Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds
 
 ### Chunked uploads {#chunk-upload}
 
-All four endpoints require authentication and the same origin checks as the other API routes. The admin app uses this flow for files over 25,000,000 bytes; smaller files still use `POST /api/admin/v1/files`.
+All four endpoints require authentication and the same origin checks as the other API routes. The admin app uses this flow for files over 25,000,000 bytes; smaller files still use `POST /api/files`.
 
-`POST /api/admin/v1/uploads`
+`POST /api/uploads`
 
 Send JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`; link options `title`, `tags`, `expiresAt`, `maxClicks` and `enabled` are optional. Body limit: 16 KiB. Returns `201` with `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`. The complete size must fit the effective `maxFileSize`. Sessions belong to the exact authenticated session/token credential, not a reusable token ID.
 
-`PUT /api/admin/v1/uploads/{id}`
+`PUT /api/uploads/{id}`
 
 Send raw bytes with `Content-Length` from 1 to 25,000,000 and `Upload-Offset` equal to the last acknowledged byte offset. Returns `200` with `{ "offset":25000000 }`. Upload serially. Retrying the most recent chunk is idempotent only when its length and SHA-256 match. Wrong offsets or different duplicate bytes return `409 upload_offset`; failed/short transfers do not advance the offset. No whole-file buffering is used.
 
-`POST /api/admin/v1/uploads/{id}/complete`
+`POST /api/uploads/{id}/complete`
 
 After every byte is acknowledged, complete with an empty body. The server verifies the stored size, calculates SHA-256 and publishes one share atomically. Returns `201` with the link; retrying a retained completion receipt returns `200` with the same link. Incomplete uploads return `409 upload_incomplete`. No share is visible before completion. Validation/storage errors leave the pending upload retryable where storage permits.
 
-`DELETE /api/admin/v1/uploads/{id}`
+`DELETE /api/uploads/{id}`
 
 Cancels a pending upload, removes its temporary bytes and returns `204`. Removing a completed receipt never deletes its share. A foreign/expired/missing session returns `404 upload_not_found`; concurrent operations return `409 upload_busy`.
 
@@ -511,7 +412,7 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
 
 ## Settings {#config}
 
-`GET /api/admin/v1/config`
+`GET /api/config`
 
 ```json
 {
@@ -552,7 +453,7 @@ All three persist independently across restarts. `configSources` includes these 
 
 On an existing instance’s initial upgrade, each missing share-length setting is initialized and persisted as `max(10, legacy effective URL slug length)`: an old length of 12 keeps both share lengths at 12. Later URL-length edits no longer affect share lengths; each share-length environment variable still takes priority. Migrated values report `settings`, or `env` while overridden; removing the override restores the saved value without following the URL length again. Lengths exclude `/p/` and affect only future generated slugs; existing and manually chosen slugs stay unchanged.
 
-`PATCH /api/admin/v1/config`
+`PATCH /api/config`
 
 Changes the short domain stored in Settings:
 
@@ -585,7 +486,7 @@ Allowed schemes: `http`, `https`, `socks5`. Supply a hostname or unbracketed IP,
 
 ## Test a metadata proxy {#metadata-test}
 
-`POST /api/admin/v1/config/metadata/test`
+`POST /api/config/metadata/test`
 
 Requires an authenticated session or API token and the same cross-origin protection as other mutations. Body: `{"metaProxy": {...}}`, using the PATCH proxy fields and password-retention rules above; limit 4 KiB. This tests the supplied form without saving it or changing the active fetcher. It fetches the title of the fixed HTTPS target `https://example.com`, through the same public-IP checks and proxy transport, with no direct fallback. The total deadline is 12 seconds; an earlier transport timeout can fail sooner. At most one test runs per instance, and starts are at least 5 seconds apart (`429 rate_limited`, `Retry-After: 5`). Request cancellation or shutdown cancels the test.
 
@@ -593,15 +494,15 @@ Success: `200 {"ok":true}`. Connection/title failure: `502 proxy_test_failed`, w
 
 ## API tokens {#tokens}
 
-`GET /api/admin/v1/tokens`
+`GET /api/tokens`
 
 Returns `{"items": [...]}`, the tokens, each like `{"id": 3, "name": "iPhone Shortcuts", "hint": "sani_Ab3d", "createdAt": "…", "usedAt": "…"}`. `hint` is the start of the token, to tell tokens apart; `usedAt` is when it was last used, to the minute, or `null`.
 
-`POST /api/admin/v1/tokens`
+`POST /api/tokens`
 
 Takes `{"name": "iPhone Shortcuts"}`, with a name of 1 to 60 characters. Returns `201`, and the `token` field holds the token itself: **this is the only time it’s returned**. Sani keeps only its hash.
 
-`DELETE /api/admin/v1/tokens/{id}`
+`DELETE /api/tokens/{id}`
 
 Revokes the token and returns `204`.
 
@@ -609,21 +510,21 @@ Revokes the token and returns `204`.
 
 The admin app uses these, and they need no authentication.
 
-`GET /api/admin/v1/session`
+`GET /api/session`
 
 Returns `{"authenticated": false, "needsSetup": true}`: whether you’re signed in, and whether no password has been set yet.
 
-`POST /api/admin/v1/setup`
+`POST /api/setup`
 
 Sets the first password, with `{"code": "k7m2-p9x4-hq3d", "password": "…"}`. `code` is the [setup code from the log](../guide/deploy#first-password); case, spaces and dashes don’t matter. On success you’re signed in and get `{"authenticated": true}`. Returns `409` once a password exists.
 
-`POST /api/admin/v1/session`
+`POST /api/session`
 
 Signs in with `{"password": "…"}`, sets the session cookie and returns `{"authenticated": true}`.
 
 If another password change replaces the password during setup or sign-in, session issuance returns `401 wrong_password`. Sign in again with the current password.
 
-`DELETE /api/admin/v1/session`
+`DELETE /api/session`
 
 Signs out and returns `204`.
 
@@ -635,13 +536,13 @@ The session cookie is `sani_session`: `HttpOnly`, `SameSite=Strict`, only sent t
 
 Initial setup and password changes require at least 8 Unicode code points and at most 1,024 UTF-8 bytes, matching the environment and CLI limits.
 
-`PUT /api/admin/v1/password`
+`PUT /api/password`
 
 Changes the password, with `{"current": "…", "password": "…"}`. Returns `204` and ends the sessions on every other device. Returns `409` when `SANI_PASSWORD` manages the password.
 
 Password replacement and session revocation commit in one transaction; failed revocation leaves the password unchanged. A concurrent change that invalidates `current` returns `400 wrong_password`.
 
-`POST /api/admin/v1/sessions/revoke`
+`POST /api/sessions/revoke`
 
 Ends every session except the current one and returns `204`.
 
@@ -678,11 +579,6 @@ Returns `200` with `ok`, for health checks.
 
 | Code | Status | Meaning |
 |---|---|---|
-| `unsupported_parameter` | 400 | This endpoint does not support the parameter; no mutation. |
-| `invalid_parameter` | 400 | Invalid type, null, limit or query parameter. |
-| `domain_invalid` | 400 | Domain does not match the configured main host. |
-| `domain_unconfigured` | 503 | Configure the instance base URL first. |
-| `content_type` | 415 | Resource API JSON requires application/json. |
 | `bad_json` | 400 | The body isn’t a valid JSON object |
 | `cursor_invalid` | 400 | The pagination cursor is invalid |
 | `url_required` | 400 | The destination is missing |
@@ -701,7 +597,7 @@ Returns `200` with `ok`, for health checks.
 | `format_invalid` | 400 | `format` isn’t `plain` or `code` |
 | `kind_mismatch` | 400 | A field that doesn’t apply to this kind of link, like a `url` for a text, or a refresh of a share |
 | `file_required` | 400 | The upload has no `file` part, or the file is empty |
-| `upload_invalid` | 400 | The upload isn’t well-formed `multipart/form-data`, has more than one file, or a field over 4 KiB |
+| `upload_invalid` | 400 | The upload isn’t well-formed `multipart/form-data`, has more than one file, or a field over 4 KB |
 | `bulk_invalid` | 400 | A bulk change with an unknown `action`, or without 1 to 500 `ids` |
 | `base_url_invalid` | 400 | The domain should look like `https://s.example.com` |
 | `name_invalid` | 400 | The token name is empty or over 60 characters |
@@ -713,7 +609,6 @@ Returns `200` with `ok`, for health checks.
 | `unauthorized` | 401 | Not signed in, and no valid token |
 | `cross_origin` | 403 | A browser request from another site |
 | `setup_code` | 403 | Wrong setup code |
-| `method_not_allowed` | 405 | This path does not accept the method; see Allow. |
 | `not_found` | 404 | No such link, token or endpoint, or the deleted link can no longer be restored |
 | `slug_taken` | 409 | The slug is taken |
 | `already_setup` | 409 | A password is already set |
@@ -721,8 +616,8 @@ Returns `200` with `ok`, for health checks.
 | `password_env` | 409 | `SANI_PASSWORD` manages the password, so the API can’t change it |
 | `base_url_env` | 409 | `SANI_BASE_URL` fixes the short domain, so the API can’t change it |
 | `files_disabled` | 409 | No files domain is set, so files can’t be shared |
-| `too_large` | 413 | The request body is over its [limit](#conventions), such as an import file over 32 MiB |
-| `text_too_large` | 413 | The text is over 1 MiB |
+| `too_large` | 413 | The request body is over its [limit](#conventions), such as an import file over 32 MB |
+| `text_too_large` | 413 | The text is over 1 MB |
 | `config_env` | 409 | Setting fixed by environment |
 | `config_invalid` | 400 | Invalid creation settings |
 | `proxy_missing` | 409 | Dedicated proxy is not configured |

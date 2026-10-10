@@ -66,7 +66,7 @@ Not public: loopback, private networks, link-local addresses (including cloud me
 More limits:
 
 - every redirect is checked again, and at most 5 are followed;
-- pages are read up to 1 MB and icons up to 256 KB, a single request times out after 12 seconds, and fetching for one link takes 20 seconds at most;
+- pages are read up to 1 MiB and icons up to 256 KiB, a single request times out after 12 seconds, and fetching for one link takes 20 seconds at most;
 - at most 32 HTML icon candidates are retained; base and HTTP(S) icon URLs are limited to 8,192 bytes before and after resolution;
 - background automatic fetching runs at most 3 jobs at once, limiting outgoing requests from bulk link creation; manual refreshes do not use these job slots;
 - the standard library handles `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. Targets still pass through `checkHost`; only requests actually routed through a proxy may delegate failed local DNS lookups. Direct and proxied requests use separate connection pools, so `NO_PROXY` requests never inherit the proxy's private-address exemption. The proxy itself may be private; Sani's dial checks do not inspect its remote DNS or final outbound connection. Use a trusted proxy and restrict reachable addresses there;
@@ -80,12 +80,12 @@ Everything whose size someone outside controls has an explicit limit:
 
 | Input | Limit |
 |---|---|
-| Request headers | 32 KB, read within 5 seconds |
-| Whole requests | 60 seconds each to read and write, 120 seconds idle; uploads and downloads a minute plus the time a 64 KB/s connection needs |
-| JSON request bodies | 1 MB; 8 MB to create or update a link |
-| Import files | 32 MB, 100,000 links |
-| Texts | 1 MB |
-| Files | `SANI_MAX_FILE_MB`, 99,000,000 bytes by default; other upload fields 4 KB each |
+| Request headers | 32 KiB, read within 5 seconds |
+| Whole requests | 60 seconds each to read and write, 120 seconds idle; uploads and downloads a minute plus the time a 64 KiB/s connection needs |
+| JSON request bodies | 1 MiB for ordinary admin JSON; 8 MiB for admin text creation, link updates and resource API JSON |
+| Import files | 32 MiB, 100,000 links |
+| Texts | 1 MiB |
+| Files | `SANI_MAX_FILE_MB`, 99,000,000 bytes by default; other upload fields 4 KiB each |
 | File names | 255 bytes |
 | Downloads at once | 32 |
 | Destinations | 8,192 bytes |
@@ -95,8 +95,8 @@ Everything whose size someone outside controls has an explicit limit:
 | Token names | 60 characters |
 | Referring sites per link | 200; between two writes, at most 64 new ones per link in memory |
 | Addresses tracked for rate limiting | 10,000 |
-| Cached unknown slugs | A quarter of `SANI_CACHE_SIZE` |
-| Fetched pages and icons | 1 MB and 256 KB |
+| Cached unknown slugs | `64 × max(1, floor(SANI_CACHE_SIZE / 256))` |
+| Fetched pages and icons | 1 MiB and 256 KiB |
 
 ## Visitor privacy {#privacy}
 
@@ -115,6 +115,6 @@ Images and binaries are built by GitHub Actions from the tagged commit, without 
 
 Please don’t open a public issue for security problems. Report them privately through GitHub’s [private vulnerability reporting](https://github.com/DejavuMoe/sani/security/advisories/new) instead.
 
-Dedicated proxies, whether saved in Settings or supplied by `SANI_META_PROXY`, pin verified public IPs through CONNECT/SOCKS5 and fail closed. Saved passwords are recoverable in the restricted database and its backups, without encryption. The API exposes only a password-set flag; errors omit transport details and credentials. Changing the proxy scheme, host, port or username cannot reuse a saved password. Authenticated connection tests use a fixed target, a 12-second deadline, one active request and a five-second start interval; they do not save settings. Legacy environment proxies retain their previous trust boundary; see [configuration](../reference/configuration#sani-meta-proxy).
+Dedicated proxies, whether saved in Settings or supplied by `SANI_META_PROXY`, pin verified public IPs through CONNECT/SOCKS5 and fail closed. Saved proxy passwords are recoverable in the restricted database and its backups, without encryption. The API exposes only a password-set flag; errors omit transport details and credentials. Changing the proxy scheme, host, port or username cannot reuse a saved password. Authenticated connection tests use a fixed target, a 12-second deadline, one active request and a five-second start interval; they do not save settings. Legacy environment proxies retain their previous trust boundary; see [configuration](../reference/configuration#sani-meta-proxy).
 
 Chunk uploads are bound to the authenticated credential hash, limited to 8 active sessions, 2 per credential and 8 GiB reserved total. Up to 32 completion receipts are retained, evicting the oldest completed receipt under pressure. Each session expires after an hour of inactivity; maintenance runs every minute, and restart removes abandoned chunk files. Completed shares retain the existing deletion/expiry rules.

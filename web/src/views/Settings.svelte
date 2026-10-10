@@ -99,7 +99,10 @@
     catch { tokensFailed = true; }
     finally { tokensLoading = false; }
   }
-  onMount(() => { void loadTokens(); });
+  onMount(() => {
+    void loadTokens();
+    return () => clearTimeout(confirmTimer);
+  });
 
   async function createToken(e: SubmitEvent) {
     e.preventDefault();
@@ -143,7 +146,7 @@
 
   const apiOrigin = location.origin;
   const curl = $derived(
-    `curl -X POST ${apiOrigin}/api/v1/shorten \\\n  -H "Authorization: Bearer ${revealed?.token ?? 'sani_…'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"target_url": "https://example.com/some/long/path"}'`,
+    `curl -X POST ${apiOrigin}/api/v1/links \\\n  -H "Authorization: Bearer ${revealed?.token ?? 'sani_…'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"target_url": "https://example.com/some/long/path"}'`,
   );
 
   // Bookmarklet: opens the compact "shorten this page" window.

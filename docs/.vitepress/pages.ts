@@ -42,6 +42,7 @@ export const groups: PageGroup[] = [
     pages: [
       { path: 'reference/configuration', zh: '配置项', en: 'Configuration' },
       { path: 'reference/api', zh: 'HTTP API', en: 'HTTP API' },
+      { path: 'reference/api-archive', zh: 'API 归档 ≤ v0.9.4', en: 'API archive ≤ v0.9.4' },
       { path: 'reference/cli', zh: '命令行', en: 'Command line' },
     ],
   },

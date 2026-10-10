@@ -62,10 +62,10 @@ export function envVars(): EnvVar[] {
   return [...vars.values()];
 }
 
-/** "GET /api/links" and so on, as registered in internal/server/api.go. */
+/** Method/path pairs registered by the admin and public route tables. */
 export function apiRoutes(): string[] {
-  const src = read('internal/server/api.go') + '\n' + read('internal/server/api_see.go');
-  return [...src.matchAll(/mux\.Handle(?:Func)?\("([A-Z]+) (\/api\/[^"]*)"/g)].map((m) => `${m[1]} ${m[2]}`);
+  const src = read('internal/server/api.go') + '\n' + read('internal/server/api_public.go');
+  return [...src.matchAll(/"([A-Z]+) (\/api\/[^"]*)"/g)].map((m) => `${m[1]} ${m[2]}`);
 }
 
 const httpStatus: Record<string, number> = {

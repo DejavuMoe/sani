@@ -16,7 +16,7 @@ const upgrade = process.argv.includes('--upgrade');
 if (upgrade) assert(legacy, 'OLD_BIN must name the verified pre-upgrade binary');
 let binary = current;
 let prefix = '/api/admin/v1';
-const root = await mkdtemp(join(tmpdir(), 'sani-compat-'));
+const root = await mkdtemp(join(tmpdir(), 'sani-api-'));
 const source = join(root, 'source');
 const restored = join(root, 'restored');
 const password = 'smoke-test-password';
@@ -120,62 +120,61 @@ async function verify(fixture) {
   await request(prefix + '/session', { method: 'POST', body: JSON.stringify({ password }), headers: { 'Content-Type': 'application/json' } });
 }
 async function contract(token) {
-  const call = async (method, path, body, status = 200) => {
+  const call = async (method, path, body, status = method === 'POST' ? 201 : method === 'DELETE' ? 204 : 200) => {
     const response = await request('/api/v1' + path, { method, status,
-      headers: { Authorization: token, ...(body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
+      headers: { Authorization: `Bearer ${token}`, ...(body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}) },
       body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
     });
     assert.equal(response.headers.get('cache-control'), 'no-store');
+    if (status === 204) { assert.equal(await response.text(), ''); return; }
     const json = await response.json();
-    assert.equal(json.code, path.startsWith('/file/delete/') ? String(status) : status);
-    if (status >= 400) assert.equal(json.success, false);
+    if (status >= 400) assert.equal(typeof json.error.code, 'string');
+    if (status === 201) assert.equal(response.headers.get('location'), json.data.short_url ?? json.data.page);
     return json;
   };
-  const domain = (await call('GET', '/domains')).data.domains[0];
-  assert.equal(domain, 'short.example');
-  for (const path of ['/text/domains', '/file/domains']) assert.deepEqual((await call('GET', path)).data.domains, [domain]);
+  const discovery = (await call('GET', '/domains')).data;
+  const domain = discovery.domains[0];
+  assert.equal(domain, 'short.example'); assert.equal(discovery.files_url, 'http://localhost');
   const tags = (await call('GET', '/tags')).data.tags;
   assert(tags.length > 0);
-  const created = await call('POST', '/shorten', { domain, target_url: 'https://example.org/contract', custom_slug: 'http-contract', tag_ids: [tags[0].id] });
-  assert.deepEqual(created.data, { slug: 'http-contract', custom_slug: 'http-contract', short_url: 'https://short.example/http-contract' });
-  await call('PUT', '/shorten', { domain, slug: 'http-contract', target_url: 'https://example.org/updated', title: '' });
-  for (const period of ['daily', 'monthly', 'totally']) assert.equal((await call('GET', `/link/visit-stat?domain=${domain}&slug=http-contract&period=${period}`)).data.visit_count, 0);
-  assert.equal((await call('DELETE', '/shorten', { domain, slug: 'http-contract' })).data, null);
-  await call('DELETE', '/shorten', { domain, slug: 'http-contract' }, 404);
+  const created = await call('POST', '/links', { domain, target_url: 'https://example.org/contract', custom_slug: 'http-contract', tag_ids: [tags[0].id] });
+  assert.deepEqual(created.data, { slug: 'http-contract', short_url: 'https://short.example/http-contract' });
+  await call('PATCH', '/links/http-contract', { domain, target_url: 'https://example.org/updated', title: '', expire_at: 0, tag_ids: [] });
+  for (const period of ['day', 'month', 'all']) assert.equal((await call('GET', `/links/http-contract/stats?period=${period}`)).data.visit_count, 0);
+  await call('DELETE', '/links/http-contract');
+  await call('DELETE', '/links/http-contract', undefined, 404);
   await request('/http-contract', { status: 404 });
-  const query = new URLSearchParams({ signature: token, url: 'https://example.org/simple', custom_slug: 'http-simple', json: 'true', tag_ids: String(tags[0].id) });
-  assert.equal((await call('GET', '/shorten?' + query)).data.slug, 'http-simple');
-  query.set('custom_slug', 'http-plain'); query.delete('json'); query.set('tag_ids', '');
-  assert.equal(await (await request('/api/v1/shorten?' + query)).text(), 'https://short.example/http-plain');
   for (const type of ['plain_text', 'source_code']) {
     const slug = 'http-' + type;
-    const text = await call('POST', '/text', { domain, content: '原文 <script>\n', text_type: type, custom_slug: slug });
+    const text = await call('POST', '/texts', { domain, content: '原文 <script>\n', text_type: type, custom_slug: slug });
     assert.equal(text.data.short_url, 'https://short.example/p/' + slug);
-    await call('PUT', '/text', { domain, slug, content: 'updated', title: '' });
-    assert.equal((await call('DELETE', '/text', { domain, slug })).data, null);
+    await call('PATCH', '/texts/' + slug, { content: 'updated', title: '', text_type: 'plain_text' });
+    await call('DELETE', '/texts/' + slug);
   }
-  for (const alias of ['file', 'smfile']) {
-    const form = new FormData(); form.set(alias, new Blob(['HTTP file bytes']), 'contract.bin');
-    form.set('domain', domain); form.set('is_private', '0'); form.set('custom_slug', 'http-' + alias);
-    const file = (await call('POST', '/file/upload', form)).data;
-    assert.equal(file.size, 15); assert.equal(file.hash.length, 48);
-    assert.equal(file.page, 'https://short.example/p/http-' + alias);
-    assert.equal(file.delete, 'https://short.example/api/v1/file/delete/' + file.hash);
-    const history = await call('GET', '/files?page=1');
-    assert.equal(history.success, true);
-    assert.equal(history.data[0].hash, file.hash);
-    assert.equal((await call('GET', '/file/delete/' + file.hash)).success, true);
-    await request('/p/http-' + alias, { status: 404 });
-  }
+  const form = new FormData(); form.set('file', new Blob(['HTTP file bytes']), 'contract.bin');
+  form.set('domain', domain); form.set('custom_slug', 'http-file');
+  const file = (await call('POST', '/files', form)).data;
+  assert.equal(file.size, 15); assert.equal(file.key.length, 48);
+  assert.equal(file.sha256, hash('HTTP file bytes'));
+  assert.equal(file.page, 'https://short.example/p/http-file');
+  const history = await call('GET', '/files?page=1');
+  assert.equal(history.page, 1); assert.equal(history.page_size, 30);
+  assert.equal(history.data[0].key, file.key);
+  await call('GET', '/files/' + file.key, undefined, 405);
+  await call('DELETE', '/files/' + file.key);
+  await request('/p/http-file', { status: 404 });
   for (const fields of [{ password: 'secret' }, { password: '' }, { domain: 'foreign.example' }, { expiration_redirect_url: 'https://example.org' }]) {
-    await call('POST', '/shorten', { target_url: 'https://example.org', ...fields }, 400);
+    await call('POST', '/links', { target_url: 'https://example.org', ...fields }, 400);
   }
-  await call('POST', '/text', { content: 'secret', text_type: 'markdown' }, 400);
+  await call('POST', '/texts', { content: 'secret', text_type: 'markdown' }, 400);
   const privateFile = new FormData(); privateFile.set('file', new Blob(['secret']), 'private.bin'); privateFile.set('is_private', '1');
-  await call('POST', '/file/upload', privateFile, 400);
-  for (const path of ['/usage', '/file/private/download-url?file_id=1', '/links', '/texts']) await call('GET', path, undefined, 501);
-  console.log('HTTP contract: 15 operations, response shapes, public URLs and rejected protection/domain parameters passed');
+  await call('POST', '/files', privateFile, 400);
+  for (const path of ['/shorten', '/text', '/usage', '/file/domains']) await call('GET', path, undefined, 404);
+  for (const path of ['/links', '/texts']) await call('GET', path, undefined, 405);
+  console.log('HTTP contract: 12 resource operations, status/envelope/Location, public URLs and rejected protection/domain parameters passed');
 }
+
+
 try {
   await start(source, upgrade ? legacy : current, upgrade ? '/api' : '/api/admin/v1');
   const setup = await request(prefix + '/setup', { method: 'POST', body: JSON.stringify({ code: 'smoke-setup-code', password }), headers: { 'Content-Type': 'application/json' } });
@@ -265,8 +264,8 @@ try {
   await verify(fixture);
   let migratedKey;
   if (upgrade) {
-    const res = await request('/api/v1/files', { headers: { Authorization: token.token } });
-    migratedKey = (await res.json()).data[0].hash;
+    const res = await request('/api/v1/files', { headers: { Authorization: `Bearer ${token.token}` } });
+    migratedKey = (await res.json()).data[0].key;
     assert.equal(migratedKey.length, 48);
     await stop();
     const refused = spawnSync(legacy, [], { env: oldConfig, encoding: 'utf8', timeout: 15000 });
@@ -274,8 +273,8 @@ try {
     assert.match(refused.stderr, /schema version 6 is newer/);
     await start(source);
     await verify(fixture);
-    const afterRestart = await request('/api/v1/files', { headers: { Authorization: token.token } });
-    assert.equal((await afterRestart.json()).data[0].hash, migratedKey);
+    const afterRestart = await request('/api/v1/files', { headers: { Authorization: `Bearer ${token.token}` } });
+    assert.equal((await afterRestart.json()).data[0].key, migratedKey);
   }
   await contract(token.token);
   await stop();
@@ -290,7 +289,7 @@ try {
     assert.equal(hash(await readFile(join(snapshot, 'data/sani.db'))), snapshotHash);
     assert.equal(hash(await readFile(join(snapshot, 'config.json'))), configHash);
   }
-  console.log(upgrade ? 'upgrade drill: schema 5 -> 6, repeated startup, old credentials/IDs/URLs/bytes, rejected broken files/read-only database, HTTP contract and old-binary snapshot rollback passed' : 'compatibility: direct HTTP contract passed without external SDKs');
+  console.log(upgrade ? 'upgrade drill: schema 5 -> 6, repeated startup, old credentials/IDs/URLs/bytes, rejected broken files/read-only database, HTTP contract and old-binary snapshot rollback passed' : 'public API: direct HTTP contract passed');
 } finally {
   if (processState?.child.exitCode === null && processState.child.signalCode === null) {
     const exited = once(processState.child, 'exit'); processState.child.kill('SIGKILL'); await exited;

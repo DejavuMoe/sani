@@ -144,7 +144,7 @@ type linkInput struct {
 	Format *string           `json:"format"`
 	Tags   nullable[[]int64] `json:"tags"`
 
-	expectedSlug *string // internal identity for compatibility updates
+	expectedSlug *string // internal identity for slug-addressed updates
 }
 
 type inputError struct {

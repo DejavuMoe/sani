@@ -99,7 +99,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 **API（Unreleased 重构）**：v0.9.4 尚未包含新路由，使用该版本时请查阅 [v0.9.4 API 文档](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/reference/api.md)。以下示例用于包含本次重构的构建；先在设置中保存固定分享域名并创建令牌，然后：
 
 ```sh
-curl -X POST https://s.example.com/api/v1/shorten \
+curl -X POST https://s.example.com/api/v1/links \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
   -d '{"target_url": "https://example.com/some/long/path", "custom_slug": "demo"}'
@@ -107,7 +107,7 @@ curl -X POST https://s.example.com/api/v1/shorten \
 
 每个接口和错误码的说明见 [HTTP API](docs/reference/api.md)。
 
-对外 `/api/v1` 使用限定范围的 `sani-see-v1-2026-10-10` HTTP 兼容配置；后台操作使用 `/api/admin/v1`。升级前先在旧后台导出 JSON，正常停机并完整备份数据库、文件与配置；新版执行 `sani preflight` 后原地迁移，无需重新导入。回滚必须恢复升级前完整快照并使用旧镜像/二进制。详见[兼容矩阵](docs/reference/api.md#see)和[升级说明](docs/guide/operations.md#upgrade)。
+Sani 资源 API 使用 `/api/v1`，后台能力使用 `/api/admin/v1`；遵循统一 HTTP 状态与错误格式。升级前先在旧后台导出 JSON，正常停机并完整备份数据库、文件与配置；新版执行 `sani preflight` 后原地迁移，无需重新导入。回滚必须恢复升级前完整快照并使用旧镜像/二进制。详见[新版 API](docs/reference/api.md)与 [v0.9.4 API 归档](docs/reference/api-archive.md)和[升级说明](docs/guide/operations.md#upgrade)。
 
 **文本和文件**：链接输入框上方的“文本”和“文件”标签页用来分享一段文字、一段代码或一个文件；在页面任意位置粘贴一段文字或一个文件也可以直接开始。访问者在 `/p/{短码}` 页面上阅读、复制或下载，只有你能创建。新安装时文本／代码和文件的自动短码分别默认 10 位，均可独立设为 3–32 位，长度不含 `/p/`。分享始终排除易混淆字符；低于 10 位仍可保存，后台会提示短码越短越容易被猜中，知道地址的人即可访问。
 
@@ -123,11 +123,11 @@ curl -X POST https://s.example.com/api/v1/shorten \
 
 | 路径 | 每秒请求数 | p50 | p99 |
 |---|---|---|---|
-| 命中缓存的跳转（计入点击） | 137,958 | 0.77 ms | 3.06 ms |
-| 带访问次数上限的跳转 | 141,450 | 0.73 ms | 3.10 ms |
-| 不存在的短码（404 页面） | 104,176 | 1.00 ms | 4.05 ms |
+| 命中缓存的跳转（计入点击） | 141,972 | 0.75 ms | 3.12 ms |
+| 带访问次数上限的跳转 | 145,048 | 0.73 ms | 3.00 ms |
+| 不存在的短码（404 页面） | 103,161 | 1.02 ms | 4.15 ms |
 
-脚本最后会核对数据库中的点击总数与实际完成的跳转次数。上面这次运行中，完成了 2,069,251 次跳转，记录了 2,069,251 次点击，一次不差。单看处理函数本身，每次跳转约 0.38 微秒（`make bench`）。笔记本上每次压测的结果会有 10% 左右的浮动，但点击总数始终一致。
+脚本最后会核对数据库中的点击总数与实际完成的跳转次数。上面这次运行中，完成了 2,129,275 次跳转，记录了 2,129,275 次点击，一次不差。单看处理函数本身，每次跳转约 0.61 微秒（`make bench`）。数据来自 2026-10-10 的开发工作树；同机负载和调度争用会影响耗时，脚本每次都校验计数一致性。
 
 做法：
 

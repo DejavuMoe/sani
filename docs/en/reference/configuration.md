@@ -136,9 +136,9 @@ If the destination already has a query, the two are joined with `&`, and a `#` f
 
 ### `SANI_CACHE_SIZE`
 
-Default `100000`, from 64 to 100,000,000. How many redirect targets to keep in memory. Sani separately caches up to a quarter as many unknown slugs to reduce repeated misses. Scanning new slugs still queries the database; apply ingress traffic limits as needed.
+Default `100000`, from 64 to 100,000,000. How many redirect targets to keep in memory. Unknown slugs have a separate capacity of `64 × max(1, floor(SANI_CACHE_SIZE / 256))` to reduce repeated misses. Scanning new slugs still queries the database; apply ingress traffic limits as needed.
 
-When the cache is full, a random entry makes room. With far fewer links than this, every link that has been visited stays in memory.
+The cache has 64 shards and a hit capacity of `64 × floor(SANI_CACHE_SIZE / 64)`. A full shard evicts one entry, without LRU ordering. Uneven hashing can cause eviction before the global capacity fills; keeping every visited link resident is not guaranteed. At the minimum setting of 64, the miss cache also holds up to 64 entries.
 
 ## Sharing
 

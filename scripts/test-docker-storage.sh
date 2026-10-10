@@ -81,17 +81,17 @@ if [ -n "$old_bin" ]; then
   sudo install -d -m 750 -o 65532 -g 65532 "$work/upgrade"
   docker cp "$name-bind:/sani" "$work/sani"
   install -m 755 "$old_bin" "$work/old-sani"
-  install -m 644 scripts/compat.mjs "$work/compat.mjs"
+  install -m 644 scripts/api-contract.mjs "$work/api-contract.mjs"
   printf '%s\n' "$name" >"$work/mount-marker"
   sudo install -m 644 "$work/mount-marker" "$work/upgrade/mount-marker"
   docker run --rm --user 65532:65532 \
     --mount "type=bind,src=$work/upgrade,dst=/work" \
     --mount "type=bind,src=$work/sani,dst=/sani,readonly" \
     --mount "type=bind,src=$work/old-sani,dst=/old-sani,readonly" \
-    --mount "type=bind,src=$work/compat.mjs,dst=/compat.mjs,readonly" \
+    --mount "type=bind,src=$work/api-contract.mjs,dst=/api-contract.mjs,readonly" \
     --tmpfs /full:rw,size=16m,uid=65532,gid=65532,mode=0700 \
     -e TMPDIR=/work -e BIN=/sani -e OLD_BIN=/old-sani -e MOUNT_MARKER="$name" -e SANI_TEST_FULL_DIR=/full \
-    node:24-alpine sh -ec 'test "$(cat /work/mount-marker)" = "$MOUNT_MARKER"; node /compat.mjs --upgrade; id -u > /work/uid'
+    node:24-alpine sh -ec 'test "$(cat /work/mount-marker)" = "$MOUNT_MARKER"; node /api-contract.mjs --upgrade; id -u > /work/uid'
   test "$(sudo cat "$work/upgrade/uid")" = 65532
   test "$(sudo stat -c '%u:%g' "$work/upgrade/uid")" = 65532:65532
   echo 'storage: image binary upgrade and complete snapshot rollback as UID 65532 on bind storage passed'

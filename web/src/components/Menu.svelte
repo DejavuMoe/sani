@@ -5,7 +5,7 @@
    * the invoking button toggles it without racing the light dismiss.
    */
   import type { Snippet } from 'svelte';
-  import { tick } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
 
   let {
     button,
@@ -40,7 +40,7 @@
     let top = r.bottom + 6;
     if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;
     pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
+    pop.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`;
   }
 
   function items(): HTMLElement[] {
@@ -52,6 +52,11 @@
   }
 
   const reposition = () => place();
+  const stopReposition = () => {
+    removeEventListener('resize', reposition);
+    removeEventListener('scroll', reposition, true);
+  };
+  onDestroy(stopReposition);
 
   async function ontoggle(e: Event) {
     open = (e as ToggleEvent).newState === 'open';
@@ -60,11 +65,11 @@
       addEventListener('resize', reposition);
       addEventListener('scroll', reposition, true);
       await tick();
+      if (!open || !pop?.isConnected) return;
       const list = items();
       (list.find((el) => el.getAttribute('aria-checked') === 'true') ?? list[0])?.focus();
     } else {
-      removeEventListener('resize', reposition);
-      removeEventListener('scroll', reposition, true);
+      stopReposition();
       if (pop?.contains(document.activeElement) || document.activeElement === document.body) trigger?.focus();
     }
   }
@@ -108,6 +113,9 @@
     inset: auto;
     margin: 0;
     padding: 4px;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    overflow: auto;
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);

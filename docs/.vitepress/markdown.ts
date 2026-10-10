@@ -76,6 +76,6 @@ export function saniMarkdown(md: MarkdownRenderer) {
     return code(tokens, idx, options, env, self);
   };
 
-  md.renderer.rules.table_open = () => '<div class="table-wrap"><table>\n';
+  md.renderer.rules.table_open = () => '<div class="table-wrap" tabindex="0"><table>\n';
   md.renderer.rules.table_close = () => '</table></div>\n';
 }

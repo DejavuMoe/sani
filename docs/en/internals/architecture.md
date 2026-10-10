@@ -12,7 +12,7 @@
 |---|---|
 | `/` | A redirect to `SANI_ROOT_REDIRECT`, `/admin/` by default |
 | `/admin/…` | The embedded admin app, a single-page app |
-| `/api/…` | The [JSON API](../reference/api) |
+| `/api/v1/…`, `/api/admin/v1/…` | The [JSON API](../reference/api) |
 | `/p/…` | The pages of [shared texts and files](../guide/usage#shares) |
 | `/healthz` | Health check, answers `ok` |
 | `/robots.txt` | Asks search engines to stay out of `/admin/`, `/api/` and `/p/` |
@@ -82,10 +82,10 @@ Upload requests share a file lifecycle read lock until the database owns the fil
 
 ## Titles and icons
 
-After a link is created, a background task fetches the destination: it reads at most 1 MB and follows at most 5 redirects. The request carries your browser’s language preferences, so titles usually come in the language you read.
+After a link is created, a background task fetches the destination: it reads at most 1 MiB and follows at most 5 redirects. The request carries your browser’s language preferences, so titles usually come in the language you read.
 
 - **Title.** The first of `og:title`, `twitter:title` and `<title>`. For files such as PDFs, the file name.
-- **Icon.** Chosen from the icons the page declares: images close to 64 pixels and SVGs first, then `apple-touch-icon` and larger images, and `/favicon.ico` last, trying at most 4. An icon must be at most 256 KB, and its content must really be an image.
+- **Icon.** Chosen from the icons the page declares: images close to 64 pixels and SVGs first, then `apple-touch-icon` and larger images, and `/favicon.ico` last, trying at most 4. An icon must be at most 256 KiB, and its content must really be an image.
 - **Reuse.** Icons are stored per host, so other links to the same site share them. An icon older than 30 days is fetched again the next time it’s needed; after a failure, Sani waits a day before trying again.
 
 The fetcher checks destination hosts and direct dial addresses for private networks. With an environment proxy, the proxy's DNS and forwarding policy remain an operator trust boundary; see [Security](./security#fetching).
@@ -98,4 +98,4 @@ Assets with hashed file names are cached for a year; `index.html` is revalidated
 
 Schema 5 rebuilds the tags table to accept normalized six-digit HEX colors as well as legacy named colors. IDs and link associations are preserved. The settings table also stores creation defaults. Back up before upgrading; v0.8.x cannot open schema 5, so a downgrade requires restoring the pre-upgrade database and files.
 
-Schema 6 appends `contents.delete_key` with a unique nonempty index, backfills random keys for existing files, and does not rewrite resources or public URL paths. `/api/v1` and `/api/admin/v1` share input validation, resource creation/update, streaming uploads, SQLite and cache invalidation. The adapter checks a configured single domain; the global slug namespace remains unchanged.
+Schema 6 appends `contents.delete_key` with a unique nonempty index, backfills random keys for existing files, and does not rewrite resources or public URL paths. `/api/v1` and `/api/admin/v1` share input validation, resource creation/update, streaming uploads, SQLite and cache invalidation. The resource API checks a configured single domain; the global slug namespace remains unchanged.

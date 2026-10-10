@@ -1,14 +1,14 @@
 {
-  "at": "2026-10-05T20:17:27Z",
-  "go": "go1.27.1",
+  "at": "2026-10-10T13:00:11Z",
+  "go": "go1.27.2",
   "os": "linux",
   "cpus": 8,
   "workers": 8,
   "datasets": [
     {
       "links": 1000,
-      "import_ms": 15.667,
-      "peak_rss_kib": 26972,
+      "import_ms": 22.454,
+      "peak_rss_kib": 27608,
       "sqlite_busy": 0,
       "recorded_clicks": 40200,
       "stored_clicks": 40200,
@@ -16,9 +16,9 @@
         {
           "name": "list",
           "samples": 200,
-          "p50_ms": 0.213,
-          "p95_ms": 0.348,
-          "p99_ms": 0.713,
+          "p50_ms": 0.252,
+          "p95_ms": 0.81,
+          "p99_ms": 1.144,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -28,9 +28,9 @@
         {
           "name": "search",
           "samples": 200,
-          "p50_ms": 0.56,
-          "p95_ms": 1.118,
-          "p99_ms": 1.953,
+          "p50_ms": 0.592,
+          "p95_ms": 1.513,
+          "p99_ms": 1.955,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -40,9 +40,9 @@
         {
           "name": "click-sort",
           "samples": 200,
-          "p50_ms": 0.211,
-          "p95_ms": 0.295,
-          "p99_ms": 0.539,
+          "p50_ms": 0.25,
+          "p95_ms": 0.734,
+          "p99_ms": 1.057,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -52,9 +52,9 @@
         {
           "name": "cold-redirect",
           "samples": 200,
-          "p50_ms": 0.03,
-          "p95_ms": 0.089,
-          "p99_ms": 0.148,
+          "p50_ms": 0.026,
+          "p95_ms": 0.058,
+          "p99_ms": 0.19,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -64,33 +64,33 @@
         {
           "name": "flush",
           "samples": 200,
-          "p50_ms": 1.501,
-          "p95_ms": 2.129,
-          "p99_ms": 2.555,
+          "p50_ms": 1.434,
+          "p95_ms": 2.372,
+          "p99_ms": 2.934,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 4148872
+          "wal_bytes": 4152992
         },
         {
           "name": "mixed",
           "samples": 1600,
-          "p50_ms": 0.566,
-          "p95_ms": 1.29,
-          "p99_ms": 1.756,
+          "p50_ms": 0.751,
+          "p95_ms": 1.657,
+          "p99_ms": 2.17,
           "read_waits": 0,
           "write_waits": 399,
           "read_wait_ms": 0,
-          "write_wait_ms": 85.378995,
-          "wal_bytes": 4820432
+          "write_wait_ms": 117.427806,
+          "wal_bytes": 9167032
         }
       ]
     },
     {
       "links": 10000,
-      "import_ms": 177.276,
-      "peak_rss_kib": 32740,
+      "import_ms": 209.168,
+      "peak_rss_kib": 34316,
       "sqlite_busy": 0,
       "recorded_clicks": 40200,
       "stored_clicks": 40200,
@@ -98,9 +98,9 @@
         {
           "name": "list",
           "samples": 200,
-          "p50_ms": 0.295,
-          "p95_ms": 0.535,
-          "p99_ms": 0.917,
+          "p50_ms": 0.333,
+          "p95_ms": 0.923,
+          "p99_ms": 1.159,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -110,9 +110,9 @@
         {
           "name": "search",
           "samples": 200,
-          "p50_ms": 6.775,
-          "p95_ms": 9.78,
-          "p99_ms": 10.882,
+          "p50_ms": 6.803,
+          "p95_ms": 9.802,
+          "p99_ms": 11.092,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -122,9 +122,9 @@
         {
           "name": "click-sort",
           "samples": 200,
-          "p50_ms": 0.279,
-          "p95_ms": 0.354,
-          "p99_ms": 0.575,
+          "p50_ms": 0.33,
+          "p95_ms": 0.582,
+          "p99_ms": 1.181,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -134,9 +134,9 @@
         {
           "name": "cold-redirect",
           "samples": 200,
-          "p50_ms": 0.012,
-          "p95_ms": 0.019,
-          "p99_ms": 0.037,
+          "p50_ms": 0.017,
+          "p95_ms": 0.062,
+          "p99_ms": 0.22,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -146,9 +146,9 @@
         {
           "name": "flush",
           "samples": 200,
-          "p50_ms": 1.497,
-          "p95_ms": 2.171,
-          "p99_ms": 3.459,
+          "p50_ms": 1.446,
+          "p95_ms": 2.054,
+          "p99_ms": 2.902,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
@@ -158,21 +158,21 @@
         {
           "name": "mixed",
           "samples": 1600,
-          "p50_ms": 0.649,
-          "p95_ms": 1.923,
-          "p99_ms": 2.612,
+          "p50_ms": 0.923,
+          "p95_ms": 2.263,
+          "p99_ms": 2.967,
           "read_waits": 0,
           "write_waits": 399,
           "read_wait_ms": 0,
-          "write_wait_ms": 111.589462,
-          "wal_bytes": 9381272
+          "write_wait_ms": 147.44362,
+          "wal_bytes": 9270032
         }
       ]
     },
     {
       "links": 100000,
-      "import_ms": 1683.09,
-      "peak_rss_kib": 108900,
+      "import_ms": 2231.109,
+      "peak_rss_kib": 115756,
       "sqlite_busy": 0,
       "recorded_clicks": 40200,
       "stored_clicks": 40200,
@@ -180,74 +180,74 @@
         {
           "name": "list",
           "samples": 200,
-          "p50_ms": 1.085,
-          "p95_ms": 2.572,
-          "p99_ms": 3.45,
+          "p50_ms": 1.158,
+          "p95_ms": 2.818,
+          "p99_ms": 3.351,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 21139752
+          "wal_bytes": 21135632
         },
         {
           "name": "search",
           "samples": 200,
-          "p50_ms": 76.985,
-          "p95_ms": 82.17,
-          "p99_ms": 86.925,
+          "p50_ms": 82.352,
+          "p95_ms": 92.477,
+          "p99_ms": 99.305,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 21139752
+          "wal_bytes": 21135632
         },
         {
           "name": "click-sort",
           "samples": 200,
-          "p50_ms": 1.051,
-          "p95_ms": 1.316,
-          "p99_ms": 3.313,
+          "p50_ms": 1.153,
+          "p95_ms": 1.382,
+          "p99_ms": 2.57,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 21139752
+          "wal_bytes": 21135632
         },
         {
           "name": "cold-redirect",
           "samples": 200,
           "p50_ms": 0.013,
-          "p95_ms": 0.017,
-          "p99_ms": 0.026,
+          "p95_ms": 0.018,
+          "p99_ms": 0.047,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 21139752
+          "wal_bytes": 21135632
         },
         {
           "name": "flush",
           "samples": 200,
-          "p50_ms": 2.573,
-          "p95_ms": 3.451,
-          "p99_ms": 5.098,
+          "p50_ms": 2.681,
+          "p95_ms": 3.65,
+          "p99_ms": 4.092,
           "read_waits": 0,
           "write_waits": 0,
           "read_wait_ms": 0,
           "write_wait_ms": 0,
-          "wal_bytes": 21139752
+          "wal_bytes": 21135632
         },
         {
           "name": "mixed",
           "samples": 1600,
-          "p50_ms": 1.868,
-          "p95_ms": 5.867,
-          "p99_ms": 7.85,
+          "p50_ms": 2.253,
+          "p95_ms": 6.614,
+          "p99_ms": 8.965,
           "read_waits": 0,
           "write_waits": 399,
           "read_wait_ms": 0,
-          "write_wait_ms": 149.814716,
-          "wal_bytes": 21139752
+          "write_wait_ms": 188.070583,
+          "wal_bytes": 21135632
         }
       ]
     }

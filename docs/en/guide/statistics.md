@@ -37,7 +37,7 @@ For a [text or file](./usage#shares), a visit is someone getting the content, an
 - **A file** counts when it’s downloaded from the files domain, not when its page opens; the details call these Downloads.
 - **On the files domain, curl and wget count.** They are how people download files, so there they’re treated as visitors; crawlers, previews, prefetches and `HEAD` requests still don’t count. Each GET that starts a successful `200` or `206` content response counts, including later ranges and suffix ranges. `304`, `412`, `416` and file-open failures do not count. Once a successful response starts, a disconnected client does not refund the visit; the count does not prove the client saved the complete file.
 
-The referrer of a raw text or a download is usually “Direct”, since the share page sends no `Referer`.
+The referrer of a raw text or a download is usually “Direct”, since the share page sends no `Referer`. Other clients that explicitly send this header still have its host recorded.
 
 ## How visit limits count {#visit-limits}
 
@@ -57,7 +57,7 @@ Normal shutdown attempts a final flush within a deadline and exits nonzero on fa
 
 “Today” and the daily counts follow the time zone of the Sani process, set with the `TZ` environment variable. The Docker image uses UTC unless you set `TZ`, so set it when you deploy, for example `TZ=Europe/Berlin`.
 
-The database stores dates, not instants. Changing `TZ` later doesn’t redistribute past clicks; new clicks follow the new zone.
+Daily aggregates use integer day numbers in the database; the API formats them as `YYYY-MM-DD`. The number represents a calendar date in the instance timezone, not an individual visit timestamp. Changing `TZ` later doesn’t redistribute past clicks; new clicks follow the new zone.
 
 ## Referring sites
 
@@ -73,4 +73,4 @@ The database stores dates, not instants. Changing `TZ` later doesn’t redistrib
 
 ## Why there are no more statistics
 
-Location, device, browser and UTM breakdowns all require keeping details of every visit. That would turn Sani into a visitor-tracking system with privacy obligations, and a database that grows with every visit. Sani doesn’t do it. If you need those numbers, use your own analytics on the destination pages: short links pass `utm_*` parameters and other query strings straight through.
+Sani does not collect location, device, browser or UTM breakdowns. The destination site can collect its own statistics when needed. Short links forward `utm_*` and other query parameters when `SANI_FORWARD_QUERY=true` (the default); disabling this setting stops forwarding them.

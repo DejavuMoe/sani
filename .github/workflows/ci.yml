@@ -80,7 +80,7 @@ jobs:
           path: web/playwright-report
           retention-days: 7
 
-  compatibility:
+  api-contract:
     name: HTTP contract and snapshot rollback
     runs-on: ubuntu-24.04
     timeout-minutes: 20

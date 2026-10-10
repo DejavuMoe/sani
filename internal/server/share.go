@@ -199,7 +199,7 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool) (*store.Link, error) {
+func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, public bool) (*store.Link, error) {
 	if s.opt.FilesURL == "" {
 		return nil, &inputError{http.StatusConflict, "files_disabled", "sharing files needs SANI_FILES_URL"}
 	}
@@ -237,7 +237,7 @@ func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool)
 		}
 		name := part.FormName()
 		switch {
-		case (name == "file" || name == "smfile" && compat) && up == nil:
+		case name == "file" && up == nil:
 			up, err = s.receive(part, limit)
 			if errors.Is(err, errFileTooLarge) || errors.As(err, &tooBig) {
 				return nil, &inputError{http.StatusRequestEntityTooLarge, "file_too_large", tooLargeMsg}
@@ -248,9 +248,9 @@ func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool)
 			if err != nil {
 				return nil, err
 			}
-		case name == "file" || name == "smfile" && compat:
+		case name == "file":
 			return nil, &inputError{http.StatusBadRequest, "upload_invalid", "send one file at a time"}
-		case uploadFields[name] && !compat || seeUploadFields[name] && compat:
+		case uploadFields[name] && !public || publicUploadFields[name] && public:
 			v, err := io.ReadAll(io.LimitReader(part, 4<<10+1))
 			if err != nil || len(v) > 4<<10 {
 				return nil, &inputError{http.StatusBadRequest, "upload_invalid", "the " + name + " field is too long"}
@@ -260,9 +260,7 @@ func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool)
 			}
 			fields[name] = string(v)
 		default:
-			if compat {
-				return nil, badInput("unsupported_parameter", "unsupported multipart field: "+name)
-			}
+			return nil, badInput("unsupported_parameter", "unsupported multipart field: "+name)
 		}
 		part.Close()
 	}
@@ -272,8 +270,8 @@ func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool)
 
 	var in *linkInput
 	var ierr *inputError
-	if compat {
-		in, ierr = s.seeFileInput(fields)
+	if public {
+		in, ierr = s.publicFileInput(fields)
 	} else {
 		in, ierr = formInput(fields)
 	}

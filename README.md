@@ -99,7 +99,7 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 **API (Unreleased refactor).** The new routes are not included in v0.9.4; use the [v0.9.4 API reference](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/en/reference/api.md) with that release. For a build containing this refactor, save a fixed sharing domain and create a token in Settings, then:
 
 ```sh
-curl -X POST https://s.example.com/api/v1/shorten \
+curl -X POST https://s.example.com/api/v1/links \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
   -d '{"target_url": "https://example.com/some/long/path", "custom_slug": "demo"}'
@@ -107,7 +107,7 @@ curl -X POST https://s.example.com/api/v1/shorten \
 
 The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
 
-The external `/api/v1` API supports the bounded `sani-see-v1-2026-10-10` HTTP profile; admin operations use `/api/admin/v1`. Before upgrading, export JSON in the old admin app, stop cleanly, and snapshot the database, files and configuration. Run `sani preflight` with the new binary; upgrade in place without reimport. Rollback requires the full pre-upgrade snapshot and old binary/image. See the [compatibility matrix](docs/en/reference/api.md#see) and [upgrade guide](docs/en/guide/operations.md#upgrade).
+Sani resource operations use `/api/v1` and admin capabilities use `/api/admin/v1`, with consistent HTTP statuses and error shapes. Before upgrading, export JSON in the old admin app, stop cleanly, and snapshot the database, files and configuration. Run `sani preflight` with the new binary; upgrade in place without reimport. Rollback requires the full pre-upgrade snapshot and old binary/image. See the [new API](docs/en/reference/api.md), [v0.9.4 API archive](docs/en/reference/api-archive.md) and [upgrade guide](docs/en/guide/operations.md#upgrade).
 
 **Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. On new installations, generated text/code and file slugs each default to 10 characters, independently configurable from 3 to 32, excluding `/p/`. Shares always exclude look-alikes. Values below 10 are allowed with an advisory: shorter slugs are easier to guess, and anyone with the address can open a share.
 
@@ -123,11 +123,11 @@ On the initial upgrade, missing share-length settings are saved as `max(10, lega
 
 | Path | Requests/s | p50 | p99 |
 |---|---|---|---|
-| Cached redirect, click counted | 137,958 | 0.77 ms | 3.06 ms |
-| Redirect with a visit limit | 141,450 | 0.73 ms | 3.10 ms |
-| Unknown slug (404 page) | 104,176 | 1.00 ms | 4.05 ms |
+| Cached redirect, click counted | 141,972 | 0.75 ms | 3.12 ms |
+| Redirect with a visit limit | 145,048 | 0.73 ms | 3.00 ms |
+| Unknown slug (404 page) | 103,161 | 1.02 ms | 4.15 ms |
 
-The script then checks the stored click total against the redirects served: in the run above, 2,069,251 redirects and 2,069,251 clicks. The handler alone costs about 0.38 µs per redirect (`make bench`). Numbers on a laptop move by 10% or so between runs; the click totals always match.
+The script then checks the stored click total against the redirects served: in the run above, 2,129,275 redirects and 2,129,275 clicks. The handler alone costs about 0.61 µs per redirect (`make bench`). These measurements are from the 2026-10-10 working tree. Shared-machine load and scheduler contention affect timings; the script checks count consistency on every run.
 
 How it gets there:
 

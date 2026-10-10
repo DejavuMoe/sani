@@ -76,7 +76,7 @@ Besides links, Sani shares a piece of text or a file. Switch to the Text or File
 - **Paste text.** Pasting text with several lines, or a line that isn’t a link, opens it in the Text tab. A link on its own is shortened as usual.
 - **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 99 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that.
 
-A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MB. Nothing is rendered: Markdown and HTML show as written.
+A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MiB. Nothing is rendered: Markdown and HTML show as written.
 
 Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Share”; for a file, the bar shows the upload’s progress and can cancel it. The address, such as `s.example.com/p/k3m9x2qv7h`, is copied as with a link. Expiry, the visit limit and the off switch work the same way. A limit of 1 means one counted visit, not automatic destruction of the content. Expired content remains until manually deleted and processed by [background cleanup](./operations#share-cleanup).
 

@@ -13,7 +13,7 @@ export interface LoadRun {
 }
 
 export const benchmark = {
-  date: '2026-10-06',
+  date: '2026-10-10',
   cpu: 'Intel Core Ultra 7 255H',
   cores: 8,
   environment: 'WSL2',
@@ -21,12 +21,12 @@ export const benchmark = {
   connections: 128,
   duration: '15s',
   runs: [
-    { id: 'hit', path: '/hot', rps: 137958, p50: 0.77, p99: 3.06 },
-    { id: 'limited', path: '/limited', rps: 141450, p50: 0.73, p99: 3.10 },
-    { id: 'missing', path: '/nope', rps: 104176, p50: 1.00, p99: 4.05 },
+    { id: 'hit', path: '/hot', rps: 141972, p50: 0.75, p99: 3.12 },
+    { id: 'limited', path: '/limited', rps: 145048, p50: 0.73, p99: 3.00 },
+    { id: 'missing', path: '/nope', rps: 103161, p50: 1.02, p99: 4.15 },
   ] satisfies LoadRun[],
-  clicks: { served: 2069251, counted: 2069251 },
+  clicks: { served: 2129275, counted: 2129275 },
   // go test -bench, per operation.
-  micro: { redirectNs: 375.3, cacheHitNs: 76.42, recordClickNs: 76.33 },
-  imageMB: 24.7,
+  micro: { redirectNs: 608.0, cacheHitNs: 108.4, recordClickNs: 92.09 },
+  imageMB: 25.6,
 };

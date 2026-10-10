@@ -2,7 +2,7 @@ import type { HeadConfig, PageData } from 'vitepress';
 
 export const siteUrl = 'https://sani.zsh.moe';
 export const productDescription = {
-  zh: 'Sani 是面向个人的自托管短链接、文本与文件分享服务。单个 Go 二进制内嵌管理界面，使用 SQLite 和本地文件存储，提供标签、访问控制与聚合点击统计。',
+  zh: 'Sani 是面向个人的自托管短链接、文本与文件分享服务。单个 Go 二进制内嵌管理界面，使用 SQLite 和本地文件存储，提供标签、链接有效期与访问次数限制和聚合点击统计。',
   en: 'Sani is a self-hosted URL shortener with text and file sharing for one administrator. One Go binary, SQLite and local files, with tags, link controls and aggregated click statistics.',
 };
 
@@ -41,13 +41,17 @@ const descriptions: Record<string, { zh: string; en: string }> = {
     zh: 'Sani 环境变量参考：网络与存储、管理员凭据、代理信任、缓存、元数据抓取、文件域名、上传限制、日志和时区。',
     en: 'Sani environment variable reference for networking, storage, credentials, trusted proxies, caching, metadata, file sharing, logging and time zones.',
   },
+  'reference/api-archive': {
+    zh: 'Sani v0.9.4 及之前的 HTTP API 历史参考，升级后请使用新版 API。',
+    en: 'Historical HTTP API reference for Sani v0.9.4 and earlier. Use the current API after upgrading.',
+  },
   'reference/api': {
     zh: 'Sani HTTP API 参考：会话与令牌认证、短链接、标签、文本、文件、统计、设置、导入导出、请求限制与错误码。',
     en: 'Sani HTTP API reference: sessions and tokens, links, tags, texts, files, statistics, settings, imports and exports, request limits and error codes.',
   },
   'reference/cli': {
-    zh: 'Sani 命令行参考：serve 启动服务、passwd 重置密码、backup 导出数据库、healthcheck 检查存活状态和 version 查看版本。',
-    en: 'Sani command-line reference for serve, passwd, backup, healthcheck and version, including database-only backups and password reset behavior.',
+    zh: 'Sani 命令行参考：serve 启动服务、passwd 重置密码、backup 导出数据库、preflight 迁移预检、healthcheck 检查存活状态和 version 查看版本。',
+    en: 'Sani command-line reference for serve, passwd, backup, preflight, healthcheck and version, including database-only backups and password reset behavior.',
   },
   'internals/architecture': {
     zh: '了解 Sani 的 Go 服务、路由、分片缓存、点击聚合、SQLite WAL 与迁移、后台任务和内嵌 Svelte 管理界面。',

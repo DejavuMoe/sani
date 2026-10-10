@@ -12,7 +12,7 @@
 |---|---|
 | `/` | 重定向至 `SANI_ROOT_REDIRECT`（缺省重定向到 `/admin/`） |
 | `/admin/…` | 内嵌的管理后台单页应用（SPA） |
-| `/api/…` | [JSON API](../reference/api) |
+| `/api/v1/…`, `/api/admin/v1/…` | [JSON API](../reference/api) |
 | `/p/…` | [文本与文件分享](../guide/usage#shares)引导页 |
 | `/healthz` | 基础存活探针，返回 `ok` |
 | `/robots.txt` | 爬虫防爬规则（阻断 `/admin/`、`/api/` 及 `/p/`） |
@@ -84,10 +84,10 @@
 
 ## 网页元数据与 Favicon 抓取
 
-新建短链后，后台爬虫异步拉取目标页（最多读取 1 MB，最多跟随 5 次重定向），请求头透传客户端 Accept-Language，优先适配用户语言：
+新建短链后，后台爬虫异步拉取目标页（最多读取 1 MiB，最多跟随 5 次重定向），请求头透传客户端 Accept-Language，优先适配用户语言：
 
 - **标题提取**：优先级依次为 `og:title` → `twitter:title` → `<title>`。针对静态文件（如 PDF）直接以文件名作为标题。
-- **图标选择**：智能评估 HTML 中声明的 icon，优先选取接近 64px 的 PNG 或矢量 SVG，其次取 `apple-touch-icon`，最后尝试 `/favicon.ico`（单任务最多试探 4 个）。单图标大小上限 256 KB，严格校验图片 Magic Number。
+- **图标选择**：智能评估 HTML 中声明的 icon，优先选取接近 64px 的 PNG 或矢量 SVG，其次取 `apple-touch-icon`，最后尝试 `/favicon.ico`（单任务最多试探 4 个）。单图标大小上限 256 KiB，严格校验图片 Magic Number。
 - **域名级复用**：图标基于 Host 缓存复用，同域名短链无需重复抓取。缓存超 30 天自动刷新；探测失败的域名在 24 小时内免重试。
 
 抓取器对目标主机和直接拨号地址执行私网检查；使用环境代理时，代理的 DNS 与转发策略属于运维信任边界，详见[安全机制](./security#fetching)。
@@ -100,4 +100,4 @@
 
 Schema 5 重建标签表，接受规范化六位 HEX 与旧命名色，保留 ID 和链接关联。创建默认值复用 settings 表。升级前备份；v0.8.x 无法打开 schema 5，降级须恢复升级前的数据库与分享文件。
 
-schema 6 追加 `contents.delete_key` 与非空唯一索引，为既有文件生成随机密钥，不改写资源或公开路径。`/api/v1` 与 `/api/admin/v1` 共享输入校验、创建/更新、流式上传、SQLite 和缓存失效；兼容层校验单个已配置域名，保留原有全局短码空间。
+schema 6 追加 `contents.delete_key` 与非空唯一索引，为既有文件生成随机密钥，不改写资源或公开路径。`/api/v1` 与 `/api/admin/v1` 共享输入校验、创建/更新、流式上传、SQLite 和缓存失效；资源 API 校验单个已配置域名，保留原有全局短码空间。
