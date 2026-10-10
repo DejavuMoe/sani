@@ -3,7 +3,7 @@
 <p class="lead">Sani's HTTP API: create and manage links, texts and files with tokens, and use the same instance's admin capabilities for settings, bulk operations and recovery.</p>
 
 ::: warning Version
-This page describes v0.9.5. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
+This page describes v0.9.6. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
 :::
 
 ## Design and conventions {#design}
@@ -158,6 +158,7 @@ curl https://s.example.com/api/admin/v1/links \
 | `GET` | `/api/admin/v1/favicons/{host}` | [Site icons](#favicons) |
 | `GET` | `/api/admin/v1/export` | [Export every link](#export) |
 | `POST` | `/api/admin/v1/import` | [Import links](#import) |
+| `GET` | `/api/admin/v1/examples/{filename}` | [Download import examples](#import-examples) |
 | `GET` | `/api/admin/v1/config` | [Read settings](#config) |
 | `PATCH` | `/api/admin/v1/config` | [Change the short domain](#config) |
 | `POST` | `/api/admin/v1/config/metadata/test` | [Test a proxy](#metadata-test) |
@@ -459,6 +460,12 @@ Returns the icon itself, or `404` when there’s none. `{host}` is the `host` of
 
 ## Import and export {#import-export}
 
+### Import examples {#import-examples}
+
+`GET /api/admin/v1/examples/{filename}`
+
+Requires a valid session cookie or API token. `{filename}` supports only `sani.csv` and `sani.json`, returning a fixed format example as an attachment without instance data and with `Cache-Control: no-store`. Unauthenticated requests return `401 unauthorized`; authenticated requests for unknown files return `404 not_found`. HEAD returns headers only. The old `/admin/examples/...` URLs return 404.
+
 ### Export {#export}
 
 `GET /api/admin/v1/export`
@@ -515,7 +522,7 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
 
 ```json
 {
-  "version": "v0.9.5",
+  "version": "v0.9.6",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

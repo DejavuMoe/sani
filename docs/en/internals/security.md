@@ -37,6 +37,8 @@ The admin app’s pages carry a strict Content Security Policy:
 
 The admin app loads nothing from third parties; its fonts and icons are part of the binary.
 
+The app shell, scripts, styles and icons needed by the sign-in page are public and contain no instance data. Admin resources such as exports, site icons, text details and import examples require authentication under `/api/admin/v1`. Import examples are kept outside the frontend public directory; old `/admin/examples/...` URLs do not serve files. The documentation site's generic format examples remain public.
+
 ## Destinations {#destinations}
 
 - **Dangerous schemes** are refused: `javascript:`, `vbscript:`, `data:`, `file:`, `blob:`, `about:`, `filesystem:`, `view-source:`, `jar:`, `chrome:`, `chrome-extension:`, `moz-extension:` and `resource:`.

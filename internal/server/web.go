@@ -134,6 +134,11 @@ func (a *webApp) serveApp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	rel := strings.TrimPrefix(r.URL.Path, "/admin/")
+	// Older frontend builds may still contain public copies of import examples.
+	if strings.HasPrefix(rel, "examples/") {
+		http.NotFound(w, r)
+		return
+	}
 	if f, ok := a.assets[rel]; ok {
 		a.serveAsset(w, r, f)
 		return

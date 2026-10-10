@@ -642,10 +642,32 @@ test('creation defaults persist and environment metadata stays locked', async ()
   await expect(page.locator('#metadata-enabled')).toBeDisabled();
   const created = await page.request.post('/api/admin/v1/links', {data:{url:'https://example.com/r3-settings'}});
   expect((await created.json()).slug).toHaveLength(7);
+});
+
+test('import examples require authentication and download from settings', async ({ request }) => {
+  await page.goto('/admin/settings');
   for (const format of ['csv', 'json']) {
-    const sample = await page.request.get(`/admin/examples/sani.${format}`);
-    expect(sample.ok()).toBe(true);
+    const path = `/api/admin/v1/examples/sani.${format}`;
+    for (const method of ['GET', 'HEAD']) {
+      expect((await request.fetch(path, { method })).status()).toBe(401);
+      expect((await request.fetch(`/admin/examples/sani.${format}`, { method })).status()).toBe(404);
+    }
+    const sample = await page.request.get(path);
+    expect(sample.status()).toBe(200);
+    expect(sample.headers()['cache-control']).toBe('no-store');
     expect(await sample.text()).toContain('example.com');
+
+    const link = page.locator('.examples').getByRole('link', { name: format.toUpperCase(), exact: true });
+    await expect(link).toHaveAttribute('href', path);
+    const pending = page.waitForEvent('download');
+    if (format === 'csv') await link.click();
+    else {
+      await link.focus();
+      await link.press('Enter');
+    }
+    const download = await pending;
+    expect(download.suggestedFilename()).toBe(`sani.${format}`);
+    expect(await download.failure()).toBeNull();
   }
 });
 

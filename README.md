@@ -96,7 +96,7 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 
 **Phone.** Install Sani on Android using a browser that supports Web Share Target. Sharing a URL from another app prefills it for review; click “Shorten” to submit. Support depends on the browser and operating system.
 
-**API (v0.9.5).** This release changes API routes; update existing scripts using the [new API reference](docs/en/reference/api.md). For v0.9.4 and earlier, use the [API archive](docs/en/reference/api-archive.md). Save a fixed sharing domain and create a token in Settings, then:
+**API (v0.9.6).** API routes changed in v0.9.5; when upgrading from v0.9.4 or earlier, update scripts using the [current API reference](docs/en/reference/api.md). The [API archive](docs/en/reference/api-archive.md) documents those older versions. Save a fixed sharing domain and create a token in Settings, then:
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \

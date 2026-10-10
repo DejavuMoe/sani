@@ -50,7 +50,7 @@ Sani tells the format from the content and understands:
 
 Only Sani and Shlink formats are supported. Sani JSON requires `app: "sani"`, `version: 1` and a `links` array; Sani CSV requires `slug,url` columns. Shlink JSON accepts `shortUrls.data` or its data array, with `shortCode` and `longUrl` on every record. Unrecognized wrappers, duplicate CSV columns and malformed CSV are rejected before any database writes. A recognized file may still have invalid rows; those are skipped as described below.
 
-Download a native [CSV example](/examples/sani.csv) or [JSON example](/examples/sani.json). The admin settings page offers the same files. Convert other products to this documented format before importing.
+Download a native [CSV example](/examples/sani.csv) or [JSON example](/examples/sani.json). Documentation examples are public; the instance's admin settings page offers the same files after sign-in, at `/api/admin/v1/examples/sani.csv` or `/api/admin/v1/examples/sani.json`. Examples contain only fixed demonstration data. Convert other products to this documented format before importing.
 
 Custom tag colors use six-digit HEX (`#5872a5`); legacy named colors remain valid.
 

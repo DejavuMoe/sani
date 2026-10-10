@@ -37,6 +37,8 @@ API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。�
 
 管理后台零外链加载，字体与 SVG 图标均已内嵌。
 
+登录页所需的应用外壳、脚本、样式与图标公开提供，不包含实例数据。导出、站点图标、文本详情与导入示例等后台资源通过 `/api/admin/v1` 鉴权；导入示例不放在前端公开目录，旧的 `/admin/examples/...` 地址也不会提供文件。文档站的通用格式示例仍公开提供。
+
 ## 目标网址与重定向安全 {#destinations}
 
 - **高危协议拦截**：拦截 `javascript:`、`vbscript:`、`data:`、`file:`、`blob:`、`about:`、`filesystem:`、`view-source:`、`jar:`、`chrome:`、`chrome-extension:`、`moz-extension:` 及 `resource:`。

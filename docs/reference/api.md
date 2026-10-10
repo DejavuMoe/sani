@@ -3,7 +3,7 @@
 <p class="lead">Sani 自有 HTTP API：使用令牌创建和管理链接、文本与文件，使用同一实例的后台能力完成设置、批量操作和恢复。</p>
 
 ::: warning 版本说明
-本页对应 v0.9.5。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
+本页对应 v0.9.6。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
 :::
 
 ## 设计与约定 {#design}
@@ -158,6 +158,7 @@ curl https://s.example.com/api/admin/v1/links \
 | `GET` | `/api/admin/v1/favicons/{host}` | [网站图标](#favicons) |
 | `GET` | `/api/admin/v1/export` | [导出全部链接](#export) |
 | `POST` | `/api/admin/v1/import` | [导入链接](#import) |
+| `GET` | `/api/admin/v1/examples/{filename}` | [下载导入示例](#import-examples) |
 | `GET` | `/api/admin/v1/config` | [读取设置](#config) |
 | `PATCH` | `/api/admin/v1/config` | [修改域名与创建设置](#config) |
 | `POST` | `/api/admin/v1/config/metadata/test` | [测试代理连接](#metadata-test) |
@@ -460,6 +461,12 @@ curl https://s.example.com/api/admin/v1/files \
 
 ## 导入与导出 {#import-export}
 
+### 导入示例 {#import-examples}
+
+`GET /api/admin/v1/examples/{filename}`
+
+需有效会话 Cookie 或 API 令牌。`{filename}` 仅支持 `sani.csv` 和 `sani.json`，以附件形式返回固定格式示例，不包含实例数据；响应带 `Cache-Control: no-store`。未认证返回 `401 unauthorized`，已认证请求不存在的文件返回 `404 not_found`。支持 HEAD，仅返回响应头。旧的 `/admin/examples/...` 地址返回 404。
+
 ### 导出 {#export}
 
 `GET /api/admin/v1/export`
@@ -516,7 +523,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ```json
 {
-  "version": "v0.9.5",
+  "version": "v0.9.6",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

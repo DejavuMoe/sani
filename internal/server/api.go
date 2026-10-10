@@ -60,6 +60,7 @@ func (s *Server) routes() http.Handler {
 
 	mux.Handle("GET /api/admin/v1/export", a(s.export))
 	mux.Handle("POST /api/admin/v1/import", a(s.importLinks))
+	mux.Handle("GET /api/admin/v1/examples/{filename}", a(s.importExample))
 	mux.Handle("GET /api/admin/v1/favicons/{host}", a(s.favicon))
 
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {

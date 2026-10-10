@@ -434,7 +434,7 @@
         <div>
           <h3>{t('settings.import')}</h3>
           <p class="hint">{t('settings.importHint')}</p>
-          <div class="examples"><span>{t('settings.examples')}</span><a href="/admin/examples/sani.csv" download>CSV</a><a href="/admin/examples/sani.json" download>JSON</a></div>
+          <div class="examples"><span>{t('settings.examples')}</span><a href="/api/admin/v1/examples/sani.csv" download>CSV</a><a href="/api/admin/v1/examples/sani.json" download>JSON</a></div>
         </div>
         <label
           class={['drop', dragOver && 'over', importing && 'busy']}

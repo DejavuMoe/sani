@@ -96,7 +96,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 **手机**：在 Android 上用支持 Web Share Target 的浏览器安装 Sani 后，可从其他应用的分享菜单预填网址，核对后点击“缩短”。是否支持取决于浏览器和操作系统。
 
-**API（v0.9.5）**：本次发布更换 API 路由，已有脚本须按[新版 API](docs/reference/api.md)调整。v0.9.4 及之前版本请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建令牌，然后：
+**API（v0.9.6）**：API 路由自 v0.9.5 起调整；从 v0.9.4 或更早版本升级时，须按[当前 API](docs/reference/api.md)更新脚本。旧版本契约请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建令牌，然后：
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \

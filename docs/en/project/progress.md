@@ -41,6 +41,10 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
+## v0.9.6 admin resource authentication regressions {#v096-auth}
+
+Admin import examples download through the protected management API; old static paths no longer serve files. Public sign-in assets and public share URLs retain their intended roles. Regression entry points: `internal/server/api_auth_boundary_test.go`, `internal/server/api_examples_test.go` and `web/e2e/app.spec.ts`, covering anonymous management requests, expired or revoked credentials, GET/HEAD, conditional requests, stale frontend files and actual downloads. Database schema remains 6 with no new migration.
+
 ## v0.9.5 compact interface and API upgrade acceptance {#r10-acceptance}
 
 Approved R10 supersedes R9 control sizing. Desktop buttons, fields and menu items use 28, 32 and 36px baselines. Narrow or touch screens use 36px buttons, 40px fields and 44px menu items, with extended hit areas. Numeric/unit inputs share `UnitInput`, regular weight and start alignment, with a 36px visible input on narrow screens. Long labels can grow, busy buttons retain width, segmented controls support Home/End, and Svelte transitions respect reduced motion.

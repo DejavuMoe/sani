@@ -50,7 +50,7 @@ JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 
 
 仅支持 Sani 与 Shlink 格式。Sani JSON 必须包含 `app: "sani"`、`version: 1` 和 `links` 数组；Sani CSV 必须包含 `slug,url` 列。Shlink JSON 接受 `shortUrls.data` 或其中的数据数组，每条记录须含 `shortCode`、`longUrl`。无法识别的包装结构、重复 CSV 列和损坏 CSV 会在写入前整体拒绝；已识别文件中的非法记录仍按下述规则逐行跳过。
 
-下载原生 [CSV 示例](/examples/sani.csv) 或 [JSON 示例](/examples/sani.json)，后台设置页也提供相同文件。其他应用请先对照示例转换格式。
+下载原生 [CSV 示例](/examples/sani.csv) 或 [JSON 示例](/examples/sani.json)。文档站的示例公开提供；实例后台设置页提供相同文件，须登录后下载，通过 `/api/admin/v1/examples/sani.csv` 或 `/api/admin/v1/examples/sani.json` 访问。示例仅含固定演示数据。其他应用请先对照示例转换格式。
 
 自定义标签色使用六位 HEX（如 `#5872a5`），原有五种命名色仍可导入。
 

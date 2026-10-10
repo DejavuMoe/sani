@@ -2,6 +2,15 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## v0.9.6
+
+2026-10-11 · Fix missing authentication on admin import example downloads and add management resource access regressions. Database schema stays at 6 with no new migration.
+
+- Require management API authentication for admin CSV/JSON import example downloads; old `/admin/examples/...` static URLs return 404. Downloads disable caching and session cookies remain scoped to `/api/`. Examples contain fixed demonstration data, never instance content.
+- Block static downloads even when an older frontend build still contains example files. Regressions cover anonymous access to every existing protected management route, plus example GET/HEAD requests, expired sessions, revoked credentials, conditional requests and pointer/keyboard downloads.
+
+When upgrading from v0.9.5, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.6`, then reload the admin app to download examples. Replace bookmarked old example URLs with the new admin links. Upgrades from v0.9.4 or earlier still require the API and schema-6 migration steps under [upgrade and rollback](../guide/operations#upgrade). Existing public share URLs and instance data remain unchanged.
+
 ## v0.9.5
 
 2026-10-10 · Release the approved R10 compact interface and new Sani HTTP API, with migration to database schema 6. **This release includes breaking changes as a one-time exception to the patch rule**; read the steps below and the [versioning note](./versioning#v095-exception) before upgrading.
