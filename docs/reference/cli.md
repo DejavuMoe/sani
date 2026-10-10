@@ -60,6 +60,8 @@ sani backup /backups/sani-2026-09-29.db
 
 ## `sani preflight`
 
+本命令随 Unreleased API 重构新增，v0.9.4 尚未包含。预检须使用包含本次重构的新版二进制。
+
 使用**新版二进制**，配合原部署环境，对已停机的数据目录或隔离完整副本执行。输出 JSON（`schema`、`target`、`files`、`file_bytes`、`stored_base_url`）；只有数据库完整性/外键、全部文件引用（含软删除记录）的大小与 SHA-256、数据库及已有 WAL/SHM 的可写检查、目录临时写入探针均成功，才退出 0。缺失文件、摘要错误、不受支持的 schema 和权限问题均给出诊断。不执行 migration，不改写凭据；临时探针会删除。
 
 ```sh

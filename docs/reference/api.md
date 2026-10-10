@@ -4,6 +4,10 @@
 
 ## s.ee 兼容范围 {#see}
 
+::: warning 版本范围
+本页描述 Unreleased API 重构。v0.9.4 尚未包含这些路由和 schema 6，使用该版本时请查阅[对应版本的 API 文档](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/reference/api.md)。只有包含本次重构的构建才能按新版接口运行，升级前必须完成所要求的备份。
+:::
+
 对外接口使用 `/api/v1`，Sani 后台与扩展能力使用 `/api/admin/v1`。旧管理路由已移除，旧令牌与会话继续有效。网址 `/{slug}`、分享页 `/p/{slug}`、文件源 `/{slug}/{filename}` 与文本原文 `/{slug}` 保持不变。升级方法见[运维](../guide/operations#upgrade)。
 
 **兼容配置：`sani-see-v1-2026-10-10`，仅覆盖本页列出的 15 个操作及其限定行为。** `make compat` 直接向真实本地服务发送 HTTP 请求验证契约，不依赖或接入 s.ee SDK；HTTP 边界和故障场景由 `go test ./internal/server ./internal/store ./cmd/sani` 覆盖。不宣称兼容所有 s.ee 功能或未来 SDK。

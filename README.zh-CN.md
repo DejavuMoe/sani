@@ -96,16 +96,18 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 **手机**：在 Android 上用支持 Web Share Target 的浏览器安装 Sani 后，可从其他应用的分享菜单预填网址，核对后点击“缩短”。是否支持取决于浏览器和操作系统。
 
-**API**：在设置里创建令牌，然后：
+**API（Unreleased 重构）**：v0.9.4 尚未包含新路由，使用该版本时请查阅 [v0.9.4 API 文档](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/reference/api.md)。以下示例用于包含本次重构的构建；先在设置中保存固定分享域名并创建令牌，然后：
 
 ```sh
 curl -X POST https://s.example.com/api/v1/shorten \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
-  -d '{"target_url": "https://example.com/some/long/path", "slug": "demo"}'
+  -d '{"target_url": "https://example.com/some/long/path", "custom_slug": "demo"}'
 ```
 
 每个接口和错误码的说明见 [HTTP API](docs/reference/api.md)。
+
+对外 `/api/v1` 使用限定范围的 `sani-see-v1-2026-10-10` HTTP 兼容配置；后台操作使用 `/api/admin/v1`。升级前先在旧后台导出 JSON，正常停机并完整备份数据库、文件与配置；新版执行 `sani preflight` 后原地迁移，无需重新导入。回滚必须恢复升级前完整快照并使用旧镜像/二进制。详见[兼容矩阵](docs/reference/api.md#see)和[升级说明](docs/guide/operations.md#upgrade)。
 
 **文本和文件**：链接输入框上方的“文本”和“文件”标签页用来分享一段文字、一段代码或一个文件；在页面任意位置粘贴一段文字或一个文件也可以直接开始。访问者在 `/p/{短码}` 页面上阅读、复制或下载，只有你能创建。新安装时文本／代码和文件的自动短码分别默认 10 位，均可独立设为 3–32 位，长度不含 `/p/`。分享始终排除易混淆字符；低于 10 位仍可保存，后台会提示短码越短越容易被猜中，知道地址的人即可访问。
 
@@ -189,5 +191,3 @@ make load             # 上面的压测
 ## 许可证
 
 [MIT](LICENSE)
-
-对外 `/api/v1` 使用限定范围的 `sani-see-v1-2026-10-10` HTTP 兼容配置；后台操作使用 `/api/admin/v1`。升级前先在旧后台导出 JSON，正常停机并完整备份数据库、文件与配置；新版执行 `sani preflight` 后原地迁移，无需重新导入。回滚必须恢复升级前完整快照并使用旧镜像/二进制。详见[兼容矩阵](docs/reference/api.md#see)和[升级说明](docs/guide/operations.md#upgrade)。

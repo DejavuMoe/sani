@@ -4,6 +4,10 @@
 
 ## s.ee compatibility profile {#see}
 
+::: warning Version scope
+This page describes the Unreleased API refactor. v0.9.4 does not include these routes or schema 6; use its [versioned API reference](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/en/reference/api.md). Upgrade only with a build containing this refactor and the required backups.
+:::
+
 External clients use `/api/v1`; the Sani admin app and extensions use `/api/admin/v1`. Old management routes are removed; existing tokens and sessions remain valid. Public `/{slug}`, `/p/{slug}`, file-origin `/{slug}/{filename}` and raw-text `/{slug}` addresses are preserved. See [upgrading](../guide/operations#upgrade).
 
 **Profile: `sani-see-v1-2026-10-10`, limited to the 15 operations and behaviors listed here.** `make compat` sends direct HTTP requests to a real local server, without importing or depending on s.ee SDKs; `go test ./internal/server ./internal/store ./cmd/sani` checks protocol boundaries and failures. This is not a promise of every s.ee feature or future SDK compatibility.

@@ -96,16 +96,18 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 
 **Phone.** Install Sani on Android using a browser that supports Web Share Target. Sharing a URL from another app prefills it for review; click “Shorten” to submit. Support depends on the browser and operating system.
 
-**API.** Create a token in Settings, then:
+**API (Unreleased refactor).** The new routes are not included in v0.9.4; use the [v0.9.4 API reference](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/en/reference/api.md) with that release. For a build containing this refactor, save a fixed sharing domain and create a token in Settings, then:
 
 ```sh
 curl -X POST https://s.example.com/api/v1/shorten \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
-  -d '{"target_url": "https://example.com/some/long/path", "slug": "demo"}'
+  -d '{"target_url": "https://example.com/some/long/path", "custom_slug": "demo"}'
 ```
 
 The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
+
+The external `/api/v1` API supports the bounded `sani-see-v1-2026-10-10` HTTP profile; admin operations use `/api/admin/v1`. Before upgrading, export JSON in the old admin app, stop cleanly, and snapshot the database, files and configuration. Run `sani preflight` with the new binary; upgrade in place without reimport. Rollback requires the full pre-upgrade snapshot and old binary/image. See the [compatibility matrix](docs/en/reference/api.md#see) and [upgrade guide](docs/en/guide/operations.md#upgrade).
 
 **Texts and files.** The Text and File tabs above the link box share a note, a piece of code or a file; paste a block of text or a file anywhere on the page to start. Visitors get a page at `/p/{slug}` to read, copy or download from, and only you can create one. On new installations, generated text/code and file slugs each default to 10 characters, independently configurable from 3 to 32, excluding `/p/`. Shares always exclude look-alikes. Values below 10 are allowed with an advisory: shorter slugs are easier to guess, and anyone with the address can open a share.
 
@@ -189,5 +191,3 @@ For a complete backup including files, stop all writers before copying the datab
 ## License
 
 [MIT](LICENSE)
-
-The external `/api/v1` API supports the bounded `sani-see-v1-2026-10-10` HTTP profile; admin operations use `/api/admin/v1`. Before upgrading, export JSON in the old admin app, stop cleanly, and snapshot the database, files and configuration. Run `sani preflight` with the new binary; upgrade in place without reimport. Rollback requires the full pre-upgrade snapshot and old binary/image. See the [compatibility matrix](docs/en/reference/api.md#see) and [upgrade guide](docs/en/guide/operations.md#upgrade).
