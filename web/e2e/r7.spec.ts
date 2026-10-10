@@ -153,18 +153,54 @@ test('an uploading file stays locked but can be canceled without losing its draf
 });
 
 for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','dark',320],['en','light',1280]] as const) {
-  test(`tag manager and expanded controls ${lang}/${theme}/${width}`,async({page},info)=>{
-    await login(page,lang,theme);await page.request.post(`${base}/api/tags`,{data:{name:'dev'}});await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
-    await page.locator('.tag-filters .tag-manage-link').click();const manager=page.getByRole('dialog',{name:lang==='zh'?'管理标签':'Manage tags',exact:true});
+  test(`R9 control groups and expanded controls ${lang}/${theme}/${width}`,async({page},info)=>{
+    await login(page,lang,theme);await page.request.post(`${base}/api/tags`,{data:{name:'dev'}});expect((await page.request.post(`${base}/api/links`,{data:{url:`https://example.com/r9/${lang}/${theme}/${width}`}})).ok()).toBe(true);await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
+    const compact = width <= 640 ? 44 : 32, field = width <= 640 ? 44 : 36;
+    const heights = async (selector: string, height: number) => {
+      const controls = page.locator(selector);
+      expect(await controls.count(), selector).toBeGreaterThan(0);
+      for (const control of await controls.all()) await expect(control).toHaveCSS('height', `${height}px`);
+    };
+    await heights('.toolbar .search,.toolbar .pick,.toolbar .kind,.toolbar .sort,.tag-filters .tag-filter', compact);
+    await page.locator('.toolbar .kind').press('Enter');
+    const menu = page.locator('.menu:popover-open');
+    await expect(menu.getByRole('menuitemradio')).toHaveText(lang === 'zh' ? ['全部类型','链接','文本','文件'] : ['All types','Links','Text','Files']);
+    for (const option of await menu.getByRole('menuitemradio').all()) await expect(option).toHaveCSS('min-height', `${width <= 640 ? 44 : 38}px`);
+    await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');
+    await page.locator('#create-panel-url .tag-add').click();
+    await expect(page.locator('.tag-pop:popover-open .tag-manage-row')).toHaveCSS('min-height', `${width <= 640 ? 44 : 38}px`);
+    await page.screenshot({path:info.outputPath('tag-picker.png')});
+    await page.locator('.tag-pop:popover-open .tag-manage-row').press('Enter');const manager=page.getByRole('dialog',{name:lang==='zh'?'管理标签':'Manage tags',exact:true});
     await expect(manager).toBeVisible();await audit(page);
+    await heights('.tag-manager-search,.tag-manager-tools .seg', field);
+    await heights('.tag-manager-tools .seg button', field - 4);
+    if (width > 640) {
+      const search = (await manager.locator('.tag-manager-search').boundingBox())!, range = (await page.locator('.tag-manager-tools .seg').boundingBox())!;
+      expect(Math.abs(search.y - range.y)).toBeLessThanOrEqual(1);
+    }
     await capture(page,`tags-${lang}-${theme}-${width}`);
     await page.screenshot({path:info.outputPath(`tags-${lang}-${theme}-${width}.png`)});
     await manager.getByRole('radio',{name:lang==='zh'?'全部':'All',exact:true}).press('ArrowRight');
     await manager.getByRole('radio',{name:lang==='zh'?'未使用':'Unused',exact:true}).click();await audit(page);
     const edit=manager.getByRole('button',{name:lang==='zh'?'编辑标签 dev':'Edit tag dev',exact:true});await edit.press('Enter');
     const child=page.getByRole('dialog',{name:lang==='zh'?'编辑标签':'Edit tag',exact:true});await expect(child).toBeVisible();await audit(page);
+    await heights('.tag-manager-edit > .field,.tag-manager-edit .color-input .field,.tag-manager-edit .color-preview', field);
+    await heights('.tag-manager-edit .dialog-actions .btn', compact);
     await capture(page,`tag-edit-${lang}-${theme}-${width}`);
     await page.screenshot({path:info.outputPath(`tag-edit-${lang}-${theme}-${width}.png`)});
     await child.getByRole('button',{name:lang==='zh'?'取消':'Cancel',exact:true}).click();await expect(edit).toBeFocused();
+    await manager.getByRole('button',{name:lang==='zh'?'关闭':'Close',exact:true}).click();
+    for (const [kind,label] of [['text',lang==='zh'?'文本':'Text'],['file',lang==='zh'?'文件':'Files']]) {
+      await page.getByRole('tab',{name:label,exact:true}).click();
+      await heights(`#create-panel-${kind} .opt,#create-panel-${kind} .slug .box,#create-panel-${kind} .go`,compact);
+    }
+    await page.goto(`${base}/admin/settings`);
+    await heights('.inline-form .field,.inline-form .btn,.length-input input',field);
+    const typography = await page.locator('.about dd').evaluateAll(elements=>elements.map(el=>({font:getComputedStyle(el).fontFamily,size:getComputedStyle(el).fontSize})));
+    expect(typography).toHaveLength(3);expect(typography[1]).toEqual(typography[0]);expect(typography[2]).toEqual(typography[0]);
+    for (const row of await page.locator('.about > div').all()) await expect(row).toHaveCSS('column-gap','12px');
+    await capture(page,`settings-${lang}-${theme}-${width}`);
+    await audit(page);await page.locator('.about').scrollIntoViewIfNeeded();
+    await page.screenshot({path:info.outputPath('about.png')});
   });
 }

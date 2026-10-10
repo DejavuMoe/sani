@@ -369,9 +369,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 28px;
+    height: var(--control-compact);
     padding: 0 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     color: var(--text-2);
     font-size: 13px;
     white-space: nowrap;
@@ -428,10 +428,10 @@
   .inline {
     font-size: var(--input-font-size, 13px);
     min-width: 0;
-    height: 28px;
+    height: var(--control-compact);
     padding: 0 8px;
     border: 1px solid var(--line-2);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     background: var(--surface);
     font-size: 13px;
   }
@@ -497,4 +497,5 @@
       height: 0;
     }
   }
+  .options:has(:global(.date-editor)) { align-items: flex-start; }
 </style>

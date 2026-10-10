@@ -49,7 +49,7 @@
 </div>
 
 <style>
-  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 280px; max-width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); flex-basis: 100%; }
+  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 280px; max-width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); flex-basis: auto; }
   .date-fields { display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 8px; }
   .input { display: grid; gap: 7px; min-width: 0; }
   label { font-size: 13px; color: var(--text-2); }

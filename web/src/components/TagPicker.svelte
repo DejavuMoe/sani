@@ -139,7 +139,7 @@
       {/if}
       {#if error}<p class="tag-empty error-text" role="alert">{error}</p>{/if}
     </div>
-    <button type="button" class="tag-manage-link" onclick={() => { close(); trigger?.focus(); links.managingTags = true; }}>{t('tags.manage')}</button>
+    <div class="tag-manager-actions"><button type="button" class="tag-manage-row" onclick={() => { close(); trigger?.focus(); links.managingTags = true; }}><Icon name="sliders" size={14}/><span>{t('tags.manage')}</span><Icon name="chevronRight" size={14}/></button></div>
     <footer><span id="{id}-status" class:error-text={tooLong} aria-live="polite">{t(tooLong ? 'tags.tooLong' : full ? 'tags.limit' : 'tags.count', { n: value.length })}</span><button type="button" class="tag-done" onclick={() => { close(); trigger?.focus(); }}>{t('tags.done')}</button></footer>
   </div>
 </div>

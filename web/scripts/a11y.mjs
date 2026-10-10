@@ -59,9 +59,14 @@ const screens = [
       }
       await page.locator('#create-panel-url .tag-add').click();
       const pop = page.locator('.tag-pop:popover-open');
+      let editor = pop;
       if (mode === 'create') await pop.locator('.tag-search input').fill('R3 custom');
-      else await pop.locator('.tag-edit-button').first().click();
-      await pop.locator('.color-input .field').fill('#e8dfcc');
+      else {
+        await pop.getByRole('button', {name: /^(管理标签|Manage tags)$/}).click();
+        await page.getByRole('button', {name: /^(编辑标签|Edit tag) QA color$/}).click();
+        editor = page.getByRole('dialog', {name: /^(编辑标签|Edit tag)$/});
+      }
+      await editor.locator('.color-input .field').fill('#e8dfcc');
     },
   }))),
   {
@@ -77,7 +82,7 @@ const screens = [
     name: 'share-file',
     path: '/admin/',
     run: async (page) => {
-      await page.getByRole('tab', { name: /^(文件|File)$/ }).click();
+      await page.getByRole('tab', { name: /^(文件|Files)$/ }).click();
       await page.locator('#create-panel-file input[type=file]').setInputFiles({
         name: 'notes.txt',
         mimeType: 'text/plain',

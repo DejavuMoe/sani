@@ -9,8 +9,10 @@ afterEach(() => {
 describe('t', () => {
   it('interpolates and picks English plurals', () => {
     i18n.lang = 'en';
-    expect(t('chart.clicks', { n: 1 })).toBe('1 click');
-    expect(t('chart.clicks', { n: 1234 })).toBe('1,234 clicks');
+    expect(t('chart.clicks', { n: 1 })).toBe('1 visit');
+    expect(t('chart.clicks', { n: 1234 })).toBe('1,234 visits');
+    expect(t('list.spark', { n: 1 })).toBe('1 visit in the last 14 days');
+    expect(t('list.spark', { n: 2 })).toBe('2 visits in the last 14 days');
     i18n.lang = 'zh';
     expect(t('chart.clicks', { n: 1234 })).toBe('1,234 次');
   });

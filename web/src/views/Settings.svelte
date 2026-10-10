@@ -519,7 +519,7 @@
     <div class="body">
       <dl class="about">
         <div><dt>{t('settings.version')}</dt><dd class="mono">{config?.version ?? '–'}</dd></div>
-        <div><dt>{t('settings.timezone')}</dt><dd>{config?.timezone ?? '–'}</dd></div>
+        <div><dt>{t('settings.timezone')}</dt><dd class="mono">{config?.timezone ?? '–'}</dd></div>
         <div>
           <dt>{t('settings.files')}</dt>
           <dd class={config?.filesUrl ? 'mono' : ''}>{config?.filesUrl ?? t('settings.filesOff')}</dd>
@@ -531,7 +531,8 @@
 
 <style>
   .backup-help { flex-basis:100%; font-size:12px; margin-top:12px; }
-  .backup-help a { color:var(--accent); }
+  .backup-help a { color:var(--text-2); text-decoration:underline; text-underline-offset:3px; }
+  .backup-help a:hover { color:var(--text); }
   .page {
     width: min(100%, calc(var(--page) + 2 * var(--gutter)));
     margin: 0 auto;
@@ -618,7 +619,7 @@
     gap: 8px;
   }
 
-  .inline-form :global(.btn) { height: 36px; }
+  .inline-form :global(.btn) { height: var(--control-field); }
 
   .inline-form .field {
     min-width: 0;
@@ -929,12 +930,15 @@
   }
 
   .about div {
-    display: flex;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 96px minmax(0,1fr);
+    align-items: baseline;
+    gap: 12px;
   }
 
   .about dt {
-    width: 96px;
+    min-width: 0;
+    line-height: 1.6;
     color: var(--text-3);
   }
 
@@ -942,6 +946,7 @@
     min-width: 0;
     overflow-wrap: anywhere;
     margin: 0;
+    line-height: 1.6;
   }
 
   @media (max-width: 720px) {
@@ -997,4 +1002,5 @@
     .setting { gap: 12px; }
     .length-row { gap: 6px 10px; }
   }
+  @media (max-width:640px) { .about div { grid-template-columns:88px minmax(0,1fr); gap:12px; } }
 </style>

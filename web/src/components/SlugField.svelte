@@ -163,10 +163,10 @@
 
   /* Inline: part of the composer's option row. */
   .inline .box {
-    height: 28px;
+    height: var(--control-compact);
     padding: 0 8px;
     margin-left: -8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     font-size: 13px;
     transition: background-color var(--fast) var(--ease);
   }
@@ -192,7 +192,7 @@
     /* Not flex: 1. In this column box that collapses the field to its text
        height beside the 36px fields around it. */
     flex: none;
-    height: 36px;
+    height: var(--control-field);
     padding: 0 11px;
     border: 1px solid var(--line-2);
     border-radius: var(--radius);

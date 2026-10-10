@@ -53,7 +53,7 @@
     <p class="hint">{t('tags.manageHint')}</p>
     <div class="tag-manager-tools">
       <label class="tag-manager-search"><Icon name="search" /><input bind:this={search} bind:value={query} placeholder={t('tags.searchExisting')} aria-label={t('tags.searchExisting')} /></label>
-      <Segmented size="sm" label={t('tags.scope')} value={Number(unused)} onchange={v => unused = v === 1} options={[{value:0,label:t('tags.all')},{value:1,label:t('tags.unused')}]} />
+      <Segmented size="lg" label={t('tags.scope')} value={Number(unused)} onchange={v => unused = v === 1} options={[{value:0,label:t('tags.all')},{value:1,label:t('tags.unused')}]} />
     </div>
     <div class="tag-manager-caption"><span>{links.tagsFailed || !links.tagsLoaded ? '—' : t('tags.total', {n:rows.length})}</span><span>{t('tags.items')}</span></div>
     {#if links.tagsFailed || !links.tagsLoaded}

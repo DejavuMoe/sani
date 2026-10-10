@@ -70,4 +70,5 @@
     background: var(--line);
   }
 
+  .expiry:has(:global(.date-editor)) { flex-direction: column; align-items: flex-start; width: min(280px, 100%); }
 </style>

@@ -149,7 +149,7 @@
   }
 
   .field {
-    height: 40px;
+    height: var(--control-field);
     font-size: var(--input-font-size, 15px);
   }
 
@@ -173,4 +173,5 @@
   .form :global(.btn) {
     margin-top: 20px;
   }
+  form :global(.btn) { height: var(--control-field); }
 </style>

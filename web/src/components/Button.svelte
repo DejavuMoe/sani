@@ -55,7 +55,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    height: 32px;
+    height: var(--control-compact);
     padding: 0 12px;
     border: 1px solid transparent;
     border-radius: var(--radius);
@@ -141,31 +141,9 @@
     background: var(--danger-soft);
   }
 
-  .sm {
-    height: 28px;
-    padding: 0 9px;
-    border-radius: var(--radius-sm);
-    font-size: 12.5px;
-  }
-
-  .lg {
-    height: 38px;
-    padding: 0 16px;
-    font-size: 14px;
-  }
-
-  .square {
-    width: 32px;
-    padding: 0;
-  }
-
-  .sm.square {
-    width: 28px;
-  }
-
-  .lg.square {
-    width: 38px;
-  }
+  .sm { padding: 0 9px; }
+  .lg { padding: 0 16px; }
+  .square { width: var(--control-compact); padding: 0; }
 
   .btn :global(.end) {
     margin-right: -3px;

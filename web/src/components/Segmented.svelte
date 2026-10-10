@@ -51,6 +51,9 @@
 
 <style>
   .seg {
+    --seg-height: var(--control-compact);
+    height: var(--seg-height);
+    flex-shrink: 0;
     display: inline-flex;
     gap: 2px;
     padding: 2px;
@@ -65,7 +68,7 @@
     justify-content: center;
     line-height: 1;
     gap: 6px;
-    height: 28px;
+    height: calc(var(--seg-height) - 4px);
     padding: 0 11px;
     border-radius: 6px;
     color: var(--text-2);
@@ -78,14 +81,10 @@
       box-shadow var(--fast) var(--ease);
   }
 
-  .sm button {
-    height: 24px;
-    padding: 0 9px;
-    font-size: 12.5px;
-  }
+  .sm button { padding: 0 9px; }
 
-  .lg button {
-    height: 32px;
+  .lg {
+    --seg-height: var(--control-field);
   }
 
   button:hover {

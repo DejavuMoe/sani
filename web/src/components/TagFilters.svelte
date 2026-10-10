@@ -25,7 +25,7 @@
     {/each}
     <button type="button" class="tag-filter" aria-haspopup="dialog" onclick={()=>{query='';more=true;}}>{t('tags.more')}<Icon name="chevronDown" size={12}/></button>
   {/if}
-  <button type="button" class="tag-manage-link" aria-haspopup="dialog" onclick={()=>links.managingTags=true}>{t('tags.manage')}</button>
+  <button type="button" class="tag-filter tag-manage-trigger" aria-haspopup="dialog" onclick={()=>links.managingTags=true}><Icon name="sliders" size={14}/>{t('tags.manage')}</button>
 </div>
 <Dialog bind:open={more} title={t('tags.filter')}>
   <label class="tag-manager-search"><Icon name="search"/><input bind:value={query} aria-label={t('tags.searchExisting')} placeholder={t('tags.searchExisting')}/></label>

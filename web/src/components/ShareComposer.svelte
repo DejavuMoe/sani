@@ -601,9 +601,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 28px;
+    height: var(--control-compact);
     padding: 0 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     color: var(--text-2);
     font-size: 13px;
     white-space: nowrap;
@@ -635,12 +635,12 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 34px;
+    height: var(--control-compact);
     padding: 0 8px 0 14px;
     border-radius: var(--radius);
     background: var(--ink);
     color: var(--on-ink);
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 550;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -717,10 +717,10 @@
 
   .inline {
     min-width: 0;
-    height: 28px;
+    height: var(--control-compact);
     padding: 0 8px;
     border: 1px solid var(--line-2);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     background: var(--surface);
     font-size: var(--input-font-size, 13px);
   }
@@ -779,4 +779,5 @@
     }
   }
   .chunk-hint { margin-top: 8px; color: var(--text-3); font-size: 12px; line-height: 1.6; }
+  .options:has(:global(.date-editor)) { align-items: flex-start; }
 </style>

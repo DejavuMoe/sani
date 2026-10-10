@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "review-r9/content-inventory.json",
+    "inventory": "implementation-r9/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -969,7 +969,16 @@
           "web/src/components/ShortcutsDialog.svelte",
           "web/src/components/TagManager.svelte",
           "web/src/components/Segmented.svelte",
-          "web/src/components/Button.svelte"
+          "web/src/components/Button.svelte",
+          "web/src/app.css",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/SlugField.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/components/DateEditor.svelte",
+          "web/src/components/MetadataSettings.svelte",
+          "web/src/views/Login.svelte",
+          "web/src/views/Setup.svelte"
         ],
         "interfaces": [
           "Existing tag catalog and item filtering; no API changes",
@@ -977,11 +986,15 @@
         ],
         "tests": [
           "web/e2e/app.spec.ts",
-          "web/e2e/r7.spec.ts"
+          "web/e2e/r7.spec.ts",
+          "web/e2e/metadata.spec.ts",
+          "web/e2e/r6.spec.ts",
+          "web/src/lib/i18n.test.ts",
+          "web/scripts/a11y.mjs"
         ]
       },
-      "status": "approved",
-      "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md."
+      "status": "implemented",
+      "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md. Implemented after approval 5958500; see r9-handoff.md and implementation-r9/ for measured production evidence."
     }
   ]
 }

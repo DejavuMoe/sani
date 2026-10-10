@@ -38,3 +38,13 @@ R9 用外框尺寸建立三种场景：紧凑工具栏 32px，标准表单 36px�
 R8 术语和关于字体继续继承；R9 DOM 文案重新采集与分类，未新增产品文案。开发工具无浏览器错误。无生产源码改动，因此未运行生产 `make check test e2e`；实施后必须通过这些 WSL 检查，并复测最终 Svelte DOM。未执行真实 Safari / Firefox 或真机触摸键盘检查。
 
 本轮检查结果：28 个保存状态、20 类控件组合、189 次组实例测量通过；axe 0 违规、无页面横向溢出。731 个 DOM 字符串已分类，25 个已核对的 dom-metadata 提示（场景、主题、条目 ID 等）；无未分类字符串。`node designs/sani/tools/r9-check.mjs`、design-scope、sources、draft contract、content audit 和 `git diff --check` 通过。
+
+## 生产实施与验证（2026-10-10）
+
+批准提交：`5958500`。已将 R9 尺寸收敛到 app.css tokens、Button 和 Segmented；调用方沿用原有组件，不引入原型运行时。创建区域实际使用 Composer 与 ShareComposer（文本/文件共用）。R8 的管理入口、分类/分享地址/访问术语、关于信息字体随 R9 实施；统计英文复数及批量内容通知也统一口径。英文关于标签与数值保留 12px 间距，避免 Stats time zone 紧贴 Local。
+
+生产证据在 `implementation-r9/`。真实桌面 1194px 下管理搜索与分段外框均为 36px、顶部相同；390px 下均为 44px。版本、时区、文件域名都是 IBM Plex Mono 13px。检查了展开管理、标签编辑/颜色、类型菜单、创建工具栏、设置与关于；中英文、明暗、320/390/1280px 的截图已对照 R9，内容和列表长度来自隔离测试数据。
+
+WSL `make check test` 通过（Go race、57 项 Vitest、Svelte 0 errors/0 warnings）；`make e2e` 79 项通过；`make smoke` 通过；`make docs` 通过（36 页 SEO）。收尾列间距和共享 CSS 去重后重新运行 check/test/build 及 r7.spec.ts 全部 10 项，均通过。`web/scripts/a11y.mjs` 的旧标签编辑入口和 Files 分类选择器同步到当前交互，双语双主题全部 84 个状态无 axe 违规。E2E 同时验证边界宽度、鼠标/模拟触屏、展开控件、键盘返回焦点、错误重试和数据保留。
+
+最终 Svelte DOM 重新采集：562 个唯一字符串完成分类，13 条 dom-metadata 标记逐项核对为条目 ID/字段元数据，无未分类文案。API 和数据库未因 R9 修改。未执行 Safari/Firefox、iOS/Android 真机、系统高对比度验收；未改动生产实例。发布与远端 CI 以具体版本流水线为准。

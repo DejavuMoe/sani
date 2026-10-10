@@ -130,9 +130,9 @@
   .option { min-height: 28px; }
   .option .hint { text-align: right; }
   .auth-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
-  .secret { display: flex; align-items: center; gap: 4px; min-height: 36px; }
+  .secret { display: flex; align-items: center; gap: 4px; min-height: var(--control-field); }
   .secret .field { flex: 1; }
-  .secret:not(.stored) :global(.btn) { height: 36px; }
+  .secret :global(.btn) { height: var(--control-field); }
   .stored .hint { margin-right: auto; }
   .actions { display: flex; align-items: center; gap: 8px; }
   [role='status']:empty { display: none; }

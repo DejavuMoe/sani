@@ -38,9 +38,9 @@ test('three lengths validate, retry, persist and govern actual URL/text/file cre
   await login(page);
   await page.goto(`${base}/admin/settings`);
   const form = page.locator('section', { has: page.getByRole('heading', { name: 'Creation defaults' }) });
-  const url = form.getByLabel('URL links', { exact: true });
-  const text = form.getByLabel('Text / code shares', { exact: true });
-  const file = form.getByLabel('File shares', { exact: true });
+  const url = form.getByLabel('Links', { exact: true });
+  const text = form.getByLabel('Text', { exact: true });
+  const file = form.getByLabel('Files', { exact: true });
   await expect(url).toHaveValue('5');
   await expect(text).toHaveValue('10');
   await expect(file).toHaveValue('10');
@@ -93,10 +93,10 @@ test('a reported environment lock disables only its own field and is omitted fro
   });
   await page.goto(`${base}/admin/settings`);
   const form = page.locator('form.creation-form');
-  await expect(form.getByLabel('Text / code shares', { exact: true })).toBeDisabled();
+  await expect(form.getByLabel('Text', { exact: true })).toBeDisabled();
   await expect(form).toContainText('Set by environment');
-  await form.getByLabel('URL links', { exact: true }).fill('7');
-  await form.getByLabel('File shares', { exact: true }).fill('13');
+  await form.getByLabel('Links', { exact: true }).fill('7');
+  await form.getByLabel('Files', { exact: true }).fill('13');
   const saved = page.waitForRequest(r => r.url().endsWith('/api/config') && r.method() === 'PATCH');
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   expect((await saved).postDataJSON()).toEqual({ slugLength: 7, fileSlugLength: 13 });

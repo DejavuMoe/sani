@@ -42,7 +42,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    min-height: 32px;
+    min-height: var(--control-option);
     padding: 0 10px;
     border-radius: var(--radius-sm);
     color: var(--text);

@@ -54,7 +54,7 @@ test('first run asks for the setup code and a password, then lands on an empty d
   // Codes are compared without case, spaces or dashes.
   await page.getByLabel('Setup code').fill(' E2E TEST CODE ');
   await page.getByRole('button', { name: 'Get started' }).click();
-  await expect(page.getByRole('heading', { name: 'No links yet' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'No items yet' })).toBeVisible();
 });
 
 test('a pasted URL becomes a short link on the clipboard', async () => {
@@ -146,12 +146,12 @@ test('keyboard: move, copy and open the shortcut sheet', async () => {
 test('several links at once: turn off, turn on, delete with undo', async () => {
   await page.getByRole('button', { name: 'Select multiple items' }).click();
   const bar = page.getByRole('group', { name: 'Bulk actions' });
-  await expect(bar).toContainText('Select links');
-  await page.getByRole('checkbox', { name: 'Select all loaded links' }).click();
+  await expect(bar).toContainText('Select items');
+  await page.getByRole('checkbox', { name: 'Select all loaded items' }).click();
   await expect(bar).toContainText('2 selected');
 
   await bar.getByRole('button', { name: 'Turn off' }).click();
-  await expect(page.locator('.toast').last()).toContainText('Turned off 2 links');
+  await expect(page.locator('.toast').last()).toContainText('Turned off 2 items');
   await expect(page.locator('.row .badge')).toHaveCount(2);
   expect((await follow('svelte')).status).toBe(410);
   await bar.getByRole('button', { name: 'Turn on' }).click();
@@ -167,7 +167,7 @@ test('several links at once: turn off, turn on, delete with undo', async () => {
   await expect(page.locator('.row', { hasText: '/svelte' })).toHaveCount(1);
   await expect(bar).toHaveCount(0);
   await page.locator('.toast').last().getByRole('button', { name: 'Undo' }).click();
-  await expect(page.locator('.toast').last()).toContainText('Restored 1 link');
+  await expect(page.locator('.toast').last()).toContainText('Restored 1 item');
   await expect(page.locator('.row')).toHaveCount(2);
 
   // X checks the selected row from the keyboard; Escape leaves selection mode.
@@ -629,12 +629,12 @@ test('custom tag colors validate, edit existing references and keep Enter inside
 
 test('creation defaults persist and environment metadata stays locked', async () => {
   await page.goto('/admin/settings');
-  await page.getByLabel('URL links', { exact: true }).fill('7');
+  await page.getByLabel('Links', { exact: true }).fill('7');
   await page.getByLabel('Maximum file size', { exact: true }).fill('200');
   await page.locator('section', {has:page.getByRole('heading', {name:'Creation defaults'})}).getByRole('button', {name:'Save',exact:true}).click();
   await expect(page.locator('.saved').first()).toContainText('Saved');
   await page.reload();
-  await expect(page.getByLabel('URL links', { exact: true })).toHaveValue('7');
+  await expect(page.getByLabel('Links', { exact: true })).toHaveValue('7');
   await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
   await expect(page.locator('#metadata-enabled')).toBeDisabled();
   const created = await page.request.post('/api/links', {data:{url:'https://example.com/r3-settings'}});
