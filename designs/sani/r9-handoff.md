@@ -48,3 +48,6 @@ R8 术语和关于字体继续继承；R9 DOM 文案重新采集与分类，未�
 WSL `make check test` 通过（Go race、57 项 Vitest、Svelte 0 errors/0 warnings）；`make e2e` 79 项通过；`make smoke` 通过；`make docs` 通过（36 页 SEO）。收尾列间距和共享 CSS 去重后重新运行 check/test/build 及 r7.spec.ts 全部 10 项，均通过。`web/scripts/a11y.mjs` 的旧标签编辑入口和 Files 分类选择器同步到当前交互，双语双主题全部 84 个状态无 axe 违规。E2E 同时验证边界宽度、鼠标/模拟触屏、展开控件、键盘返回焦点、错误重试和数据保留。
 
 最终 Svelte DOM 重新采集：562 个唯一字符串完成分类，13 条 dom-metadata 标记逐项核对为条目 ID/字段元数据，无未分类文案。API 和数据库未因 R9 修改。未执行 Safari/Firefox、iOS/Android 真机、系统高对比度验收；未改动生产实例。发布与远端 CI 以具体版本流水线为准。
+
+
+发布前截图复核补充：旧的窄屏 nth-child 规则曾误隐藏空目录／少量标签时的“管理标签”或“更多标签”。现仅隐藏带 aria-pressed 的标签筛选项，并在 320/390px、0–5 个标签目录中验证两个入口可见、键盘打开与焦点返回。最终候选 `make check test e2e smoke docs VERSION=v0.9.4` 全部通过，E2E 总数为 80。文档的 16 张实际界面截图重新生成。

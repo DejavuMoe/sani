@@ -161,6 +161,7 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
       expect(await controls.count(), selector).toBeGreaterThan(0);
       for (const control of await controls.all()) await expect(control).toHaveCSS('height', `${height}px`);
     };
+    await expect(page.locator('.tag-manage-trigger')).toBeVisible();
     await heights('.toolbar .search,.toolbar .pick,.toolbar .kind,.toolbar .sort,.tag-filters .tag-filter', compact);
     await page.locator('.toolbar .kind').press('Enter');
     const menu = page.locator('.menu:popover-open');
@@ -204,3 +205,24 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
     await page.screenshot({path:info.outputPath('about.png')});
   });
 }
+
+
+test('narrow tag toolbars keep management and more actions for every small catalog size', async ({page}) => {
+  await login(page);
+  for (const width of [320,390]) for (let count=0;count<=5;count++) {
+    await page.route('**/api/tags', async route => {
+      const response = await route.fetch();
+      const catalog = await response.json();
+      catalog.items = Array.from({length:count},(_,i)=>({id:100+i,name:`tag-${i}`,color:'blue',count:0}));
+      await route.fulfill({response,json:catalog});
+    });
+    await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
+    const manage=page.locator('.tag-manage-trigger');
+    await expect(manage).toBeVisible();
+    await expect(page.getByRole('button',{name:'More tags',exact:true})).toBeVisible();
+    await manage.press('Enter');
+    const dialog=page.getByRole('dialog',{name:'Manage tags',exact:true});await expect(dialog).toBeVisible();
+    await dialog.getByRole('button',{name:'Close',exact:true}).click();await expect(manage).toBeFocused();
+    await page.unroute('**/api/tags');
+  }
+});
