@@ -48,7 +48,7 @@ func newEnv(t *testing.T, opt Options) *env {
 		t.Fatal(err)
 	}
 	rec := clicks.New(st, time.UTC)
-	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	log := slog.New(slog.NewTextHandler(t.Output(), nil))
 	if opt.CacheSize == 0 {
 		opt.CacheSize = 1000
 	}
