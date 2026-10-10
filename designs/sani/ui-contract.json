@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "content-inventory.json",
+    "inventory": "review-r7/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -764,6 +764,79 @@
       },
       "status": "implemented",
       "notes": "Approved R6 implemented with user-authorized responsive sizing corrections: independent lengths, legacy migration and stable previews; width-independent controls, consistent create/edit typography and separate touch input sizing. WSL make check test e2e passed (69 Chromium tests); docs build passed. Prototype verified across 28 language/theme/width combinations. See r6-handoff.md."
+    },
+    {
+      "id": "admin-r7",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r7.html",
+        "assetPath": "prototype-r7.html",
+        "files": [
+          "src/r7/app.jsx",
+          "src/r7/copy.js",
+          "src/r7/detail.jsx",
+          "src/r7/management.jsx",
+          "src/r7/patterns.jsx",
+          "src/r7/refinements.css",
+          "src/r7/scenes.jsx",
+          "src/r7/screens.jsx",
+          "src/r7/states.jsx",
+          "src/r7/store.jsx",
+          "src/r7/tags.jsx"
+        ],
+        "states": [
+          "tag-manager",
+          "tag-edit",
+          "tag-delete-confirm",
+          "tag-delete-error-retry",
+          "unused-tags",
+          "exact-tag-keyboard",
+          "query-error",
+          "next-page-error",
+          "refresh-error-with-selection",
+          "stats-error",
+          "stats-stale",
+          "token-error",
+          "token-empty",
+          "busy-create",
+          "upload-cancel",
+          "dirty-leave",
+          "save-failure",
+          "tag-empty",
+          "combined-empty",
+          "import-report",
+          "files-unavailable"
+        ],
+        "stableIds": [
+          "r7-tag-manager",
+          "r7-list-state",
+          "r7-edit-guard"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/ and /admin/#settings",
+        "files": [
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/TagFilters.svelte",
+          "web/src/components/LinkList.svelte",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/LinkEditor.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/lib/links.svelte.ts",
+          "web/src/views/Settings.svelte",
+          "web/src/lib/i18n.svelte.ts"
+        ],
+        "interfaces": [
+          "Existing GET/POST/PATCH /api/tags; DELETE is proposed, not implemented"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/src/lib/tags.test.ts",
+          "web/src/lib/links.test.ts"
+        ]
+      },
+      "status": "approved"
     }
   ]
 }

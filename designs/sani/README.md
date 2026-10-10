@@ -9,11 +9,13 @@ Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
 (`_d_meta.json`). Revisions 1–3 are approved and implemented; R4 needs changes;
-R5 is approved for implementation.
+R5 and R6 are approved and implemented. R7 is approved; implementation is in progress.
 
 ## Revisions
 
-R6 is ready for review: [independent slug lengths](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-settings&lang=zh&theme=light&chrome=0&focus=defaults), [text preview](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-text&lang=zh&theme=light&chrome=0), and [code preview](http://127.0.0.1:4311/sani/prototype-r6.html?scene=r6-code&lang=zh&theme=dark&chrome=0). See [r6-handoff.md](r6-handoff.md) for the observed preview jitter, proposed behavior, implementation scope and verification. Production code is unchanged by R6.
+R7 is approved: [review hub](http://127.0.0.1:4311/sani/review-r7.html), [full prototype](http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0). Scope, state contracts and implementation boundaries are in [r7-handoff.md](r7-handoff.md). R7 changes only design files.
+
+R6 is approved and implemented; see [r6-handoff.md](r6-handoff.md) for implementation and responsive verification. Approval status is authoritative in `_d_meta.json`; implementation evidence is recorded by revision below. Release or deployment must not be inferred from design approval.
 
 | Revision | Base | Items | Approved | Implemented |
 |---|---|---|---|---|
@@ -21,8 +23,9 @@ R6 is ready for review: [independent slug lengths](http://127.0.0.1:4311/sani/pr
 | r2 — link tags | `61d2a5f` | Create, edit, filter | `99109ac` | Implemented 2026-10-07; schema 4 |
 | r3 — admin refinements | `fc391bd` | Colors, defaults, uploads, metadata | `81e5609` | `e58de51` / v0.9.0 |
 | r4 — metadata connections | `e58de51` | In-admin relay/HTTP/SOCKS and custom controls | Changes requested | Not implemented |
-| r5 — compact settings | R4 | One connection selector, aligned controls, no hosted relay | Approved 2026-10-09 | Not implemented |
-| r6 — creation defaults and text preview | R5 | Independent URL/text/file lengths, stable content preview | Needs review | Not implemented |
+| r5 — compact settings | R4 | One connection selector, aligned controls, no hosted relay | `81a1762` | `eeea4eb`; see r5-handoff.md |
+| r6 — creation defaults and text preview | R5 | Independent URL/text/file lengths, stable content preview | `a4a77b7` | `480c707`, responsive fix `0b9b1bd`; see r6-handoff.md |
+| r7 — management and recovery | R6 / `934c5f0` | Tag lifecycle, drafts, errors, copy and delivery boundaries | Approved 2026-10-10 | In progress |
 
 ### R5 — compact settings (approved)
 
@@ -33,7 +36,7 @@ nested connection dropdown/card are removed. Input/action pairs use equal
 heights throughout Settings, including the domain and API token forms.
 See [r5-handoff.md](r5-handoff.md) for the three comment fixes and verification.
 R5 keeps R1–R4 snapshots intact. Saves and connection tests remain in-memory
-simulations; production implementation is authorized.
+simulations; the approved production implementation is recorded in r5-handoff.md.
 
 ### R4 — metadata connections (changes requested)
 
@@ -269,4 +272,4 @@ its sync check rejects pages that aren't in its sidebar.
 
 ## R5（2026-10-09，已批准并实施）
 
-`prototype-r5.html?scene=r5-settings&lang=zh&theme=light&chrome=0` 恢复紧凑设置布局；后台直接配置 HTTP(S)/SOCKS5，移除公共商业中继，并统一应用内颜色、日期和提示控件。对应设计提交 `81a1762`，实现与本地验证记录见 [r5-handoff.md](r5-handoff.md)。R4 保留为被要求修改的历史方案；本次实现尚未发布或部署。
+`prototype-r5.html?scene=r5-settings&lang=zh&theme=light&chrome=0` 恢复紧凑设置布局；后台直接配置 HTTP(S)/SOCKS5，移除公共商业中继，并统一应用内颜色、日期和提示控件。对应设计提交 `81a1762`，实现与本地验证记录见 [r5-handoff.md](r5-handoff.md)。R4 保留为被要求修改的历史方案；该记录只证明设计与实现状态；发布和部署需另行核对。

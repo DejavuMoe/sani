@@ -67,6 +67,16 @@
             "width": 1280,
             "height": 900
           }
+        },
+        {
+          "path": "prototype-r7.html",
+          "createdAt": "2026-10-10T00:53:39.834Z",
+          "status": "approved",
+          "subtitle": "Revision 7: tag lifecycle, draft protection and recovery states",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
         }
       ]
     },
@@ -129,8 +139,22 @@
           "section": "Layers"
         }
       ]
+    },
+    "R7 Review": {
+      "versions": [
+        {
+          "path": "review-r7.html",
+          "createdAt": "2026-10-10T00:53:39.907Z",
+          "status": "approved",
+          "subtitle": "Review entry points and task walkthroughs",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
+        }
+      ]
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-09T06:15:11.871Z"
+  "updatedAt": "2026-10-10T01:06:39.420Z"
 }

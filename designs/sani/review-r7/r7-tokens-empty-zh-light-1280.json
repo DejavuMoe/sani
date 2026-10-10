@@ -1,0 +1,827 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tokens-empty&lang=zh&theme=light&chrome=0&qa=1",
+  "viewport": [
+    1280,
+    720
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "sani",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "返回",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "设置",
+      "channel": "text",
+      "location": "h1",
+      "visibility": "visible"
+    },
+    {
+      "text": "外观",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "主题",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "跟随系统",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "浅色",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "深色",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "语言",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "中文",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "English",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "短链接域名",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "保存",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "生成短链接时使用的地址。留空则使用你当前访问的地址（https://s.example.com）。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "创建默认值",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "自动短码长度",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "分别设置三类短码的长度（3–32 位）。仅影响之后自动生成的短码，已有链接不变。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "普通网址",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "默认 5 位",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "位",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "示例",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "文本 / 代码分享",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "默认 10 位",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "位",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "示例",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "p/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "文件分享",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "默认 10 位",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "位",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "示例",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "p/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "排除易混淆字符",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "网址短码不使用 0、o、1、i、l。文本和文件分享始终排除这些字符。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "单文件大小上限",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "默认 99 MB。超过 25 MB 自动分片上传。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "MB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "保存",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "网页信息",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "自动获取网页信息",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "创建短链接时获取标题与网站图标。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "网页信息连接设置",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "连接方式",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "直接连接",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "HTTP(S)",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "SOCKS5",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "目标网站会看到服务器的出口 IP。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "保存",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "API 令牌",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "供脚本、快捷指令和浏览器扩展使用。令牌拥有完整权限，修改密码后依然有效，不再使用时请删除。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "创建令牌",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "还没有创建令牌",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "快捷方式",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "书签小工具",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "把按钮拖到浏览器的书签栏。以后在任何网页上点它，就能缩短当前页面。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "缩短此页",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "添加到主屏幕",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "在手机浏览器中把 Sani 添加到主屏幕。在 Android 上，之后可以从任意应用的“分享”菜单直接缩短链接。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "数据",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "导出网址链接",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "包含每条短链接的设置与点击总数，不含分享的文本和文件。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "JSON",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "CSV",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "导入链接",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "支持 Sani、Shlink 导出的 CSV 或 JSON。已有短码会被跳过。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sani 格式示例",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "CSV",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "JSON",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "拖入文件，或点击选择",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "备份整个实例",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "网址导出用于迁移，不包含分享的文本和文件。完整备份需要同时保留数据库与文件目录。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "请按部署方式执行备份，并验证恢复。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "查看备份与恢复说明",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "↗",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "账户与安全",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "修改密码",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "当前密码",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "新密码",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "修改密码",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "退出其他设备",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "退出登录",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "关于",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "版本",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "v0.9.3",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "统计时区",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "Asia/Shanghai",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "文件域名",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "https://files.example.com",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "新建短链接",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "N",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "在任意位置粘贴链接、文本或文件",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "V",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "上下选择",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "J",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "K",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "展开或收起详情",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "复制短链接",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "C",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "编辑",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "E",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "保存修改",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "删除（可撤销）",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Del",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "选中，用于批量操作",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "X",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "收起 / 清除",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Esc",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "显示快捷键",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "?",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Sani",
+      "channel": "aria-label",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "菜单",
+      "channel": "aria-label",
+      "location": "nav",
+      "visibility": "visible"
+    },
+    {
+      "text": "快捷键",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "主题: 浅色",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "设置",
+      "channel": "aria-label",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "主题",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "语言",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "短链接域名",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "https://s.example.com",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "排除易混淆字符",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "自动获取网页信息",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "连接方式",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "令牌名称",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "例如：iPhone 快捷指令",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "关闭",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    }
+  ]
+}

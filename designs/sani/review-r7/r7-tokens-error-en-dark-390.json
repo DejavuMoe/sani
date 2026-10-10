@@ -1,0 +1,833 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tokens-error&lang=en&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    390,
+    844
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "sani",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Back",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Settings",
+      "channel": "text",
+      "location": "h1",
+      "visibility": "visible"
+    },
+    {
+      "text": "Appearance",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Theme",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "System",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Light",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Dark",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Language",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "中文",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "English",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Short domain",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Save",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "The address short links are built from. Leave it empty to use the one you’re visiting (https://s.example.com).",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Creation defaults",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Generated slug length",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "Set each type independently (3–32 characters). Only future generated slugs change; existing links stay the same.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "URL links",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "5 characters by default",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "chars",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Example",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "Text / code shares",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "10 characters by default",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "chars",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Example",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "p/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "File shares",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "10 characters by default",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "chars",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Example",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "p/",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "code",
+      "visibility": "visible"
+    },
+    {
+      "text": "Exclude look-alike characters",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "Omit 0, o, 1, i and l from URL slugs. Text and file shares always omit them.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Maximum file size",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "99 MB by default. Files over 25 MB upload in chunks.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "MB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Save",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Page metadata",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Fetch page metadata",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "Fetch titles and site icons when creating links.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Metadata connection settings",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "Connection",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Direct",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "HTTP(S)",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "SOCKS5",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Destination sites can see your server’s outgoing IP.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Save",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "API tokens",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "For scripts, Shortcuts and browser extensions. A token has full access and outlives password changes, so revoke the ones you no longer use.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Create token",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Could not read token list. The token count is unknown.",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Retry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Shortcuts",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Bookmarklet",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "Drag the button to your bookmarks bar. Click it on any page to shorten that page.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Shorten this page",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Add to home screen",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "Add Sani to your phone’s home screen. On Android you can then shorten links from any app’s Share menu.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Data",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Export URL links",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "Every short link with its settings and click total. Shared texts and files aren’t included.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "JSON",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "CSV",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Import links",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "Import CSV or JSON exported by Sani or Shlink. Existing slugs are skipped.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sani format examples",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "CSV",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "JSON",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Drop a file here, or click to choose",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Back up the whole instance",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "URL exports are for migration and exclude shared texts and files. A full backup must preserve the database and file directory together.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Follow the steps for your deployment and verify restoration.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Backup and restore guide",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "↗",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Account",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Change password",
+      "channel": "text",
+      "location": "h3",
+      "visibility": "visible"
+    },
+    {
+      "text": "Current password",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "New password",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Change password",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sign out other devices",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sign out",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "About",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Version",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "v0.9.3",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Stats time zone",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "Asia/Shanghai",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Files domain",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "https://files.example.com",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "New link",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "N",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Paste a link, text or file anywhere",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "V",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Move selection",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "J",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "K",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Open or close details",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "C",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Edit",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "E",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Save changes",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Delete (undoable)",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Del",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Select for bulk actions",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "X",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Close / clear",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Esc",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Show shortcuts",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "?",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Sani",
+      "channel": "aria-label",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Menu",
+      "channel": "aria-label",
+      "location": "nav",
+      "visibility": "visible"
+    },
+    {
+      "text": "Shortcuts",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Theme: Dark",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Settings",
+      "channel": "aria-label",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Theme",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Language",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Short domain",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "https://s.example.com",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Exclude look-alike characters",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Fetch page metadata",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Connection",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Token name",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "e.g. iPhone Shortcut",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Close",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    }
+  ]
+}

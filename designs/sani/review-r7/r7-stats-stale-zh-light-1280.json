@@ -1,0 +1,2459 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-stats-stale&lang=zh&theme=light&chrome=0&qa=1",
+  "viewport": [
+    1280,
+    720
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "sani",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sani",
+      "channel": "text",
+      "location": "h1",
+      "visibility": "visible"
+    },
+    {
+      "text": "链接",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "文本",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "文件",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "新建",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "网址",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "缩短",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "s.example.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "有效期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 小时",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "自定义时间…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "更多选项",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "选择或新建标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "管理标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "已选 0 / 5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "完成",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "到期后停止访问，内容仍保留，可续期或删除。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "hidden"
+    },
+    {
+      "text": "新建",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "hidden"
+    },
+    {
+      "text": "要分享的文本",
+      "channel": "text",
+      "location": "label",
+      "visibility": "hidden"
+    },
+    {
+      "text": "纯文本",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "代码",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "s.example.com/p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "有效期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 小时",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "自定义时间…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "更多选项",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "分享",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "选择或新建标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "管理标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "已选 0 / 5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "完成",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "新建",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "hidden"
+    },
+    {
+      "text": "把文件拖到这里，或者",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "选择文件",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "单个文件最大 99 MB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "s.example.com/p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "有效期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 小时",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "自定义时间…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "更多选项",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "分享",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "选择或新建标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "管理标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "已选 0 / 5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "完成",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "内容总数",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "16",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "总访问",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "6,554",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "今日访问",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "3",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 30 天",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 30 天每日访问",
+      "channel": "text",
+      "location": "caption",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-05",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "48",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-06",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "57",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-07",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "80",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-08",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "97",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-09",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "155",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-10",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "145",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-11",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "105",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-12",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "69",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-13",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "174",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-14",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "198",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-15",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "141",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-16",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "146",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-17",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "101",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-18",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "85",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-19",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "57",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-20",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "53",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-21",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "75",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-22",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "99",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-23",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "109",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-24",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "106",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-25",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "226",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-26",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "526",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-27",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "289",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-28",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "359",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-29",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "257",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-30",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "205",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-01",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "190",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-02",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "207",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-03",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "166",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-04",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "3",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "全部内容 · 统计口径",
+      "channel": "text",
+      "location": "summary",
+      "visibility": "visible"
+    },
+    {
+      "text": "上方统计覆盖全部未删除内容，不随筛选变化。标签数量包含停用、过期内容。一次访问不等同于一位访客。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "全部",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "16",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "2",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "未标记",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "1",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "更多标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "管理标签",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "搜索短码、标题、链接或文件名",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "visible"
+    },
+    {
+      "text": "当前筛选：3 条内容",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "多选",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "文本",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "全部类型",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "短链接",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "文本",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "文件",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "最近创建",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "最近创建",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "点击最多",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "最近访问",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "短链接",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "标题与目标",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 14 天",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "点击",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "m4rq8v2x7p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "compose.yaml",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "代码 · 36 行 · 1.3 KB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "周五分享会",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "纯文本 · 5 行 · 271 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "s.example.com/p/k7mx9p4w2r",
+      "channel": "text",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "复制",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "打开",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "纯文本",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "·",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "5 行",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "·",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "271 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "复制文本",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "正在加载…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "查看",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "今天",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "最近访问",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "暂无",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "7 天",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "30 天",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "90 天",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "text",
+      "visibility": "visible"
+    },
+    {
+      "text": "9月5日",
+      "channel": "text",
+      "location": "text",
+      "visibility": "visible"
+    },
+    {
+      "text": "今天",
+      "channel": "text",
+      "location": "text",
+      "visibility": "visible"
+    },
+    {
+      "text": "还没有访问记录",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "每日点击数据",
+      "channel": "text",
+      "location": "caption",
+      "visibility": "visible"
+    },
+    {
+      "text": "日期",
+      "channel": "text",
+      "location": "th",
+      "visibility": "visible"
+    },
+    {
+      "text": "点击",
+      "channel": "text",
+      "location": "th",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-05",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-06",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-07",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-08",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-09",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-10",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-11",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-12",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-13",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-14",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-15",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-16",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-17",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-18",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-19",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-20",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-21",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-22",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-23",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-24",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-25",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-26",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-27",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-28",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-29",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-09-30",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-01",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-02",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-03",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "2026-10-04",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "td",
+      "visibility": "visible"
+    },
+    {
+      "text": "打开分享页与访问原始文本分别消耗次数。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "停用、到期或次数用尽只会停止访问，内容仍然保留。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "PNG",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "SVG",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "创建于",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "9月29日 15:52",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "有效期",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "不过期",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "访问上限",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "不限",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "E",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "visible"
+    },
+    {
+      "text": "停用",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "nginx-conf",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Nginx 反向代理配置",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "代码 · 11 行 · 286 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "51",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "新建短链接",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "N",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "在任意位置粘贴链接、文本或文件",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "V",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "上下选择",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "J",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "K",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "展开或收起详情",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "复制短链接",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "C",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "编辑",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "E",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "保存修改",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "删除（可撤销）",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Del",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "选中，用于批量操作",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "X",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "收起 / 清除",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Esc",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "显示快捷键",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "?",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Sani",
+      "channel": "aria-label",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "菜单",
+      "channel": "aria-label",
+      "location": "nav",
+      "visibility": "visible"
+    },
+    {
+      "text": "快捷键",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "主题: 浅色",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "设置",
+      "channel": "aria-label",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "新建",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "新建",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "输入或粘贴网址",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "留空自动生成",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "有效期",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "粘贴或输入要分享的文字、日志或代码",
+      "channel": "placeholder",
+      "location": "textarea",
+      "visibility": "hidden"
+    },
+    {
+      "text": "格式",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "留空自动生成",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "有效期",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "文件",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "留空自动生成",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "有效期",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "搜索或新建标签",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "标签",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "近 30 天每日访问",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 30 天每日访问",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "内容列表",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "按标签筛选",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "搜索短码、标题、链接或文件名",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "多选内容",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "按类型筛选",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "排序",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 14 天共 0 次点击",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "visible"
+    },
+    {
+      "text": "复制短链接",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 14 天共 0 次点击",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "visible"
+    },
+    {
+      "text": "复制短链接",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "文本内容",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "每日点击",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "每日点击",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "s.example.com/p/k7mx9p4w2r 的二维码",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "visible"
+    },
+    {
+      "text": "近 14 天共 51 次点击",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "visible"
+    },
+    {
+      "text": "复制短链接",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "关闭",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    }
+  ]
+}

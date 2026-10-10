@@ -1,0 +1,272 @@
+[
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tokens-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-stats-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-import&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-files-off&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=en&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=en&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tokens-error&lang=en&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-text-create&lang=en&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=zh&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      320,
+      740
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-import&lang=en&theme=light&chrome=0&qa=1",
+    "viewport": [
+      320,
+      740
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-stats-error&lang=en&theme=light&chrome=0&qa=1",
+    "viewport": [
+      320,
+      740
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      320,
+      740
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-query-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-delete-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-stats-stale&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-refresh-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-page-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-refresh-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-edit-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-edit-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-edit-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-edit-error&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-empty-combined&lang=en&theme=dark&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-empty-tag&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tokens-empty&lang=zh&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1280,
+      720
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=en&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1194,
+      804
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=en&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1194,
+      804
+    ],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=en&theme=light&chrome=0&qa=1",
+    "viewport": [
+      1194,
+      804
+    ],
+    "overflow": false,
+    "violations": []
+  }
+]

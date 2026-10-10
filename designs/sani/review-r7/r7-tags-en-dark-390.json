@@ -1,0 +1,365 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=en&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    390,
+    844
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "Manage tags",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "Name and color changes apply to all items. Deleting a tag keeps its items.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "All",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Unused",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "12 tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Items",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "2",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Counts include disabled and expired items, regardless of search or type filters.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Close",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Search tags",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Search tags",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Tag scope",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag netcup",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag netcup",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag aff",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag aff",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag dmit",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag dmit",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag 阅读",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag 阅读",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag 工作",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag 工作",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag devops",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag devops",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag dev",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag dev",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag blog",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag blog",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag design",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag design",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag notes",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag notes",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag archive",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag archive",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Edit tag rabisu",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Delete tag rabisu",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    }
+  ]
+}

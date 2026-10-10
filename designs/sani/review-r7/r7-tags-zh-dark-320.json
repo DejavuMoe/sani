@@ -1,0 +1,365 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-tags&lang=zh&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    320,
+    740
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "管理标签",
+      "channel": "text",
+      "location": "h2",
+      "visibility": "visible"
+    },
+    {
+      "text": "名称和颜色的修改对所有内容生效。删除标签不会删除内容。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "全部",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "未使用",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "12 个标签",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "关联内容",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "2",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "数量包含停用和过期内容，不随当前搜索或类型筛选变化。",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "关闭",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "搜索标签",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "搜索标签",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "标签范围",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 netcup",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 netcup",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 aff",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 aff",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 dmit",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 dmit",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 阅读",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 阅读",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 工作",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 工作",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 devops",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 devops",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 dev",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 dev",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 blog",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 blog",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 design",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 design",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 notes",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 notes",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 archive",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 archive",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "编辑标签 rabisu",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "删除标签 rabisu",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    }
+  ]
+}

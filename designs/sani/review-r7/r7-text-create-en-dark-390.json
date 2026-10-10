@@ -1,0 +1,2579 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-text-create&lang=en&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    390,
+    844
+  ],
+  "overflow": false,
+  "violations": [],
+  "items": [
+    {
+      "text": "sani",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sani",
+      "channel": "text",
+      "location": "h1",
+      "visibility": "visible"
+    },
+    {
+      "text": "Links",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Text",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Files",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Create",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "hidden"
+    },
+    {
+      "text": "URL",
+      "channel": "text",
+      "location": "label",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Shorten",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "s.example.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Expires",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 hour",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 day",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Pick a time…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "More options",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Choose or create tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Manage tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "0 / 5 selected",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Done",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Expiry stops access. Content stays available to extend or delete.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Create",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "visible"
+    },
+    {
+      "text": "Text to share",
+      "channel": "text",
+      "location": "label",
+      "visibility": "visible"
+    },
+    {
+      "text": "周五下午三点，讨论下周安排。",
+      "channel": "text",
+      "location": "textarea",
+      "visibility": "visible"
+    },
+    {
+      "text": "Plain text",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Code",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "s.example.com/p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "42 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "1.0 MB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Expires",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 hour",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 day",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Pick a time…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Fewer options",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Share",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Choose or create tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Manage tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "0 / 5 selected",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Done",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Title",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Visit limit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Create",
+      "channel": "text",
+      "location": "legend",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Drop a file here, or",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "choose one",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Up to 99 MB per file",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "s.example.com/p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Expires",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "No expiry",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 hour",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "1 day",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "7 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "30 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Pick a time…",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "More options",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Share",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Choose or create tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "devops",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "dev",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "design",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "notes",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "archive",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "rabisu",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Manage tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "0 / 5 selected",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Done",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Total items",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "16",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Total visits",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "6,554",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Visits today",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "visible"
+    },
+    {
+      "text": "3",
+      "channel": "text",
+      "location": "dd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Last 30 days",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Daily visits over the last 30 days",
+      "channel": "text",
+      "location": "caption",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-05",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "48",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-06",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "57",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-07",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "80",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-08",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "97",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-09",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "155",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-10",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "145",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-11",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "105",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-12",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "69",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-13",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "174",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-14",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "198",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-15",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "141",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-16",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "146",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-17",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "101",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-18",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "85",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-19",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "57",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-20",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "53",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-21",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "75",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-22",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "99",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-23",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "109",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-24",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "106",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-25",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "226",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-26",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "526",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-27",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "289",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-28",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "359",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-29",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "257",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-09-30",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "205",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-10-01",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "190",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-10-02",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "207",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-10-03",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "166",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2026-10-04",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "3",
+      "channel": "text",
+      "location": "td",
+      "visibility": "hidden"
+    },
+    {
+      "text": "All items · What is counted",
+      "channel": "text",
+      "location": "summary",
+      "visibility": "visible"
+    },
+    {
+      "text": "The summary covers all undeleted items, regardless of filters. Tag counts include disabled and expired items. A visit is not a unique visitor.",
+      "channel": "text",
+      "location": "p",
+      "visibility": "visible"
+    },
+    {
+      "text": "Tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "All",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "16",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "2",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "4",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Untagged",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "1",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "More tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Manage tags",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Search slugs, titles, URLs, file names",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "visible"
+    },
+    {
+      "text": "Select multiple",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "All types",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "All types",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Links",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Texts",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Files",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Newest",
+      "channel": "text",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Newest",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Most clicked",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Last visited",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Short link",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Title and destination",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "14 days",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Clicks",
+      "channel": "text",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "jud9x",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "【开发者日常】我为什么又写了一个短链接服务",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "bilibili.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/video/BV1xK4y1m7aB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "40",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "t6r5dzept6",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sani 设计评审 v3.pdf",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "application/pdf · 597 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "16",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "92ukv",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "news.ycombinator.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/item?id=41234567",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "41",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "m4rq8v2x7p",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "compose.yaml",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Code · 36 lines · 1.3 KB",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "k7mx9p4w2r",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "周五分享会",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Plain text · 5 lines · 271 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/p/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "nginx-conf",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Nginx 反向代理配置",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Code · 11 lines · 286 B",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "51",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "beta",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Join the Sani iOS beta – TestFlight",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Limit reached",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "testflight.apple.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/join/Ab3dEf9h",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "60",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "weekly-42",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "周刊第 42 期：把长期主义当作一种工程习惯",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "mp.weixin.qq.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/s/Qm7rXk2pLwE9aZ3cVb8Nfg",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "1,566",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "vz9s5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Onboarding Flow – Figma",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "figma.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/design/7f3Kd92/Onboarding-Flow?node-id=12-345&t=Xy8",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "65",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "rfc",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "RFC 9110: HTTP Semantics",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "rfc-editor.org",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/rfc/rfc9110.html#name-redirection-3xx",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dmit",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "17",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "jarsx",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Scaling Laws for Retrieval-Augmented Language Models",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "arxiv.org",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/abs/2409.01234",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "403",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "uq4s5",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Q3 预算（草稿）",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Off",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "docs.google.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/spreadsheets/d/1AbCdEfGhIjK/edit#gid=0",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "57",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "talk",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "GopherCon 2026 — Designing for the Hot Path",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Expired",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "youtube.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/watch?v=R7tq3-GvhlQ",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "382",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "简历",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "简历 · 工作经历与项目",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dejavu.moe",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/resume",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "aff",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "144",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Dejavu’s Blog",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "dejavu.moe",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "netcup",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "1,192",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "gh",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "DejavuMoe/sani: A small, fast link shortener you host yourself",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "github.com",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "/DejavuMoe/sani",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "阅读",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "工作",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "2,520",
+      "channel": "text",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "New link",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "N",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Paste a link, text or file anywhere",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "V",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Move selection",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "J",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "/",
+      "channel": "text",
+      "location": "span",
+      "visibility": "hidden"
+    },
+    {
+      "text": "K",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Open or close details",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "C",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Edit",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "E",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Save changes",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Ctrl",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "↵",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Delete (undoable)",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Del",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Select for bulk actions",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "X",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Close / clear",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Esc",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Show shortcuts",
+      "channel": "text",
+      "location": "dt",
+      "visibility": "hidden"
+    },
+    {
+      "text": "?",
+      "channel": "text",
+      "location": "kbd",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Sani",
+      "channel": "aria-label",
+      "location": "span",
+      "visibility": "visible"
+    },
+    {
+      "text": "Menu",
+      "channel": "aria-label",
+      "location": "nav",
+      "visibility": "visible"
+    },
+    {
+      "text": "Shortcuts",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Theme: Dark",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Settings",
+      "channel": "aria-label",
+      "location": "a",
+      "visibility": "visible"
+    },
+    {
+      "text": "Create",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "Create",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Enter or paste a URL",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Leave blank to generate",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Expires",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Paste or type some text, a log or code",
+      "channel": "placeholder",
+      "location": "textarea",
+      "visibility": "visible"
+    },
+    {
+      "text": "Format",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Leave blank to generate",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Expires",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Optional",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "None",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Files",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Leave blank to generate",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Expires",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "aria-label",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Search or create a tag",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Tags",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Daily visits over the last 30 days",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "Daily visits over the last 30 days",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Items",
+      "channel": "aria-label",
+      "location": "section",
+      "visibility": "visible"
+    },
+    {
+      "text": "Filter by tag",
+      "channel": "aria-label",
+      "location": "div",
+      "visibility": "visible"
+    },
+    {
+      "text": "Search slugs, titles, URLs, file names",
+      "channel": "placeholder",
+      "location": "input",
+      "visibility": "visible"
+    },
+    {
+      "text": "Select multiple items",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Filter by type",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Sort",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "40 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "16 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "41 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "0 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "0 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "51 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "60 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "1,566 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "65 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "9 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "113 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "1 click in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "66 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "47 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "249 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "493 clicks in the last 14 days",
+      "channel": "aria-label",
+      "location": "svg",
+      "visibility": "hidden"
+    },
+    {
+      "text": "Copy short link",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "visible"
+    },
+    {
+      "text": "Close",
+      "channel": "aria-label",
+      "location": "button",
+      "visibility": "hidden"
+    }
+  ]
+}
