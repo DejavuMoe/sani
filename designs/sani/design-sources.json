@@ -548,6 +548,30 @@
       "limitations": [
         "R8 is not approved. Only link appearance changes in the backup section; production structure stays in place."
       ]
+    },
+    {
+      "id": "r9-height-feedback",
+      "type": "screenshot",
+      "location": "User attachment 2026-10-10: codex-clipboard-de7c7bec-87d9-400a-9e2d-1054c8c88f28.png; prototype-r8.html at c2c4f2b",
+      "roles": [
+        "visual-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Raw user capture is not copied. Before/after screenshots use existing synthetic fixture data.",
+      "licenseOrPermission": "User-provided UI evidence",
+      "localCopies": [],
+      "observations": [
+        "Search and segmented outer frames have unequal heights. Browser baseline confirms 37.5px vs 28px."
+      ],
+      "inferences": [
+        "Use role-based outer sizing and verify grouped controls across rendered states."
+      ],
+      "limitations": [
+        "Screenshot alone does not approve a solution or establish hidden interaction behavior."
+      ]
     }
   ]
 }

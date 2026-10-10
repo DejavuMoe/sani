@@ -1,0 +1,71 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r8-setup&lang=en&theme=light&chrome=0&qa=1",
+  "viewport": [
+    320,
+    740
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".setup-form",
+        "controls": [
+          {
+            "selector": "input.field mono setup-code",
+            "text": "",
+            "height": 44,
+            "top": 258.6875,
+            "bottom": 302.6875,
+            "left": 24,
+            "width": 257,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "24px"
+          },
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 44,
+            "top": 386.1875,
+            "bottom": 430.1875,
+            "left": 24,
+            "width": 257,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "24px"
+          },
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 44,
+            "top": 495.6875,
+            "bottom": 539.6875,
+            "left": 24,
+            "width": 257,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "24px"
+          },
+          {
+            "selector": "button.btn btn-primary btn-lg",
+            "text": "Get started",
+            "height": 44,
+            "top": 559.6875,
+            "bottom": 603.6875,
+            "left": 24,
+            "width": 257,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

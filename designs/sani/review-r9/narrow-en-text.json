@@ -1,0 +1,293 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-text-create&lang=en&theme=light&chrome=0&qa=1",
+  "viewport": [
+    320,
+    740
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "div.seg seg-sm",
+            "text": "Plain textCode",
+            "height": 44,
+            "top": 267,
+            "bottom": 311,
+            "left": 31,
+            "width": 132.1796875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/p/",
+            "height": 44,
+            "top": 317,
+            "bottom": 361,
+            "left": 23,
+            "width": 246.3984375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "ExpiresNo expiry",
+            "height": 44,
+            "top": 373,
+            "bottom": 417,
+            "left": 119.1171875,
+            "width": 146.2890625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "Fewer options",
+            "height": 44,
+            "top": 423,
+            "bottom": 467,
+            "left": 31,
+            "width": 122.53125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.cmp-go",
+            "text": "ShareCtrl↵",
+            "height": 44,
+            "top": 423,
+            "bottom": 467,
+            "left": 219.7734375,
+            "width": 60.2265625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".cmp-more",
+        "controls": [
+          {
+            "selector": "input.cmp-inline",
+            "text": "",
+            "height": 44,
+            "top": 546,
+            "bottom": 590,
+            "left": 69.5234375,
+            "width": 202.4765625,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "16px"
+          },
+          {
+            "selector": "input.cmp-inline cmp-num",
+            "text": "",
+            "height": 44,
+            "top": 598,
+            "bottom": 642,
+            "left": 98.125,
+            "width": 88,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "16px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "Search slugs, titles, URLs, file names/",
+            "height": 44,
+            "top": 973.5,
+            "bottom": 1017.5,
+            "left": 16,
+            "width": 106.7578125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "Select multiple",
+            "height": 44,
+            "top": 973.5,
+            "bottom": 1017.5,
+            "left": 126.7578125,
+            "width": 34,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind",
+            "text": "All types",
+            "height": 44,
+            "top": 973.5,
+            "bottom": 1017.5,
+            "left": 164.7578125,
+            "width": 34,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "Newest",
+            "height": 44,
+            "top": 973.5,
+            "bottom": 1017.5,
+            "left": 202.7578125,
+            "width": 86.2421875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "All16",
+            "height": 44,
+            "top": 817.5,
+            "bottom": 861.5,
+            "left": 16,
+            "width": 55.5390625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 44,
+            "top": 817.5,
+            "bottom": 861.5,
+            "left": 77.5390625,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 44,
+            "top": 817.5,
+            "bottom": 861.5,
+            "left": 170.1328125,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "Untagged1",
+            "height": 44,
+            "top": 867.5,
+            "bottom": 911.5,
+            "left": 16,
+            "width": 93.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "More tags",
+            "height": 44,
+            "top": 867.5,
+            "bottom": 911.5,
+            "left": 115.59375,
+            "width": 99.90625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "Manage tags",
+            "height": 44,
+            "top": 917.5,
+            "bottom": 961.5,
+            "left": 16,
+            "width": 119.6875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-sm",
+          "text": "Plain textCode",
+          "height": 44,
+          "top": 267,
+          "bottom": 311,
+          "left": 31,
+          "width": 132.1796875,
+          "radius": "8px",
+          "font": "13px",
+          "lineHeight": "19.5px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "Plain text",
+            "height": 40,
+            "top": 269,
+            "bottom": 309,
+            "left": 33,
+            "width": 75.1171875,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Code",
+            "height": 40,
+            "top": 269,
+            "bottom": 309,
+            "left": 110.1171875,
+            "width": 51.0625,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

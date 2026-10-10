@@ -919,7 +919,69 @@
         ]
       },
       "status": "needs-review",
-      "notes": "R8 changes action styling, vocabulary and technical-value typography only. See r8-handoff.md for evidence, preserved semantics and verification boundaries."
+      "notes": "R8 changes action styling, vocabulary and technical-value typography only. See r8-handoff.md for evidence, preserved semantics and verification boundaries. Superseded by R9 after height feedback; changes-requested asset status is recorded in _d_meta.json."
+    },
+    {
+      "id": "r9-control-geometry",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r9.html",
+        "assetPath": "prototype-r9.html",
+        "files": [
+          "src/r9/controls.css",
+          "src/r9/app.jsx"
+        ],
+        "states": [
+          "grouped-control-alignment",
+          "tag-manager-filter",
+          "tag-edit-invalid",
+          "tag-picker-open",
+          "type-menu-open",
+          "text-file-creation",
+          "custom-date-expanded",
+          "editor",
+          "proxy-saved-replacement",
+          "settings-locked",
+          "tags-error-retry",
+          "setup",
+          "about-long-values",
+          "zh-en-light-dark",
+          "320-390-768-1194"
+        ],
+        "stableIds": [
+          "create-tab-url",
+          "create-tab-text",
+          "create-tab-file",
+          "r6-defaults",
+          "r7-tag-manager"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/ and /admin/settings",
+        "files": [
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/TagFilters.svelte",
+          "web/src/tags.css",
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/views/Settings.svelte",
+          "web/src/components/LinkList.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/components/ShortcutsDialog.svelte",
+          "web/src/components/TagManager.svelte",
+          "web/src/components/Segmented.svelte",
+          "web/src/components/Button.svelte"
+        ],
+        "interfaces": [
+          "Existing tag catalog and item filtering; no API changes",
+          "Existing config timezone, version, filesUrl"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/e2e/r7.spec.ts"
+        ]
+      },
+      "status": "needs-review",
+      "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md."
     }
   ]
 }

@@ -1,0 +1,741 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0&qa=1",
+  "viewport": [
+    1194,
+    804
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".r7-manager-tools",
+        "controls": [
+          {
+            "selector": "label.r7-search",
+            "text": "",
+            "height": 36,
+            "top": 192,
+            "bottom": 228,
+            "left": 334.5,
+            "width": 391,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "div.seg seg-sm",
+            "text": "全部未使用",
+            "height": 36,
+            "top": 192,
+            "bottom": 228,
+            "left": 737.5,
+            "width": 107,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r3-color-input",
+        "controls": [
+          {
+            "selector": "span.r4-color-preview",
+            "text": "",
+            "height": 36,
+            "top": 411.453125,
+            "bottom": 447.453125,
+            "left": 422.5,
+            "width": 36,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 36,
+            "top": 411.453125,
+            "bottom": 447.453125,
+            "left": 466.5,
+            "width": 290,
+            "radius": "8px",
+            "font": "12px",
+            "lineHeight": "18px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/",
+            "height": 32,
+            "top": 176,
+            "bottom": 208,
+            "left": 138.5,
+            "width": 211.0078125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "有效期不过期",
+            "height": 32,
+            "top": 176,
+            "bottom": 208,
+            "left": 824.5,
+            "width": 120,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "更多选项",
+            "height": 32,
+            "top": 176,
+            "bottom": 208,
+            "left": 950.5,
+            "width": 88,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "搜索短码、标题、链接或文件名/",
+            "height": 32,
+            "top": 464.5,
+            "bottom": 496.5,
+            "left": 129.5,
+            "width": 360,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "多选",
+            "height": 32,
+            "top": 464.5,
+            "bottom": 496.5,
+            "left": 791.5,
+            "width": 66,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind",
+            "text": "全部类型",
+            "height": 32,
+            "top": 464.5,
+            "bottom": 496.5,
+            "left": 861.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "最近创建",
+            "height": 32,
+            "top": 464.5,
+            "bottom": 496.5,
+            "left": 957.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-actions",
+        "controls": [
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "取消",
+            "height": 32,
+            "top": 607.046875,
+            "bottom": 639.046875,
+            "left": 652.5,
+            "width": 52,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-primary btn-md",
+            "text": "保存",
+            "height": 32,
+            "top": 607.046875,
+            "bottom": 639.046875,
+            "left": 712.5,
+            "width": 52,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 netcup",
+            "height": 32,
+            "top": 282,
+            "bottom": 314,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 netcup",
+            "height": 32,
+            "top": 282,
+            "bottom": 314,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 aff",
+            "height": 32,
+            "top": 333,
+            "bottom": 365,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 aff",
+            "height": 32,
+            "top": 333,
+            "bottom": 365,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 dmit",
+            "height": 32,
+            "top": 384,
+            "bottom": 416,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 dmit",
+            "height": 32,
+            "top": 384,
+            "bottom": 416,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 阅读",
+            "height": 32,
+            "top": 435,
+            "bottom": 467,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 阅读",
+            "height": 32,
+            "top": 435,
+            "bottom": 467,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 工作",
+            "height": 32,
+            "top": 486,
+            "bottom": 518,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 工作",
+            "height": 32,
+            "top": 486,
+            "bottom": 518,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 devops",
+            "height": 32,
+            "top": 537,
+            "bottom": 569,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 devops",
+            "height": 32,
+            "top": 537,
+            "bottom": 569,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 dev",
+            "height": 32,
+            "top": 588,
+            "bottom": 620,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 dev",
+            "height": 32,
+            "top": 588,
+            "bottom": 620,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 blog",
+            "height": 32,
+            "top": 639,
+            "bottom": 671,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 blog",
+            "height": 32,
+            "top": 639,
+            "bottom": 671,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 design",
+            "height": 32,
+            "top": 690,
+            "bottom": 722,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 design",
+            "height": 32,
+            "top": 690,
+            "bottom": 722,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 notes",
+            "height": 32,
+            "top": 741,
+            "bottom": 773,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 notes",
+            "height": 32,
+            "top": 741,
+            "bottom": 773,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 archive",
+            "height": 32,
+            "top": 792,
+            "bottom": 824,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 archive",
+            "height": 32,
+            "top": 792,
+            "bottom": 824,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-tag-row",
+        "controls": [
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square",
+            "text": "编辑标签 rabisu",
+            "height": 32,
+            "top": 843,
+            "bottom": 875,
+            "left": 757.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm btn-square r7-danger",
+            "text": "删除标签 rabisu",
+            "height": 32,
+            "top": 843,
+            "bottom": 875,
+            "left": 797.5,
+            "width": 32,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "全部16",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 183.5,
+            "width": 66.265625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 255.765625,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 348.359375,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "dmit2",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 414.9140625,
+            "width": 70.8828125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "阅读4",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 491.796875,
+            "width": 70.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "未标记1",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 567.9296875,
+            "width": 72.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "更多标签",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 646.0625,
+            "width": 90,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "管理标签",
+            "height": 32,
+            "top": 420.5,
+            "bottom": 452.5,
+            "left": 957.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-sm",
+          "text": "全部未使用",
+          "height": 36,
+          "top": 192,
+          "bottom": 228,
+          "left": 737.5,
+          "width": 107,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "全部",
+            "height": 32,
+            "top": 194,
+            "bottom": 226,
+            "left": 739.5,
+            "width": 44,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "未使用",
+            "height": 32,
+            "top": 194,
+            "bottom": 226,
+            "left": 785.5,
+            "width": 57,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

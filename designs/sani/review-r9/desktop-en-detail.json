@@ -1,0 +1,305 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r6-text&lang=en&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    1194,
+    804
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/",
+            "height": 32,
+            "top": -368.5,
+            "bottom": -336.5,
+            "left": 138.5,
+            "width": 211.0078125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "ExpiresNo expiry",
+            "height": 32,
+            "top": -368.5,
+            "bottom": -336.5,
+            "left": 769.265625,
+            "width": 146.2890625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "More options",
+            "height": 32,
+            "top": -368.5,
+            "bottom": -336.5,
+            "left": 921.5546875,
+            "width": 116.9453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "Search slugs, titles, URLs, file names/",
+            "height": 32,
+            "top": -80,
+            "bottom": -48,
+            "left": 129.5,
+            "width": 360,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "Select multiple",
+            "height": 32,
+            "top": -80,
+            "bottom": -48,
+            "left": 758.4921875,
+            "width": 130.4921875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind on",
+            "text": "Text",
+            "height": 32,
+            "top": -80,
+            "bottom": -48,
+            "left": 892.984375,
+            "width": 66.2734375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "Newest",
+            "height": 32,
+            "top": -80,
+            "bottom": -48,
+            "left": 963.2578125,
+            "width": 86.2421875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ld-short-actions",
+        "controls": [
+          {
+            "selector": "button.btn btn-secondary btn-sm",
+            "text": "Copy",
+            "height": 32,
+            "top": 151,
+            "bottom": 183,
+            "left": 642.3828125,
+            "width": 72.65625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-sm",
+            "text": "Open",
+            "height": 32,
+            "top": 151,
+            "bottom": 183,
+            "left": 719.0390625,
+            "width": 73.4609375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "All16",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 186.8046875,
+            "width": 55.5390625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 248.34375,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 340.9375,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "dmit2",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 407.4921875,
+            "width": 70.8828125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "阅读4",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 484.375,
+            "width": 70.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "Untagged1",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 560.5078125,
+            "width": 93.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "More tags",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 660.1015625,
+            "width": 99.90625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "Manage tags",
+            "height": 32,
+            "top": -124,
+            "bottom": -92,
+            "left": 929.8125,
+            "width": 119.6875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-sm",
+          "text": "7 days30 days90 days",
+          "height": 32,
+          "top": 404.3984375,
+          "bottom": 436.3984375,
+          "left": 590.453125,
+          "width": 202.046875,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "7 days",
+            "height": 28,
+            "top": 406.3984375,
+            "bottom": 434.3984375,
+            "left": 592.453125,
+            "width": 58.59375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "30 days",
+            "height": 28,
+            "top": 406.3984375,
+            "bottom": 434.3984375,
+            "left": 653.046875,
+            "width": 67.7109375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "90 days",
+            "height": 28,
+            "top": 406.3984375,
+            "bottom": 434.3984375,
+            "left": 722.7578125,
+            "width": 67.7421875,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

@@ -1,0 +1,317 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-text-create&lang=en&theme=dark&chrome=0&qa=1",
+  "viewport": [
+    768,
+    900
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "div.seg seg-sm",
+            "text": "Plain textCode",
+            "height": 32,
+            "top": 267,
+            "bottom": 299,
+            "left": 41,
+            "width": 132.1796875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/p/",
+            "height": 32,
+            "top": 267,
+            "bottom": 299,
+            "left": 175.1796875,
+            "width": 226.6015625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "ExpiresNo expiry",
+            "height": 32,
+            "top": 267,
+            "bottom": 299,
+            "left": 573.7109375,
+            "width": 146.2890625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "Fewer options",
+            "height": 32,
+            "top": 305,
+            "bottom": 337,
+            "left": 41,
+            "width": 122.53125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.cmp-go",
+            "text": "ShareCtrl↵",
+            "height": 32,
+            "top": 305,
+            "bottom": 337,
+            "left": 173.53125,
+            "width": 99.46875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".cmp-more",
+        "controls": [
+          {
+            "selector": "input.cmp-inline",
+            "text": "",
+            "height": 32,
+            "top": 404,
+            "bottom": 436,
+            "left": 77.5234375,
+            "width": 461.3515625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "input.cmp-inline cmp-num",
+            "text": "",
+            "height": 32,
+            "top": 404,
+            "bottom": 436,
+            "left": 624,
+            "width": 88,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "Search slugs, titles, URLs, file names/",
+            "height": 32,
+            "top": 687.5,
+            "bottom": 719.5,
+            "left": 24,
+            "width": 360,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "Select multiple",
+            "height": 32,
+            "top": 687.5,
+            "bottom": 719.5,
+            "left": 411.125,
+            "width": 130.4921875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind",
+            "text": "All types",
+            "height": 32,
+            "top": 687.5,
+            "bottom": 719.5,
+            "left": 545.6171875,
+            "width": 93.140625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "Newest",
+            "height": 32,
+            "top": 687.5,
+            "bottom": 719.5,
+            "left": 642.7578125,
+            "width": 86.2421875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "All16",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 81.3046875,
+            "width": 55.5390625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 142.84375,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 235.4375,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "dmit2",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 301.9921875,
+            "width": 70.8828125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "阅读4",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 378.875,
+            "width": 70.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "Untagged1",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 455.0078125,
+            "width": 93.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "More tags",
+            "height": 32,
+            "top": 605.5,
+            "bottom": 637.5,
+            "left": 554.6015625,
+            "width": 99.90625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "Manage tags",
+            "height": 32,
+            "top": 643.5,
+            "bottom": 675.5,
+            "left": 609.3125,
+            "width": 119.6875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-sm",
+          "text": "Plain textCode",
+          "height": 32,
+          "top": 267,
+          "bottom": 299,
+          "left": 41,
+          "width": 132.1796875,
+          "radius": "8px",
+          "font": "13px",
+          "lineHeight": "19.5px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "Plain text",
+            "height": 28,
+            "top": 269,
+            "bottom": 297,
+            "left": 43,
+            "width": 75.1171875,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Code",
+            "height": 28,
+            "top": 269,
+            "bottom": 297,
+            "left": 120.1171875,
+            "width": 51.0625,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

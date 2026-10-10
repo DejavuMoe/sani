@@ -1,0 +1,195 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r8-dashboard&lang=en&theme=light&chrome=0&qa=1&focus=type",
+  "viewport": [
+    320,
+    740
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/",
+            "height": 44,
+            "top": -182.5,
+            "bottom": -138.5,
+            "left": 23,
+            "width": 230.8046875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "ExpiresNo expiry",
+            "height": 44,
+            "top": -130.5,
+            "bottom": -86.5,
+            "left": 31,
+            "width": 146.2890625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "More options",
+            "height": 44,
+            "top": -82.5,
+            "bottom": -38.5,
+            "left": 31,
+            "width": 116.9453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "Search slugs, titles, URLs, file names/",
+            "height": 44,
+            "top": 348,
+            "bottom": 392,
+            "left": 16,
+            "width": 106.7578125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "Select multiple",
+            "height": 44,
+            "top": 348,
+            "bottom": 392,
+            "left": 126.7578125,
+            "width": 34,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind",
+            "text": "All types",
+            "height": 44,
+            "top": 348,
+            "bottom": 392,
+            "left": 164.7578125,
+            "width": 34,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "Newest",
+            "height": 44,
+            "top": 348,
+            "bottom": 392,
+            "left": 202.7578125,
+            "width": 86.2421875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "All16",
+            "height": 44,
+            "top": 192,
+            "bottom": 236,
+            "left": 16,
+            "width": 55.5390625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 44,
+            "top": 192,
+            "bottom": 236,
+            "left": 77.5390625,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 44,
+            "top": 192,
+            "bottom": 236,
+            "left": 170.1328125,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "Untagged1",
+            "height": 44,
+            "top": 242,
+            "bottom": 286,
+            "left": 16,
+            "width": 93.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "More tags",
+            "height": 44,
+            "top": 242,
+            "bottom": 286,
+            "left": 115.59375,
+            "width": 99.90625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "Manage tags",
+            "height": 44,
+            "top": 292,
+            "bottom": 336,
+            "left": 16,
+            "width": 119.6875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

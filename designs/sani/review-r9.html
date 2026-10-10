@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sani · R9 视觉一致性审批</title>
+  <link rel="stylesheet" href="src/fonts.css"><link rel="stylesheet" href="src/gen/tokens.css">
+  <style>
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.65 var(--font-sans)}
+    main{max-width:1120px;margin:auto;padding:48px 24px 80px}h1{font-size:28px;letter-spacing:-.5px}h2{font-size:18px;margin-top:36px}p{color:var(--text-2)}
+    .status{font-size:12px;color:var(--text-3)}.compare,.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+    figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}figure img{width:100%;height:auto;display:block}figcaption{padding:12px 16px;font-size:13px}
+    a{color:var(--text);text-underline-offset:4px}a:hover{color:var(--accent)}a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+    .card{border-top:1px solid var(--line);padding-top:16px}.card p{font-size:13px;margin:8px 0}.card a{display:inline-block;margin-right:12px;min-height:32px}
+    table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{font-weight:500;color:var(--text-2)}code{font-family:var(--font-mono)}
+    .lead{font-size:16px;max-width:800px}.action{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:8px;background:var(--text);color:var(--surface);text-decoration:none;margin:8px 0 24px}
+    @media(max-width:680px){main{padding:24px 16px}.compare,.grid{grid-template-columns:1fr}th,td{padding:8px 4px;font-size:12px}}
+  </style>
+</head>
+<body><main>
+  <div class="status">SANI / R9 · 待审批 · 仅原型 · R8 已标记为需要修改</div>
+  <h1>让同组控件遵守同一套尺寸规则</h1>
+  <p class="lead">统一外框高度、上下边缘、圆角、文字角色与展开状态。保留 Sani 现有视觉语言；用共享尺寸替代逐个页面的像素补丁。</p>
+  <a class="action" href="prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0">打开 R9 交互原型 →</a>
+  <div class="compare">
+    <figure><img src="review-r9/manager-before.png" alt="R8 管理标签：搜索框明显高于旁边切换器"><figcaption>修改前 · 搜索框 37.5px / 切换器外框 28px</figcaption></figure>
+    <figure><img src="review-r9/manager-after.png" alt="R9 管理标签：搜索框与切换器外框上下对齐"><figcaption>R9 · 两个外框均为 36px / 上下边缘差 0px</figcaption></figure>
+  </div>
+  <h2>尺寸规则</h2>
+  <table><thead><tr><th>使用场景</th><th>桌面外框</th><th>窄屏 / 粗指针</th></tr></thead><tbody>
+    <tr><td>紧凑工具栏、创建选项、同组动作</td><td>32px</td><td>44px</td></tr>
+    <tr><td>标准表单、管理搜索、同组提交按钮</td><td>36px</td><td>44px</td></tr>
+    <tr><td>展开菜单操作行</td><td>至少 38px</td><td>至少 44px</td></tr>
+    <tr><td>分段切换器</td><td colspan="2">外框跟随所在组；内部按钮高度 = 外框 − 4px，保留上下各 2px 留白</td></tr>
+  </tbody></table>
+  <p>外框圆角 8px，分段内部与菜单行圆角 6px。输入正文与操作标签按既有角色排版；短码、版本、时区和域名保留等宽字体。开关、状态标签、日历网格和主网址输入保留各自形态。</p>
+  <h2>本轮一起修订的范围</h2>
+  <div class="grid">
+    <div class="card"><strong>标签管理与编辑</strong><p>搜索与切换器等高；编辑 / 删除按钮、颜色预览、颜色输入及保存动作遵守组内尺寸。菜单选项不会被内部标签撑高。</p><a href="prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0">中文浅色</a><a href="prototype-r9.html?scene=r7-tags&lang=en&theme=dark&chrome=0">英文暗色</a><a href="prototype-r9.html?scene=r7-tags-error&lang=en&theme=dark&chrome=0">读取失败与重试</a></div>
+    <div class="card"><strong>创建与列表工具栏</strong><p>文本格式、短码、有效期、更多选项及分享按钮同档；搜索、类型、排序、多选同档。自定义日期展开后其余选项顶部对齐。</p><a href="prototype-r9.html?scene=r7-text-create&lang=zh&theme=light&chrome=0">文本创建</a><a href="prototype-r9.html?scene=r7-file-create&lang=en&theme=dark&chrome=0">文件创建</a><a href="prototype-r9.html?scene=r8-dashboard&lang=zh&theme=light&chrome=0&focus=type">类型菜单</a></div>
+    <div class="card"><strong>设置中的组合表单</strong><p>域名 / 保存、令牌 / 创建、代理地址 / 端口及密码查看 / 替换 / 移除；已保存、编辑中和禁用状态尺寸稳定。</p><a href="prototype-r9.html?scene=r5-socks&lang=en&theme=dark&chrome=0&focus=metadata">代理设置</a><a href="prototype-r9.html?scene=r6-settings-locked&lang=zh&theme=light&chrome=0&focus=defaults">锁定默认值</a></div>
+    <div class="card"><strong>详情与既有一致性修订</strong><p>编辑表单、详情动作及首次设置同步；保留链接 / 文本 / 文件、管理标签中性入口、关于信息字体与长值换行。</p><a href="prototype-r9.html?scene=r7-edit&lang=en&theme=dark&chrome=0">编辑内容</a><a href="prototype-r9.html?scene=r8-settings-long&lang=en&theme=light&chrome=0&focus=about">关于长值</a><a href="prototype-r9.html?scene=r8-setup&lang=en&theme=light&chrome=0">首次设置</a></div>
+  </div>
+  <h2>验收依据</h2>
+  <p><strong>28 个保存状态 · 20 类成组控件 · 189 次组实例测量</strong>。目标档位、组内对齐、分段内边距均通过；axe 0 违规，页面无横向溢出。</p>
+  <p>浏览器记录包含外框尺寸、组内上下边缘、切换器内边距、页面溢出和 axe 结果，并保存对应截图。检查覆盖 1194px、768px、390px、320px，中英文和明暗主题的代表组合；不是所有组合的笛卡尔积。</p>
+  <p>详细范围、已验证交互和实施映射见 <a href="r9-handoff.md">R9 交接记录</a>。原型为内存演示，刷新恢复。批准的是本页对应的 R9；生产实施与生产回归随后进行。</p>
+</main></body></html>

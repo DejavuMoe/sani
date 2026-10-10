@@ -1,0 +1,367 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r5-socks&lang=en&theme=dark&chrome=0&qa=1&focus=metadata",
+  "viewport": [
+    1194,
+    804
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".st-inline-form",
+        "controls": [
+          {
+            "selector": "input.field mono",
+            "text": "Share domain",
+            "height": 36,
+            "top": -598.5,
+            "bottom": -562.5,
+            "left": 361.5,
+            "width": 623.5546875,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "Save",
+            "height": 36,
+            "top": -598.5,
+            "bottom": -562.5,
+            "left": 993.0546875,
+            "width": 56.4453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".st-inline-form",
+        "controls": [
+          {
+            "selector": "input.field",
+            "text": "Token name",
+            "height": 36,
+            "top": 571.078125,
+            "bottom": 607.078125,
+            "left": 361.5,
+            "width": 552.5546875,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "Create token",
+            "height": 36,
+            "top": 571.078125,
+            "bottom": 607.078125,
+            "left": 922.0546875,
+            "width": 127.4453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r5-secret",
+        "controls": [
+          {
+            "selector": "button.btn btn-secondary btn-sm",
+            "text": "Replace",
+            "height": 36,
+            "top": 396.8828125,
+            "bottom": 432.8828125,
+            "left": 905.8828125,
+            "width": 69.71875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm",
+            "text": "Remove",
+            "height": 36,
+            "top": 396.8828125,
+            "bottom": 432.8828125,
+            "left": 979.6015625,
+            "width": 69.8984375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r5-auth-fields",
+        "controls": [
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 36,
+            "top": 396.8828125,
+            "bottom": 432.8828125,
+            "left": 361.5,
+            "width": 338,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-sm",
+            "text": "Replace",
+            "height": 36,
+            "top": 396.8828125,
+            "bottom": 432.8828125,
+            "left": 905.8828125,
+            "width": 69.71875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-sm",
+            "text": "Remove",
+            "height": 36,
+            "top": 396.8828125,
+            "bottom": 432.8828125,
+            "left": 979.6015625,
+            "width": 69.8984375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r5-actions",
+        "controls": [
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "Save",
+            "height": 32,
+            "top": 482.078125,
+            "bottom": 514.078125,
+            "left": 361.5,
+            "width": 56.4453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.btn btn-ghost btn-md",
+            "text": "Test connection",
+            "height": 32,
+            "top": 482.078125,
+            "bottom": 514.078125,
+            "left": 425.9453125,
+            "width": 125.5078125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r5-address",
+        "controls": [
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 36,
+            "top": 237.3828125,
+            "bottom": 273.3828125,
+            "left": 361.5,
+            "width": 588,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          },
+          {
+            "selector": "input.field",
+            "text": "",
+            "height": 36,
+            "top": 237.3828125,
+            "bottom": 273.3828125,
+            "left": 961.5,
+            "width": 88,
+            "radius": "8px",
+            "font": "14px",
+            "lineHeight": "21px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "SystemLightDark",
+          "height": 32,
+          "top": -733.5,
+          "bottom": -701.5,
+          "left": 808.9453125,
+          "width": 240.5546875,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "System",
+            "height": 28,
+            "top": -731.5,
+            "bottom": -703.5,
+            "left": 810.9453125,
+            "width": 88.359375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Light",
+            "height": 28,
+            "top": -731.5,
+            "bottom": -703.5,
+            "left": 901.3046875,
+            "width": 72.9296875,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Dark",
+            "height": 28,
+            "top": -731.5,
+            "bottom": -703.5,
+            "left": 976.234375,
+            "width": 71.265625,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      },
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "中文English",
+          "height": 32,
+          "top": -687.5,
+          "bottom": -655.5,
+          "left": 928.40625,
+          "width": 121.09375,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "中文",
+            "height": 28,
+            "top": -685.5,
+            "bottom": -657.5,
+            "left": 930.40625,
+            "width": 48,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "English",
+            "height": 28,
+            "top": -685.5,
+            "bottom": -657.5,
+            "left": 980.40625,
+            "width": 67.09375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      },
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "DirectHTTP(S)SOCKS5",
+          "height": 32,
+          "top": 165.8828125,
+          "bottom": 197.8828125,
+          "left": 819.5625,
+          "width": 229.9375,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "Direct",
+            "height": 28,
+            "top": 167.8828125,
+            "bottom": 195.8828125,
+            "left": 821.5625,
+            "width": 72,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "HTTP(S)",
+            "height": 28,
+            "top": 167.8828125,
+            "bottom": 195.8828125,
+            "left": 895.5625,
+            "width": 74.984375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "SOCKS5",
+            "height": 28,
+            "top": 167.8828125,
+            "bottom": 195.8828125,
+            "left": 972.546875,
+            "width": 74.953125,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

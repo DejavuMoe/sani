@@ -1,0 +1,114 @@
+/* Size means the visible outer box, including a segmented control's padding. */
+:root {
+  --control-compact: 32px;
+  --control-field: 36px;
+  --control-option: 38px;
+  --control-font: 13px;
+}
+@media (max-width: 640px), (pointer: coarse) {
+  :root {
+    --control-compact: 44px;
+    --control-field: 44px;
+    --control-option: 44px;
+    --input-font-size: 16px;
+  }
+}
+
+.btn, .btn-sm, .btn-lg, .r5-actions .btn,
+.cmp-options .opt, .cmp-share .cmp-go, .cmp-inline,
+.ll-toolbar .ll-search, .ll-toolbar .ll-pick, .ll-toolbar .kind, .ll-toolbar .sort,
+.tag-filter, .tag-add, .tag-done {
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  border-radius: var(--radius);
+  font-size: var(--control-font);
+  line-height: 1;
+}
+.btn-square, .btn-square.btn-sm, .btn-square.btn-lg,
+.r7-tag-row .btn-square {
+  width: var(--control-compact);
+  min-width: var(--control-compact);
+  min-height: var(--control-compact);
+}
+.seg, .seg-sm, .seg-field {
+  --seg-height: var(--control-compact);
+  height: var(--seg-height);
+  min-height: var(--seg-height);
+  padding: 2px;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+}
+.seg-field, .r7-manager-tools .seg { --seg-height: var(--control-field); }
+.seg > button, .seg-sm > button, .seg-field > button, .r5-route .seg > button {
+  height: calc(var(--seg-height) - 4px);
+  min-height: 0;
+  border-radius: var(--radius-sm);
+  font-size: var(--control-font);
+  line-height: 1;
+}
+input.field, button.field, .st .field:not(textarea), .login-form .field, .setup-form .field,
+.r6-length-input .field, .r5-address .field, .r5-auth-fields .field,
+.st-inline-form > .btn, .login-form .btn, .setup-form .btn, .r5-secret > .btn, .r5-secret:not(.r5-secret-saved) > .btn,
+.r7-search, .slugf-boxed .slugf-box, .r3-color-input .r4-color-preview {
+  height: var(--control-field);
+  min-height: var(--control-field);
+  border-radius: var(--radius);
+}
+.r3-color-input .r4-color-preview { width: var(--control-field); flex-shrink: 0; }
+.r5-secret > .btn-square { width: var(--control-field); min-width: var(--control-field); }
+.r7-search input {
+  height: 100%;
+  min-height: 0;
+  padding-block: 0;
+  font-size: var(--input-font-size, 13px);
+}
+.r7-manager-tools { align-items: center; }
+.r7-search, .ll-search { box-sizing: border-box; }
+.ll-search input { font-size: var(--input-font-size, 13px); }
+.slugf-inline .slugf-box, .cmp-more .cmp-inline {
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  border-radius: var(--radius);
+}
+.slugf-inline input, .slugf-boxed input { height: 100%; min-height: 0; }
+.cmp-options { align-items: center; }
+.cmp-options:has(.r4-date) { align-items: flex-start; }
+.expiry:has(.r4-date) {
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(280px, 100%);
+}
+.r4-date { flex-basis: auto; width: 100%; max-width: 100%; }
+.tag-choice, .tag-create, .r8-manage-row, .menu .mi {
+  min-height: var(--control-option);
+}
+.r8-manage-row { font-size: var(--control-font); }
+.tag-label { min-height: var(--control-compact); }
+.tag-selected .tag-badge {
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  padding-block: 0;
+}
+.tag-selected .tag-badge button {
+  height: calc(var(--control-compact) - 4px);
+  min-height: 0;
+  width: calc(var(--control-compact) - 4px);
+  min-width: 0;
+}
+.tag-choice .tag-badge { min-height: 24px; }
+.tag-search {
+  height: var(--control-field);
+  min-height: var(--control-field);
+  padding-block: 0;
+}
+.r3-swatches button { min-height: var(--control-field); }
+
+/* A hero input and a switch retain their distinct roles; toolbars share a scale. */
+@media (max-width: 640px), (pointer: coarse) {
+  .r5-secret { min-height: var(--control-field); }
+  .cmp-inline, .slugf-inline input, .slugf-boxed input { font-size: 16px; }
+  .r3-swatches button { min-width: 44px; }
+  .r7-manager-tools { flex-wrap: wrap; }
+  .r7-manager-tools .r7-search { flex-basis: 100%; }
+  .r5-secret.r5-secret-saved { flex-wrap: wrap; }
+}

@@ -1,0 +1,317 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-text-create&lang=zh&theme=light&chrome=0&qa=1",
+  "viewport": [
+    1194,
+    804
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".cmp-options",
+        "controls": [
+          {
+            "selector": "div.seg seg-sm",
+            "text": "纯文本代码",
+            "height": 32,
+            "top": 267.5,
+            "bottom": 299.5,
+            "left": 146.5,
+            "width": 107,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "label.slugf-box",
+            "text": "s.example.com/p/",
+            "height": 32,
+            "top": 267.5,
+            "bottom": 299.5,
+            "left": 255.5,
+            "width": 226.6015625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "19.5px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "有效期不过期",
+            "height": 32,
+            "top": 267.5,
+            "bottom": 299.5,
+            "left": 723.2578125,
+            "width": 120,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.opt",
+            "text": "收起选项",
+            "height": 32,
+            "top": 267.5,
+            "bottom": 299.5,
+            "left": 853.2578125,
+            "width": 88,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.cmp-go",
+            "text": "分享Ctrl↵",
+            "height": 32,
+            "top": 267.5,
+            "bottom": 299.5,
+            "left": 951.2578125,
+            "width": 89.2421875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".cmp-more",
+        "controls": [
+          {
+            "selector": "input.cmp-inline",
+            "text": "",
+            "height": 32,
+            "top": 367,
+            "bottom": 399,
+            "left": 182.5,
+            "width": 680,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "input.cmp-inline cmp-num",
+            "text": "",
+            "height": 32,
+            "top": 367,
+            "bottom": 399,
+            "left": 944.5,
+            "width": 88,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".ll-toolbar",
+        "controls": [
+          {
+            "selector": "label.ll-search",
+            "text": "搜索短码、标题、链接或文件名/",
+            "height": 32,
+            "top": 612.5,
+            "bottom": 644.5,
+            "left": 129.5,
+            "width": 360,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.ll-pick",
+            "text": "多选",
+            "height": 32,
+            "top": 612.5,
+            "bottom": 644.5,
+            "left": 791.5,
+            "width": 66,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.kind",
+            "text": "全部类型",
+            "height": 32,
+            "top": 612.5,
+            "bottom": 644.5,
+            "left": 861.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.sort",
+            "text": "最近创建",
+            "height": 32,
+            "top": 612.5,
+            "bottom": 644.5,
+            "left": 957.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".r7-filter-strip",
+        "controls": [
+          {
+            "selector": "button.tag-filter",
+            "text": "全部16",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 183.5,
+            "width": 66.265625,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "netcup5",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 255.765625,
+            "width": 86.59375,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "aff4",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 348.359375,
+            "width": 60.5546875,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "dmit2",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 414.9140625,
+            "width": 70.8828125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "阅读4",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 491.796875,
+            "width": 70.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "未标记1",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 567.9296875,
+            "width": 72.1328125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter",
+            "text": "更多标签",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 646.0625,
+            "width": 90,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.tag-filter r8-manage-trigger",
+            "text": "管理标签",
+            "height": 32,
+            "top": 568.5,
+            "bottom": 600.5,
+            "left": 957.5,
+            "width": 92,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-sm",
+          "text": "纯文本代码",
+          "height": 32,
+          "top": 267.5,
+          "bottom": 299.5,
+          "left": 146.5,
+          "width": 107,
+          "radius": "8px",
+          "font": "13px",
+          "lineHeight": "19.5px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "纯文本",
+            "height": 28,
+            "top": 269.5,
+            "bottom": 297.5,
+            "left": 148.5,
+            "width": 57,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "代码",
+            "height": 28,
+            "top": 269.5,
+            "bottom": 297.5,
+            "left": 207.5,
+            "width": 44,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

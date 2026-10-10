@@ -1,0 +1,227 @@
+{
+  "url": "http://127.0.0.1:4311/sani/prototype-r9.html?scene=r8-settings-long&lang=en&theme=light&chrome=0&qa=1&focus=about",
+  "viewport": [
+    320,
+    740
+  ],
+  "geometry": {
+    "groups": [
+      {
+        "group": ".st-inline-form",
+        "controls": [
+          {
+            "selector": "input.field mono",
+            "text": "Share domain",
+            "height": 44,
+            "top": -2629.5,
+            "bottom": -2585.5,
+            "left": 16,
+            "width": 208.5546875,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "24px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "Save",
+            "height": 44,
+            "top": -2629.5,
+            "bottom": -2585.5,
+            "left": 232.5546875,
+            "width": 56.4453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      },
+      {
+        "group": ".st-inline-form",
+        "controls": [
+          {
+            "selector": "input.field",
+            "text": "Token name",
+            "height": 44,
+            "top": -1248.8515625,
+            "bottom": -1204.8515625,
+            "left": 16,
+            "width": 137.5546875,
+            "radius": "8px",
+            "font": "16px",
+            "lineHeight": "24px"
+          },
+          {
+            "selector": "button.btn btn-secondary btn-md",
+            "text": "Create token",
+            "height": 44,
+            "top": -1248.8515625,
+            "bottom": -1204.8515625,
+            "left": 161.5546875,
+            "width": 127.4453125,
+            "radius": "8px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "heightDelta": 0,
+        "edgeDelta": 0,
+        "pass": true
+      }
+    ],
+    "segments": [
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "SystemLightDark",
+          "height": 44,
+          "top": -2851,
+          "bottom": -2807,
+          "left": 16,
+          "width": 240.5546875,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "System",
+            "height": 40,
+            "top": -2849,
+            "bottom": -2809,
+            "left": 18,
+            "width": 88.359375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Light",
+            "height": 40,
+            "top": -2849,
+            "bottom": -2809,
+            "left": 108.359375,
+            "width": 72.9296875,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "Dark",
+            "height": 40,
+            "top": -2849,
+            "bottom": -2809,
+            "left": 183.2890625,
+            "width": 71.265625,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      },
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "中文English",
+          "height": 44,
+          "top": -2765.5,
+          "bottom": -2721.5,
+          "left": 16,
+          "width": 121.09375,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "中文",
+            "height": 40,
+            "top": -2763.5,
+            "bottom": -2723.5,
+            "left": 18,
+            "width": 48,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "English",
+            "height": 40,
+            "top": -2763.5,
+            "bottom": -2723.5,
+            "left": 68,
+            "width": 67.09375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      },
+      {
+        "outer": {
+          "selector": "div.seg seg-md",
+          "text": "DirectHTTP(S)SOCKS5",
+          "height": 44,
+          "top": -1583.2421875,
+          "bottom": -1539.2421875,
+          "left": 16,
+          "width": 273,
+          "radius": "8px",
+          "font": "14px",
+          "lineHeight": "21px"
+        },
+        "buttons": [
+          {
+            "selector": "button.",
+            "text": "Direct",
+            "height": 40,
+            "top": -1581.2421875,
+            "bottom": -1541.2421875,
+            "left": 18,
+            "width": 88.328125,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "HTTP(S)",
+            "height": 40,
+            "top": -1581.2421875,
+            "bottom": -1541.2421875,
+            "left": 108.328125,
+            "width": 88.3359375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          },
+          {
+            "selector": "button.",
+            "text": "SOCKS5",
+            "height": 40,
+            "top": -1581.2421875,
+            "bottom": -1541.2421875,
+            "left": 198.6640625,
+            "width": 88.3359375,
+            "radius": "6px",
+            "font": "13px",
+            "lineHeight": "13px"
+          }
+        ],
+        "pass": true
+      }
+    ],
+    "failures": []
+  },
+  "overflow": false,
+  "violations": []
+}

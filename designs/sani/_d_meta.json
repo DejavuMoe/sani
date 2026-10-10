@@ -81,8 +81,18 @@
         {
           "path": "prototype-r8.html",
           "createdAt": "2026-10-10T05:53:57.518Z",
-          "status": "needs-review",
+          "status": "changes-requested",
           "subtitle": "Revision 8: consistent actions, vocabulary and technical values",
+          "viewport": {
+            "width": 1194,
+            "height": 804
+          }
+        },
+        {
+          "path": "prototype-r9.html",
+          "createdAt": "2026-10-10T06:14:50.935Z",
+          "status": "needs-review",
+          "subtitle": "R9: shared control geometry and grouped alignment",
           "viewport": {
             "width": 1194,
             "height": 804
@@ -169,8 +179,22 @@
         {
           "path": "review-r8.html",
           "createdAt": "2026-10-10T05:53:57.598Z",
-          "status": "needs-review",
+          "status": "changes-requested",
           "subtitle": "Consistency audit and approval entry points",
+          "viewport": {
+            "width": 1194,
+            "height": 804
+          }
+        }
+      ]
+    },
+    "R9 Review": {
+      "versions": [
+        {
+          "path": "review-r9.html",
+          "createdAt": "2026-10-10T06:18:13.702Z",
+          "status": "needs-review",
+          "subtitle": "Grouped-control sizing evidence and approval preview",
           "viewport": {
             "width": 1194,
             "height": 804
@@ -180,5 +204,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-10T05:53:57.599Z"
+  "updatedAt": "2026-10-10T06:18:13.703Z"
 }

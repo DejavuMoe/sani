@@ -1,0 +1,764 @@
+{
+  "tags": [
+    {
+      "controls": [
+        {
+          "cls": "r7-search",
+          "font": "14px",
+          "h": 37.5,
+          "radius": "6px",
+          "tag": "LABEL",
+          "text": "",
+          "y": 191.25
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 35.5,
+          "radius": "4px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 192.25
+        },
+        {
+          "cls": "seg seg-sm",
+          "font": "14px",
+          "h": 28,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "全部未使用",
+          "y": 196
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "全部",
+          "y": 198
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "未使用",
+          "y": 198
+        }
+      ],
+      "group": ".r7-manager-tools"
+    },
+    {
+      "controls": [
+        {
+          "cls": "slugf-box",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "LABEL",
+          "text": "s.example.com/",
+          "y": 176.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 176.5
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "有效期不过期",
+          "y": 176.5
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "更多选项",
+          "y": 176.5
+        }
+      ],
+      "group": ".cmp-options"
+    },
+    {
+      "controls": [
+        {
+          "cls": "",
+          "font": "13.5px",
+          "h": 32,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 458.5
+        },
+        {
+          "cls": "ll-pick",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "多选",
+          "y": 458.5
+        },
+        {
+          "cls": "kind",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "全部类型",
+          "y": 458.5
+        },
+        {
+          "cls": "sort",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "最近创建",
+          "y": 458.5
+        }
+      ],
+      "group": ".ll-toolbar"
+    }
+  ],
+  "settings": [
+    {
+      "controls": [
+        {
+          "cls": "field mono",
+          "font": "14px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "INPUT",
+          "text": "",
+          "y": -598.5
+        },
+        {
+          "cls": "btn btn-secondary btn-md",
+          "font": "13px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "Save",
+          "y": -598.5
+        }
+      ],
+      "group": ".st-inline-form"
+    },
+    {
+      "controls": [
+        {
+          "cls": "field",
+          "font": "14px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 571.078125
+        },
+        {
+          "cls": "btn btn-secondary btn-md",
+          "font": "13px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "Create token",
+          "y": 571.078125
+        }
+      ],
+      "group": ".st-inline-form"
+    },
+    {
+      "controls": [
+        {
+          "cls": "btn btn-secondary btn-sm",
+          "font": "12.5px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Replace",
+          "y": 400.8828125
+        },
+        {
+          "cls": "btn btn-ghost btn-sm",
+          "font": "12.5px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Remove",
+          "y": 400.8828125
+        }
+      ],
+      "group": ".r5-secret"
+    },
+    {
+      "controls": [
+        {
+          "cls": "btn btn-secondary btn-md",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "Save",
+          "y": 482.078125
+        },
+        {
+          "cls": "btn btn-ghost btn-md",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "Test connection",
+          "y": 482.078125
+        }
+      ],
+      "group": ".r5-actions"
+    },
+    {
+      "controls": [
+        {
+          "cls": "seg seg-md",
+          "font": "14px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "DirectHTTP(S)SOCKS5",
+          "y": 165.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Direct",
+          "y": 167.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "HTTP(S)",
+          "y": 167.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "SOCKS5",
+          "y": 167.8828125
+        }
+      ],
+      "group": ".r5-route"
+    },
+    {
+      "controls": [
+        {
+          "cls": "seg seg-md",
+          "font": "14px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "SystemLightDark",
+          "y": -733.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "System",
+          "y": -731.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Light",
+          "y": -731.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Dark",
+          "y": -731.5
+        }
+      ],
+      "group": ".st-row"
+    },
+    {
+      "controls": [
+        {
+          "cls": "seg seg-md",
+          "font": "14px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "中文English",
+          "y": -687.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "中文",
+          "y": -685.5
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "English",
+          "y": -685.5
+        }
+      ],
+      "group": ".st-row"
+    },
+    {
+      "controls": [
+        {
+          "cls": "seg seg-md",
+          "font": "14px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "DirectHTTP(S)SOCKS5",
+          "y": 165.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "Direct",
+          "y": 167.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "HTTP(S)",
+          "y": 167.8828125
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "SOCKS5",
+          "y": 167.8828125
+        }
+      ],
+      "group": ".st-row"
+    },
+    {
+      "controls": [],
+      "group": ".st-row"
+    },
+    {
+      "controls": [
+        {
+          "cls": "switch",
+          "font": "14px",
+          "h": 20,
+          "radius": "10px",
+          "tag": "BUTTON",
+          "text": "",
+          "y": 333.3828125
+        }
+      ],
+      "group": ".st-row"
+    }
+  ],
+  "composer": [
+    {
+      "controls": [
+        {
+          "cls": "seg seg-sm",
+          "font": "13px",
+          "h": 28,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "纯文本代码",
+          "y": 270
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "纯文本",
+          "y": 272
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "代码",
+          "y": 272
+        },
+        {
+          "cls": "slugf-box",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "LABEL",
+          "text": "s.example.com/p/",
+          "y": 270
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 270
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "有效期不过期",
+          "y": 270
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "收起选项",
+          "y": 270
+        },
+        {
+          "cls": "cmp-go",
+          "font": "13.5px",
+          "h": 34,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "分享Ctrl↵",
+          "y": 267
+        }
+      ],
+      "group": ".cmp-options"
+    },
+    {
+      "controls": [
+        {
+          "cls": "cmp-inline",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 366
+        },
+        {
+          "cls": "cmp-inline cmp-num",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 366
+        }
+      ],
+      "group": ".cmp-more"
+    },
+    {
+      "controls": [
+        {
+          "cls": "",
+          "font": "13.5px",
+          "h": 32,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 606.5
+        },
+        {
+          "cls": "ll-pick",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "多选",
+          "y": 606.5
+        },
+        {
+          "cls": "kind",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "全部类型",
+          "y": 606.5
+        },
+        {
+          "cls": "sort",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "最近创建",
+          "y": 606.5
+        }
+      ],
+      "group": ".ll-toolbar"
+    }
+  ],
+  "editor": [
+    {
+      "controls": [
+        {
+          "cls": "slugf-box",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "LABEL",
+          "text": "s.example.com/",
+          "y": -363
+        },
+        {
+          "cls": "",
+          "font": "13px",
+          "h": 28,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": -363
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "有效期不过期",
+          "y": -363
+        },
+        {
+          "cls": "opt",
+          "font": "13px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "更多选项",
+          "y": -363
+        }
+      ],
+      "group": ".cmp-options"
+    },
+    {
+      "controls": [
+        {
+          "cls": "",
+          "font": "13.5px",
+          "h": 32,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": -81
+        },
+        {
+          "cls": "ll-pick",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "多选",
+          "y": -81
+        },
+        {
+          "cls": "kind on",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "文本",
+          "y": -81
+        },
+        {
+          "cls": "sort",
+          "font": "13px",
+          "h": 32,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "最近创建",
+          "y": -81
+        }
+      ],
+      "group": ".ll-toolbar"
+    },
+    {
+      "controls": [
+        {
+          "cls": "seg seg-sm",
+          "font": "14px",
+          "h": 28,
+          "radius": "8px",
+          "tag": "DIV",
+          "text": "纯文本代码",
+          "y": 149
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "纯文本",
+          "y": 151
+        },
+        {
+          "cls": "",
+          "font": "12.5px",
+          "h": 24,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "代码",
+          "y": 151
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "slugf-box",
+          "font": "13.5px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "LABEL",
+          "text": "s.example.com/p/",
+          "y": 373.5
+        },
+        {
+          "cls": "",
+          "font": "13.5px",
+          "h": 34,
+          "radius": "0px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 374.5
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "field",
+          "font": "14px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 373.5
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "field picker-field",
+          "font": "14px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "BUTTON",
+          "text": "不过期",
+          "y": 515
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "field tnum",
+          "font": "14px",
+          "h": 36,
+          "radius": "8px",
+          "tag": "INPUT",
+          "text": "",
+          "y": 515
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "switch",
+          "font": "14px",
+          "h": 20,
+          "radius": "10px",
+          "tag": "BUTTON",
+          "text": "",
+          "y": 600.5
+        }
+      ],
+      "group": ".le-cell"
+    },
+    {
+      "controls": [
+        {
+          "cls": "btn btn-ghost btn-sm",
+          "font": "12.5px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "取消",
+          "y": 681.5
+        },
+        {
+          "cls": "btn btn-primary btn-sm",
+          "font": "12.5px",
+          "h": 28,
+          "radius": "6px",
+          "tag": "BUTTON",
+          "text": "保存",
+          "y": 681.5
+        }
+      ],
+      "group": ".le-foot"
+    }
+  ]
+}

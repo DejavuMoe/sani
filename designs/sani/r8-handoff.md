@@ -1,6 +1,6 @@
 # R8 — 管理入口、术语与信息排版一致性
 
-状态：**needs-review / 待审批**。R7 已批准并实施；本轮新增的 R8 尚未批准或实施。
+状态：**changes-requested / 需要修改**。用户指出管理搜索与切换器高度不一致；后续修订见 `r9-handoff.md`。R7 已批准并实施；本轮新增的 R8 尚未批准或实施。
 
 基线：`c9bc16d`。入口：[审批页](http://127.0.0.1:4311/sani/review-r8.html)、[完整原型](http://127.0.0.1:4311/sani/prototype-r8.html?scene=r8-dashboard&lang=zh&theme=light&chrome=0)。只修改 `designs/sani/`；R1–R7 文件保持原样，现有 R7 交互通过共享脚本继承。
 
