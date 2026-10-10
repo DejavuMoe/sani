@@ -101,7 +101,7 @@
       const stableId = current.getAttribute("data-screen-id") || current.getAttribute("data-component-id");
       if (stableId) {
         part += "[data-" + (current.hasAttribute("data-screen-id") ? "screen" : "component") + "-id=\"" +
-          String(stableId).replace(/"/g, "\\\"") + "\"]";
+          escapePart(stableId) + "\"]";
       } else if (current.classList && current.classList.length > 0) {
         part += "." + Array.from(current.classList).slice(0, 2).map(escapePart).join(".");
       }

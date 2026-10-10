@@ -47,6 +47,6 @@ for(const name of readdirSync(new URL('review-r9/',root)).filter(n=>n.endsWith('
 for(const group of ['.r7-manager-tools','.r3-color-input','.r5-auth-fields','.cmp-options','.ll-toolbar','.le','.tag-selected','.tag-pop:popover-open','.setup-form'])assert.ok(seen.has(group),`Missing coverage: ${group}`);
 assert.ok(states>=20);
 const meta=JSON.parse(read('_d_meta.json'));
-assert.equal(meta.assets['Admin app'].versions.find(v=>v.path==='prototype-r9.html').status,'needs-review');
+assert.equal(meta.assets['Admin app'].versions.find(v=>v.path==='prototype-r9.html').status,'approved');
 assert.equal(meta.assets['Admin app'].versions.find(v=>v.path==='prototype-r8.html').status,'changes-requested');
 console.log(`R9: ${states} browser states, ${groups} group instances, ${seen.size} group types; geometry, axe, overflow, dependency/syntax and measurement self-checks passed.`);

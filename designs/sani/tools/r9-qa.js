@@ -50,7 +50,9 @@ function captureGeometry() {
 }
 if (new URLSearchParams(location.search).get('qa') === '1') {
   const script = document.createElement('script');
-  script.src = 'http://127.0.0.1:4312/axe.min.js';
+  script.src = 'https://unpkg.com/axe-core@4.13.0/axe.min.js';
+  script.integrity = 'sha384-jzJDdyy7z7+/I7TeoAg0Gc8k9hD8b1xRN0W18hMptWJ0cdoiebywhPpCyP9eBOgn';
+  script.crossOrigin = 'anonymous';
   document.head.append(script);
   const collector = document.createElement('script');
   collector.src = 'tools/collect-dom-content.js';
