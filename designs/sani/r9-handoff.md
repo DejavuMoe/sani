@@ -1,6 +1,6 @@
 # R9 — 成组控件几何与视觉一致性
 
-状态：needs-review，未实施。R8 因控件高度漏检标记为 changes-requested。R1–R7 批准历史保留。
+状态：approved，用户于 2026-10-10 批准 R9 并授权实施、推送 master 和按规范发布 v0.9.4。R8 因控件高度漏检标记为 changes-requested。R1–R7 批准历史保留。
 
 基线：`c2c4f2b`。入口：[审批页](http://127.0.0.1:4311/sani/review-r9.html)、[管理标签原型](http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0)。继承 R8 功能、术语和字体修订；新增共享 CSS，不增加功能或依赖。
 

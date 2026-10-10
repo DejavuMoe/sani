@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "review-r8/content-inventory.json",
+    "inventory": "review-r9/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -980,7 +980,7 @@
           "web/e2e/r7.spec.ts"
         ]
       },
-      "status": "needs-review",
+      "status": "approved",
       "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md."
     }
   ]

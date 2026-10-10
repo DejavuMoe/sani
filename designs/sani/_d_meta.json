@@ -91,7 +91,7 @@
         {
           "path": "prototype-r9.html",
           "createdAt": "2026-10-10T06:14:50.935Z",
-          "status": "needs-review",
+          "status": "approved",
           "subtitle": "R9: shared control geometry and grouped alignment",
           "viewport": {
             "width": 1194,
@@ -193,7 +193,7 @@
         {
           "path": "review-r9.html",
           "createdAt": "2026-10-10T06:18:13.702Z",
-          "status": "needs-review",
+          "status": "approved",
           "subtitle": "Grouped-control sizing evidence and approval preview",
           "viewport": {
             "width": 1194,
@@ -204,5 +204,5 @@
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-10T06:18:13.703Z"
+  "updatedAt": "2026-10-10T07:26:22.165Z"
 }
