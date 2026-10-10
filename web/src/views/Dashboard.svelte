@@ -77,6 +77,7 @@
 
   function onkeydown(e: KeyboardEvent) {
     if (overlayOpen()) return;
+    if (links.stale && !['/','n','?','Escape'].includes(e.key)) return;
     // ⌘⌫ on a Mac, Delete elsewhere; a bare Backspace is too easy to hit.
     if (isMac && e.key === 'Backspace' && e.metaKey && !isTyping(e.target)) return removeSelected(e);
     if (e.key === 'Escape' && !isTyping(e.target)) {

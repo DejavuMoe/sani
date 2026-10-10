@@ -31,6 +31,7 @@ curl https://s.example.com/api/links \
 |---|---|---|
 | `GET` | `/api/links` | [List links](#list) |
 | `PATCH` | `/api/tags/{id}` | [Edit a tag](#tags) |
+| `DELETE` | `/api/tags/{id}` | [Delete tag](#tags) |
 | `POST` | `/api/uploads` | [Start a chunked upload](#chunk-upload) |
 | `PUT` | `/api/uploads/{id}` | [Upload a chunk](#chunk-upload) |
 | `POST` | `/api/uploads/{id}/complete` | [Complete an upload](#chunk-upload) |
@@ -83,6 +84,10 @@ Tags appear only in authenticated administration APIs and screens, never on visi
 `PATCH /api/tags/{id}`
 
 Send both `name` and `color` to rename/recolor an existing tag; returns `200` with the updated tag. All assignments retain the same ID. A conflicting normalized name returns `409 tag_taken`, a missing ID `404`. Creation and editing accept legacy named colors or six-digit HEX (`#5872a5`), normalized to lowercase. The admin UI converts HEX3, RGB and HSL to HEX6; the API does not accept arbitrary CSS.
+
+`DELETE /api/tags/{id}`
+
+Permanently removes the tag and all its associations, including associations on soft-deleted items, in one transaction. Links, shared text, files and other tags are retained. Associated items receive a monotonic `updatedAt`. Returns `204` with no body; a missing tag returns `404 not_found`. Counts shown before confirmation are a snapshot: deletion applies to all associations at commit time. Requires the same authentication and cross-origin protection as other writes.
 
 ### The link object {#link-object}
 

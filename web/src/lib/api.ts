@@ -271,6 +271,7 @@ export const api = {
   setConfig: (values: Partial<Pick<Config, 'slugLength' | 'textSlugLength' | 'fileSlugLength' | 'excludeConfusable' | 'maxFileSize' | 'metaMode'>> & { metaProxy?: MetadataProxyInput }) => request<Config>('PATCH', '/config', values),
   testMetadataProxy: (metaProxy: MetadataProxyInput, signal?: AbortSignal) => request<{ ok: boolean }>('POST', '/config/metadata/test', { metaProxy }, { signal }),
   updateTag: (id: number, name: string, color: TagColor) => request<Tag>('PATCH', `/tags/${id}`, { name, color }),
+  deleteTag: (id: number) => request<void>('DELETE', `/tags/${id}`),
   overview: (days = 30) => request<Overview>('GET', `/overview?days=${days}`),
   tags: (signal?: AbortSignal) => request<TagCatalog>('GET', '/tags', undefined, { signal }),
   createTag: (name: string, color: TagColor) => request<Tag>('POST', '/tags', { name, color }),

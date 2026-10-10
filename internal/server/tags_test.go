@@ -8,6 +8,42 @@ import (
 	"testing"
 )
 
+func TestDeleteTagAPIKeepsSharedContents(t *testing.T) {
+	e := newEnv(t, Options{FilesURL: "http://" + filesHost, FilesDir: t.TempDir()})
+	if r := e.req("DELETE", "/api/tags/1", nil); r.status != 401 {
+		t.Fatal(r.status)
+	}
+	e.signIn()
+	tag := e.req("POST", "/api/tags", `{"name":"remove","color":"blue"}`).json()["id"]
+	path := fmt.Sprintf("/api/tags/%v", tag)
+	ids := []any{tag}
+	link := e.create(map[string]any{"url": "https://example.com", "tags": ids})
+	text := e.req("POST", "/api/texts", map[string]any{"text": "retained text", "tags": ids}).json()
+	file := e.upload(map[string]string{"tags": fmt.Sprintf("[%v]", tag)}, "keep.txt", []byte("retained bytes")).json()
+	if r := e.req("DELETE", path, nil, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
+		t.Fatal(r.status)
+	}
+	if r := e.req("DELETE", path, nil); r.status != 204 || len(r.body) != 0 {
+		t.Fatalf("delete: %d %s", r.status, r.body)
+	}
+	for _, item := range []map[string]any{link, text, file} {
+		r := e.req("GET", fmt.Sprintf("/api/links/%v", item["id"]), nil)
+		if r.status != 200 || len(r.json()["tags"].([]any)) != 0 {
+			t.Fatalf("lost item: %d %s", r.status, r.body)
+		}
+	}
+	if r := e.req("GET", fmt.Sprintf("/api/links/%v/text", text["id"]), nil); r.status != 200 || !strings.Contains(string(r.body), "retained text") {
+		t.Fatalf("text lost: %s", r.body)
+	}
+	entries, err := os.ReadDir(e.srv.opt.FilesDir)
+	if err != nil || len(entries) == 0 {
+		t.Fatalf("file lost: %v", err)
+	}
+	if r := e.req("DELETE", path, nil); r.status != 404 {
+		t.Fatal(r.status)
+	}
+}
+
 func TestTagAPIAndSharing(t *testing.T) {
 	e := newEnv(t, Options{FilesURL: "http://" + filesHost, FilesDir: t.TempDir()})
 	for _, method := range []string{"GET", "POST"} {

@@ -31,6 +31,7 @@ curl https://s.example.com/api/links \
 |---|---|---|
 | `GET` | `/api/links` | [列出链接](#list) |
 | `PATCH` | `/api/tags/{id}` | [修改标签](#tags) |
+| `DELETE` | `/api/tags/{id}` | [删除标签](#tags) |
 | `POST` | `/api/uploads` | [建立分片上传](#chunk-upload) |
 | `PUT` | `/api/uploads/{id}` | [写入分片](#chunk-upload) |
 | `POST` | `/api/uploads/{id}/complete` | [完成上传](#chunk-upload) |
@@ -84,6 +85,10 @@ curl https://s.example.com/api/links \
 `PATCH /api/tags/{id}`
 
 传入 `name` 与 `color` 修改现有标签，返回 `200` 和更新后的标签对象；所有关联保留同一 ID。规范化后的同名冲突返回 `409 tag_taken`，不存在的 ID 返回 `404`。创建与修改均接受旧命名色或六位 HEX（如 `#5872a5`），规范化为小写。后台会把 HEX3、RGB、HSL 转为 HEX6；API 不接受任意 CSS。
+
+`DELETE /api/tags/{id}`
+
+在一个事务中永久删除标签及其全部关联（包括软删除内容的关联），保留链接、文本、文件和其他标签，并单调递增关联内容的 `updatedAt`。成功返回 `204`，无响应体；不存在的标签返回 `404 not_found`。确认前显示的关联数是快照，删除作用于提交时的全部关联。需要与其他写接口相同的鉴权与跨来源保护。
 
 ### 链接对象 {#link-object}
 

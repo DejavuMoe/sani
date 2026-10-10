@@ -8,7 +8,9 @@
     title,
     width = 440,
     children,
-  }: { open?: boolean; title: string; width?: number; children: Snippet } = $props();
+    dismissible = true,
+    onclose,
+  }: { open?: boolean; title: string; width?: number; children: Snippet; dismissible?: boolean; onclose?: () => void } = $props();
 
   let dialog = $state<HTMLDialogElement>();
 
@@ -24,17 +26,18 @@
   class="dialog"
   style:width="min({width}px, calc(100vw - 32px))"
   aria-label={title}
-  onclose={() => (open = false)}
+  onclose={() => { open = false; onclose?.(); }}
+  oncancel={(e) => { if (!dismissible) e.preventDefault(); }}
   onclick={(e) => {
     // A click on the backdrop lands on the dialog element itself.
-    if (e.target === dialog) open = false;
+    if (e.target === dialog && dismissible) open = false;
   }}
 >
   <!-- svelte-ignore a11y_autofocus -->
   <div class="inner" tabindex="-1" autofocus>
     <header>
       <h2>{title}</h2>
-      <button class="close" aria-label={t('act.close')} onclick={() => (open = false)}><Icon name="x" /></button>
+      <button class="close" disabled={!dismissible} aria-label={t('act.close')} onclick={() => (open = false)}><Icon name="x" /></button>
     </header>
     {@render children()}
   </div>

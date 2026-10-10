@@ -88,6 +88,29 @@ func (s *Store) CreateTag(ctx context.Context, name, color string) (tag *Tag, er
 	return
 }
 
+// DeleteTag removes associations, including those on soft-deleted links, but
+// keeps the links and their contents. The foreign key cascades in this transaction.
+func (s *Store) DeleteTag(ctx context.Context, id, now int64) error {
+	return s.tx(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, `UPDATE links SET updated_at = max(?, updated_at + 1)
+			WHERE id IN (SELECT link_id FROM link_tags WHERE tag_id = ?)`, now, id); err != nil {
+			return err
+		}
+		res, err := tx.ExecContext(ctx, `DELETE FROM tags WHERE id = ?`, id)
+		if err != nil {
+			return err
+		}
+		n, err := res.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if n == 0 {
+			return ErrNotFound
+		}
+		return nil
+	})
+}
+
 func (s *Store) UpdateTag(ctx context.Context, id int64, name, color string) (*Tag, error) {
 	name, color, err := NormalizeTag(name, color)
 	if err != nil {

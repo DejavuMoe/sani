@@ -9,11 +9,11 @@ Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
 becomes the visual and interaction truth once a version is approved
 (`_d_meta.json`). Revisions 1–3 are approved and implemented; R4 needs changes;
-R5 and R6 are approved and implemented. R7 is approved; implementation is in progress.
+R5 and R6 are approved and implemented. R7 is approved and implemented.
 
 ## Revisions
 
-R7 is approved: [review hub](http://127.0.0.1:4311/sani/review-r7.html), [full prototype](http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0). Scope, state contracts and implementation boundaries are in [r7-handoff.md](r7-handoff.md). R7 changes only design files.
+R7 is approved: [review hub](http://127.0.0.1:4311/sani/review-r7.html), [full prototype](http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0). Scope, state contracts and implementation boundaries are in [r7-handoff.md](r7-handoff.md). Production verification and screenshots are in `implementation-r7/`.
 
 R6 is approved and implemented; see [r6-handoff.md](r6-handoff.md) for implementation and responsive verification. Approval status is authoritative in `_d_meta.json`; implementation evidence is recorded by revision below. Release or deployment must not be inferred from design approval.
 
@@ -25,7 +25,7 @@ R6 is approved and implemented; see [r6-handoff.md](r6-handoff.md) for implement
 | r4 — metadata connections | `e58de51` | In-admin relay/HTTP/SOCKS and custom controls | Changes requested | Not implemented |
 | r5 — compact settings | R4 | One connection selector, aligned controls, no hosted relay | `81a1762` | `eeea4eb`; see r5-handoff.md |
 | r6 — creation defaults and text preview | R5 | Independent URL/text/file lengths, stable content preview | `a4a77b7` | `480c707`, responsive fix `0b9b1bd`; see r6-handoff.md |
-| r7 — management and recovery | R6 / `934c5f0` | Tag lifecycle, drafts, errors, copy and delivery boundaries | Approved 2026-10-10 | In progress |
+| r7 — management and recovery | R6 / `934c5f0` | Tag lifecycle, drafts, errors, copy and delivery boundaries | `2cce5c1` / 2026-10-10 | Implemented 2026-10-10; see r7-handoff.md |
 
 ### R5 — compact settings (approved)
 

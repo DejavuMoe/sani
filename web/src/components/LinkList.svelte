@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from './Button.svelte';
   import { tooltip } from '../lib/tooltip';
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
@@ -34,7 +35,7 @@
 
   $effect(() => {
     if (!sentinel) return;
-    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && links.loadMore(), {
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && !links.moreFailed && links.loadMore(), {
       rootMargin: '800px 0px',
     });
     io.observe(sentinel);
@@ -49,7 +50,7 @@
   const pickable = $derived(links.items.slice(0, MAX_PICK));
   const allPicked = $derived(pickable.length > 0 && pickable.every((l) => links.picked.has(l.id)));
   const nonePicked = $derived(links.picked.size === 0);
-  const empty = $derived(links.loaded && links.items.length === 0);
+  const empty = $derived(links.loaded && !links.stale && links.items.length === 0);
   const blank = $derived(empty && !links.query && !links.kind && links.tag === null);
 
   /** Splits a message around {key} placeholders so keys render as keycaps. */
@@ -73,7 +74,7 @@
         type="search"
         placeholder={t('list.search')}
         value={links.query}
-        oninput={(e) => links.search(e.currentTarget.value)}
+          oninput={(e) => { links.search(e.currentTarget.value); e.currentTarget.value = links.query; }}
         onfocus={() => (searchFocused = true)}
         onblur={() => (searchFocused = false)}
         onkeydown={(e) => {
@@ -99,11 +100,12 @@
         <kbd class="slash" aria-hidden="true">/</kbd>
       {/if}
     </label>
-    {#if links.query && links.loaded}
+    {#if (links.query || links.kind || links.tag !== null) && links.loaded && !links.stale}
       <span class="count" aria-live="polite">{t('list.results', { n: links.total })}</span>
     {/if}
     <button
       class={['pick', links.picking && 'on']}
+      disabled={links.stale}
       aria-pressed={links.picking}
       aria-label={t('bulk.startLabel')}
       use:tooltip={t('bulk.startLabel')}
@@ -154,6 +156,7 @@
     <div class="bulkbar" role="group" aria-label={t('bulk.label')}>
       <button
         class="all"
+        disabled={links.stale}
         role="checkbox"
         aria-checked={allPicked ? true : nonePicked ? false : 'mixed'}
         aria-label={t('bulk.all')}
@@ -168,13 +171,13 @@
         {nonePicked ? t('bulk.none') : t('bulk.count', { n: links.picked.size })}
       </span>
       <span class="actions">
-        <button disabled={nonePicked || links.busy} aria-label={t('bulk.enable')} onclick={() => links.bulk('enable')}>
+        <button disabled={nonePicked || links.busy || links.stale} aria-label={t('bulk.enable')} onclick={() => links.bulk('enable')}>
           <Icon name="power" size={14} /><span class="name">{t('bulk.enable')}</span>
         </button>
-        <button disabled={nonePicked || links.busy} aria-label={t('bulk.disable')} onclick={() => links.bulk('disable')}>
+        <button disabled={nonePicked || links.busy || links.stale} aria-label={t('bulk.disable')} onclick={() => links.bulk('disable')}>
           <Icon name="pause" size={14} /><span class="name">{t('bulk.disable')}</span>
         </button>
-        <button class="danger" disabled={nonePicked || links.busy} aria-label={t('bulk.delete')} onclick={() => links.bulk('delete')}>
+        <button class="danger" disabled={nonePicked || links.busy || links.stale} aria-label={t('bulk.delete')} onclick={() => links.bulk('delete')}>
           <Icon name="trash" size={14} /><span class="name">{t('bulk.delete')}</span>
         </button>
       </span>
@@ -182,6 +185,9 @@
     </div>
   {/if}
 
+  {#if (links.failed && links.loaded) || links.refreshFailed}
+    <div class="state-notice error" role="alert"><span>{t(links.failed ? 'list.queryFailed' : 'list.refreshFailed')}</span><Button size="sm" loading={links.refreshing} onclick={() => links.failed ? links.load() : links.refresh()}>{t('act.retry')}</Button></div>
+  {/if}
   {#if blank}
     <div class="blank">
       <div class="blank-art" aria-hidden="true">
@@ -200,7 +206,7 @@
       </p>
     </div>
   {:else if empty && links.tag !== null}
-    <div class="blank"><p>{t('tags.none')}</p><button class="text-btn" onclick={() => links.clearFilters()}>{t('tags.clear')}</button></div>
+    <div class="blank"><p>{t(links.query || links.kind ? 'list.emptyCombined' : 'list.emptyTag', {name:links.tag === 'untagged' ? t('tags.untagged') : links.tags.find(tag=>tag.id===links.tag)?.name ?? ''})}</p><button class="text-btn" onclick={() => links.setTag(null)}>{t('list.clearTag')}</button>{#if links.kind}<button class="text-btn" onclick={()=>links.setKind(null)}>{t('list.clearKind')}</button>{/if}{#if links.query}<button class="text-btn" onclick={()=>links.search('')}>{t('list.clearSearch')}</button>{/if}</div>
   {:else if empty && links.query}
     <div class="blank">
       <p>{t('list.noResults', { q: links.query })}</p>
@@ -227,7 +233,7 @@
       </div>
     {/if}
   {:else}
-    <div class={['card', links.loading && 'stale']}>
+    <div class={['card', links.stale && 'stale']} inert={links.stale} aria-busy={links.loading}>
       <div class="head" aria-hidden="true">
         {#if links.picking}<span class="h-pick"></span>{/if}
         <span class="h-slug">{t('list.col.link')}</span>
@@ -253,6 +259,8 @@
       </ul>
     </div>
     <div bind:this={sentinel} class="sentinel" aria-hidden="true"></div>
+    {#if links.moreFailed}<div class="state-notice error" role="alert"><span>{t('list.moreFailed')}</span><Button size="sm" onclick={()=>links.loadMore()}>{t('act.retry')}</Button></div>
+    {:else if links.next && !links.stale}<div class="more"><Button size="sm" loading={links.loadingMore} onclick={()=>links.loadMore()}>{t('list.more')}</Button></div>{/if}
     {#if links.loadingMore}
       <p class="more">{t('list.loading')}</p>
     {/if}
@@ -532,7 +540,7 @@
   }
 
   .stale {
-    opacity: 0.6;
+    color: var(--text-2);
   }
 
   .head {
@@ -696,6 +704,8 @@
     font-size: 13px;
     font-weight: 500;
   }
+
+  .text-btn + .text-btn { margin-left:14px; }
 
   .text-btn:hover {
     text-decoration: underline;

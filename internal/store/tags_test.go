@@ -12,6 +12,50 @@ import (
 	"testing"
 )
 
+func TestDeleteTagKeepsLinksAndRollsBack(t *testing.T) {
+	s := open(t)
+	ctx := context.Background()
+	tag, err := s.CreateTag(ctx, "delete-me", "blue")
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, err := s.CreateTag(ctx, "keep-me", "green")
+	if err != nil {
+		t.Fatal(err)
+	}
+	l := newLink("keep-link", "https://example.com", 100)
+	l.Tags = []int64{tag.ID, other.ID}
+	if err := s.CreateLink(ctx, l, true); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.w.Exec(`CREATE TRIGGER reject_tag_delete BEFORE DELETE ON tags BEGIN SELECT RAISE(ABORT, 'test failure'); END`); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.DeleteTag(ctx, tag.ID, 200); err == nil {
+		t.Fatal("delete should fail")
+	}
+	got, err := s.GetLink(ctx, l.ID)
+	if err != nil || !reflect.DeepEqual(got.Tags, l.Tags) || got.UpdatedAt != l.UpdatedAt {
+		t.Fatalf("failed delete changed link: %+v %v", got, err)
+	}
+	if _, err := s.w.Exec(`DROP TRIGGER reject_tag_delete`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.DeleteLink(ctx, l.ID, 200); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.DeleteTag(ctx, tag.ID, 50); err != nil {
+		t.Fatal(err)
+	}
+	got, err = s.RestoreLink(ctx, l.ID)
+	if err != nil || !reflect.DeepEqual(got.Tags, []int64{other.ID}) || got.URL != l.URL || got.UpdatedAt <= l.UpdatedAt {
+		t.Fatalf("restored link: %+v %v", got, err)
+	}
+	if err := s.DeleteTag(ctx, tag.ID, 300); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("second delete: %v", err)
+	}
+}
+
 func TestTagsMigrationAndTransactions(t *testing.T) {
 	ctx := context.Background()
 	path := filepath.Join(t.TempDir(), "v3.db")

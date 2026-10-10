@@ -9,6 +9,7 @@
   import Segmented from '../components/Segmented.svelte';
   import { api, ApiError, type Config, type ImportResult, type Token } from '../lib/api';
   import { clock } from '../lib/clock.svelte';
+  import { download } from '../lib/qr';
   import { copyText } from '../lib/clipboard';
   import { errorText, formatDate, formatRelative, i18n, t, type Lang, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
@@ -90,16 +91,19 @@
   let confirming = $state<number | null>(null);
   let confirmTimer: ReturnType<typeof setTimeout> | undefined;
 
-  onMount(async () => {
-    try {
-      tokens = (await api.tokens()).items;
-    } catch {
-      tokens = [];
-    }
-  });
+  let tokensFailed = $state(false), tokensLoading = $state(false);
+  async function loadTokens() {
+    if (tokensLoading) return;
+    tokensLoading = true; tokensFailed = false;
+    try { tokens = (await api.tokens()).items; }
+    catch { tokensFailed = true; }
+    finally { tokensLoading = false; }
+  }
+  onMount(() => { void loadTokens(); });
 
   async function createToken(e: SubmitEvent) {
     e.preventDefault();
+    if (tokens === null || tokensLoading || tokensFailed || tokenBusy) return;
     if (!tokenName.trim()) return void (tokenError = t('err.name_invalid'));
     tokenBusy = true;
     tokenError = '';
@@ -331,7 +335,7 @@
           aria-label={t('settings.tokenName')}
           aria-invalid={!!tokenError || undefined}
         />
-        <Button type="submit" icon="plus" loading={tokenBusy}>{t('settings.tokenCreate')}</Button>
+        <Button type="submit" icon="plus" loading={tokenBusy} disabled={tokens === null || tokensLoading || tokensFailed}>{t('settings.tokenCreate')}</Button>
       </form>
       {#if tokenError}<p class="error-text">{tokenError}</p>{/if}
 
@@ -355,6 +359,8 @@
         </div>
       {/if}
 
+      {#if tokensFailed}<div class="state-notice error" role="alert"><span>{t('settings.tokensFailed')}</span><Button size="sm" onclick={loadTokens}>{t('act.retry')}</Button></div>
+      {:else if tokensLoading}<p class="empty" role="status">{t('list.loading')}</p>{/if}
       {#if tokens && tokens.length > 0}
         <ul class="tokens">
           {#each tokens as tok (tok.id)}
@@ -421,6 +427,7 @@
           <a class="dl" href="/api/export?format=csv" download>CSV</a>
         </div>
       </div>
+      <div class="tool column backup-help"><h3>{t('settings.backup')}</h3><p class="hint">{t('settings.backupHint')}</p><a href={i18n.lang === 'zh' ? 'https://sani.zsh.moe/guide/operations#backup-files' : 'https://sani.zsh.moe/en/guide/operations#backup-files'} target="_blank" rel="noopener">{t('settings.backupGuide')}</a></div>
       <div class="tool column">
         <div>
           <h3>{t('settings.import')}</h3>
@@ -456,7 +463,8 @@
           <div class="import-result" transition:slide={{ duration: 160 }}>
             <p><Icon name="check" size={14} stroke={2} />{t('settings.imported', { n: importResult.created })}</p>
             {#if importResult.skipped.length > 0}
-              <p class="k">{t('settings.importSkipped', { n: importResult.skipped.length })}</p>
+              <p class="k">{t('settings.importSkipped', { n: importResult.skipped.length })} {#if importResult.skipped.length > 20}{t('settings.previewSkipped')}{/if}</p>
+              <Button size="sm" onclick={() => download('sani-import-skipped.json',new Blob([JSON.stringify(importResult?.skipped,null,2)],{type:'application/json'}))}>{t('settings.downloadSkipped',{n:importResult.skipped.length})}</Button>
               <ul>
                 {#each importResult.skipped.slice(0, 20) as s, i (i)}
                   <li>
@@ -522,6 +530,8 @@
 </main>
 
 <style>
+  .backup-help { flex-basis:100%; font-size:12px; margin-top:12px; }
+  .backup-help a { color:var(--accent); }
   .page {
     width: min(100%, calc(var(--page) + 2 * var(--gutter)));
     margin: 0 auto;

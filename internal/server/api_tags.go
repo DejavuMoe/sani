@@ -3,9 +3,27 @@ package server
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/DejavuMoe/sani/internal/store"
 )
+
+func (s *Server) deleteTag(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	err := s.store.DeleteTag(r.Context(), id, time.Now().UnixMilli())
+	if errors.Is(err, store.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "not_found", "no such tag")
+		return
+	}
+	if err != nil {
+		s.internalError(w, r, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func tagError(w http.ResponseWriter, err error) bool {
 	switch {

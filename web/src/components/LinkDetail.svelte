@@ -28,6 +28,8 @@
   let stats = $state<LinkStats | null>(null);
   let loading = $state(false);
   let refetching = $state(false);
+  let failed = $state(false), statsRange = $state(30);
+  let statsSeq = 0;
 
   // Depends on the id and range only: new click counts arriving for the
   // same link must not refetch the stats.
@@ -38,16 +40,19 @@
   });
 
   async function load(linkId: number, days: number) {
-    loading = true;
+    const seq = ++statsSeq;
+    loading = true; failed = false;
     try {
       const s = await api.stats(linkId, days);
-      if (linkId !== id || days !== range) return;
-      stats = s;
+      if (linkId !== id || days !== range || seq !== statsSeq) return;
+      stats = s; statsRange = days;
       links.upsert({ ...s.link, spark: undefined });
     } catch (e) {
-      if (e instanceof ApiError && e.code === 'not_found') links.expandedId = null;
+      if (seq !== statsSeq) return;
+      failed = true;
+      if (e instanceof ApiError && e.code === 'not_found' && !editing) links.expandedId = null;
     } finally {
-      loading = false;
+      if (seq === statsSeq) loading = false;
     }
   }
 
@@ -190,7 +195,7 @@
             </div>
             <div>
               <dt>{t('detail.today')}</dt>
-              <dd>{formatNumber(today)}</dd>
+              <dd>{stats ? formatNumber(today) : '—'}</dd>
             </div>
             <div>
               <dt>{t('detail.lastVisit')}</dt>
@@ -206,8 +211,9 @@
           />
         </div>
 
+        {#if failed}<div class="state-notice error" role="alert"><span>{stats ? t('detail.statsStale',{n:statsRange}) : t('detail.statsFailed')}</span><Button size="sm" onclick={()=>load(id,range)}>{t('act.retry')}</Button></div>{/if}
         {#if stats}
-          <BarChart days={stats.days} dim={loading} label={t('detail.chart')} empty={t('detail.noVisits')} />
+          <BarChart days={stats.days} dim={loading} label={t('detail.chartRange',{n:statsRange})} empty={t('detail.noVisits')} />
           {#if stats.referrers.length > 0}
             <section class="refs">
               <h2>{t('detail.referrers')}</h2>
@@ -226,7 +232,7 @@
               </ul>
             </section>
           {/if}
-        {:else}
+        {:else if !failed}
           <div class="chart-placeholder" aria-busy="true"></div>
         {/if}
       </div>
@@ -265,6 +271,7 @@
             </div>
           {/if}
         </dl>
+        <div class="access-rules"><p>{t('rules.retained')}</p>{#if link.maxClicks}<p>{t(link.kind === 'url' ? 'rules.url' : link.kind === 'text' ? 'rules.text' : 'rules.file')}</p>{/if}{#if link.kind==='url' && (link.redirect===301 || link.redirect===308)}<p>{t('rules.permanent')}</p>{/if}</div>
       </aside>
     </div>
 

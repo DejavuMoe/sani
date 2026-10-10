@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { editor } from '../lib/editor.svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { api, ApiError, type Link, type LinkInput, type TextFormat } from '../lib/api';
   import { fromISO, sameExpiry, toISO, type Expiry } from '../lib/expiry';
   import { errorText, t } from '../lib/i18n.svelte';
@@ -81,7 +82,12 @@
     if (isURL) urlField?.setSelectionRange(urlField.value.length, urlField.value.length);
   }
 
+  const checkDirty = () => dirty;
+  onDestroy(() => { if (editor.check === checkDirty || (editor.check === null && links.editingId === link.id)) { editor.check = null; editor.save = null; editor.saving = false; if (links.editingId === link.id) links.editingId = null; } });
+  $effect(() => { editor.saving = saving || tagBusy; });
   onMount(() => {
+    editor.check = checkDirty;
+    editor.save = save;
     if (!isText) {
       ready();
       return;
@@ -101,22 +107,23 @@
     links.editingId = null;
   }
 
-  async function save() {
-    if (saving || tagBusy) return;
+  async function save(): Promise<boolean> {
+    if (saving || tagBusy || !loaded) return false;
     errors = {};
-    if (isURL && !form.url.trim()) return void (errors = { url: t('err.url_required') });
-    if (isText && loaded && !form.text.trim()) return void (errors = { text: t('err.text_required') });
-    if (!form.slug.trim()) return void (errors = { slug: t('err.slug_invalid') });
-    if (blocking.includes(slugStatus)) return void (errors = { slug: t(`slug.${slugStatus}` as 'slug.taken') });
-    if (form.maxClicks.trim() && !/^[1-9]\d*$/.test(form.maxClicks.trim()))
-      return void (errors = { maxClicks: t('err.max_clicks_invalid') });
+    if (isURL && !form.url.trim()) { errors = { url: t('err.url_required') }; return false; }
+    if (isText && loaded && !form.text.trim()) { errors = { text: t('err.text_required') }; return false; }
+    if (!form.slug.trim()) { errors = { slug: t('err.slug_invalid') }; return false; }
+    if (blocking.includes(slugStatus)) { errors = { slug: t(`slug.${slugStatus}` as 'slug.taken') }; return false; }
+    if (form.maxClicks.trim() && !/^[1-9]\d*$/.test(form.maxClicks.trim())) { errors = { maxClicks: t('err.max_clicks_invalid') }; return false; }
     const p = patch();
-    if (!Object.keys(p).length) return cancel();
+    if (!Object.keys(p).length) { editor.check = null; editor.saving = false; links.editingId = null; return true; }
     saving = true;
     try {
       await links.update(link.id, p);
+      editor.check = null; editor.saving = false;
       links.editingId = null;
       toasts.success(t('detail.saved'));
+      return true;
     } catch (e) {
       const code = e instanceof ApiError ? e.code : 'unknown';
       const text = errorText(code);
@@ -125,6 +132,7 @@
       else if (code.startsWith('slug_')) errors = { slug: text };
       else if (code === 'max_clicks_invalid') errors = { maxClicks: text };
       else errors = { other: text };
+      return false;
     } finally {
       saving = false;
     }
@@ -152,6 +160,7 @@
   {onkeydown}
   novalidate
 >
+  <fieldset class="editor-lock" disabled={saving}>
   {#if isURL}
     <div class="cell wide">
       <label class="label" for="edit-url-{link.id}">{t('detail.destination')}</label>
@@ -279,9 +288,11 @@
     <Button size="sm" variant="ghost" onclick={cancel}>{t('act.cancel')}</Button>
     <Button size="sm" variant="primary" type="submit" loading={saving} disabled={!dirty || tagBusy}>{t('act.save')}</Button>
   </footer>
+  </fieldset>
 </form>
 
 <style>
+  .editor-lock { display:contents; }
   .editor {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

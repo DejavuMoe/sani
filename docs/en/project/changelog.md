@@ -2,6 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Complete tag management with search, unused tags, global editing and atomic deletion that retains content.
+- Protect submitted drafts and unsaved item edits; preserve loaded pages and selection during refresh.
+- Distinguish query, pagination, statistics and token errors from empty data, with retry actions.
+- Clarify Links / Text / Files, counts, access limits and export versus backup; download all skipped import records.
+
 ## v0.9.3
 
 2026-10-09 · Fix share slug lengths not matching their settings, detail preview jitter and controls abruptly growing on narrow screens. Implements approved R6. Database schema stays at 5; the first startup only initializes missing independent share-length settings, with no new schema migration.

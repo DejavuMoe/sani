@@ -45,6 +45,7 @@
 
   /** Called by the page for paste-anywhere, drops and ?url= prefills. */
   export function fill(text: string, how: 'paste' | 'drop' | 'prefill', pageTitle = '') {
+    if (busy) return;
     url = text.trim();
     if (pageTitle) title = pageTitle.trim();
     error = null;
@@ -147,6 +148,7 @@
 </script>
 
 <form class={['composer', error?.field === 'url' && 'invalid', pulse && 'pulse']} onsubmit={submit} novalidate>
+  <fieldset class="form-lock" disabled={busy}>
   <div class="main">
     <Icon name="link" class="lead" />
     <label class="sr-only" for="composer-url">{t('composer.label')}</label>
@@ -197,7 +199,7 @@
     <span class="gap"></span>
     <ExpiryPicker bind:value={expiry} triggerClass="opt" />
     <button type="button" class="opt" aria-expanded={more} aria-controls="composer-more" onclick={() => (more = !more)}>
-      {more ? t('composer.less') : t('composer.more')}
+      {more ? t('composer.less') : t('composer.more')}{#if title.trim() || maxClicks.trim() || redirect !== 302}<span class="more-count">{Number(!!title.trim()) + Number(!!maxClicks.trim()) + Number(redirect !== 302)}</span>{/if}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
   </div>
@@ -234,6 +236,14 @@
       </span>
     </div>
   {/if}
+  {#if maxClicks.trim() || ('at' in expiry || expiry.preset !== 'never') || redirect === 301}
+  <div class="access-rules">
+    {#if maxClicks.trim()}<p>{t('rules.url')}</p>{/if}
+    {#if ('at' in expiry || expiry.preset !== 'never')}<p>{t('rules.expiry')}</p>{/if}
+    {#if redirect === 301}<p>{t('rules.permanent')}</p>{/if}
+  </div>
+  {/if}
+  </fieldset>
 </form>
 
 {#if error}

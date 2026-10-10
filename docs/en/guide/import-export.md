@@ -103,3 +103,5 @@ Afterwards you see how many links were imported and which rows were skipped. Thr
 ```
 
 The reasons are [API error codes](../reference/api#errors).
+
+The import result previews the first 20 skipped records and offers a JSON download containing every skipped record. URL export is for migration; a complete backup also preserves shared text and files through the database and file directory. See [backup and restore](./operations#backup-files).

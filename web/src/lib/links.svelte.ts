@@ -1,3 +1,4 @@
+import { editor } from './editor.svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import {
   api,
@@ -36,6 +37,18 @@ class LinksStore {
   tagsLoaded = $state(false);
   tagsFailed = $state(false);
   private tagSeq = 0;
+  managingTags = $state(false);
+
+  async deleteTag(id: number) {
+    await api.deleteTag(id);
+    ++this.tagSeq;
+    ++this.revision;
+    this.tags = this.tags.filter(tag => tag.id !== id);
+    this.items = this.items.map(link => ({ ...link, tags: link.tags.filter(tag => tag !== id) }));
+    if (this.tag === id) this.tag = null;
+    await this.refresh();
+    await this.refreshTags();
+  }
 
   async refreshTags() {
     const seq = ++this.tagSeq;
@@ -65,12 +78,11 @@ class LinksStore {
   }
 
   setTag(tag: TagFilter) {
-    this.tag = tag;
-    this.expandedId = this.editingId = null;
-    this.load();
+    editor.request(() => { this.tag = tag; this.expandedId = this.editingId = null; void this.load(); });
   }
 
   clearFilters() {
+    if (editor.check?.()) { editor.request(() => this.clearFilters()); return; }
     this.query = '';
     this.kind = null;
     this.tag = null;
@@ -86,9 +98,26 @@ class LinksStore {
   loading = $state(false);
   loadingMore = $state(false);
   failed = $state(false);
+  moreFailed = $state(false);
+  refreshFailed = $state(false);
+  refreshing = $state(false);
+  overviewFailed = $state(false);
+  private refreshSeq = 0;
+  private overviewSeq = 0;
+  get stale() { return this.loading || this.failed; }
 
-  expandedId = $state<number | null>(null);
-  editingId = $state<number | null>(null);
+  private expanded = $state<number | null>(null);
+  private editing = $state<number | null>(null);
+  get expandedId() { return this.expanded; }
+  set expandedId(id: number | null) {
+    if (id === this.expanded) return;
+    editor.request(() => { this.editing = null; this.expanded = id; });
+  }
+  get editingId() { return this.editing; }
+  set editingId(id: number | null) {
+    if (id === this.editing) return;
+    editor.request(() => { this.editing = id; });
+  }
   selectedId = $state<number | null>(null);
   /** Links to highlight briefly: just created or restored. */
   fresh = new SvelteSet<number>();
@@ -119,6 +148,7 @@ class LinksStore {
     const revision = this.revision;
     this.loading = true;
     this.failed = false;
+    this.moreFailed = this.refreshFailed = false;
     try {
       const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
@@ -140,10 +170,11 @@ class LinksStore {
   }
 
   async loadMore() {
-    if (!this.next || this.loadingMore || this.loading) return;
+    if (!this.next || this.loadingMore || this.stale || this.refreshing) return;
     const seq = this.seq;
     const revision = this.revision;
     this.loadingMore = true;
+    this.moreFailed = false;
     let retry = false;
     try {
       const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
@@ -154,7 +185,7 @@ class LinksStore {
       this.next = res.next;
       this.total = res.total;
     } catch {
-      /* the sentinel will try again when it comes back into view */
+      if (seq === this.seq) this.moreFailed = true;
     } finally {
       this.loadingMore = false;
       // The sentinel may stay visible, so it will not emit another entry.
@@ -163,57 +194,70 @@ class LinksStore {
   }
 
   search(q: string) {
-    this.query = q;
-    clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => this.load(), q ? 140 : 0);
+    editor.request(() => {
+      this.query = q;
+      this.ctrl?.abort(); ++this.seq;
+      this.loading = true;
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => this.load(), q ? 140 : 0);
+    });
   }
 
   setSort(sort: Sort) {
     if (sort === this.sort) return;
-    this.sort = sort;
-    this.load();
+    editor.request(() => { this.sort = sort; void this.load(); });
   }
 
   setKind(kind: LinkKind | null) {
     if (kind === this.kind) return;
-    this.kind = kind;
-    this.load();
+    editor.request(() => { this.kind = kind; void this.load(); });
   }
 
-  /** Refresh counts after returning to the tab, keeping scroll and pages. */
+  /** Rebuild the loaded range through real cursors, then publish it atomically. */
   async refresh() {
-    this.refreshOverview();
-    if (!this.loaded) return;
-    if (this.tag !== null) { await this.load(); return; }
-    const seq = this.seq;
-    const revision = this.revision;
+    void this.refreshOverview();
+    if (!this.loaded || this.stale || this.loadingMore) return;
+    const seq = this.seq, revision = this.revision, refresh = ++this.refreshSeq;
+    const wanted = Math.max(PAGE, this.items.length);
+    this.refreshing = true;
     try {
-      const res = await api.links({
-        q: this.query,
-        sort: this.sort,
-        kind: this.kind,
-        tag: this.tag,
-        limit: Math.min(200, Math.max(PAGE, this.items.length)),
-      });
-      if (seq !== this.seq || revision !== this.revision) return;
-      const byId = new Map(res.items.map((l) => [l.id, l]));
-      this.items = this.items.map((l) => byId.get(l.id) ?? l).filter(l => this.matchesTag(l));
-      const known = new Set(this.items.map((l) => l.id));
-      const added = res.items.filter((l) => !known.has(l.id));
-      if (added.length && this.sort === 'created') this.items = [...added, ...this.items];
-      this.total = res.total;
-    } catch {
-      /* stale counts are fine */
-    }
+      let cursor: string | null = null;
+      let total = 0;
+      const items: Link[] = [];
+      do {
+        const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag,
+          limit: Math.min(200, wanted - items.length), ...(cursor ? { cursor } : {}) });
+        if (seq !== this.seq || revision !== this.revision || refresh !== this.refreshSeq) return;
+        items.push(...res.items); total = res.total;
+        if (res.next === cursor && cursor !== null) throw new Error('Repeated list cursor');
+        cursor = res.next;
+      } while (cursor && items.length < wanted);
+      // Never unmount a dirty editor because a background refresh lost its row.
+      if (editor.check?.() && this.editingId !== null && !items.some(l => l.id === this.editingId)) {
+        this.refreshFailed = true;
+        return;
+      }
+      this.items = items;
+      this.total = total;
+      this.next = cursor;
+      this.refreshFailed = false;
+      const ids = new Set(items.map(l => l.id));
+      for (const id of this.picked) if (!ids.has(id)) this.picked.delete(id);
+      if (this.selectedId !== null && !ids.has(this.selectedId)) this.selectedId = null;
+      if (this.expandedId !== null && !ids.has(this.expandedId)) this.expandedId = null;
+    } catch { if (seq === this.seq && refresh === this.refreshSeq) this.refreshFailed = true; }
+    finally { if (refresh === this.refreshSeq) this.refreshing = false; }
   }
 
   async refreshOverview() {
-    this.refreshTags();
+    void this.refreshTags();
+    const seq = ++this.overviewSeq;
     try {
-      this.overview = await api.overview(30);
-    } catch {
-      /* keep the previous numbers */
-    }
+      const overview = await api.overview(30);
+      if (seq !== this.overviewSeq) return;
+      this.overview = overview;
+      this.overviewFailed = false;
+    } catch { if (seq === this.overviewSeq) this.overviewFailed = true; }
   }
 
   private flash(id: number) {
@@ -245,6 +289,7 @@ class LinksStore {
     // A delayed stats/metadata response must not undo a newer saved edit.
     if (Date.parse(link.updatedAt) < Date.parse(prev.updatedAt)) return;
     if (!this.matchesTag(link)) {
+      if (this.editingId === link.id && editor.check?.() && !editor.saving) { this.refreshFailed = true; return; }
       this.items = this.items.filter(l => l.id !== link.id);
       this.total = Math.max(0, this.total - 1);
       if (this.expandedId === link.id) this.expandedId = null;
@@ -252,7 +297,8 @@ class LinksStore {
       this.picked.delete(link.id);
       return;
     }
-    this.items[i] = { ...link, spark: link.spark ?? prev.spark };
+    const tags = this.tagsLoaded && !this.tagsFailed ? link.tags.filter(id => this.tags.some(tag => tag.id === id)) : link.tags;
+    this.items[i] = { ...link, tags, spark: link.spark ?? prev.spark };
   }
 
   async create(input: LinkInput): Promise<Link> {
@@ -282,7 +328,7 @@ class LinksStore {
 
   private added(link: Link) {
     const filtered = !!this.query || !!this.kind || this.tag !== null || this.sort !== 'created';
-    if (filtered) { this.sort = 'created'; this.clearFilters(); }
+    if (filtered) { this.sort = 'created'; this.clearFilters(); toasts.show(t('created.filtersCleared')); }
     else this.place(link);
     this.flash(link.id);
     this.selectedId = link.id;
@@ -330,6 +376,8 @@ class LinksStore {
 
   /** Delete right away and offer undo; no confirmation dialog. */
   async remove(link: Link) {
+    if (this.stale) return;
+    if (this.editingId === link.id && editor.check?.()) { editor.request(() => { void this.remove(link); }); return; }
     ++this.revision;
     const index = this.items.findIndex((l) => l.id === link.id);
     const neighbor = this.items[index + 1] ?? this.items[index - 1] ?? null;
@@ -360,6 +408,8 @@ class LinksStore {
   }
 
   startPicking() {
+    if (this.stale) return;
+    if (editor.check?.()) { editor.request(() => this.startPicking()); return; }
     this.picking = true;
     this.expandedId = null;
     this.editingId = null;
@@ -373,6 +423,7 @@ class LinksStore {
 
   /** Check or uncheck a link; with range, everything from the last one clicked. */
   togglePick(id: number, range = false) {
+    if (this.stale) return;
     if (!this.picking) this.startPicking();
     const ids = this.items.map((l) => l.id);
     const to = ids.indexOf(id);
@@ -388,6 +439,7 @@ class LinksStore {
 
   /** Check every loaded link, or none when they already are. */
   togglePickAll() {
+    if (this.stale) return;
     const ids = this.items.slice(0, MAX_PICK).map((l) => l.id);
     const all = ids.length > 0 && ids.every((id) => this.picked.has(id));
     this.picked.clear();
@@ -397,7 +449,7 @@ class LinksStore {
   /** Turns the checked links on or off, or deletes them with undo. */
   async bulk(action: Exclude<BulkAction, 'restore'>) {
     const targets = this.items.filter((l) => this.picked.has(l.id));
-    if (!targets.length || this.busy) return;
+    if (!targets.length || this.busy || this.stale) return;
     this.busy = true;
     try {
       if (action === 'delete') await this.bulkDelete(targets);

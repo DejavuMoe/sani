@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "review-r7/content-inventory.json",
+    "inventory": "implementation-r7/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -814,8 +814,12 @@
         ]
       },
       "production": {
-        "routeOrWindow": "/admin/ and /admin/#settings",
+        "routeOrWindow": "/admin/ and /admin/settings",
         "files": [
+          "web/src/components/TagManager.svelte",
+          "web/src/components/LeaveEditorDialog.svelte",
+          "web/src/lib/editor.svelte.ts",
+          "web/src/lib/router.svelte.ts",
           "web/src/components/TagPicker.svelte",
           "web/src/components/TagFilters.svelte",
           "web/src/components/LinkList.svelte",
@@ -825,18 +829,33 @@
           "web/src/components/LinkDetail.svelte",
           "web/src/lib/links.svelte.ts",
           "web/src/views/Settings.svelte",
-          "web/src/lib/i18n.svelte.ts"
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/components/Dialog.svelte",
+          "web/src/components/Summary.svelte",
+          "web/src/tags.css",
+          "internal/store/tags.go",
+          "internal/server/api_tags.go",
+          "internal/server/api.go"
         ],
         "interfaces": [
-          "Existing GET/POST/PATCH /api/tags; DELETE is proposed, not implemented"
+          "GET/POST /api/tags",
+          "PATCH/DELETE /api/tags/{id}",
+          "GET /api/links (cursor pagination)",
+          "GET /api/links/{id}/stats",
+          "GET /api/tokens",
+          "POST /api/import"
         ],
         "tests": [
           "web/e2e/app.spec.ts",
           "web/src/lib/tags.test.ts",
-          "web/src/lib/links.test.ts"
+          "web/src/lib/links.test.ts",
+          "web/e2e/r7.spec.ts",
+          "internal/store/tags_test.go",
+          "internal/server/tags_test.go"
         ]
       },
-      "status": "approved"
+      "status": "implemented",
+      "notes": "Approved design 2cce5c1 implemented in Svelte/Go. WSL make check test e2e passed: 57 Vitest and 79 Chromium cases. Final R7 visual/content captures passed after dialog spacing alignment; docs build and SEO passed. Evidence and limits: r7-handoff.md, implementation-r7/."
     }
   ]
 }

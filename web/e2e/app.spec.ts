@@ -58,7 +58,7 @@ test('first run asks for the setup code and a password, then lands on an empty d
 });
 
 test('a pasted URL becomes a short link on the clipboard', async () => {
-  await page.getByLabel('Long URL').fill('example.com/docs/getting-started?ref=e2e');
+  await page.getByLabel('URL', {exact:true}).fill('example.com/docs/getting-started?ref=e2e');
   await page.keyboard.press('Enter');
   await expect(page.locator('.toast')).toContainText('Copied');
 
@@ -73,19 +73,19 @@ test('a pasted URL becomes a short link on the clipboard', async () => {
 });
 
 test('custom slugs are checked while typing and conflicts are explained', async () => {
-  await page.getByLabel('Long URL').fill('https://github.com/sveltejs/svelte');
+  await page.getByLabel('URL', {exact:true}).fill('https://github.com/sveltejs/svelte');
   await page.locator('#composer-slug').fill('svelte');
   await expect(page.locator('#create-panel-url .options')).toContainText('Available');
   await page.keyboard.press('Enter');
   await expect(page.locator('.row', { hasText: '/svelte' })).toBeVisible();
 
-  await page.getByLabel('Long URL').fill('https://svelte.dev');
+  await page.getByLabel('URL', {exact:true}).fill('https://svelte.dev');
   await page.locator('#composer-slug').fill('SVELTE');
   await expect(page.locator('#create-panel-url .options')).toContainText('Taken');
   await page.getByRole('button', { name: /Shorten/ }).click();
   await expect(page.locator('#composer-error')).toContainText('taken');
   await page.locator('#composer-slug').fill('');
-  await page.getByLabel('Long URL').fill('');
+  await page.getByLabel('URL', {exact:true}).fill('');
 });
 
 test('the destination can be edited and takes effect immediately', async () => {
@@ -144,7 +144,7 @@ test('keyboard: move, copy and open the shortcut sheet', async () => {
 });
 
 test('several links at once: turn off, turn on, delete with undo', async () => {
-  await page.getByRole('button', { name: 'Select several links' }).click();
+  await page.getByRole('button', { name: 'Select multiple items' }).click();
   const bar = page.getByRole('group', { name: 'Bulk actions' });
   await expect(bar).toContainText('Select links');
   await page.getByRole('checkbox', { name: 'Select all loaded links' }).click();
@@ -222,7 +222,7 @@ test('a text is shared at /p/ and served raw from the files origin', async () =>
 });
 
 test('a file is uploaded and downloaded from the files origin', async () => {
-  await page.getByRole('tab', { name: 'File' }).click();
+  await page.getByRole('tab', { name: 'Files', exact: true }).click();
   const panel = page.locator('#create-panel-file');
   await panel.locator('input[type=file]').setInputFiles({
     name: '会议纪要.txt',
@@ -254,7 +254,7 @@ test('a file is uploaded and downloaded from the files origin', async () => {
   await page.getByRole('button', { name: 'Filter by type' }).click();
   await page.getByRole('menuitemradio', { name: 'All types' }).click();
   await expect(page.locator('.row')).toHaveCount(4);
-  await page.getByRole('tab', { name: 'Link' }).click();
+  await page.getByRole('tab', { name: 'Links', exact: true }).click();
 });
 
 test('an API token can create links and be revoked', async () => {
@@ -300,7 +300,7 @@ test('unknown and gone links get a readable page', async () => {
 
 test('tags are created inline, survive refresh and retain the draft after a failed save', async () => {
   await page.goto('/admin/');
-  await page.getByLabel('Long URL').fill('https://example.org/tag-review');
+  await page.getByLabel('URL', {exact:true}).fill('https://example.org/tag-review');
   await page.locator('#composer-slug').fill('review-tags');
   await page.locator('#create-panel-url .tag-add').click();
   const pop = page.locator('.tag-pop:popover-open');
@@ -323,7 +323,7 @@ test('tags are created inline, survive refresh and retain the draft after a fail
     : route.continue());
   await page.locator('#create-panel-url .go').click();
   await expect(page.locator('#create-panel-url [role=alert]')).toBeVisible();
-  await expect(page.getByLabel('Long URL')).toHaveValue('https://example.org/tag-review');
+  await expect(page.getByLabel('URL', {exact:true})).toHaveValue('https://example.org/tag-review');
   await expect(page.locator('#create-panel-url .tag-selected')).toContainText('Review');
   await page.unroute('**/api/links');
   await page.locator('#create-panel-url .go').click();
@@ -346,16 +346,17 @@ test('tag editing, filtering and clearing work together', async () => {
   await page.keyboard.press('e');
   await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: 'Discard changes', exact: true }).click();
   await expect(row.locator('.tags')).toContainText('Review');
   await page.keyboard.press('e');
   await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.row')).toHaveCount(0);
   await expect(filter.locator('.tag-count')).toHaveText('0');
-  await expect(page.getByRole('button', { name: 'Clear filters', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Clear this tag filter', exact: true })).toBeVisible();
 
   // Creating while filtered returns to the complete list, with the new link visible.
-  await page.getByLabel('Long URL').fill('https://example.org/tag-limit');
+  await page.getByLabel('URL', {exact:true}).fill('https://example.org/tag-limit');
   await page.locator('#composer-slug').fill('limit-tags');
   await page.locator('#create-panel-url .tag-add').click();
   const pop = page.locator('.tag-pop:popover-open');
@@ -377,14 +378,14 @@ test('tag editing, filtering and clearing work together', async () => {
   await page.getByRole('button', { name: 'Filter by type' }).click();
   await page.getByRole('menuitemradio', { name: 'Files', exact: true }).click();
   await expect(page.locator('.row')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
+  await page.getByRole('button', { name: 'Clear this tag filter', exact: true }).click();
   await expect(page.locator('.row')).not.toHaveCount(0);
 });
 
 test('tags work for text and multipart file uploads on a phone', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const kind of ['Text', 'File']) {
-    await page.getByRole('tab', { name: kind, exact: true }).click();
+    await page.getByRole('tab', { name: kind === 'File' ? 'Files' : kind, exact: true }).click();
     const panel = page.locator(`#create-panel-${kind.toLowerCase()}`);
     if (kind === 'Text') await panel.getByLabel('Text to share').fill('Tagged mobile note');
     else await panel.locator('input[type=file]').setInputFiles({ name: 'tagged-mobile.txt', mimeType: 'text/plain', buffer: Buffer.from('tagged mobile file') });
@@ -466,7 +467,7 @@ test('external shared URLs need confirmation on desktop and phone', async () => 
       await page.goto('http://external.test/share');
       await page.getByRole('link', { name: 'Open shared page' }).click();
       await expect(page.getByRole('heading', { name: 'Shorten this page' })).toBeVisible();
-      await expect(page.getByLabel('Long URL')).toHaveValue(destination);
+      await expect(page.getByLabel('URL', {exact:true})).toHaveValue(destination);
       await page.getByRole('button', { name: 'More options' }).click();
       await expect(page.locator('#composer-more input').first()).toHaveValue('Review this shared page');
       await page.waitForLoadState('networkidle');
@@ -600,7 +601,7 @@ test('imports the original Shlink CSV shape through Settings', async () => {
 
 test('custom tag colors validate, edit existing references and keep Enter inside the popover', async () => {
   await page.goto('/admin/');
-  const panel = page.getByRole('tabpanel', { name: 'Link', exact: true });
+  const panel = page.getByRole('tabpanel', { name: 'Links', exact: true });
   await panel.getByRole('button', { name: 'Choose or create tags' }).click();
   const pop = page.locator('.tag-pop:popover-open');
   await pop.getByLabel('Search or create a tag').fill('Custom R3');
@@ -612,14 +613,17 @@ test('custom tag colors validate, edit existing references and keep Enter inside
   await color.press('Enter');
   await expect(pop).toBeVisible();
   await pop.locator('.tag-create').click();
-  await pop.getByRole('button', { name: 'Edit tag Custom R3' }).click();
-  await pop.getByLabel('Name', { exact: true }).fill('Custom renamed');
-  await pop.getByLabel('Custom color', { exact: true }).fill('hsl(120, 20%, 40%)');
-  await pop.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(pop.getByRole('button', { name: 'Edit tag Custom renamed' })).toBeFocused();
+  await pop.getByRole('button', { name: 'Manage tags', exact: true }).click();
+  const manager = page.getByRole('dialog', {name:'Manage tags',exact:true});
+  await manager.getByRole('button',{name:'Edit tag Custom R3'}).click();
+  const edit = page.getByRole('dialog',{name:'Edit tag',exact:true});
+  await edit.getByLabel('Name', { exact: true }).fill('Custom renamed');
+  await edit.getByLabel('Custom color', { exact: true }).fill('hsl(120, 20%, 40%)');
+  await edit.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(manager.getByRole('button', { name: 'Edit tag Custom renamed' })).toBeFocused();
   const tags = await (await page.request.get('/api/tags')).json();
   expect(tags.items.find((tag: {name:string}) => tag.name === 'Custom renamed').color).toBe('#527a52');
-  await pop.getByRole('button', { name: 'Done', exact: true }).click();
+  await manager.getByRole('button', {name:'Close',exact:true}).click();
   await expect(panel.locator('.tag-selected')).toContainText('Custom renamed');
 });
 
@@ -645,8 +649,8 @@ test('creation defaults persist and environment metadata stays locked', async ()
 test('large file retries the failed chunk without resending confirmed bytes', async () => {
   test.setTimeout(60000);
   await page.goto('/admin/');
-  await page.getByRole('tab', {name:'File',exact:true}).click();
-  const panel = page.getByRole('tabpanel', {name:'File',exact:true});
+  await page.getByRole('tab', {name:'Files',exact:true}).click();
+  const panel = page.getByRole('tabpanel', {name:'Files',exact:true});
   const bytes = Buffer.alloc(26_000_000, 37);
   const offsets:number[] = [];
   let fail = true;
@@ -680,7 +684,7 @@ test('tabs and settings keep horizontal geometry at desktop and narrow widths', 
     await page.setViewportSize({width,height:860});
     await page.goto('/admin/');
     let left:number|undefined;
-    for (const name of ['Link','Text','File','Link']) {
+    for (const name of ['Links','Text','Files','Links']) {
       const tab = page.getByRole('tab', {name,exact:true});
       await tab.click();
       const x = (await page.getByRole('tablist').boundingBox())!.x;

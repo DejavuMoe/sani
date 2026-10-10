@@ -1,3 +1,4 @@
+import { editor } from './editor.svelte';
 /*
  * A tiny history router. The app lives under /admin/; everything after it
  * is a client route.
@@ -24,16 +25,32 @@ function parse(): { name: RouteName; params: URLSearchParams } {
 class Router {
   current = $state(parse());
 
+  private index = typeof history.state?.saniIndex === 'number' ? history.state.saniIndex : 0;
+  private reverting = false;
   constructor() {
-    addEventListener('popstate', () => (this.current = parse()));
+    history.replaceState({ ...history.state, saniIndex: this.index }, '');
+    addEventListener('popstate', () => {
+      const index = history.state?.saniIndex;
+      if (this.reverting) { this.reverting = false; return; }
+      if (typeof index === 'number' && editor.check?.()) {
+        const delta = index - this.index;
+        if (!delta) return;
+        this.reverting = true;
+        history.go(-delta);
+        editor.request(() => history.go(delta));
+      } else { this.index = typeof index === 'number' ? index : this.index; this.current = parse(); }
+    });
   }
 
   go(to: string, opts: { replace?: boolean } = {}) {
     const url = to.startsWith(BASE) ? to : BASE + to;
     if (url === location.pathname + location.search) return;
-    history[opts.replace ? 'replaceState' : 'pushState'](null, '', url);
-    this.current = parse();
-    if (!opts.replace) scrollTo({ top: 0 });
+    editor.request(() => {
+      if (!opts.replace) this.index++;
+      history[opts.replace ? 'replaceState' : 'pushState']({ saniIndex: this.index }, '', url);
+      this.current = parse();
+      if (!opts.replace) scrollTo({ top: 0 });
+    });
   }
 
   /** onclick handler for in-app anchors: keeps modifier-clicks native. */

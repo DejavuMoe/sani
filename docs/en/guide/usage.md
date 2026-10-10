@@ -26,6 +26,10 @@ Filter by one tag or Untagged alongside search and type filters. Tag counts incl
 
 Tags are private to administrators. Undoing deletion restores assignments. Tag names and colors are also kept in [link exports](./import-export).
 
+Use **Manage tags** above the list or inside the tag picker to search the catalog, show unused tags, edit names/colors globally, or delete a tag. Removing a badge in an item editor only changes that item. Deleting a tag removes all its associations, including those on deleted items, but keeps the content and other tags; it cannot be undone. The confirmation count includes URL links, text and files, including disabled/expired items. The active tag filter is removed after deletion; search and type filters remain. **More tags** keeps a large catalog searchable without filling the toolbar.
+
+Unsaved item edits prompt before leaving: keep editing, discard, or save and leave. A failed save retains the draft. Submission locks the corresponding creation form; file uploads can still be cancelled. Same-query refreshes preserve loaded pages and selection, while changing filters clears selection. Failed query results are not actionable; pagination errors keep loaded items available with a retry action.
+
 ## Slugs {#slugs}
 
 Leave the slug empty and Sani makes one up. By default, generated URL slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. Settings controls the URL length (3–32) and look-alike exclusion; an explicit [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) takes priority and locks the URL length. Shares have independent length settings, described below.

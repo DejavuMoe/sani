@@ -5,7 +5,7 @@
   import { ApiError, UPLOAD_CHUNK_SIZE, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
-  import { errorText, t } from '../lib/i18n.svelte';
+  import { errorText, i18n, t } from '../lib/i18n.svelte';
   import { mod, modEnter } from '../lib/keys';
   import { links } from '../lib/links.svelte';
   import { session } from '../lib/session.svelte';
@@ -59,6 +59,7 @@
 
   /** Called by the page for text pasted outside any field. */
   export async function fillText(s: string) {
+    if (busy) return;
     text = s;
     error = null;
     note = t('share.pasted', { keys: `${mod} ↵` });
@@ -210,6 +211,7 @@
   onsubmit={submit}
   novalidate
 >
+  <fieldset class="form-lock" disabled={busy}>
   {#if mode === 'text'}
     <label class="sr-only" for="{id}-body">{t('share.textLabel')}</label>
     <textarea
@@ -254,7 +256,7 @@
       }}
     >
       {#if !filesOn}
-        <p class="off"><Icon name="lock" size={16} />{t('share.fileDisabled')}</p>
+        <p class="off"><Icon name="lock" size={16} />{t('share.fileDisabled')} <a href={i18n.lang === 'zh' ? 'https://sani.zsh.moe/guide/deploy#files-domain' : 'https://sani.zsh.moe/en/guide/deploy#files-domain'} target="_blank" rel="noopener">{t('share.configGuide')}</a></p>
       {:else if file}
         <div class="picked">
           <span class="ficon"><Icon name="file" size={18} /></span>
@@ -262,11 +264,7 @@
             <span class="fname">{file.name}</span>
             <span class="fmeta">{formatSize(file.size)}{file.type ? ` · ${file.type}` : ''}</span>
           </span>
-          {#if busy && progress !== null}
-            <button type="button" class="x" aria-label={t('share.cancel')} use:tooltip={t('share.cancel')} onclick={() => upload?.abort()}>
-              <Icon name="x" />
-            </button>
-          {:else}
+          {#if !(busy && progress !== null)}
             <button
               type="button"
               class="x"
@@ -348,7 +346,7 @@
     {/if}
     <ExpiryPicker bind:value={expiry} triggerClass="opt" />
     <button type="button" class="opt" aria-expanded={more} aria-controls="{id}-more" onclick={() => (more = !more)}>
-      {more ? t('composer.less') : t('composer.more')}
+      {more ? t('composer.less') : t('composer.more')}{#if title.trim() || maxClicks.trim()}<span class="more-count">{Number(!!title.trim()) + Number(!!maxClicks.trim())}</span>{/if}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
     <button class="go" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
@@ -377,6 +375,14 @@
       </label>
     </div>
   {/if}
+  {#if maxClicks.trim() || ('at' in expiry || expiry.preset !== 'never')}
+  <div class="access-rules">
+    {#if maxClicks.trim()}<p>{t(mode === 'text' ? 'rules.text' : 'rules.file')}</p>{/if}
+    {#if ('at' in expiry || expiry.preset !== 'never')}<p>{t('rules.expiry')}</p>{/if}
+  </div>
+  {/if}
+  </fieldset>
+  {#if busy && progress !== null}<button type="button" class="cancel-upload" onclick={() => upload?.abort()}>{t('share.cancel')}</button>{/if}
 </form>
 
 {#if mode === 'file' && file && file.size > UPLOAD_CHUNK_SIZE}<p class="chunk-hint">{t('share.chunked')}</p>{/if}
@@ -387,6 +393,8 @@
 {/if}
 
 <style>
+  .cancel-upload { display:block; margin:10px 16px; color:var(--danger); font-size:13px; }
+  .off a { color:var(--accent); }
   .composer {
     border: 1px solid var(--line-2);
     border-radius: var(--radius-lg);

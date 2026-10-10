@@ -1,6 +1,6 @@
 # R7 — 管理闭环与失败恢复
 
-日期：2026-10-10。状态：**approved，用户已批准并授权实施（2026-10-10），实施进行中**。
+日期：2026-10-10。状态：**approved，用户已批准并授权实施（2026-10-10），生产实施与本地验证完成**。
 
 ## 入口与基线
 
@@ -8,7 +8,7 @@
 - [完整原型](http://127.0.0.1:4311/sani/prototype-r7.html?scene=r7-dashboard&lang=zh&theme=light&chrome=0)。移除 `chrome=0` 可打开场景面板；`lang=en`、`theme=dark` 切换语言与主题；`latency=3000` 模拟慢请求。
 - 来源：用户指定的 ChatGPT 评估 `6ac979bc-a4ac-83e8-a0dd-c1004e7fc7b1`。评估属于问题线索，行为以当前源码核对为准；原会话两张图片未随预览提供，本轮不声称复现截图细节。
 - 源码基线：`934c5f0` / v0.9.3。视觉基线：已批准并实施的 R6（批准 `a4a77b7`，实施 `480c707`，响应式修正 `0b9b1bd`）。保留原有字体、令牌、布局、控件体系。R4 未批准方向不进入本轮。
-- 范围仅 `designs/sani/**`；R1–R6 原型保持原样。本轮未改生产源码、接口、数据库、发布配置或部署。
+- 原型阶段仅修改 `designs/sani/**`；R1–R6 原型保持原样。用户批准后已完成 Svelte/Go 实施，详见文末。未发布或部署。
 
 启动预览（Windows 仓库根目录）：
 
@@ -65,7 +65,7 @@ python -m http.server 4311 --bind 127.0.0.1 --directory designs
 
 用户可直接对 R7 的入口、删除确认文案、锁定表单方案、离开编辑的三项选择以及错误状态提出修改；`_d_meta.json` 中 R7 已由用户批准为 `approved`。
 
-## 验证证据与边界
+## 原型阶段验证证据与边界（历史记录）
 
 - Windows：`node designs/sani/tools/r7-check.mjs` 校验局部依赖、全部 R7 JSX/JS 语法、R6/R7 审批状态及保存的浏览器检查。
 - 工作流：`validate_workflow.py contract --project-dir designs/sani --phase draft`、`sources`、`design-scope`；内容清单单独用 `content_audit.py check` 验证。R7 独立内容清单通过（897 条）；24 条 dom-metadata 提示已逐项检查，来自数值 ID、主题/状态选择器及复制操作，保留提示以呈现采集边界。内容允许出现不代表用户已批准文案。
@@ -78,3 +78,31 @@ python -m http.server 4311 --bind 127.0.0.1 --directory designs
 ## 文件组织
 
 `prototype-r7.html` 复用既有设计系统和共享层；`src/r7/` 保存本轮差异层（store、patterns、tags、screens、detail、app）及管理/状态/文案/场景补充。`review-r7.html` 是评审导航，不属于产品界面。README 修正 R5/R6 历史状态并增加 R7。`ui-contract.json` 与 `design-sources.json` 记录新增表面和来源；内容清单留在 R7 证据目录，避免改写 R6 审批时的清单。
+
+## 生产实施完成（2026-10-10）
+
+批准提交：`2cce5c12e1bd97f4009abf695679345ad685b37e`。用户明确批准当前 R7 并授权实施；原型与审批文件保留在独立设计提交中。生产实现复用 Svelte、现有 Dialog/Segmented/ColorEditor 和 Go/SQLite，未增加依赖或 schema 迁移。
+
+| 批准场景 | 生产实现与路由 | 验证 |
+|---|---|---|
+| 标签管理、删除、精确 Enter、更多筛选 | `/admin/`；TagManager、TagPicker、TagFilters；新增 `DELETE /api/tags/{id}` | Go store 事务回滚、单调版本、软删除后恢复；API 鉴权/跨站阻断；链接/文本/文件保留；E2E 失败重试、NFC/大小写、键盘焦点 |
+| 提交草稿保护 | Composer、ShareComposer 的提交字段锁定，上传取消保留文件 | 慢请求、失败保留草稿、取消上传；既有分片失败重试 |
+| 未保存编辑 | LinkEditor、editor store、router、LeaveEditorDialog | Escape、设置、搜索、浏览器后退；继续/放弃/保存，保存失败保留正文；浏览器关闭注册 beforeunload |
+| 列表与统计失败恢复 | Links store、LinkList、LinkDetail、Summary | 230 条跨 cursor 刷新与多选保留；中途失败原子保留；查询失败阻止旧列表操作；统计旧范围与重试 |
+| 令牌与导入导出 | `/admin/settings`；Settings | 令牌失败数量未知并禁用创建；重试；下载文件验证包含全部 27 条跳过项 |
+| 术语、空态、访问与备份说明 | i18n、创建/详情/设置及中英文 usage/import-export/API/changelog | 类型检查与双语文档同步；实际 DOM 内容清单；桌面/窄屏截图 |
+
+实现中的补充保护：全局删除当前筛选标签只清掉该条件，保留搜索和类型；删除触发刷新不卸载尚未保存的编辑器。迟到的详情响应不能把已删除标签重新放回列表。编辑器的行在后台消失或不再匹配时先保留草稿；显式删除当前编辑内容也经过同一离开守卫。
+
+最终验证均在 Windows 源码同步后的 Debian WSL 构建镜像执行：
+
+- `make check test e2e`：通过。Svelte **0 errors / 0 warnings**；Go vet、race 测试、文档同步与前端 **57** 个单元测试通过；Chromium **79** 条 E2E 全通过，无跳过。
+- 后续只修正初次列表错误的重复提示、空统计的失败可见性及 R7 子弹窗间距，并增加内容采集；重新执行 `make check build` 与 R7 **10** 条 E2E，全部通过。
+- `make docs`：通过，36 个页面的 SEO、语言切换、sitemap、robots 与 404 校验通过。
+- 视觉与交互：管理器/编辑弹窗在中文浅色 1280、英文浅色 1280、英文深色 390、中文深色 320 通过 axe 与水平溢出检查；既有 R5/R6 中英文、明暗主题、鼠标/触屏模拟覆盖随完整 E2E 通过。axe 在弹窗动画完成后采样，避免把过渡透明度误判为最终对比度。
+- Codex 浏览器实测：独立 localhost 演示实例的标签创建、管理入口、键盘进入编辑、颜色保存及焦点返回；连续编辑不同标签不串用颜色。核对桌面与 320px 布局，控制台未发现 error/warn。保存 `production-tags-desktop.png`；窄屏图使用 Playwright 原生尺寸截图。
+- `content_audit.py check --inventory designs/sani/implementation-r7/content-inventory.json`：**494** 条渲染字符串完成分类；9 条 `dom-metadata` 提示来自数据 ID/主题/复制操作属性，已检查并保留提示。原始 DOM 均来自合成测试夹具，覆盖管理/编辑/删除错误、离开确认、筛选失败、统计旧范围、令牌失败、导入结果和上传状态。
+
+截图、16 份 DOM 采集及生产内容清单位于 `implementation-r7/`；`review-r7/` 保留原型阶段证据。对照批准稿复核了管理器与子弹窗的字体、间距、颜色、按钮、提示及窄屏换行。数据量不同会自然改变弹窗高度；这是实际数据，未复制原型假数据进入生产代码。
+
+验证边界：没有远程 CI、发布、镜像推送或实例部署；没有改动用户生产数据。没有运行真实手机/真实中文输入法、屏幕阅读器或 Firefox/WebKit；浏览器原生关闭确认未做自动化验证。未改变重定向热路径，因此本轮未重新运行 bench/load；备份和过期语义只更新解释，没有执行实际运维操作。暂缓项仍按上文保持暂缓。

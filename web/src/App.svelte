@@ -1,4 +1,6 @@
 <script lang="ts">
+  import TagManager from './components/TagManager.svelte';
+  import LeaveEditorDialog from './components/LeaveEditorDialog.svelte';
   import Button from './components/Button.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import Toaster from './components/Toaster.svelte';
@@ -32,6 +34,8 @@
     <Dashboard />
   {/if}
   <ShortcutsDialog />
+  <TagManager />
+  <LeaveEditorDialog />
 {/if}
 
 <Toaster />

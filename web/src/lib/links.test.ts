@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, type Link } from './api';
 import { links } from './links.svelte';
+import { editor } from './editor.svelte';
 
 vi.mock('./api', async (original) => ({
   ...await original<typeof import('./api')>(),
-  api: Object.fromEntries(['links', 'updateLink', 'deleteLink', 'restoreLink', 'bulk', 'createLink', 'tags', 'overview'].map(name => [name, vi.fn()])),
+  api: Object.fromEntries(['links', 'updateLink', 'deleteLink', 'restoreLink', 'bulk', 'createLink', 'tags', 'overview', 'deleteTag'].map(name => [name, vi.fn()])),
 }));
 vi.mock('./toast.svelte', () => ({ toasts: { show: vi.fn(), error: vi.fn() } }));
 vi.mock('./i18n.svelte', () => ({ t: (key: string) => key, errorText: (key: string) => key }));
@@ -25,10 +26,13 @@ function held<T>() {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  editor.check = editor.save = editor.pending = null; editor.saving = false;
+  links.editingId = links.expandedId = null;
+  links.tagsLoaded = links.tagsFailed = false;
   links.items = [{ ...old }];
   links.total = 1;
   links.loaded = true;
-  links.loading = links.loadingMore = false;
+  links.loading = links.loadingMore = links.failed = links.refreshFailed = links.refreshing = links.moreFailed = false;
   links.query = '';
   links.kind = links.tag = null;
   links.sort = 'created';
@@ -52,8 +56,8 @@ describe('lists racing local writes', () => {
       expect(links.items[0].title).toBe('Saved');
       expect(links.loading).toBe(false);
     });
-    expect(api.links).toHaveBeenCalledTimes(mode === 'refresh' ? 1 : 2);
-    expect(links.items[0].clicks).toBe(mode === 'refresh' ? 0 : 17);
+    expect(api.links).toHaveBeenCalledTimes(mode === 'load' ? 2 : 1);
+    expect(links.items[0].clicks).toBe(mode === 'load' ? 17 : 0);
   });
 
   it.each(['single', 'bulk'] as const)('a stale refresh cannot resurrect a %s deletion', async (mode) => {
@@ -152,5 +156,59 @@ describe('lists racing local writes', () => {
     await pending;
     expect(links.items).toEqual([old, other]);
     expect(links.total).toBe(2);
+  });
+});
+
+
+describe('management state recovery', () => {
+  it('protects a dirty row from background removal and explicit deletion', async () => {
+    links.tag = 1; links.expandedId = 1; links.editingId = 1;
+    editor.check = () => true;
+    links.upsert({...fresh,tags:[]});
+    expect(links.items).toHaveLength(1);expect(links.refreshFailed).toBe(true);
+    vi.mocked(api.links).mockResolvedValue(list([]));
+    await links.refresh();expect(links.items).toHaveLength(1);
+    await links.remove(old);expect(api.deleteLink).not.toHaveBeenCalled();expect(editor.pending).not.toBeNull();
+    editor.leave();await vi.waitFor(() => expect(api.deleteLink).toHaveBeenCalledWith(1));
+  });
+  it('refreshes every loaded cursor page while keeping selection under a tag filter', async () => {
+    const items = Array.from({length:230},(_,i)=>({...old,id:i+1,slug:`item-${i}`}));
+    links.items=items; links.total=250; links.next='old-cursor'; links.tag=1;
+    links.startPicking(); links.picked.add(220);
+    vi.mocked(api.links).mockResolvedValueOnce({items:items.slice(0,200),total:250,next:'page-2'})
+      .mockResolvedValueOnce({items:items.slice(200),total:250,next:'page-3'});
+    await links.refresh();
+    expect(links.items).toHaveLength(230); expect([...links.picked]).toEqual([220]);
+    expect(api.links).toHaveBeenLastCalledWith(expect.objectContaining({tag:1,cursor:'page-2',limit:30}));
+    expect(links.next).toBe('page-3');
+  });
+  it('keeps all old pages when a refresh fails midway and retries without losing selection', async () => {
+    links.items=Array.from({length:210},(_,i)=>({...old,id:i+1}));
+    const saved=links.items; links.startPicking();links.picked.add(200);
+    vi.mocked(api.links).mockResolvedValueOnce({items:saved.slice(0,200),total:210,next:'second'}).mockRejectedValueOnce(new Error('offline'));
+    await links.refresh(); expect(links.refreshFailed).toBe(true);expect(links.items).toEqual(saved);expect(links.picked.has(200)).toBe(true);
+    vi.mocked(api.links).mockResolvedValue({items:[old],total:1,next:null});
+    await links.refresh();expect(links.refreshFailed).toBe(false);expect(links.picked.size).toBe(0);
+  });
+  it('query failures block stale bulk writes and next-page failures keep the cursor for retry', async () => {
+    links.startPicking();links.picked.add(1);
+    vi.mocked(api.links).mockRejectedValueOnce(new Error('offline'));
+    await links.load();await links.bulk('delete');expect(api.bulk).not.toHaveBeenCalled();expect(links.failed).toBe(true);
+    vi.mocked(api.links).mockResolvedValueOnce({items:[old],total:2,next:'page-2'});
+    await links.load();expect(links.failed).toBe(false);
+    vi.mocked(api.links).mockRejectedValueOnce(new Error('offline'));
+    await links.loadMore();expect(links.moreFailed).toBe(true);expect(links.next).toBe('page-2');expect(links.items).toHaveLength(1);
+    vi.mocked(api.links).mockResolvedValueOnce({items:[{...old,id:2}],total:2,next:null});
+    await links.loadMore();expect(links.moreFailed).toBe(false);expect(links.items).toHaveLength(2);
+  });
+  it('failed tag deletion leaves associations and filters unchanged', async () => {
+    links.tag=1;links.kind='url';links.query='old';
+    links.tags=[{id:1,name:'tag',color:'blue',count:1}];
+    vi.mocked(api.deleteTag).mockRejectedValueOnce(new Error('offline'));
+    await expect(links.deleteTag(1)).rejects.toThrow('offline');
+    expect(links.tag).toBe(1);expect(links.items[0].tags).toEqual([1]);expect(links.tags).toHaveLength(1);
+    vi.mocked(api.deleteTag).mockResolvedValueOnce();
+    vi.mocked(api.links).mockResolvedValueOnce(list([{...old,tags:[]}])) ;
+    await links.deleteTag(1);expect(links.tag).toBeNull();expect(links.kind).toBe('url');expect(links.query).toBe('old');expect(links.items[0].tags).toEqual([]);
   });
 });

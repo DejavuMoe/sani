@@ -1,12 +1,13 @@
 <script lang="ts">
   import { formatNumber, t } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
+  import Button from './Button.svelte';
   import MiniBars from './MiniBars.svelte';
 
   const o = $derived(links.overview);
 </script>
 
-{#if !o || o.links > 0}
+{#if !o || o.links > 0 || links.overviewFailed}
 <section class="summary" aria-label={t('summary.chart')}>
   <dl>
     <div>
@@ -28,10 +29,15 @@
       </div>
     {/if}
   </dl>
+  <details class="scope"><summary>{t('summary.scope')}</summary><p>{t('summary.scopeHint')}</p></details>
+  {#if links.overviewFailed}<div class="state-notice error" role="alert"><span>{t('summary.failed')}</span><Button size="sm" onclick={()=>links.refreshOverview()}>{t('act.retry')}</Button></div>{/if}
 </section>
 {/if}
 
 <style>
+  .scope { margin-top:12px; color:var(--text-3); font-size:11px; }
+  .scope summary { cursor:pointer; width:fit-content; }
+  .scope p { max-width:560px; margin-top:6px; line-height:1.7; }
   .summary {
     padding: 0 4px;
   }
