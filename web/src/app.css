@@ -8,9 +8,12 @@
  */
 
 :root {
-  --control-compact: 32px;
-  --control-field: 36px;
-  --control-option: 38px;
+  --control-compact: 28px;
+  --control-field: 32px;
+  --control-option: 36px;
+  --control-large: 36px;
+  --control-size: var(--control-compact);
+  --input-font-size: 13px;
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC",
     "Noto Sans SC", sans-serif;
@@ -18,8 +21,8 @@
     "PingFang SC", "Microsoft YaHei", monospace;
 
   --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius: 8px;
+  --radius-sm: 5px;
+  --radius: 7px;
   --radius-lg: 12px;
 
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -212,12 +215,14 @@ textarea::placeholder {
   display: block;
   width: 100%;
   height: var(--control-field);
-  padding: 0 11px;
+  min-height: max(var(--control-field), calc(1lh + 8px));
+  padding: 0 10px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
-  font-size: var(--input-font-size, 14px);
+  font-size: var(--input-font-size);
+  line-height: 1.5;
   transition:
     border-color var(--fast) var(--ease),
     box-shadow var(--fast) var(--ease);
@@ -226,6 +231,9 @@ textarea::placeholder {
 .field:hover {
   border-color: color-mix(in oklab, var(--line-2), var(--text-3) 30%);
 }
+
+.field:disabled { color: var(--text-3); background: var(--surface-2); cursor: default; opacity: 1; }
+:lang(zh) .hint, :lang(zh) .error-text { line-height: 1.7; }
 
 .field:focus,
 .field:focus-visible {
@@ -295,13 +303,21 @@ kbd {
 @media (max-width: 640px), (pointer: coarse) {
   :root {
     --input-font-size: 16px;
-    --control-compact: 44px;
-    --control-field: 44px;
+    --control-compact: 36px;
+    --control-field: 40px;
+    --control-large: 40px;
     --control-option: 44px;
+  }
+
+  .btn, .seg > button, .tag-filter, .tag-add, .tag-done, .opt, .dialog-close { position: relative; }
+  .btn::after, .seg > button::after, .tag-filter::after, .tag-add::after, .tag-done::after, .opt::after, .dialog-close::after {
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled) { transform: none !important; }
   *,
   *::before,
   *::after {

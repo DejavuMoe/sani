@@ -2,6 +2,7 @@
   import { tooltip } from '../lib/tooltip';
   import { onDestroy, tick } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
   import { ApiError, UPLOAD_CHUNK_SIZE, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
@@ -358,7 +359,7 @@
 
   <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy || (mode === 'file' && !filesOn)} />
   {#if more}
-    <div class="more" id="{id}-more" transition:slide={{ duration: 180 }}>
+    <div class="more" id="{id}-more" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}>
       <label class="cell grow">
         <span class="k">{t('composer.title')}</span>
         <input class="inline" bind:value={title} placeholder={t('share.optional')} maxlength="300" />

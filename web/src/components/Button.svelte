@@ -28,6 +28,9 @@
   }: Props = $props();
 
   const iconSize = $derived(size === 'sm' ? 14 : 16);
+  let busyWidth = $state<number>();
+  // Preserve the idle width even when a caller changes its label during a request.
+  $effect.pre(() => { busyWidth = loading && el ? el.getBoundingClientRect().width : undefined; });
 </script>
 
 <button
@@ -36,11 +39,13 @@
   class={['btn', variant, size, !children && 'square', cls]}
   disabled={disabled || loading}
   aria-busy={loading || undefined}
+  style:width={busyWidth === undefined ? undefined : `${busyWidth}px`}
   {...rest}
 >
   {#if loading}
     <span class="spinner" style:width="{iconSize - 2}px" style:height="{iconSize - 2}px" aria-hidden="true"></span>
-  {:else if icon}
+  {/if}
+  {#if icon}
     <Icon name={icon} size={iconSize} />
   {/if}
   {#if children}<span class="text">{@render children()}</span>{/if}
@@ -55,14 +60,16 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    height: var(--control-compact);
-    padding: 0 12px;
+    min-height: max(var(--control-size), calc(1lh + 8px));
+    max-width: 100%;
+    padding: 3px 10px;
     border: 1px solid transparent;
     border-radius: var(--radius);
     font-size: 13px;
     font-weight: 500;
-    line-height: 1;
-    white-space: nowrap;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: center;
     user-select: none;
     transition:
       background-color var(--fast) var(--ease),
@@ -72,18 +79,25 @@
   }
 
   .btn:active:not(:disabled) {
-    transform: translateY(0.5px);
+    transform: translateY(1px);
   }
 
   .btn:disabled {
-    opacity: 0.45;
+    color: var(--text-3);
+    background: var(--surface-2);
+    border-color: var(--line);
   }
 
   .btn[aria-busy='true'] {
-    opacity: 0.8;
+    cursor: progress;
   }
+  .ghost:disabled, .danger:disabled { background: transparent; border-color: transparent; }
+  .btn[aria-busy='true'] > .spinner { position: absolute; inset: 0; margin: auto; }
+  .btn[aria-busy='true'] > .text, .btn[aria-busy='true'] :global(.icon) { opacity: 0; }
+  .btn[aria-busy='true'] > .text { white-space: nowrap; }
 
   .text {
+    min-width: 0;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -140,13 +154,12 @@
     background: var(--danger-soft);
   }
 
-  .sm { padding: 0 9px; }
-  .lg { padding: 0 16px; }
-  .square { width: var(--control-compact); padding: 0; }
+  .lg { --control-size: var(--control-large); }
+  .square { width: var(--control-size); min-width: var(--control-size); padding: 0; }
 
   .btn :global(.end) {
     margin-right: -3px;
-    opacity: 0.7;
+    color: var(--text-3);
   }
 
   .spinner {

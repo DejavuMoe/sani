@@ -1033,28 +1033,38 @@
         "routeOrWindow": "/admin/",
         "files": [
           "web/src/app.css",
+          "web/src/tags.css",
           "web/src/components/Button.svelte",
           "web/src/components/Segmented.svelte",
-          "web/src/components/Menu.svelte",
-          "web/src/views/Settings.svelte",
-          "web/src/components/TagManager.svelte",
-          "web/src/components/TagPicker.svelte",
-          "web/src/components/ShareComposer.svelte",
           "web/src/components/UnitInput.svelte",
+          "web/src/components/Menu.svelte",
+          "web/src/components/MenuItem.svelte",
+          "web/src/components/Dialog.svelte",
+          "web/src/components/Switch.svelte",
+          "web/src/components/Toaster.svelte",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/LinkEditor.svelte",
+          "web/src/components/LinkList.svelte",
+          "web/src/components/DateEditor.svelte",
           "web/src/components/MetadataSettings.svelte",
-          "web/src/tags.css"
+          "web/src/views/Settings.svelte",
+          "web/src/views/Login.svelte",
+          "web/src/views/Setup.svelte"
         ],
         "interfaces": [
           "Existing Sani admin API; no backend contract change proposed"
         ],
         "tests": [
           "web/e2e/r7.spec.ts",
-          "web/e2e/r10.spec.ts",
           "web/e2e/r6.spec.ts",
-          "web/e2e/metadata.spec.ts"
+          "web/e2e/metadata.spec.ts",
+          "web/e2e/app.spec.ts",
+          "web/scripts/a11y.mjs"
         ]
       },
-      "status": "approved"
+      "status": "implemented",
+      "notes": "Approved in ead108e; Svelte implementation and verification recorded in implementation-r10/verification.json and r10-handoff.md."
     }
   ]
 }

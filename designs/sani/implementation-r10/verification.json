@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "designCommit": "ead108e399f522428a194c8a67b889c97f5fa8e5",
+  "prototype": "prototype-r10.html",
+  "environment": "Canonical Windows source; Debian WSL2 build mirror; Chromium; Docker Desktop WSL2",
+  "checks": [
+    {
+      "command": "make check test e2e VERSION=dev-r10",
+      "result": "passed; Svelte 0 errors/warnings, Go race tests, frontend tests, 86 Playwright tests"
+    },
+    {
+      "command": "make smoke; OLD_BIN=/tmp/sani-v094-verified/sani make upgrade-drill",
+      "result": "passed; verified published v0.9.4 binary, schema 5 to 6, preserved credentials/IDs/URLs/file bytes, repeat startup, preflight rejection and full snapshot rollback"
+    },
+    {
+      "command": "docker build --build-arg VERSION=dev-r10 -t sani:r10-local .; bash scripts/test-docker-storage.sh sani:r10-local /tmp/sani-v094-verified/sani",
+      "result": "passed; UID 65532, bind storage, recreation, permissions, restart, read-only database, real tmpfs ENOSPC over three starts, complete snapshot rollback"
+    },
+    {
+      "command": "SANI_URL=http://127.0.0.1:18880 SANI_FRESH_URL=http://127.0.0.1:18881 pnpm --dir web a11y",
+      "result": "88 clean states, both languages/themes, setup/login/admin/visitor pages"
+    },
+    {
+      "command": "content_audit.py check --inventory designs/sani/implementation-r10/content-inventory.json",
+      "result": "573 classified strings, 0 errors, 16 reviewed DOM metadata warnings"
+    }
+  ],
+  "browserInspection": {
+    "platform": "Windows Codex in-app browser, actual Svelte app",
+    "number": {
+      "fontSize": "13px",
+      "fontWeight": "400",
+      "textAlign": "start",
+      "width": 56,
+      "height": 32
+    },
+    "interactions": [
+      "sign-in",
+      "settings",
+      "HTTP proxy selection",
+      "Home/End to Direct/SOCKS5",
+      "English switch"
+    ],
+    "consoleErrors": []
+  },
+  "fixesFromValidation": [
+    "Reserve non-overlapping 44px switch targets in compact proxy rows",
+    "Use Svelte prefersReducedMotion for script-driven transitions",
+    "Reset menu label/hint margins so form typography does not misalign menu text"
+  ],
+  "limitations": [
+    "Docker Desktop creates absent mount paths; missing-directory rejection is reserved for native Linux CI.",
+    "Chromium emulation and enlarged control text do not establish Safari/Firefox, physical phone, screen reader or browser zoom acceptance.",
+    "Docker Hub cached credentials failed; public image build succeeded with an isolated empty DOCKER_CONFIG. User credentials were unchanged."
+  ],
+  "sourceHashes": {
+    "web/src/app.css": "33eb97807068e0f3ec224ccd9a2ce803ac52d85c05e0a5965d959ddef64f8bad",
+    "web/src/tags.css": "d2879e0a538b6b21b74b9cfd68991572cec9f05600d026534529297518d8b936",
+    "web/src/components/Button.svelte": "11dd38833bb8d553e465789fd12b65f911f713051f9e15d6ab0f64fdae7c2da5",
+    "web/src/components/Segmented.svelte": "6f20fa2525a0f3d67a7f029d73e9949ed969f33c3e8815b4d382e1fadab1734c",
+    "web/src/components/UnitInput.svelte": "6a1e46f3f1f21434acc1629749c4285439bbff14512fc4435d6b2c9fdd7556c7",
+    "web/src/components/Menu.svelte": "7ae4a328be4b10c9b3b6447a74f2d61a51c346999605ac4adb5e8decf2168490",
+    "web/src/components/MenuItem.svelte": "4c18896d978cb9d704d0344e173eede422eb9b00621e7ef2ae5d60a7ada70318",
+    "web/src/components/Dialog.svelte": "fd80df0af6e3d09469c7fd37e2946f7454310b2a2d9c926a294e1896c02e4b02",
+    "web/src/components/Switch.svelte": "8e24c097b3d7e4acda4a15b34b433ad6c844727e057ff698c32c0009b3022657",
+    "web/src/components/Toaster.svelte": "56436e45a4bc4a7e182b80a3c0e2a6e7c56bc6d1d74a9d1c56967e90041313ad",
+    "web/src/components/Composer.svelte": "9686ae49b494385bf070cc0a0822c98c7f84c2a0fe6f3f4944b0fc9b941db746",
+    "web/src/components/ShareComposer.svelte": "fd90bf2cbdab7b33337a6a6d255d40a57ef4149c614ebfb7d26ada9f05884a94",
+    "web/src/components/LinkEditor.svelte": "6081a0142503a1fa27ded0469b50d9a1092b38784551ddf3a9906945ed014d00",
+    "web/src/components/LinkList.svelte": "42837858c9ccbab4f3e52f3a0095291d78efe58594e17381002d5486e2a2fe88",
+    "web/src/components/DateEditor.svelte": "e87a75b34ae102a623d6a1d19ab5f193ade1fb82af0f52cad5ee3dfb6cb167de",
+    "web/src/components/MetadataSettings.svelte": "f83a22e322e1b5c7e22cda863007c650d6de6485a12e188b1d981e65e1017b64",
+    "web/src/views/Settings.svelte": "44ad09426bbd04a51793942285e2d90e39853a1361ed0fed2f544612cf231f20",
+    "web/src/views/Login.svelte": "03a2f813cef0679c33ad4bc0a435ef1ad4c0230a5035993ad76303e57eb40036",
+    "web/src/views/Setup.svelte": "0a78e5c07f3df54fe6358ce9777d6a4a012af67e5e1a33fa911311b024d7bdbe"
+  },
+  "sourceHashEncoding": "UTF-8 with LF line endings"
+}

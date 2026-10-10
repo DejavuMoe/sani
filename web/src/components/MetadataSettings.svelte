@@ -113,34 +113,41 @@
 </form>
 
 <style>
-  .metadata-form { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .metadata-form { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .hint, .error-text { margin: 0; line-height: 1.6; }
-  .setting { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .setting label { font-size: 13px; font-weight: 500; }
   .setting .hint { margin-top: 6px; }
-  .setting :global(.switch) { flex: none; margin-top: 2px; }
-  .connection { display: grid; gap: 14px; padding: 0; margin: 0; min-width: 0; border: 0; }
+  .setting :global(.switch) { flex: none; margin-top: 0; }
+  .connection { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; padding: 0; margin: 0; min-width: 0; border: 0; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .k, .input label { font-size: 13px; color: var(--text-2); }
+  .k { font-size: 13px; color: var(--text-2); }
+  .input label { font-size: 12px; color: var(--text-2); }
   .route :global(.seg) { flex: none; }
-  .route :global(.seg button) { min-width: 72px; }
-  .address { display: grid; grid-template-columns: minmax(0,1fr) 88px; gap: 12px; }
-  .input { display: grid; gap: 6px; min-width: 0; align-content: start; }
+  .route :global(.seg button) { min-width: 0; padding-inline: 12px; }
+  .address { display: grid; grid-template-columns: minmax(0,1fr) 88px; gap: 10px; }
+  .input { display: grid; gap: 5px; min-width: 0; align-content: start; }
   .input .field { min-width: 0; width: 100%; }
   .option { min-height: 28px; }
   .option .hint { text-align: right; }
-  .auth-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+  .auth-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
   .secret { display: flex; align-items: center; gap: 4px; min-height: var(--control-field); }
   .secret .field { flex: 1; }
-  .secret :global(.btn) { height: var(--control-field); }
+  .secret { --control-size: var(--control-field); }
+  .stored { gap: 8px; }
   .stored .hint { margin-right: auto; }
   .actions { display: flex; align-items: center; gap: 8px; }
   [role='status']:empty { display: none; }
-  @media (max-width: 720px) { .route { flex-direction: column; align-items: flex-start; gap: 8px; } }
+  @media (max-width: 720px) { .route { flex-wrap: wrap; gap: 8px 16px; } }
   @media (max-width: 640px) {
-    .route :global(.seg) { width: 100%; }
-    .route :global(.seg button) { flex: 1; min-width: 0; }
+    .route :global(.seg) { width: max-content; }
+    .route :global(.seg button) { flex: none; padding-inline: 11px; }
+    .stored { flex-wrap: wrap; }
     .address { grid-template-columns: minmax(0,1fr) 76px; }
     .auth-fields { grid-template-columns: minmax(0,1fr); }
+  }
+  @media (max-width: 640px), (pointer: coarse) {
+    /* Leave room for the switches' 44px hit areas without overlapping rows. */
+    .option { min-height: 32px; }
   }
 </style>

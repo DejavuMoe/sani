@@ -43,19 +43,20 @@
     gap: 10px;
     width: 100%;
     min-height: var(--control-option);
-    padding: 0 10px;
+    padding: 6px 10px;
     border-radius: var(--radius-sm);
     color: var(--text);
     font-size: 13px;
     text-align: left;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.4;
   }
 
   .item:hover,
   .item:focus-visible {
-    outline: none;
     background: var(--surface-2);
   }
+  .item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
   :global([data-theme='dark']) .item:hover,
   :global([data-theme='dark']) .item:focus-visible {
@@ -68,9 +69,12 @@
 
   .label {
     flex: 1;
+    margin: 0;
+    font-weight: 400;
   }
 
   .hint {
+    margin: 0;
     color: var(--text-3);
     font-size: 12px;
   }

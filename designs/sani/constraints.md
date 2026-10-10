@@ -60,7 +60,7 @@ They do not replace those files.
 
 - Typography: Inter Variable for text, IBM Plex Mono for slugs, URLs and code. Chinese uses the system CJK fonts in `--font-sans`. Body text is 14px.
 - Density and layout: one 920px column with hairline-separated surfaces. Shadows only on floating layers (menus, dialogs, toasts). One accent on warm neutrals.
-- 新设置沿用现有的行布局、控件尺寸和间距；不为几个字段新增嵌套卡片、大块保底高度或重复的选择层级。互斥选项使用同一组 Segmented，按钮文字居中。同一行输入框与操作按钮必须等高、顶边对齐；桌面为 36px，窄屏触控为 44px。独立按钮保留原有紧凑尺寸。
+- 新设置沿用现有的行布局、控件尺寸和间距；不为几个字段新增嵌套卡片、大块保底高度或重复的选择层级。互斥选项使用同一组 Segmented，按钮文字居中。同一行输入框与操作按钮必须等高、顶边对齐；按已批准的 R10，桌面字段为 32px，窄屏或粗指针为 40px；独立按钮为 28px / 36px，菜单行至少 36px / 44px。数字框为 32px / 36px 高，400 字重、起始侧对齐；按钮透明触控区域至少 44px 且不重叠。字号放大时控件允许增长与换行。
 - 控件验收包含实际几何检查：成组输入框与按钮的高度、顶边，以及分段按钮中文字的水平和垂直居中。必须在整页上下文中检查同类控件，不能仅凭局部截图或无障碍检测通过判定视觉一致。
 - 网页信息获取不引入付费或依赖免费额度的商业中继。R5 去除 Jina，保留后台配置 HTTP(S) / SOCKS5；未经验证的第三方服务不能作为可用功能展示。
 - Interaction: everything is reachable by keyboard, with the shortcuts in `capabilities.md`. Destructive actions offer undo rather than confirmation dialogs. Copying gives a toast with the copied value.

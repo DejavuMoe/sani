@@ -192,7 +192,7 @@ test('an uploading file stays locked but can be canceled without losing its draf
 for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','dark',320],['en','light',1280]] as const) {
   test(`R9 control groups and expanded controls ${lang}/${theme}/${width}`,async({page},info)=>{
     await login(page,lang,theme);await page.request.post(`${base}/api/admin/v1/tags`,{data:{name:'dev'}});expect((await page.request.post(`${base}/api/admin/v1/links`,{data:{url:`https://example.com/r9/${lang}/${theme}/${width}`}})).ok()).toBe(true);await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
-    const compact = width <= 640 ? 44 : 32, field = width <= 640 ? 44 : 36;
+    const compact = width <= 640 ? 36 : 28, field = width <= 640 ? 40 : 32;
     const heights = async (selector: string, height: number) => {
       const controls = page.locator(selector);
       expect(await controls.count(), selector).toBeGreaterThan(0);
@@ -203,10 +203,10 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
     await page.locator('.toolbar .kind').press('Enter');
     const menu = page.locator('.menu:popover-open');
     await expect(menu.getByRole('menuitemradio')).toHaveText(lang === 'zh' ? ['全部类型','链接','文本','文件'] : ['All types','Links','Text','Files']);
-    for (const option of await menu.getByRole('menuitemradio').all()) await expect(option).toHaveCSS('min-height', `${width <= 640 ? 44 : 38}px`);
+    for (const option of await menu.getByRole('menuitemradio').all()) await expect(option).toHaveCSS('min-height', `${width <= 640 ? 44 : 36}px`);
     await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');
     await page.locator('#create-panel-url .tag-add').click();
-    await expect(page.locator('.tag-pop:popover-open .tag-manage-row')).toHaveCSS('min-height', `${width <= 640 ? 44 : 38}px`);
+    await expect(page.locator('.tag-pop:popover-open .tag-manage-row')).toHaveCSS('min-height', `${width <= 640 ? 44 : 36}px`);
     await page.screenshot({path:info.outputPath('tag-picker.png')});
     await page.locator('.tag-pop:popover-open .tag-manage-row').press('Enter');const manager=page.getByRole('dialog',{name:lang==='zh'?'管理标签':'Manage tags',exact:true});
     await expect(manager).toBeVisible();await audit(page);
@@ -233,16 +233,80 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
       await heights(`#create-panel-${kind} .opt,#create-panel-${kind} .slug .box,#create-panel-${kind} .go`,compact);
     }
     await page.goto(`${base}/admin/settings`);
-    await heights('.inline-form .field,.inline-form .btn,.length-input input',field);
+    await heights('.inline-form .field,.inline-form .btn',field);
+    await heights('.length-row .unit-input input',width <= 640 ? 36 : 32);
     const typography = await page.locator('.about dd').evaluateAll(elements=>elements.map(el=>({font:getComputedStyle(el).fontFamily,size:getComputedStyle(el).fontSize})));
     expect(typography).toHaveLength(3);expect(typography[1]).toEqual(typography[0]);expect(typography[2]).toEqual(typography[0]);
-    for (const row of await page.locator('.about > div').all()) await expect(row).toHaveCSS('column-gap','12px');
+    for (const row of await page.locator('.about > div').all()) await expect(row).toHaveCSS('column-gap',width <= 640 ? '12px' : '20px');
     await capture(page,`settings-${lang}-${theme}-${width}`);
     await audit(page);await page.locator('.about').scrollIntoViewIfNeeded();
     await page.screenshot({path:info.outputPath('about.png')});
   });
 }
 
+
+test('R10 numeric typography, unit focus, busy width and segmented end keys', async ({page}) => {
+  await login(page, 'en', 'dark');
+  await page.goto(`${base}/admin/settings`);
+  const field = page.locator('#default-slugLength');
+  await expect(field).toHaveCSS('font-weight', '400');
+  await expect(field).toHaveCSS('text-align', 'start');
+  await expect(field).toHaveCSS('padding-left', '10px');
+  await page.locator('label[for="default-slugLength"]').last().click();
+  await expect(field).toBeFocused();
+  await field.fill('8');
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => release = resolve);
+  await page.route('**/api/admin/v1/config', async route => {
+    if (route.request().method() === 'PATCH') await pending;
+    await route.continue();
+  });
+  const save = page.locator('.settings-save .btn');
+  const width = (await save.boundingBox())!.width;
+  await save.click();
+  await expect(save).toHaveAttribute('aria-busy', 'true');
+  expect((await save.boundingBox())!.width).toBe(width);
+  await expect(save).toHaveAccessibleName('Save');
+  await expect(field).toBeDisabled();
+  release();
+  await expect(save).not.toHaveAttribute('aria-busy');
+  await page.unroute('**/api/admin/v1/config');
+  const radios = page.getByRole('radiogroup', {name:'Theme'}).getByRole('radio');
+  await radios.first().press('End');
+  await expect(radios.last()).toBeFocused();
+  await expect(radios.last()).toHaveAttribute('aria-checked', 'true');
+  await radios.last().press('Home');
+  await expect(radios.first()).toBeFocused();
+  await expect(radios.first()).toHaveAttribute('aria-checked', 'true');
+  await page.setViewportSize({width:390,height:844});
+  await page.addStyleTag({content:'button,input { font-size:26px !important; }'});
+  await audit(page);
+  for (const button of await page.locator('.inline-form .btn,.metadata-form [role=radio]').all()) {
+    expect(await button.evaluate(el=>el.scrollHeight <= el.clientHeight + 1)).toBe(true);
+  }
+  await page.screenshot({path:test.info().outputPath('r10-large-text.png')});
+});
+
+test('reduced motion also suppresses Svelte transitions', async ({page}) => {
+  await login(page);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.addInitScript(() => {
+    const animate = Element.prototype.animate;
+    (window as any).motionDurations = [];
+    Element.prototype.animate = function(frames, options) {
+      (window as any).motionDurations.push(typeof options === 'number' ? options : Number(options?.duration ?? 0));
+      return animate.call(this, frames, options);
+    };
+  });
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  expect((await page.request.post(`${base}/api/admin/v1/links`, {data:{url:'https://example.org/motion'}})).ok()).toBe(true);
+  await page.goto(`${base}/admin/`);
+  await page.getByRole('button', {name:'More options', exact:true}).click();
+  await expect(page.locator('#composer-more')).toBeVisible();
+  await page.locator('.row .copy').first().click();
+  await expect(page.locator('.toast').first()).toBeVisible();
+  expect(await page.evaluate(() => (window as any).motionDurations.filter((duration:number) => duration > 1))).toEqual([]);
+});
 
 test('narrow tag toolbars keep management and more actions for every small catalog size', async ({page}) => {
   await login(page);

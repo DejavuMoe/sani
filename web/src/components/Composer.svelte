@@ -1,5 +1,6 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
   import { ApiError, type Link } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
@@ -206,7 +207,7 @@
 
   <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy} />
   {#if more}
-    <div class="more" id="composer-more" transition:slide={{ duration: 180 }}>
+    <div class="more" id="composer-more" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}>
       <label class="cell grow">
         <span class="k">{t('composer.title')}</span>
         <input class="inline" bind:value={title} placeholder={t('composer.titleAuto')} maxlength="300" />
@@ -281,7 +282,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 56px;
+    height: 52px;
     padding: 0 8px 0 16px;
   }
 
@@ -296,7 +297,7 @@
     border: 0;
     background: transparent;
     color: var(--text);
-    font-size: var(--input-font-size, 15.5px);
+    font-size: max(15px, var(--input-font-size));
   }
 
   .url:focus {

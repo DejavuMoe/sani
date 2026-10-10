@@ -104,7 +104,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
       return { rows, centers };
     });
     for (const row of geometry.rows) for (const control of row) {
-      expect(control.height).toBe(width <= 640 ? 44 : 36);
+      expect(control.height).toBe(width <= 640 ? 40 : 32);
       expect(Math.abs(control.top - row[0].top)).toBeLessThanOrEqual(1);
     }
     for (const center of geometry.centers) { expect(center.dx).toBeLessThan(1); expect(center.dy).toBeLessThanOrEqual(1); }
@@ -191,18 +191,17 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       await form.getByRole('radio').nth(0).focus();
       await page.keyboard.press('ArrowRight');
       await page.locator('#metadata-auth').click();
-      const dimensions = () => page.locator('.inline-form input,.inline-form .btn,.length-input input,#default-max-file,.settings-save .btn,.metadata-form input,.metadata-form .btn,.metadata-form [role=radio]').evaluateAll(elements => elements.map(el => ({
-        height: el.getBoundingClientRect().height, font: getComputedStyle(el).fontSize,
-      })));
-      const baseline = await dimensions();
       for (const width of [721, 720, 641, 640, 502, 390, 320]) {
         await page.setViewportSize({ width, height: 900 });
         const large = touch || width <= 640;
-        const expected = baseline.map(control => large && !touch ? { ...control, height: control.height === 28 ? 40 : 44, font: control.font === '14px' ? '16px' : control.font } : control);
-        expect(await dimensions(), `settings at ${width}px`).toEqual(expected);
+        for (const input of await page.locator('.inline-form input,.metadata-form input').all()) {
+          await expect(input).toHaveCSS('height', large ? '40px' : '32px');
+          await expect(input).toHaveCSS('font-size', large ? '16px' : '13px');
+        }
+        for (const radio of await form.getByRole('radio').all()) await expect(radio).toHaveCSS('height', large ? '32px' : '24px');
         const field = page.locator('#default-fileSlugLength');
-        await expect(field).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '14px');
-        await expect(field).toHaveCSS('height', (touch || width <= 640) ? '44px' : '36px');
+        await expect(field).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '13px');
+        await expect(field).toHaveCSS('height', (touch || width <= 640) ? '36px' : '32px');
         await expect(page.locator('.settings-save .btn')).toHaveCSS('height', await form.locator('.actions .btn').first().evaluate(el => getComputedStyle(el).height));
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         if (width === 502 || width === 320) {
@@ -235,8 +234,8 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       const urlPanel = page.locator('#create-panel-url');
       for (const width of [641, 640, 320]) {
         await page.setViewportSize({ width, height: 900 });
-        await expect(urlPanel.locator('.tag-add')).toHaveCSS('min-height', (touch || width <= 640) ? '44px' : '32px');
-        await expect(urlPanel.locator('.url')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '15.5px');
+        await expect(urlPanel.locator('.tag-add')).toHaveCSS('min-height', (touch || width <= 640) ? '36px' : '28px');
+        await expect(urlPanel.locator('.url')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '15px');
       }
       await urlPanel.locator('.tag-add').press('Enter');
       const pop = page.locator('.tag-pop:popover-open');
@@ -244,8 +243,8 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       for (const width of [641, 640, 320]) {
         await page.setViewportSize({ width, height: 900 });
         await expect(pop.locator('.tag-search input')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '13px');
-        await expect(pop.locator('.color-input input')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '12px');
-        await expect(pop.locator('.tag-done')).toHaveCSS('min-height', (touch || width <= 640) ? '44px' : '32px');
+        await expect(pop.locator('.color-input input')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '13px');
+        await expect(pop.locator('.tag-done')).toHaveCSS('min-height', (touch || width <= 640) ? '36px' : '28px');
         await expect(pop.locator('.color-swatches button').first()).toHaveCSS('height', (touch || width <= 640) ? '44px' : '36px');
       }
       await audit(page);
@@ -274,7 +273,7 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
         await editor.getByRole('radio').nth(format).click();
         for (const width of [641, 640, 320]) {
           await page.setViewportSize({ width, height: 900 });
-          const font = (touch || width <= 640) ? '16px' : format === 0 ? '14.5px' : '13px';
+          const font = (touch || width <= 640) ? '16px' : '13px';
           await expect(panel.locator('textarea')).toHaveCSS('font-size', font);
           await expect(editor.locator('textarea')).toHaveCSS('font-size', font);
         }

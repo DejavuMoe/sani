@@ -116,6 +116,7 @@
     max-width: calc(100vw - 16px);
     max-height: calc(100dvh - 16px);
     overflow: auto;
+    overscroll-behavior: contain;
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);

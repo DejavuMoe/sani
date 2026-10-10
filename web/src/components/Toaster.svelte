@@ -1,6 +1,7 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
   import { fade, fly } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
   import { t } from '../lib/i18n.svelte';
   import { toasts } from '../lib/toast.svelte';
   import Icon from './Icon.svelte';
@@ -11,9 +12,9 @@
     <div
       class={['toast', toast.tone]}
       role="presentation"
-      animate:flip={{ duration: 220 }}
-      in:fly={{ y: 14, duration: 240, opacity: 0 }}
-      out:fade={{ duration: 140 }}
+      animate:flip={{ duration: prefersReducedMotion.current ? 0 : 180 }}
+      in:fly={{ y: 6, duration: prefersReducedMotion.current ? 0 : 180, opacity: 0 }}
+      out:fade={{ duration: prefersReducedMotion.current ? 0 : 140 }}
       onpointerenter={() => toasts.pause(toast.id)}
       onpointerleave={() => toasts.resume(toast.id)}
     >
@@ -107,7 +108,7 @@
 
   .detail {
     overflow: hidden;
-    color: color-mix(in oklab, var(--on-toast) 62%, transparent);
+    color: var(--on-toast);
     font-family: var(--font-mono);
     font-size: 12.5px;
     text-overflow: ellipsis;
@@ -134,7 +135,7 @@
     height: 28px;
     place-items: center;
     border-radius: 6px;
-    color: color-mix(in oklab, var(--on-toast) 55%, transparent);
+    color: var(--on-toast);
   }
 
   .dismiss:hover {

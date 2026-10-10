@@ -277,7 +277,7 @@
   .toolbar {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     margin-bottom: 10px;
   }
 

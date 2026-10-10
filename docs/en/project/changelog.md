@@ -17,6 +17,10 @@
 - Record cache/batching ablations and dependency/component references; correct documented day storage, cache capacity, referrers and units.
 - Keep menus inside short viewports and clean up listeners on unmount; make scrolling docs tables keyboard reachable with visible focus. Update token examples and fail screenshot scripts on authentication errors.
 
+### Interface refinements
+
+- Implement approved R10: share compact sizing across buttons, fields and segmented controls; reuse numeric/unit inputs with regular weight and start alignment. Refine settings and tag spacing, bilingual typography, stable busy-button width, Home/End navigation and reduced motion.
+
 ## v0.9.4
 
 2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.

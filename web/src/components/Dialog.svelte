@@ -37,7 +37,7 @@
   <div class="inner" tabindex="-1" autofocus>
     <header>
       <h2>{title}</h2>
-      <button class="close" disabled={!dismissible} aria-label={t('act.close')} onclick={() => (open = false)}><Icon name="x" /></button>
+      <button class="close dialog-close" disabled={!dismissible} aria-label={t('act.close')} onclick={() => (open = false)}><Icon name="x" /></button>
     </header>
     {@render children()}
   </div>
@@ -55,10 +55,10 @@
     opacity: 1;
     transform: none;
     transition:
-      opacity 160ms var(--ease),
-      transform 160ms var(--ease),
-      overlay 160ms allow-discrete,
-      display 160ms allow-discrete;
+      opacity 120ms var(--ease),
+      transform 120ms var(--ease),
+      overlay 120ms allow-discrete,
+      display 120ms allow-discrete;
   }
 
   .dialog:not([open]) {
@@ -77,9 +77,9 @@
     background: var(--scrim);
     opacity: 1;
     transition:
-      opacity 160ms var(--ease),
-      overlay 160ms allow-discrete,
-      display 160ms allow-discrete;
+      opacity 120ms var(--ease),
+      overlay 120ms allow-discrete,
+      display 120ms allow-discrete;
   }
 
   .dialog:not([open])::backdrop {

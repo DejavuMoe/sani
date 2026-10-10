@@ -13,7 +13,7 @@
     options: { value: T; label: string; icon?: IconName }[];
     onchange: (v: T) => void;
     label: string;
-    /** `lg` matches the 36px text fields of a form. */
+    /** `lg` matches the text fields of a form. */
     size?: 'sm' | 'md' | 'lg';
     disabled?: boolean;
   } = $props();
@@ -26,6 +26,8 @@
     let next = -1;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % options.length;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + options.length) % options.length;
+    if (e.key === 'Home') next = 0;
+    if (e.key === 'End') next = options.length - 1;
     if (next < 0) return;
     e.preventDefault();
     onchange(options[next].value);
@@ -51,8 +53,12 @@
 
 <style>
   .seg {
-    --seg-height: var(--control-compact);
-    height: var(--seg-height);
+    --seg-height: var(--control-size);
+    min-height: var(--seg-height);
+    width: max-content;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
     flex-shrink: 0;
     display: inline-flex;
     gap: 2px;
@@ -66,11 +72,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
+    line-height: 1.25;
     gap: 6px;
     height: calc(var(--seg-height) - 4px);
-    padding: 0 11px;
-    border-radius: 6px;
+    min-height: max(calc(var(--seg-height) - 4px), calc(1lh + 4px));
+    padding: 0 10px;
+    border-radius: var(--radius-sm);
     color: var(--text-2);
     font-size: 13px;
     font-weight: 500;
@@ -81,8 +88,6 @@
       box-shadow var(--fast) var(--ease);
   }
 
-  .sm button { padding: 0 9px; }
-
   .lg {
     --seg-height: var(--control-field);
   }
@@ -90,6 +95,9 @@
   button:hover {
     color: var(--text);
   }
+  button:focus-visible { outline-offset: -2px; }
+  button:disabled { color: var(--text-3); cursor: default; }
+  @media (max-width: 640px), (pointer: coarse) { button { min-width: 44px; } }
 
   button[aria-checked='true'] {
     background: var(--surface);

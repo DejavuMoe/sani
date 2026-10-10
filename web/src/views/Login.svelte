@@ -122,5 +122,5 @@
       transform: translateX(2px);
     }
   }
-  form :global(.btn) { height: var(--control-field); }
+  form :global(.btn) { --control-size: var(--control-field); }
 </style>

@@ -56,12 +56,12 @@
     opacity: 0.5;
   }
 
-  @media (pointer: coarse) {
+  @media (max-width: 640px), (pointer: coarse) {
     .switch::before {
       content: '';
       position: absolute;
       /* Stay inside the gap between adjacent settings rows. */
-      inset: -10px -3px;
+      inset: -12px -5px;
     }
   }
 </style>

@@ -172,7 +172,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
     await login(page, lang, theme);
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${base}/admin/settings`);
-    const fields = page.locator('.length-input input');
+    const fields = page.locator('.length-row .unit-input input');
     await expect(fields).toHaveCount(3);
     for (const field of await fields.all()) await field.fill('32');
     const toggle = page.getByRole('switch', { name: lang === 'zh' ? '排除易混淆字符' : 'Exclude look-alike characters' });

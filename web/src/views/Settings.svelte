@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
   import AppHeader from '../components/AppHeader.svelte';
   import Button from '../components/Button.svelte';
+  import UnitInput from '../components/UnitInput.svelte';
   import Icon from '../components/Icon.svelte';
   import MetadataSettings from '../components/MetadataSettings.svelte';
   import Switch from '../components/Switch.svelte';
@@ -290,13 +292,10 @@
           {@const valid = validInteger(lengths[key], 3, 32)}
           <div class="length-row">
             <div class="length-label">
-              <label for={'default-' + key}>{t(label)}</label>
+              <label id={'default-' + key + '-label'} for={'default-' + key}>{t(label)}</label>
               <p class="hint" id={'default-' + key + '-default'}>{t('settings.lengthDefault', { n: fallback })}{#if locked(key)}<span class="env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</span>{/if}</p>
             </div>
-            <div class="length-input">
-              <input id={'default-' + key} class="field" inputmode="numeric" autocomplete="off" spellcheck="false" bind:value={lengths[key]} disabled={locked(key)} aria-invalid={!valid} aria-describedby={'default-' + key + '-default default-' + key + '-help'} />
-              <span aria-hidden="true">{t('settings.lengthUnit')}</span>
-            </div>
+            <UnitInput id={'default-' + key} aria-labelledby={'default-' + key + '-label'} unit={t('settings.lengthUnit')} bind:value={lengths[key]} disabled={locked(key)} aria-invalid={!valid} aria-describedby={'default-' + key + '-default default-' + key + '-help'} />
             <div id={'default-' + key + '-help'} class="length-example">
               {#if valid}
                 <span>{t('settings.slugExample')}</span><code>/{prefix}{(key === 'slugLength' && !excludeConfusable ? 'k0mi9p1o2r6h8q3t' : 'k7mx9p4w2r6h8q3t').repeat(2).slice(0, +lengths[key])}</code>
@@ -309,7 +308,7 @@
       </fieldset>
       {#if shortShare}<p class="hint short-help">{t('settings.shortShareHint')}</p>{/if}
       <div class="setting"><div><label for="default-exclude">{t('settings.exclude')}</label><p class="hint">{t('settings.excludeHint')}</p>{#if locked('excludeConfusable')}<p class="hint env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</p>{/if}</div><Switch id="default-exclude" label={t('settings.exclude')} checked={excludeConfusable} onchange={v => { excludeConfusable = v; editDefaults(); }} disabled={locked('excludeConfusable') || defaultsBusy} /></div>
-      <div class="setting"><div><label for="default-max-file">{t('settings.maxFile')}</label><p class="hint" id="default-max-file-help">{t('settings.maxFileHint')}{#if locked('maxFileSize')}<span class="env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</span>{/if}</p></div><span class="unit"><input id="default-max-file" class="field" inputmode="numeric" autocomplete="off" spellcheck="false" bind:value={maxFileMB} disabled={locked('maxFileSize') || defaultsBusy} aria-invalid={!maxFileValid} aria-describedby={maxFileValid ? 'default-max-file-help' : 'default-max-file-help default-max-file-error'} />MB</span></div>
+      <div class="setting"><div><label id="default-max-file-label" for="default-max-file">{t('settings.maxFile')}</label><p class="hint" id="default-max-file-help">{t('settings.maxFileHint')}{#if locked('maxFileSize')}<span class="env-lock"><Icon name="lock" size={12} />{t('settings.envLocked')}</span>{/if}</p></div><UnitInput id="default-max-file" aria-labelledby="default-max-file-label" unit="MB" bind:value={maxFileMB} disabled={locked('maxFileSize') || defaultsBusy} aria-invalid={!maxFileValid} aria-describedby={maxFileValid ? 'default-max-file-help' : 'default-max-file-help default-max-file-error'} /></div>
       {#if !maxFileValid}<p id="default-max-file-error" class="error-text" role="alert">{t('settings.maxFileInvalid')}</p>{/if}
       <div class="settings-save">
         <Button type="submit" loading={defaultsBusy} disabled={!defaultsValid || !defaultsChanged}>{t(defaultsError ? 'settings.retrySave' : 'act.save')}</Button>
@@ -344,7 +343,7 @@
 
       {#if revealed?.token}
         {@const secret = revealed.token}
-        <div class="reveal" transition:slide={{ duration: 180 }}>
+        <div class="reveal" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}>
           <p class="reveal-note"><Icon name="key" size={14} />{t('settings.tokenOnce')}</p>
           <div class="secret">
             <code>{secret}</code>
@@ -367,7 +366,7 @@
       {#if tokens && tokens.length > 0}
         <ul class="tokens">
           {#each tokens as tok (tok.id)}
-            <li transition:slide={{ duration: 160 }}>
+            <li transition:slide={{ duration: prefersReducedMotion.current ? 0 : 160 }}>
               <Icon name="key" size={14} class="tok-icon" />
               <div class="tok-main">
                 <span class="tok-name">{tok.name}</span>
@@ -463,7 +462,7 @@
         </label>
         {#if importError}<p class="error-text">{importError}</p>{/if}
         {#if importResult}
-          <div class="import-result" transition:slide={{ duration: 160 }}>
+          <div class="import-result" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 160 }}>
             <p><Icon name="check" size={14} stroke={2} />{t('settings.imported', { n: importResult.created })}</p>
             {#if importResult.skipped.length > 0}
               <p class="k">{t('settings.importSkipped', { n: importResult.skipped.length })} {#if importResult.skipped.length > 20}{t('settings.previewSkipped')}{/if}</p>
@@ -560,8 +559,8 @@
   }
 
   h1 {
-    margin: 12px 0 28px;
-    font-size: 22px;
+    margin: 12px 0 24px;
+    font-size: 21px;
     font-weight: 600;
     letter-spacing: -0.015em;
   }
@@ -569,8 +568,8 @@
   section {
     display: grid;
     grid-template-columns: 200px minmax(0, 1fr);
-    gap: 32px;
-    padding: 28px 0;
+    gap: 28px;
+    padding: 24px 0;
     border-top: 1px solid var(--line);
   }
 
@@ -589,7 +588,7 @@
   .body {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     min-width: 0;
   }
 
@@ -622,7 +621,7 @@
     gap: 8px;
   }
 
-  .inline-form :global(.btn) { height: var(--control-field); }
+  .inline-form { --control-size: var(--control-field); }
 
   .inline-form .field {
     min-width: 0;
@@ -667,7 +666,7 @@
     flex: none;
     align-items: center;
     gap: 6px;
-    height: 32px;
+    min-height: var(--control-compact);
     padding: 0 12px;
     border: 1px solid var(--line-2);
     border-radius: var(--radius);
@@ -692,7 +691,7 @@
   .dl {
     display: inline-flex;
     align-items: center;
-    height: 32px;
+    min-height: var(--control-compact);
     padding: 0 12px;
     border: 1px solid var(--line-2);
     border-radius: var(--radius);
@@ -934,9 +933,9 @@
 
   .about div {
     display: grid;
-    grid-template-columns: 96px minmax(0,1fr);
+    grid-template-columns: minmax(100px, max-content) minmax(0,1fr);
     align-items: baseline;
-    gap: 12px;
+    gap: 20px;
   }
 
   .about dt {
@@ -946,6 +945,8 @@
   }
 
   .about dd {
+    font-family: var(--font-mono);
+    font-size: 12px;
     min-width: 0;
     overflow-wrap: anywhere;
     margin: 0;
@@ -968,42 +969,38 @@
       gap: 12px;
     }
 
-    .row {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
+    .row { flex-wrap: wrap; gap: 8px 16px; }
   }
-  .defaults-form { gap: 22px; }
+  .defaults-form { gap: 18px; }
   .lengths { min-width: 0; padding: 0; border: 0; margin: 0; }
   .lengths legend { padding: 0; font-size: 13px; font-weight: 500; }
-  .length-help { margin: 6px 0 16px; line-height: 1.65; }
-  .length-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 4px 16px; padding: 13px 0; border-top: 1px solid var(--line); }
+  .length-help { margin: 6px 0 12px; line-height: 1.65; }
+  .length-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 16px; padding: 10px 0; border-top: 1px solid var(--line); }
   .length-label label { font-size: 13px; font-weight: 500; }
-  .length-label .hint { margin: 3px 0 0; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .length-label .hint { margin: 2px 0 0; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
   .env-lock { display: inline-flex; align-items: center; gap: 4px; }
-  .length-input { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-3); }
-  .length-input .field { width: 76px; min-width: 0; font-variant-numeric: tabular-nums; }
-  .length-example { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; min-height: 20px; font-size: 12px; color: var(--text-3); }
+  .length-row :global(.unit-input) { grid-column: 2; grid-row: 1 / 3; }
+  .length-label { min-width: 0; }
+  .length-example { grid-column: 1; display: flex; align-items: baseline; gap: 7px; min-height: 18px; font-size: 12px; color: var(--text-3); }
   .length-example > span { flex: none; }
-  .length-example code { min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
+  .length-example code { font-size: 11.5px; min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
   .length-example .error-text { margin: 0; flex: 1; min-width: 0; }
-  .setting { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .setting { --unit-width: 64px; --unit-mobile-width: 62px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
   .setting > div { min-width: 0; }
   .setting label { display: block; font-size: 13px; font-weight: 500; }
   .setting .hint { margin: 6px 0 0; line-height: 1.6; }
   .defaults-form > .hint { margin: 0; line-height: 1.65; }
-  .defaults-form > .short-help { margin-top: -14px; }
-  .setting .field { width: 82px; flex: none; }
-  .unit { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; }
-  .settings-save { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; min-height: 32px; }
+  .defaults-form > .short-help { margin-top: -6px; }
+  .settings-save { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; min-height: var(--control-compact); }
   .save-error { margin: 0; }
   .saved { color: var(--success); font-size: 12px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; margin-top: 12px; }
   .examples a { display: inline-flex; align-items: center; min-height: 28px; color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 5px 0; }
   @media (max-width: 640px) {
     .setting { gap: 12px; }
-    .length-row { gap: 6px 10px; }
+    .length-row { gap: 3px 10px; }
+    .length-example { align-items: start; }
+    section { padding-block: 20px; }
   }
-  @media (max-width:640px) { .about div { grid-template-columns:88px minmax(0,1fr); gap:12px; } }
+  @media (max-width:640px) { .about div { grid-template-columns:108px minmax(0,1fr); gap:12px; } }
 </style>

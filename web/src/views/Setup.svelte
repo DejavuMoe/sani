@@ -173,5 +173,5 @@
   .form :global(.btn) {
     margin-top: 20px;
   }
-  form :global(.btn) { height: var(--control-field); }
+  form :global(.btn) { --control-size: var(--control-field); }
 </style>

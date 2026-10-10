@@ -294,6 +294,7 @@
 <style>
   .editor-lock { display:contents; }
   .editor {
+    --control-size: var(--control-field);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 20px;
@@ -305,7 +306,7 @@
   }
 
   .url {
-    min-height: 36px;
+    min-height: var(--control-field);
     font-size: var(--input-font-size, 13px);
     line-height: 1.5;
     overflow-wrap: anywhere;
@@ -383,6 +384,7 @@
   }
 
   footer {
+    --control-size: var(--control-compact);
     display: flex;
     flex-wrap: wrap;
     align-items: center;

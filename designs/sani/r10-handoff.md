@@ -87,3 +87,19 @@ R10_OUTPUT=/tmp/sani-r10-final node designs/sani/tools/r10-check.mjs
 ## 数字输入微调（已批准）
 
 根据用户对 `#r6-defaults` 的浏览器批注，四个数值字段统一改为 400 常规字重、起始侧对齐，并继承普通字段的 10px 水平内边距。桌面 13px、手机 16px 和原控件尺寸保留；保留等宽数字，取消额外的居中加重处理。只修改共享 UnitInput 的文字样式，无文案或交互变化。此次定向验证结果与新截图见 `review-r10/verification.json` 的 numericTypographyFollowup。
+
+## Svelte 实施与验收
+
+按批准提交 `ead108e` 实施。原型作为视觉与交互依据，生产仍使用 Svelte 组件及现有 API。
+
+| 表面 | 生产实现 | 验证 |
+|---|---|---|
+| 控件、浮层与忙碌状态 | app.css、Button、Segmented、MenuItem、Dialog、Toaster | r7.spec.ts：几何、焦点、Home/End、忙碌宽度、减少动态效果 |
+| 创建默认值与代理设置 | UnitInput、Settings、MetadataSettings | r6.spec.ts、metadata.spec.ts：校验、保存、重试、锁定、真实创建、触控命中范围 |
+| 创建、编辑与标签 | Composer、ShareComposer、LinkEditor、DateEditor、tags.css | app.spec.ts、r7.spec.ts 与全页面 axe |
+
+仅新增小型 UnitInput；复用 Svelte 自带的 prefersReducedMotion，没有新增依赖。原型验证时遗漏的触控区域重叠在真实应用验收中修复；菜单标签清除继承的表单边距，保持文本与图标对齐。
+
+本地 86 项 Playwright、88 个 axe 状态、573 条渲染文案审计通过。实际 Windows 内置浏览器确认 13px / 400 / 起始侧对齐及 56×32px 数字框、代理指针与 Home/End 操作、英文切换，控制台无错误。截图和具体命令见 [implementation-r10/verification.json](implementation-r10/verification.json)。
+
+旧数据与发布准备另通过真实 v0.9.4 二进制升级/完整快照回滚及 WSL Docker UID 65532 存储验证。Docker Desktop 的缺失挂载目录行为与原生 Linux 不同，该项依赖原生 CI；不把跳过计为本地通过。Safari、Firefox、真实手机及屏幕阅读器尚未验证。
