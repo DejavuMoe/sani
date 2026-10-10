@@ -96,6 +96,8 @@ sudo systemctl start sani
 
 ## 版本升级 {#upgrade}
 
+**v0.9.5 含不兼容的 API 变更与 schema 6 迁移**，是[修订版本规则的一次性例外](../project/versioning#v095-exception)。从 v0.9.4 或更早版本升级须完成以下流程。
+
 本次移除旧管理 API，改用 `/api/admin/v1` 和 Sani 资源 API `/api/v1`。升级前必须**先在旧后台导出 JSON**，再正常停机，完整备份数据库（包括仍存在的 WAL/SHM）、`files/`、Compose/环境变量/密钥、代理与域名配置，以及固定的旧镜像或二进制。副本保存在运行目录之外。后台 JSON 只有网址链接和标签，不能恢复分享文本/文件、凭据和完整统计；CSV 可作额外副本。**正常升级是原地增量迁移，不要导出再导入。**
 
 第一次启动前，在原配置和部署 UID（Docker 为 `65532:65532`）下，用新版 [`preflight`](../reference/cli#sani-preflight) 检查已停机数据或完整副本。Compose 已选定并校验目标镜像、旧服务已停止后，执行 `docker compose run --rm --no-deps sani preflight`。检查输出，处理缺失/损坏文件及权限错误，并为数据库安全副本、事务/WAL 和上传文件预留空间。启动会先保存数据库安全副本，再将 schema 1–5 原子升级到 6；保留 ID、短码、密码/令牌/会话哈希、设置、统计和文件名，只新增随机文件删除密钥。旧公开地址与毫秒时间戳不变。使用资源 API 前须配置已有的规范主域名，不能从 Host 猜测历史域名。

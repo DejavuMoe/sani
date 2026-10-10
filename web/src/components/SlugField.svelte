@@ -83,7 +83,7 @@
   // characters take two columns, and the stylesheet caps it at 32ch.
   const width = $derived.by(() => {
     if (variant !== 'inline') return undefined;
-    const cols = [...value].reduce((n, ch) => n + (/[ᄀ-ᅟ⺀-꓏가-힣豈-﫿＀-｠]/.test(ch) ? 2 : 1), 0);
+    const cols = [...(value || placeholder)].reduce((n, ch) => n + (/[ᄀ-ᅟ⺀-꓏가-힣豈-﫿＀-｠]/.test(ch) ? 2 : 1), 0);
     return `${Math.max(11, cols + 1)}ch`;
   });
 </script>

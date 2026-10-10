@@ -17,7 +17,7 @@ docs=https://github.com/DejavuMoe/sani/blob/master/docs
 # anchors, which GitHub names differently.
 notes=$(awk -v heading="## $tag" '$0 == heading { on = 1; next } on && /^## / { exit } on' "$changelog" |
   sed -E '1,/[^[:space:]]/ s/^[0-9]{4}-[0-9]{2}-[0-9]{2} · //' |
-  sed -E "s#\]\(\.\./([a-z-]+/[a-z-]+)(\#[a-z-]+)?\)#]($docs/en/\1.md)#g; s#\]\(\./([a-z-]+)(\#[a-z-]+)?\)#]($docs/en/project/\1.md)#g")
+  sed -E "s#\]\(\.\./([a-z-]+/[a-z-]+)(\#[a-z0-9-]+)?\)#]($docs/en/\1.md)#g; s#\]\(\./([a-z-]+)(\#[a-z0-9-]+)?\)#]($docs/en/project/\1.md)#g")
 if [ -z "$(tr -d '[:space:]' <<<"$notes")" ]; then
   echo "release-notes: $changelog has no section \"## $tag\"" >&2
   exit 1

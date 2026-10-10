@@ -41,6 +41,14 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
+## v0.9.5 compact interface and API upgrade acceptance {#r10-acceptance}
+
+Approved R10 supersedes R9 control sizing. Desktop buttons, fields and menu items use 28, 32 and 36px baselines. Narrow or touch screens use 36px buttons, 40px fields and 44px menu items, with extended hit areas. Numeric/unit inputs share `UnitInput`, regular weight and start alignment, with a 36px visible input on narrow screens. Long labels can grow, busy buttons retain width, segmented controls support Home/End, and Svelte transitions respect reduced motion.
+
+Interaction and sizing regressions: `web/e2e/r7.spec.ts` and `web/e2e/metadata.spec.ts`. Actual interface, content and verification records: `designs/sani/implementation-r10/`. Documentation and README landing images use the latest English interface; guides retain both languages and themes.
+
+API and migration entry points: `make contract`, `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill` and `scripts/test-docker-storage.sh`. Local checks used the verified published v0.9.4 binary for upgrade and full-snapshot rollback. WSL Docker checks cover non-root storage, read-only databases and real disk exhaustion. Docker Desktop creates missing bind directories; native Linux CI covers their rejection. Physical devices, Firefox/WebKit and production deployments require separate acceptance.
+
 ## v0.9.4 management and visual consistency acceptance {#r9-acceptance}
 
 Approved R7 and R9 are implemented. Tag search and scope filters share an outer height; toolbars, fields and menus use shared sizes, with 44px controls on narrow or touch screens. Categories, share URLs, visit statistics and About typography are consistent. R9 sizing supersedes the R6 narrow-screen compact rule.

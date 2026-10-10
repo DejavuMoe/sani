@@ -3,7 +3,7 @@
 <p class="lead">Sani 自有 HTTP API：使用令牌创建和管理链接、文本与文件，使用同一实例的后台能力完成设置、批量操作和恢复。</p>
 
 ::: warning 版本说明
-本页对应 Unreleased 源码。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
+本页对应 v0.9.5。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
 :::
 
 ## 设计与约定 {#design}
@@ -516,7 +516,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ```json
 {
-  "version": "v0.9.4",
+  "version": "v0.9.5",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

@@ -61,7 +61,7 @@ Prints the version, such as `sani v0.3.0`. Builds from source take it from `git 
 
 ## `sani preflight`
 
-Added with the Unreleased API refactor; v0.9.4 does not include this command. Use a new binary containing the refactor for preflight.
+Available from v0.9.5. Run preflight with the new binary for your target version; v0.9.4 and earlier do not include this command.
 
 Run the **new binary** against stopped data or an isolated full copy, with the original deployment environment. Outputs JSON (`schema`, `target`, `files`, `file_bytes`, `stored_base_url`) and exits 0 only after SQLite integrity/foreign-key checks, every stored file's size/SHA-256 check (including soft-deleted rows), write access to the database and existing WAL/SHM, and temporary directory write probes pass. Missing/corrupt files, unsupported schemas and permission failures are diagnostic errors. It never migrates or changes stored credentials; short-lived probe files are removed.
 

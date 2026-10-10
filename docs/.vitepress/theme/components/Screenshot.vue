@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// A real screenshot of the admin app in the reader's language and theme.
+// A real screenshot of the admin app, localized unless a language is specified.
 // Both theme variants are lazy images, so the hidden one is never fetched.
 // Clicking opens it full size in a native <dialog>.
 import { withBase } from 'vitepress';
@@ -12,6 +12,7 @@ type Scene = 'dashboard' | 'detail' | 'mobile' | 'setup';
 const props = defineProps<{
   name: Scene;
   alt: string;
+  language?: 'zh' | 'en';
   /** The scene to show on narrow screens, where this one would be too small to read. */
   narrow?: Scene;
   /** Near the top of the page: fetch it before other images. */
@@ -24,7 +25,7 @@ const NARROW = '(max-width: 640px)';
 
 const { lang, pick } = useLang();
 const src = (theme: 'light' | 'dark', scene: Scene = props.name) => {
-  const name = `${scene}-${theme}-${lang.value}.png`;
+  const name = `${scene}-${theme}-${props.language ?? lang.value}.png`;
   return withBase(`/screenshots/${name}?v=${revisions[name]}`);
 };
 const size = computed(() => sizes[props.name]);

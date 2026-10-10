@@ -28,10 +28,10 @@ docker compose up -d
 
 | 标签 | 指向 |
 |---|---|
-| `v0.9.4` | 对应 Git tag 和 GitHub Release `v0.9.4` 的具体版本 |
-| `v0.9.4-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
+| `v0.9.5` | 对应 Git tag 和 GitHub Release `v0.9.5` 的具体版本 |
+| `v0.9.5-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
 
-从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.9.4`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
+从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v0.9.5`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
 
 升级时先[备份](./operations#backup)，再手动将 `compose.yaml` 的 `image:` 改为目标版本的完整标签，随后执行：
 
@@ -104,7 +104,7 @@ docker exec sani /sani healthcheck
 ::: code-group
 
 ```sh [下载]
-base=https://github.com/DejavuMoe/sani/releases/download/v0.9.4
+base=https://github.com/DejavuMoe/sani/releases/download/v0.9.5
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -119,7 +119,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-下载路径固定到 `v0.9.4`；升级时将路径中的标签改为已发布的目标版本。
+下载路径固定到 `v0.9.5`；升级时将路径中的标签改为已发布的目标版本。
 
 ### 校验来源与签名 {#verify}
 
@@ -127,7 +127,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.4 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.5 -R DejavuMoe/sani
 ```
 
 将生成的 `sani.service` 写入 `/etc/systemd/system/` 并启动：

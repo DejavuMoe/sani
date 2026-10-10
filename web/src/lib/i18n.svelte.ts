@@ -747,7 +747,7 @@ const en: Record<Key, string> & Record<string, string> = {
   "composer.placeholder": "Enter or paste a URL",
   'composer.submit': 'Shorten',
   'composer.slug': 'Slug',
-  "composer.slugAuto": "Leave blank to generate",
+  "composer.slugAuto": "Auto-generated",
   'composer.expiry': 'Expires',
   'composer.more': 'More options',
   'composer.less': 'Fewer options',

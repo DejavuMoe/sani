@@ -2,7 +2,9 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.5
+
+2026-10-10 · Release the approved R10 compact interface and new Sani HTTP API, with migration to database schema 6. **This release includes breaking changes as a one-time exception to the patch rule**; read the steps below and the [versioning note](./versioning#v095-exception) before upgrading.
 
 ### Breaking changes
 
@@ -19,6 +21,7 @@
 
 ### Interface refinements
 
+- Size empty slug fields for their placeholder and shorten the English hint to avoid clipping. Refresh actual documentation and README screenshots, using English for landing images.
 - Implement approved R10: share compact sizing across buttons, fields and segmented controls; reuse numeric/unit inputs with regular weight and start alignment. Refine settings and tag spacing, bilingual typography, stable busy-button width, Home/End navigation and reduced motion.
 
 ## v0.9.4

@@ -9,8 +9,8 @@
 [文档](docs/guide/introduction.md) · [下载](https://github.com/DejavuMoe/sani/releases) · [English](README.md)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/public/screenshots/dashboard-dark-zh.png">
-  <img alt="Sani 的管理界面：顶部是缩短链接的输入框和近 30 天的点击趋势，下面是短链接列表。" src="docs/public/screenshots/dashboard-light-zh.png">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/public/screenshots/dashboard-dark-en.png">
+  <img alt="Sani 的管理界面：顶部是缩短链接的输入框和近 30 天的点击趋势，下面是短链接列表。" src="docs/public/screenshots/dashboard-light-en.png">
 </picture>
 
 粘贴长链接，按下回车，短链接就已经在剪贴板里了。Sani 会自动获取网页标题和图标，方便日后辨认。点击统计不会拖慢跳转。除此之外，它不来打扰你。
@@ -96,7 +96,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 **手机**：在 Android 上用支持 Web Share Target 的浏览器安装 Sani 后，可从其他应用的分享菜单预填网址，核对后点击“缩短”。是否支持取决于浏览器和操作系统。
 
-**API（Unreleased 重构）**：v0.9.4 尚未包含新路由，使用该版本时请查阅 [v0.9.4 API 文档](https://github.com/DejavuMoe/sani/blob/v0.9.4/docs/reference/api.md)。以下示例用于包含本次重构的构建；先在设置中保存固定分享域名并创建令牌，然后：
+**API（v0.9.5）**：本次发布更换 API 路由，已有脚本须按[新版 API](docs/reference/api.md)调整。v0.9.4 及之前版本请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建令牌，然后：
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \

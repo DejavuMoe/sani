@@ -41,6 +41,14 @@ Sani 面向**单管理员、单个服务进程、本地持久化数据目录**�
 
 上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
 
+## v0.9.5 紧凑界面与 API 升级验收入口 {#r10-acceptance}
+
+已实施批准的 R10，取代 R9 的控件尺寸规则。桌面按钮、字段、菜单项分别使用 28、32、36px 基准；窄屏与触屏按钮、字段采用 36、40px，菜单项为 44px，并保留扩展的点击区域。数字与单位输入复用 `UnitInput`，常规字重、起始侧对齐，窄屏可见输入高度为 36px。长文案可增高，忙碌按钮保留宽度，分段选项支持 Home/End，Svelte 过渡尊重减少动态效果偏好。
+
+交互与尺寸回归：`web/e2e/r7.spec.ts`、`web/e2e/metadata.spec.ts`；实际界面、文案与验证记录：`designs/sani/implementation-r10/`。文档和 README 首页使用最新英文界面截图；使用指南保留中英文、明暗主题截图。
+
+API 契约与迁移入口：`make contract`、`OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`、`scripts/test-docker-storage.sh`。本地使用已校验的 v0.9.4 发布二进制完成升级与完整快照回滚，WSL Docker 验证非 root 存储、只读数据库和真实磁盘写满。Docker Desktop 会创建缺失的绑定目录，该拒绝场景由原生 Linux CI 覆盖。真机、Firefox/WebKit 与生产部署仍需独立验收。
+
 ## v0.9.4 管理与视觉一致性验收入口 {#r9-acceptance}
 
 已实施批准的 R7、R9。标签搜索／范围筛选按外框同高，工具栏、表单和菜单采用共享尺寸；窄屏或触屏控件为 44px。分类、分享地址、访问统计和关于信息字体统一。R9 的尺寸规则取代 R6 的窄屏紧凑规则。

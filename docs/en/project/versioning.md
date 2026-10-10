@@ -4,13 +4,19 @@
 
 ## Version numbers {#semver}
 
-Sani follows [semantic versioning](https://semver.org). A version looks like `major.minor.patch`:
+Sani uses [semantic versioning](https://semver.org), with the one-time v0.9.5 exception documented below. A version looks like `major.minor.patch`:
 
 - **Patch releases** (0.1.0 → 0.1.1) only fix things; still back up and read the changelog before upgrading.
 - **Minor releases** (1.1 → 1.2) add things without breaking what exists.
 - **Major releases** (1.x → 2.0) are the only ones with breaking changes, and the [changelog](./changelog) says how to upgrade.
 
 **Before 1.0**, a minor release may also break things, as from 0.1 to 0.2. Every such change is listed under “Breaking changes” in the changelog, with how to upgrade. From 1.0 on, the promises below hold for the whole major version.
+
+### One-time v0.9.5 exception {#v095-exception}
+
+**v0.9.5 includes breaking API changes and is not an ordinary compatible patch.** During early development before 1.0, this release makes a one-time exception to the patch rule above: old management routes are removed, the admin app uses `/api/admin/v1`, the resource API uses `/api/v1`, and the database moves to schema 6. Update automation scripts. Existing public short links, text shares, file downloads, credentials, tokens and resource IDs are retained.
+
+Export JSON in the old admin app, stop cleanly and back up the database, files and configuration. Run preflight before the in-place migration; rollback requires the complete pre-upgrade snapshot and old version. See the [v0.9.5 changelog](./changelog#v0-9-5) and [upgrade steps](../guide/operations#upgrade). This exception does not relax compatibility requirements for later patches.
 
 ## What stays the same {#stable}
 
@@ -69,6 +75,6 @@ These gates precede the formal compatibility promise; Sani is still in 0.x:
 - Exercise incremental database upgrades, preserving URLs, texts, files, statistics and credentials. Roll back failed migrations, reject newer schemas in older binaries, and rehearse a complete restore.
 - Complete tests on Linux, Windows and macOS, build every release platform, and pass E2E, accessibility and dependency checks. Release decisions use remote CI for the exact commit.
 - Record reproducible capacity measurements for latency, memory, SQLite waits and count consistency. Those measurements are not an SLA.
-- List changes to documented behavior, such as resumed-download counting, under “Breaking changes” with migration steps. During 0.x, ship them in a minor release instead of silently including them in a patch.
+- List incompatible changes to documented behavior under “Breaking changes” with migration steps. During 0.x, ship them in a minor release; the explicitly documented one-time v0.9.5 exception is not a precedent for breaking later patches.
 
 Database tables remain internal implementation details after 1.0.

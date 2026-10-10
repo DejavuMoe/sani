@@ -72,7 +72,29 @@
     "web/src/components/MetadataSettings.svelte": "f83a22e322e1b5c7e22cda863007c650d6de6485a12e188b1d981e65e1017b64",
     "web/src/views/Settings.svelte": "44ad09426bbd04a51793942285e2d90e39853a1361ed0fed2f544612cf231f20",
     "web/src/views/Login.svelte": "03a2f813cef0679c33ad4bc0a435ef1ad4c0230a5035993ad76303e57eb40036",
-    "web/src/views/Setup.svelte": "0a78e5c07f3df54fe6358ce9777d6a4a012af67e5e1a33fa911311b024d7bdbe"
+    "web/src/views/Setup.svelte": "0a78e5c07f3df54fe6358ce9777d6a4a012af67e5e1a33fa911311b024d7bdbe",
+    "web/src/components/SlugField.svelte": "b8c6205be509576ac1b5f558770d19116e09b29357b4e0bbd09bb14d7723f3af",
+    "web/src/lib/i18n.svelte.ts": "77250ad889a1ed4d87e7104bf7df12d784f1d503b65124093cc36a10d4bdcc98"
   },
-  "sourceHashEncoding": "UTF-8 with LF line endings"
+  "sourceHashEncoding": "UTF-8 with LF line endings",
+  "releasePreparation": {
+    "version": "v0.9.5",
+    "implementationCI": {
+      "commit": "bfd916bc7c73392aa0683034b045058f3a6eeab3",
+      "ci": "https://github.com/DejavuMoe/sani/actions/runs/38061944142",
+      "codeql": "https://github.com/DejavuMoe/sani/actions/runs/38061944143",
+      "docs": "https://ci.via.moe/repos/7/pipeline/28/1",
+      "result": "passed"
+    },
+    "checks": [
+      "make check test e2e smoke docs VERSION=v0.9.5: passed; 57 frontend unit tests and 86 browser tests",
+      "bash scripts/test-release-notes.sh and release-notes.sh v0.9.5: passed, including numeric link anchors",
+      "verify-docs-output.sh and test-publish-docs.sh: passed",
+      "web a11y: 88 clean states",
+      "docs a11y: 76 clean pages; builder and comments interactions passed"
+    ],
+    "screenshots": "16 regenerated real Svelte captures. Both landing pages and READMEs use English screenshots; guides keep reader-language variants. Verified theme, zoom, Escape and language changes in the Windows in-app browser with no console warnings/errors.",
+    "copyFollowup": "Empty SlugField sizes for its placeholder; English hint is Auto-generated. The earlier 573-string inventory is a dated capture before this release follow-up. New English hint verified in rendered desktop and mobile UI.",
+    "ciDiagnostics": "Initial Windows CI returned HTTP 500 in one concurrent-rename subtest. It did not reproduce in 15 local repetitions or three full Windows Go runs. Server test logs are now retained with testing.T.Output; the next complete CI passed. The original underlying database error was not captured, so its cause is unconfirmed."
+  }
 }

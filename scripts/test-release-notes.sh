@@ -8,8 +8,11 @@ mkdir -p docs/en/project
 for tag in v0.7.0 v0.7.0-rc.1; do
   printf '    image: ghcr.io/dejavumoe/sani:%s\n' "$tag" > compose.yaml
   printf '## %s\n\n2026-10-08 · Release fixture.\n' "$tag" > docs/en/project/changelog.md
+  printf '\n[Version](./versioning#v095-exception) and [Upgrade](../guide/operations#step-2).\n' >> docs/en/project/changelog.md
   bash "$script" "$tag" > notes.md
   grep -Fxq "docker pull ghcr.io/dejavumoe/sani:$tag" notes.md
+  grep -Fq '[Version](https://github.com/DejavuMoe/sani/blob/master/docs/en/project/versioning.md)' notes.md
+  grep -Fq '[Upgrade](https://github.com/DejavuMoe/sani/blob/master/docs/en/guide/operations.md)' notes.md
 done
 for image in latest 0.7.0 v0.6.0; do
   printf '    image: ghcr.io/dejavumoe/sani:%s\n' "$image" > compose.yaml

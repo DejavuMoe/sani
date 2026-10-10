@@ -143,6 +143,7 @@ async function copy(i: number) {
       <Screenshot
         class="shot"
         name="dashboard"
+        language="en"
         narrow="mobile"
         priority
         :alt="pick('Sani 的管理界面：顶部是缩短链接的输入框和点击总数，下面是短链接列表。', 'The Sani dashboard: the box for new links and the click totals at the top, the list of short links below.')"
