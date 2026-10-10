@@ -1,6 +1,6 @@
 # Everyday use
 
-<p class="lead">The admin app is built around one job: getting a short link into your hands as quickly as possible. Here are the everyday actions, plus a few details that are easy to miss.</p>
+<p class="lead">Use Links, Text and Files to create content, then manage share URLs, tags and visits together. This guide explains everyday actions and their limits.</p>
 
 ## Shortening links
 
@@ -18,7 +18,7 @@ You can shorten the same URL as often as you like, and each time you get a new l
 
 ## Grouping with tags {#tags}
 
-Choose existing tags or create one by name when creating a URL, text or file link. Each link supports up to 5 tags. Names allow 24 Unicode code points, are trimmed and NFC-normalized, and are matched case-insensitively. New tags can have a color; the default is blue. Each instance supports up to 1,000 tags.
+Choose existing tags or create one by name when creating a URL, text or file link. Each item supports up to 5 tags. Names allow 24 Unicode code points, are trimmed and NFC-normalized, and are matched case-insensitively. New tags can have a color; the default is blue. Each instance supports up to 1,000 tags.
 
 Open a link's details and choose Edit to change its tags. Saving applies assignments; canceling keeps the previous grouping. Creating a tag saves it to the catalog immediately, so it remains available even if you later cancel the link edit.
 
@@ -63,9 +63,9 @@ Under “More options”, when creating a link or any time later:
 
 ## Several links at once {#bulk}
 
-Click “Select” above the list, or press <kbd>X</kbd> on a selected row, to enter selection mode. A click on a row then checks it; <kbd>Shift</kbd>-click another row to check everything in between, and the box at the left of the action bar checks every loaded link.
+Click “Select” above the list, or press <kbd>X</kbd> on a selected row, to enter selection mode. A click on a row then checks it; <kbd>Shift</kbd>-click another row to check everything in between, and the box at the left of the action bar checks every loaded item.
 
-With links checked, the action bar turns them on or off, or deletes them, up to 500 at a time. Deleting offers undo, as usual. Press <kbd>Esc</kbd> or click “Done” to leave selection mode.
+With items checked, the action bar turns them on or off, or deletes them, up to 500 at a time. Deleting offers undo, as usual. Press <kbd>Esc</kbd> or click “Done” to leave selection mode.
 
 Search first and then check everything to handle a group of related links at once, such as turning off all the links of a campaign. Changing the search or the sort clears the checks, so nothing out of sight gets changed.
 
@@ -92,14 +92,14 @@ In the list, texts and files show `/p/` before the slug and an icon instead of a
 
 Search matches slugs, titles, destinations, file names and the first line of texts; press <kbd>/</kbd> to start typing. Pasting a full short link finds that link. Next to it, “All types” narrows the list to links, texts or files.
 
-The list sorts by “Newest”, “Most clicked” or “Last visited”.
+The list sorts by “Newest”, “Most visits” or “Last visited”.
 
 ## Link details
 
 Click a row, or select it and press <kbd>Enter</kbd>, to open its details:
 
-- total clicks, clicks today, the last visit and the creation date, plus how much of the expiry and visit limit is used;
-- daily clicks for the last 7, 30 or 90 days;
+- total visits, visits today, the last visit and the creation date, plus how much of the expiry and visit limit is used;
+- daily visits for the last 7, 30 or 90 days;
 - the top referring sites;
 - a QR code, downloadable as PNG or SVG;
 - edit, turn off, delete and “Refetch title”.
@@ -110,12 +110,12 @@ Press <kbd>?</kbd> in the admin app to see them any time.
 
 | Keys | Action |
 |---|---|
-| <kbd>N</kbd> | New short link |
+| <kbd>N</kbd> | Focus the current creation form |
 | <kbd>Ctrl</kbd> <kbd>V</kbd> / <kbd>⌘</kbd> <kbd>V</kbd> | Paste a link anywhere |
 | <kbd>/</kbd> | Search |
 | <kbd>J</kbd> / <kbd>K</kbd>, or <kbd>↓</kbd> / <kbd>↑</kbd> | Move the selection |
 | <kbd>Enter</kbd> | Open or close details |
-| <kbd>C</kbd> | Copy the short link |
+| <kbd>C</kbd> | Copy the share URL |
 | <kbd>E</kbd> | Edit |
 | <kbd>Ctrl</kbd> <kbd>Enter</kbd> / <kbd>⌘</kbd> <kbd>Enter</kbd> | Save changes |
 | <kbd>Del</kbd> / <kbd>⌘</kbd> <kbd>⌫</kbd> | Delete, with undo; with links checked, deletes all of them |

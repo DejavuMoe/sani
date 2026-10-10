@@ -411,7 +411,7 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
 
 ```json
 {
-  "version": "v0.9.3",
+  "version": "v0.9.4",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

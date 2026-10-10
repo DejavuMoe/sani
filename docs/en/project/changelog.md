@@ -2,13 +2,17 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.4
+
+2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.
 
 - Apply approved R9 control sizes: 32px desktop toolbars, 36px fields and 38px menu rows, with 44px controls on narrow or touch screens. Align tag search and filters, management entry styling and About typography.
 - Complete tag management with search, unused tags, global editing and atomic deletion that retains content.
 - Protect submitted drafts and unsaved item edits; preserve loaded pages and selection during refresh.
 - Distinguish query, pagination, statistics and token errors from empty data, with retry actions.
 - Clarify Links / Text / Files, counts, access limits and export versus backup; download all skipped import records.
+
+Before upgrading from v0.9.3, back up the database, files and configuration using [backup and restore](../guide/operations#backup-files), then replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.4`. Check Manage tags and creation/editing for all three content types. Deleting a tag removes its associations from all items while keeping the items; it cannot be undone. Use disposable tags when checking deletion.
 
 ## v0.9.3
 

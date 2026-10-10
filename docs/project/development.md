@@ -120,18 +120,18 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 推送入口是 Forgejo：`origin` 应指向 `ssh://git@ssh.via.moe/dejavu/sani.git`。Forgejo 收到推送后自动镜像到 GitHub，触发应用 CI 与发布构建。文档站由 `.woodpecker/docs.yml` 监听 Forgejo 的 `master` 推送并部署到 `https://sani.zsh.moe`；只推 GitHub 或只推标签不会触发这条文档部署流程。
 
-1. 把两份更新日志里的“未发布”一节改成新版本，标题是 `## v0.9.3` 这样的格式，并在下一行写上日期；同步 Compose、双语下载示例与镜像校验示例的完整版本标签。
-2. 运行 `make check test e2e smoke docs VERSION=v0.9.3` 和 `bash scripts/test-release-notes.sh`，确认 `scripts/release-notes.sh v0.9.3` 能生成说明。
+1. 把两份更新日志里的“未发布”一节改成新版本，标题是 `## v0.9.4` 这样的格式，并在下一行写上日期；同步 Compose、双语下载示例与镜像校验示例的完整版本标签。
+2. 运行 `make check test e2e smoke docs VERSION=v0.9.4` 和 `bash scripts/test-release-notes.sh`，确认 `scripts/release-notes.sh v0.9.4` 能生成说明。
 3. 提交后先用 `git remote get-url origin` 核对 Forgejo 地址，再 `git push origin master`。确认镜像到 GitHub 的提交一致，等待该提交的 CI 与 CodeQL 通过，并检查 Woodpecker 文档部署。
 4. 在已通过检查的提交上创建附注标签，推送到同一个 Forgejo 远程：
 
    ```sh
-   git tag -a v0.9.3 -m "Sani v0.9.3"
-   git push origin refs/tags/v0.9.3
+   git tag -a v0.9.4 -m "Sani v0.9.4"
+   git push origin refs/tags/v0.9.4
    ```
 
 5. 等待 GitHub Release 成功，核对 Forgejo 与 GitHub 的标签对象及目标提交一致；验证所有压缩包的 SHA-256 与来源证明、多平台镜像和实际运行版本，以及线上中英文文档的版本和内容。已发布标签不得移动、重建或强推；补同步缺失标签时推送原有对象。
 
-发布流程会先确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.9.3-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
+发布流程会先确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.9.4-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
 
 在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。

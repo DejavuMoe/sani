@@ -41,6 +41,12 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
+## v0.9.4 management and visual consistency acceptance {#r9-acceptance}
+
+Approved R7 and R9 are implemented. Tag search and scope filters share an outer height; toolbars, fields and menus use shared sizes, with 44px controls on narrow or touch screens. Categories, share URLs, visit statistics and About typography are consistent. R9 sizing supersedes the R6 narrow-screen compact rule.
+
+Atomic tag deletion and retained content: `internal/store/tags_test.go`, `internal/server/tags_test.go`. Draft guards, filtered refresh, retries and grouped dimensions: `web/e2e/r7.spec.ts`. Breakpoints, both languages/themes, mouse and emulated touch: `web/e2e/metadata.spec.ts`. Rendered evidence: `designs/sani/implementation-r9/`. Physical devices and Firefox/WebKit remain unverified.
+
 ## v0.9.3 slug and interface fix acceptance {#r6-acceptance}
 
 Approved R6 is implemented, with matching prototype and production fixes. These regressions cover independent slug settings, stable previews and responsive controls. Touch checks use browser emulation; they do not establish acceptance on physical iOS/Android devices or Firefox/WebKit.

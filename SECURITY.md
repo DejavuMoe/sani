@@ -30,5 +30,5 @@ provenance for every archive and image. To check a download:
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.3 --repo DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.4 --repo DejavuMoe/sani
 ```

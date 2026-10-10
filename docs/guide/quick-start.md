@@ -10,11 +10,11 @@
 mkdir -p ~/sani && cd ~/sani
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker run -d --name sani -p 127.0.0.1:8080:8080 \
-  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v0.9.3
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v0.9.4
 ```
 
 ```sh [二进制文件]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.3/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.4/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 ```
 

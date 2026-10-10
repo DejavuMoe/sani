@@ -41,6 +41,12 @@ Sani 面向**单管理员、单个服务进程、本地持久化数据目录**�
 
 上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
 
+## v0.9.4 管理与视觉一致性验收入口 {#r9-acceptance}
+
+已实施批准的 R7、R9。标签搜索／范围筛选按外框同高，工具栏、表单和菜单采用共享尺寸；窄屏或触屏控件为 44px。分类、分享地址、访问统计和关于信息字体统一。R9 的尺寸规则取代 R6 的窄屏紧凑规则。
+
+标签原子删除与内容保留：`internal/store/tags_test.go`、`internal/server/tags_test.go`；草稿保护、筛选刷新、错误重试和成组控件尺寸：`web/e2e/r7.spec.ts`；响应式边界、中英文、明暗、鼠标与模拟触屏：`web/e2e/metadata.spec.ts`。实际截图与文案证据：`designs/sani/implementation-r9/`。真机与 Firefox/WebKit 未验收。
+
 ## v0.9.3 短码与界面修复验收入口 {#r6-acceptance}
 
 已实施批准的 R6，原型与产品同步修复。以下回归覆盖独立短码配置、稳定预览和响应式控件；触屏检查使用浏览器模拟，尚不代表 iOS/Android 真机及 Firefox/WebKit 验收。
