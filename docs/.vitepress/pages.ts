@@ -4,10 +4,17 @@
 
 export type Lang = 'zh' | 'en';
 
+export interface PageItem {
+  path: string;
+  zh: string;
+  en: string;
+  sidebar?: boolean;
+}
+
 export interface PageGroup {
   zh: string;
   en: string;
-  pages: { path: string; zh: string; en: string }[];
+  pages: PageItem[];
 }
 
 export const groups: PageGroup[] = [
@@ -42,7 +49,7 @@ export const groups: PageGroup[] = [
     pages: [
       { path: 'reference/configuration', zh: '配置项', en: 'Configuration' },
       { path: 'reference/api', zh: 'HTTP API', en: 'HTTP API' },
-      { path: 'reference/api-archive', zh: 'API 归档 ≤ v0.9.4', en: 'API archive ≤ v0.9.4' },
+      { path: 'reference/api-archive', zh: 'API 归档 ≤ v0.9.4', en: 'API archive ≤ v0.9.4', sidebar: false },
       { path: 'reference/cli', zh: '命令行', en: 'Command line' },
     ],
   },

@@ -191,4 +191,5 @@ SQLite waits at most 1 second per external write-lock attempt; cancellation of a
 
 **The admin app only says “The admin app is not part of this build”.** The binary was built with plain `go build`, without the frontend. Rebuild with `make build`.
 
+**Items deleted via the resource API cannot be restored in the admin app.**  
 Resource API deletion is permanent in SQLite; files are reclaimed asynchronously by the same ten-minute sweeper and age threshold. Management deletions retain the one-hour restore window.

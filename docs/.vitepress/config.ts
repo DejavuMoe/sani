@@ -19,7 +19,9 @@ const version = latestVersion();
 function sidebar(lang: Lang): DefaultTheme.SidebarItem[] {
   return groups.map((g) => ({
     text: g[lang],
-    items: g.pages.map((p) => ({ text: p[lang], link: prefix(lang) + p.path })),
+    items: g.pages
+      .filter((p) => p.sidebar !== false)
+      .map((p) => ({ text: p[lang], link: prefix(lang) + p.path })),
   }));
 }
 

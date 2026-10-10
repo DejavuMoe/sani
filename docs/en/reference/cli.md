@@ -8,7 +8,7 @@
 | [`sani passwd`](#sani-passwd) | Set a new admin password and sign out every device |
 | [`sani backup`](#sani-backup) | Write a consistent copy of the database to a file or standard output |
 | [`sani healthcheck`](#sani-healthcheck) | Check that the local service is healthy |
-| [`sani preflight`](#sani-preflight) | Check database, file references, hashes and permissions without migrating. |
+| [`sani preflight`](#sani-preflight) | Check database, file references, hashes and permissions without migrating |
 | [`sani version`](#sani-version) | Print the version |
 | `sani help` | Print the usage text |
 

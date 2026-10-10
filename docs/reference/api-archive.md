@@ -1,3 +1,8 @@
+---
+prev: false
+next: false
+---
+
 # HTTP API 归档 · v0.9.4 及之前
 
 ::: warning 历史文档

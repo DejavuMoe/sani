@@ -1,3 +1,8 @@
+---
+prev: false
+next: false
+---
+
 # HTTP API archive · v0.9.4 and earlier
 
 ::: warning Archived reference

@@ -8,7 +8,7 @@
 | [`sani passwd`](#sani-passwd) | 设置新管理员密码并注销所有设备的会话 |
 | [`sani backup`](#sani-backup) | 导出数据库的一致性副本至文件或标准输出 |
 | [`sani healthcheck`](#sani-healthcheck) | 探测本机服务健康度状态 |
-| [`sani preflight`](#sani-preflight) | 迁移前核对数据库、文件引用、摘要与文件/目录权限，不执行迁移。 |
+| [`sani preflight`](#sani-preflight) | 迁移前核对数据库、文件引用、摘要与文件/目录权限，不执行迁移 |
 | [`sani version`](#sani-version) | 查看版本信息 |
 | `sani help` | 输出命令行帮助指南 |
 
