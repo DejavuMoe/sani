@@ -25,7 +25,7 @@ func TestMetadataProxyPersistenceCredentialsAndAtomicity(t *testing.T) {
 	const secret = "test-only-proxy-password"
 	p := metadataProxyInput{Scheme: "https", Host: "proxy.example.com", Port: 443, Auth: true, Username: "demo", Password: new(secret)}
 	patch := func() reply {
-		return e.req("PATCH", "/api/config", map[string]any{"metaMode": "proxy", "metaProxy": p})
+		return e.req("PATCH", "/api/admin/v1/config", map[string]any{"metaMode": "proxy", "metaProxy": p})
 	}
 	if r := patch(); r.status != 200 || strings.Contains(string(r.body), secret) || r.json()["metaProxy"].(map[string]any)["passwordSet"] != true {
 		t.Fatal(r.status, string(r.body))
@@ -52,7 +52,7 @@ func TestMetadataProxyPersistenceCredentialsAndAtomicity(t *testing.T) {
 	}
 	raw, _ := e.srv.store.Setting(context.Background(), store.SettingCreation)
 	p.Port = 0
-	if r := e.req("PATCH", "/api/config", map[string]any{"metaProxy": p, "baseUrl": "https://new.example.com", "slugLength": 9}); r.status != 400 {
+	if r := e.req("PATCH", "/api/admin/v1/config", map[string]any{"metaProxy": p, "baseUrl": "https://new.example.com", "slugLength": 9}); r.status != 400 {
 		t.Fatal(r.status, string(r.body))
 	}
 	after, _ := e.srv.store.Setting(context.Background(), store.SettingCreation)
@@ -108,7 +108,7 @@ func TestStoredMetadataProxyActuallyRoutesAndNeverFallsBack(t *testing.T) {
 	u, _ := url.Parse(proxy.URL)
 	port, _ := strconv.Atoi(u.Port())
 	p := metadataProxyInput{Scheme: "http", Host: u.Hostname(), Port: port}
-	if r := e.req("PATCH", "/api/config", map[string]any{"metaMode": "proxy", "metaProxy": p}); r.status != 200 {
+	if r := e.req("PATCH", "/api/admin/v1/config", map[string]any{"metaMode": "proxy", "metaProxy": p}); r.status != 200 {
 		t.Fatal(string(r.body))
 	}
 	f := e.srv.metadataFetcher()
@@ -140,26 +140,26 @@ func TestMetadataProxyValidationLocksAndTestBoundary(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if r := e.req("POST", "/api/config/metadata/test", `{}`); r.status != 401 {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", `{}`); r.status != 401 {
 		t.Fatal(r.status)
 	}
 	e.signIn()
-	if r := e.req("POST", "/api/config/metadata/test", `{}`, "Origin", "https://other.example.com", "Sec-Fetch-Site", "cross-site"); r.code() != "cross_origin" {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", `{}`, "Origin", "https://other.example.com", "Sec-Fetch-Site", "cross-site"); r.code() != "cross_origin" {
 		t.Fatal(r.status)
 	}
-	if r := e.req("POST", "/api/config/metadata/test", `{"metaProxy":{"host":"`+strings.Repeat("x", 5000)+`"}}`); r.status != 413 {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", `{"metaProxy":{"host":"`+strings.Repeat("x", 5000)+`"}}`); r.status != 413 {
 		t.Fatal(r.status)
 	}
-	if r := e.req("POST", "/api/config/metadata/test", `{}`); r.code() != "config_invalid" {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", `{}`); r.code() != "config_invalid" {
 		t.Fatal(r.code())
 	}
 	e.srv.metaTestNext = time.Now().Add(time.Minute)
 	input := map[string]any{"metaProxy": metadataProxyInput{Scheme: "http", Host: "127.0.0.1", Port: 1}}
-	if r := e.req("POST", "/api/config/metadata/test", input); r.status != 429 || r.header.Get("Retry-After") == "" {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", input); r.status != 429 || r.header.Get("Retry-After") == "" {
 		t.Fatal(r.status)
 	}
 	e.srv.metaTestNext = time.Time{}
-	if r := e.req("POST", "/api/config/metadata/test", input); r.code() != "proxy_test_failed" || r.header.Get("Cache-Control") != "no-store" {
+	if r := e.req("POST", "/api/admin/v1/config/metadata/test", input); r.code() != "proxy_test_failed" || r.header.Get("Cache-Control") != "no-store" {
 		t.Fatal(r.status, string(r.body))
 	}
 	if after, err := e.srv.store.Setting(context.Background(), store.SettingCreation); err != nil || after != before {
@@ -167,11 +167,11 @@ func TestMetadataProxyValidationLocksAndTestBoundary(t *testing.T) {
 	}
 	locked := newEnv(t, Options{MetaProxy: "http://demo:env-only-secret@127.0.0.1:8080", FetchMeta: true})
 	locked.signIn()
-	if r := locked.req("GET", "/api/config", nil); strings.Contains(string(r.body), "env-only-secret") {
+	if r := locked.req("GET", "/api/admin/v1/config", nil); strings.Contains(string(r.body), "env-only-secret") {
 		t.Fatal("environment secret leaked")
 	}
 	for _, method := range []string{"PATCH", "POST"} {
-		path := "/api/config"
+		path := "/api/admin/v1/config"
 		if method == "POST" {
 			path += "/metadata/test"
 		}
@@ -198,7 +198,7 @@ func TestMetadataProxyConcurrentSnapshots(t *testing.T) {
 	}
 	for i := 0; i < 20; i++ {
 		body := fmt.Sprintf(`{"metaMode":"proxy","metaProxy":{"scheme":"http","host":"127.0.0.1","port":%d,"auth":false}}`, 20000+i)
-		if r := e.req("PATCH", "/api/config", body); r.status != 200 {
+		if r := e.req("PATCH", "/api/admin/v1/config", body); r.status != 200 {
 			t.Fatal(r.status, string(r.body))
 		}
 	}

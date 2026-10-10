@@ -2,6 +2,17 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow [semantic versioning](./versioning); before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+### Breaking changes
+
+- Replace old management routes with `/api/admin/v1` and switch the embedded app, exports, icons, uploads and automation examples together. Existing public URLs, IDs, passwords, tokens and sessions remain valid.
+- Add `/api/v1` profile `sani-see-v1-2026-10-10`: 15 tested HTTP operations with documented limits. Reject unsupported protection/domain parameters; do not claim full s.ee compatibility.
+- Schema 6 adds stable opaque file deletion keys. Pending migrations run in one transaction, with preflight and a database safety copy before upgrading. Compatibility deletion is permanent; management deletion stays restorable.
+- **Upgrade steps:** export JSON from the old admin app; stop cleanly; snapshot database, shared files and deployment configuration; run new-binary preflight; start and verify old addresses. Normal upgrades migrate in place, without reimport. Roll back only with the old binary/image and the complete pre-upgrade snapshot. See [operations](../guide/operations#upgrade).
+- Add direct HTTP contract checks without external SDK dependencies, schema 1–5 preservation/failure tests and the old-binary full-snapshot recovery drill to CI.
+- Independent review adds atomic identity checks between rename and updates/permanent deletion, raw JSON UTF-8 validation, database/WAL/SHM write-access preflight and failed-migration copy cleanup. Docker verifies full-snapshot rollback, read-only databases and real ENOSPC as UID 65532.
+
 ## v0.9.4
 
 2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.

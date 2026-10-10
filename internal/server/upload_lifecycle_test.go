@@ -68,7 +68,7 @@ func TestSweepPreservesActiveUploadUntilCommitOrCleanup(t *testing.T) {
 				}
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
-				r := httptest.NewRequest("POST", "/api/files", body).WithContext(ctx)
+				r := httptest.NewRequest("POST", "/api/admin/v1/files", body).WithContext(ctx)
 				r.Header.Set("Content-Type", mw.FormDataContentType())
 				w := httptest.NewRecorder()
 				done := make(chan struct{})

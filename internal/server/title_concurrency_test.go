@@ -44,7 +44,7 @@ func TestMetadataChangesKeepConcurrentlySavedManualTitle(t *testing.T) {
 			if _, err := tx.ExecContext(ctx, "UPDATE links SET title = ?, meta = ?, updated_at = ? WHERE id = ?", manual, store.MetaManual, now+1, l.ID); err != nil {
 				t.Fatal(err)
 			}
-			r := httptest.NewRequest("PATCH", "/api/links/manual", strings.NewReader(`{"url":"http://127.0.0.1/new"}`))
+			r := httptest.NewRequest("PATCH", "/api/admin/v1/links/manual", strings.NewReader(`{"url":"http://127.0.0.1/new"}`))
 			r.SetPathValue("id", fmt.Sprint(l.ID))
 			w := httptest.NewRecorder()
 			done := make(chan struct{})

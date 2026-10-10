@@ -264,6 +264,10 @@ var migrations = []string{
 	INSERT INTO tags_new SELECT * FROM tags;
 	DROP TABLE tags;
 	ALTER TABLE tags_new RENAME TO tags;`,
+	// 6: opaque file deletion keys, independent of content hashes and public URLs.
+	`ALTER TABLE contents ADD COLUMN delete_key TEXT NOT NULL DEFAULT '';
+	UPDATE contents SET delete_key = lower(hex(randomblob(24))) WHERE file != '';
+	CREATE UNIQUE INDEX contents_delete_key ON contents(delete_key) WHERE delete_key != '';`,
 }
 
 func migrate(ctx context.Context, db *sql.DB) (result error) {
@@ -283,35 +287,41 @@ func migrate(ctx context.Context, db *sql.DB) (result error) {
 		_, err := db.ExecContext(context.Background(), "PRAGMA foreign_keys = ON")
 		result = errors.Join(result, err)
 	}()
+	// One immediate transaction serializes concurrent starts and makes the entire
+	// upgrade atomic. Read the version again after acquiring the writer lock.
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("acquire migration lock: %w", err)
+	}
+	defer tx.Rollback()
+	if err := tx.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
+		return fmt.Errorf("read locked schema version: %w", err)
+	}
+	if version > len(migrations) {
+		return fmt.Errorf("database schema version %d is newer than this build supports (%d)", version, len(migrations))
+	}
 	for i := version; i < len(migrations); i++ {
-		tx, err := db.BeginTx(ctx, nil)
-		if err != nil {
-			return err
-		}
 		if _, err := tx.ExecContext(ctx, migrations[i]); err != nil {
-			tx.Rollback()
-			return fmt.Errorf("migration %d: %w", i+1, err)
+			return fmt.Errorf("migration %d (from schema %d): %w", i+1, version, err)
 		}
 		rows, err := tx.QueryContext(ctx, "PRAGMA foreign_key_check")
 		if err != nil {
-			tx.Rollback()
-			return err
+			return fmt.Errorf("migration %d foreign key check: %w", i+1, err)
 		}
 		broken := rows.Next()
 		err = rows.Err()
 		rows.Close()
 		if broken || err != nil {
-			tx.Rollback()
 			return fmt.Errorf("migration %d: foreign key check failed: %v", i+1, err)
 		}
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("PRAGMA user_version = %d", i+1)); err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err := tx.Commit(); err != nil {
-			return err
+			return fmt.Errorf("migration %d record version: %w", i+1, err)
 		}
 	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit migration from schema %d to %d: %w", version, len(migrations), err)
+	}
+
 	return nil
 }
 

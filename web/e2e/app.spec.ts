@@ -263,9 +263,11 @@ test('an API token can create links and be revoked', async () => {
   await page.getByRole('button', { name: 'Create token' }).click();
   const token = (await page.locator('.secret code').textContent())!.trim();
   expect(token).toMatch(/^sani_[0-9A-Za-z]{43}$/);
+  await expect(page.locator('.reveal pre')).toContainText('/api/v1/shorten');
+  await expect(page.locator('.reveal pre')).toContainText('target_url');
 
   const api = await page.context().request;
-  const created = await api.post('/api/links', {
+  const created = await api.post('/api/admin/v1/links', {
     headers: { Authorization: `Bearer ${token}` },
     data: { url: 'https://example.org/from-api', slug: 'from-api' },
   });
@@ -274,7 +276,7 @@ test('an API token can create links and be revoked', async () => {
   await page.getByRole('button', { name: 'Revoke' }).click();
   await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.locator('.tokens')).toHaveCount(0);
-  const refused = await api.post('/api/links', {
+  const refused = await api.post('/api/admin/v1/links', {
     headers: { Authorization: `Bearer ${token}` },
     data: { url: 'https://example.org/again' },
   });
@@ -318,14 +320,14 @@ test('tags are created inline, survive refresh and retain the draft after a fail
   await search.press('Escape');
   await expect(page.locator('#create-panel-url .tag-add')).toBeFocused();
 
-  await page.route('**/api/links', route => route.request().method() === 'POST'
+  await page.route('**/api/admin/v1/links', route => route.request().method() === 'POST'
     ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal', message: 'try again' } }) })
     : route.continue());
   await page.locator('#create-panel-url .go').click();
   await expect(page.locator('#create-panel-url [role=alert]')).toBeVisible();
   await expect(page.getByLabel('URL', {exact:true})).toHaveValue('https://example.org/tag-review');
   await expect(page.locator('#create-panel-url .tag-selected')).toContainText('Review');
-  await page.unroute('**/api/links');
+  await page.unroute('**/api/admin/v1/links');
   await page.locator('#create-panel-url .go').click();
   const row = page.locator('.row', { hasText: '/review-tags' });
   await expect(row.locator('.tags')).toContainText('Review');
@@ -419,7 +421,7 @@ test('a delayed statistics response cannot undo saved tags', async () => {
   let captured!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   const ready = new Promise<void>(resolve => { captured = resolve; });
-  await page.route('**/api/links/*/stats?*', async route => {
+  await page.route('**/api/admin/v1/links/*/stats?*', async route => {
     const response = await route.fetch();
     captured();
     await held;
@@ -441,13 +443,13 @@ test('a delayed statistics response cannot undo saved tags', async () => {
     await expect(row.locator('.tag-detail .tag-name')).toHaveText(['Review', 'One', 'Two', 'Three']);
   } finally {
     release();
-    await page.unroute('**/api/links/*/stats?*');
+    await page.unroute('**/api/admin/v1/links/*/stats?*');
   }
 });
 
 test('external shared URLs need confirmation on desktop and phone', async () => {
   const destination = 'https://example.com/review-before-shortening';
-  const before = await (await page.request.get('/api/links')).json();
+  const before = await (await page.request.get('/api/admin/v1/links')).json();
   let createdURL = '';
   for (const [index, width] of [1280, 390].entries()) {
     await page.setViewportSize({ width, height: 860 });
@@ -456,7 +458,7 @@ test('external shared URLs need confirmation on desktop and phone', async () => 
     target.searchParams.set('title', 'Review this shared page');
     const posts: string[] = [];
     const track = (request: import('@playwright/test').Request) => {
-      if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/links') posts.push(request.url());
+      if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/admin/v1/links') posts.push(request.url());
     };
     page.on('request', track);
     await page.route('http://external.test/share', route => route.fulfill({
@@ -472,7 +474,7 @@ test('external shared URLs need confirmation on desktop and phone', async () => 
       await expect(page.locator('#composer-more input').first()).toHaveValue('Review this shared page');
       await page.waitForLoadState('networkidle');
       expect(posts).toHaveLength(0);
-      const unconfirmed = await (await page.request.get('/api/links')).json();
+      const unconfirmed = await (await page.request.get('/api/admin/v1/links')).json();
       expect(unconfirmed.total).toBe(before.total + index);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 
@@ -487,13 +489,13 @@ test('external shared URLs need confirmation on desktop and phone', async () => 
       await page.unroute('http://external.test/share');
     }
   }
-  const after = await (await page.request.get('/api/links')).json();
+  const after = await (await page.request.get('/api/admin/v1/links')).json();
   expect(after.total).toBe(before.total + 1);
   await page.setViewportSize({ width: 1280, height: 860 });
 });
 
 test('a text response from before an edit cannot replace its saved preview or clipboard', async () => {
-  const created = await page.request.post('/api/texts', { data: { slug: 'delayed-body', text: 'Old body' } });
+  const created = await page.request.post('/api/admin/v1/texts', { data: { slug: 'delayed-body', text: 'Old body' } });
   expect(created.status()).toBe(201);
   const link = await created.json();
   await page.goto('/admin/');
@@ -502,7 +504,7 @@ test('a text response from before an edit cannot replace its saved preview or cl
   const held = new Promise<void>(resolve => { release = resolve; });
   const ready = new Promise<void>(resolve => { captured = resolve; });
   let first = true;
-  const path = `**/api/links/${link.id}/text`;
+  const path = `**/api/admin/v1/links/${link.id}/text`;
   await page.route(path, async route => {
     if (!first) return route.continue();
     first = false;
@@ -520,7 +522,7 @@ test('a text response from before an edit cannot replace its saved preview or cl
     await row.locator('.editor textarea').fill('New saved body');
     await row.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(row.locator('.preview')).toHaveText('New saved body');
-    const response = page.waitForResponse(r => r.url().endsWith(`/api/links/${link.id}/text`));
+    const response = page.waitForResponse(r => r.url().endsWith(`/api/admin/v1/links/${link.id}/text`));
     release();
     await response;
     await row.getByRole('button', { name: 'Copy text', exact: true }).click();
@@ -535,7 +537,7 @@ test('a text response from before an edit cannot replace its saved preview or cl
 test('failed sign-out stays authenticated and can be retried', async () => {
   await page.goto('/admin/settings');
   for (const failure of ['server', 'network']) {
-    await page.route('**/api/session', route => {
+    await page.route('**/api/admin/v1/session', route => {
       if (route.request().method() !== 'DELETE') return route.continue();
       return failure === 'network' ? route.abort('failed') : route.fulfill({
         status: 500, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal', message: 'failed' } }),
@@ -544,7 +546,7 @@ test('failed sign-out stays authenticated and can be retried', async () => {
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(page.locator('.toast').last()).toContainText(failure === 'network' ? 'Can’t reach the server' : 'Something went wrong');
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
-    await page.unroute('**/api/session');
+    await page.unroute('**/api/admin/v1/session');
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
   }
@@ -552,7 +554,7 @@ test('failed sign-out stays authenticated and can be retried', async () => {
   expect(oldCookie).not.toBe('');
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
-  expect((await page.request.get('/api/links', { headers: { Cookie: oldCookie } })).status()).toBe(401);
+  expect((await page.request.get('/api/admin/v1/links', { headers: { Cookie: oldCookie } })).status()).toBe(401);
   await page.reload();
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
   await page.getByLabel('Password').fill(PASSWORD);
@@ -591,7 +593,7 @@ test('imports the original Shlink CSV shape through Settings', async () => {
       + '"2026-02-04T20:04:57+08:00","s.example.com","shlink-csv","https://s.example.com/shlink-csv","https://example.com/from-shlink","Imported from Shlink","blog|work",17\n'),
   });
   await expect(page.locator('.import-result')).toContainText('Imported 1 link');
-  const exported = await (await page.request.get('/api/export')).json();
+  const exported = await (await page.request.get('/api/admin/v1/export')).json();
   expect(exported.links.find((link: { slug: string }) => link.slug === 'shlink-csv')).toMatchObject({
     url: 'https://example.com/from-shlink', title: 'Imported from Shlink', clicks: 17,
     tags: [{ name: 'blog', color: 'blue' }, { name: 'work', color: 'blue' }],
@@ -621,7 +623,7 @@ test('custom tag colors validate, edit existing references and keep Enter inside
   await edit.getByLabel('Custom color', { exact: true }).fill('hsl(120, 20%, 40%)');
   await edit.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(manager.getByRole('button', { name: 'Edit tag Custom renamed' })).toBeFocused();
-  const tags = await (await page.request.get('/api/tags')).json();
+  const tags = await (await page.request.get('/api/admin/v1/tags')).json();
   expect(tags.items.find((tag: {name:string}) => tag.name === 'Custom renamed').color).toBe('#527a52');
   await manager.getByRole('button', {name:'Close',exact:true}).click();
   await expect(panel.locator('.tag-selected')).toContainText('Custom renamed');
@@ -637,7 +639,7 @@ test('creation defaults persist and environment metadata stays locked', async ()
   await expect(page.getByLabel('Links', { exact: true })).toHaveValue('7');
   await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
   await expect(page.locator('#metadata-enabled')).toBeDisabled();
-  const created = await page.request.post('/api/links', {data:{url:'https://example.com/r3-settings'}});
+  const created = await page.request.post('/api/admin/v1/links', {data:{url:'https://example.com/r3-settings'}});
   expect((await created.json()).slug).toHaveLength(7);
   for (const format of ['csv', 'json']) {
     const sample = await page.request.get(`/admin/examples/sani.${format}`);
@@ -654,7 +656,7 @@ test('large file retries the failed chunk without resending confirmed bytes', as
   const bytes = Buffer.alloc(26_000_000, 37);
   const offsets:number[] = [];
   let fail = true;
-  await page.route('**/api/uploads/*', route => {
+  await page.route('**/api/admin/v1/uploads/*', route => {
     if (route.request().method() !== 'PUT') return route.continue();
     const offset = Number(route.request().headers()['upload-offset']);
     offsets.push(offset);
@@ -676,7 +678,7 @@ test('large file retries the failed chunk without resending confirmed bytes', as
     const downloaded = await file.body();
     expect(downloaded.length).toBe(bytes.length);
     expect(createHash('sha256').update(downloaded).digest('hex')).toBe(createHash('sha256').update(bytes).digest('hex'));
-  } finally { await page.unroute('**/api/uploads/*'); }
+  } finally { await page.unroute('**/api/admin/v1/uploads/*'); }
 });
 
 test('tabs and settings keep horizontal geometry at desktop and narrow widths', async () => {

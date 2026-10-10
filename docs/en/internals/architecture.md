@@ -66,7 +66,7 @@ SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure 
 
 Shared files themselves are not in the database but in `files/` in the data directory, each under a random name; texts and files share the cache and click counting with links.
 
-The schema version is kept in `PRAGMA user_version`; startup runs outstanding migrations in order, each in a transaction. Schema 4 adds `tags` (name, normalized name key, color) and `link_tags` (link ID, tag ID, display order), with cascading foreign keys and an index for tag filtering. The non-reused `AUTOINCREMENT` link IDs introduced in schema 3 remain. Tag assignments and link updates share a transaction; redirect caches and target lookups do not read tags. Take a complete backup first; downgrades need the pre-upgrade backup.
+The schema version is kept in `PRAGMA user_version`; startup runs outstanding migrations in order, within one immediate write transaction. Schema 4 adds `tags` (name, normalized name key, color) and `link_tags` (link ID, tag ID, display order), with cascading foreign keys and an index for tag filtering. The non-reused `AUTOINCREMENT` link IDs introduced in schema 3 remain. Tag assignments and link updates share a transaction; redirect caches and target lookups do not read tags. Take a complete backup first; downgrades need the pre-upgrade backup.
 
 ## Background work
 
@@ -97,3 +97,5 @@ The admin app is written in Svelte 5 and TypeScript and built with Vite, without
 Assets with hashed file names are cached for a year; `index.html` is revalidated every time and carries a strict Content Security Policy.
 
 Schema 5 rebuilds the tags table to accept normalized six-digit HEX colors as well as legacy named colors. IDs and link associations are preserved. The settings table also stores creation defaults. Back up before upgrading; v0.8.x cannot open schema 5, so a downgrade requires restoring the pre-upgrade database and files.
+
+Schema 6 appends `contents.delete_key` with a unique nonempty index, backfills random keys for existing files, and does not rewrite resources or public URL paths. `/api/v1` and `/api/admin/v1` share input validation, resource creation/update, streaming uploads, SQLite and cache invalidation. The adapter checks a configured single domain; the global slug namespace remains unchanged.

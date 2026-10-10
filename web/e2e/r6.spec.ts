@@ -25,7 +25,7 @@ test.afterAll(async () => {
 
 async function login(page: Page, lang = 'en', theme = 'light') {
   await page.addInitScript(({ lang, theme }) => { localStorage.setItem('sani.lang', lang); localStorage.setItem('sani.theme', theme); }, { lang, theme });
-  expect((await page.request.post(`${base}/api/session`, { data: { password } })).ok()).toBe(true);
+  expect((await page.request.post(`${base}/api/admin/v1/session`, { data: { password } })).ok()).toBe(true);
 }
 async function audit(page: Page) {
   await page.evaluate(axe);
@@ -54,24 +54,24 @@ test('three lengths validate, retry, persist and govern actual URL/text/file cre
   await file.fill('12');
   await expect(form).toContainText('easier to guess');
   let fail = true;
-  await page.route('**/api/config', route => {
+  await page.route('**/api/admin/v1/config', route => {
     if (route.request().method() !== 'PATCH' || !fail) return route.continue();
     fail = false;
     return route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal', message: 'failed' } }) });
   });
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(form.getByRole('alert')).toBeVisible();
-  expect((await (await page.request.get(`${base}/api/config`)).json()).textSlugLength).toBe(10);
+  expect((await (await page.request.get(`${base}/api/admin/v1/config`)).json()).textSlugLength).toBe(10);
   await form.getByRole('button', { name: /Retry/ }).press('Enter');
   await expect(form.getByRole('status')).toContainText('Saved');
-  await page.unroute('**/api/config');
+  await page.unroute('**/api/admin/v1/config');
   await page.reload();
   await expect(url).toHaveValue('32');
   await expect(text).toHaveValue('5');
   await expect(file).toHaveValue('12');
-  const link = await page.request.post(`${base}/api/links`, { data: { url: 'https://example.com/r6' } });
-  const sharedText = await page.request.post(`${base}/api/texts`, { data: { text: 'Shared meeting notes' } });
-  const sharedFile = await page.request.post(`${base}/api/files`, { multipart: { file: { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Meeting notes') } } });
+  const link = await page.request.post(`${base}/api/admin/v1/links`, { data: { url: 'https://example.com/r6' } });
+  const sharedText = await page.request.post(`${base}/api/admin/v1/texts`, { data: { text: 'Shared meeting notes' } });
+  const sharedFile = await page.request.post(`${base}/api/admin/v1/files`, { multipart: { file: { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Meeting notes') } } });
   for (const response of [link, sharedText, sharedFile]) expect(response.status()).toBe(201);
   expect((await link.json()).slug).toHaveLength(32);
   expect((await sharedText.json()).slug).toHaveLength(5);
@@ -79,12 +79,12 @@ test('three lengths validate, retry, persist and govern actual URL/text/file cre
   await text.fill('3');
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(form.getByRole('status')).toContainText('Saved');
-  expect((await (await page.request.post(`${base}/api/texts`, { data: { text: 'Three characters' } })).json()).slug).toHaveLength(3);
+  expect((await (await page.request.post(`${base}/api/admin/v1/texts`, { data: { text: 'Three characters' } })).json()).slug).toHaveLength(3);
 });
 
 test('a reported environment lock disables only its own field and is omitted from saves', async ({ page }) => {
   await login(page);
-  await page.route('**/api/config', async route => {
+  await page.route('**/api/admin/v1/config', async route => {
     if (route.request().method() !== 'GET') return route.continue();
     const response = await route.fetch();
     const config = await response.json();
@@ -97,7 +97,7 @@ test('a reported environment lock disables only its own field and is omitted fro
   await expect(form).toContainText('Set by environment');
   await form.getByLabel('Links', { exact: true }).fill('7');
   await form.getByLabel('Files', { exact: true }).fill('13');
-  const saved = page.waitForRequest(r => r.url().endsWith('/api/config') && r.method() === 'PATCH');
+  const saved = page.waitForRequest(r => r.url().endsWith('/api/admin/v1/config') && r.method() === 'PATCH');
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   expect((await saved).postDataJSON()).toEqual({ slugLength: 7, fileSlugLength: 13 });
   await expect(form.getByRole('status')).toContainText('Saved');
@@ -107,10 +107,10 @@ for (const format of ['plain', 'code']) {
   test(`${format} preview survives statistics and list refresh without refetching or scrolling`, async ({ page }) => {
     await login(page);
     const text = Array.from({ length: 36 }, (_, n) => format === 'code' ? `const entry${n} = '${'weekly notes '.repeat(12)}';` : `Meeting note ${n + 1}: discuss next week's schedule.`).join('\n');
-    const created = await page.request.post(`${base}/api/texts`, { data: { text, format } });
+    const created = await page.request.post(`${base}/api/admin/v1/texts`, { data: { text, format } });
     const link = await created.json();
     let bodyRequests = 0;
-    page.on('request', request => { if (request.url().endsWith(`/api/links/${link.id}/text`)) bodyRequests++; });
+    page.on('request', request => { if (request.url().endsWith(`/api/admin/v1/links/${link.id}/text`)) bodyRequests++; });
     await page.clock.install();
     await page.goto(`${base}/admin/`);
     const row = page.locator(`[data-link="${link.id}"]`);
@@ -129,7 +129,7 @@ for (const format of ['plain', 'code']) {
       expect(await geometry()).toEqual(before);
       expect(bodyRequests).toBe(1);
     }
-    const refreshed = page.waitForResponse(r => new URL(r.url()).pathname === '/api/links');
+    const refreshed = page.waitForResponse(r => new URL(r.url()).pathname === '/api/admin/v1/links');
     await page.clock.fastForward(60_000);
     await refreshed;
     await expect(preview).toHaveText(text);
@@ -141,8 +141,8 @@ for (const format of ['plain', 'code']) {
 
 test('failed initial body load retries and an edited body keeps the old content until ready', async ({ page }) => {
   await login(page);
-  const link = await (await page.request.post(`${base}/api/texts`, { data: { text: 'Original meeting notes' } })).json();
-  const path = `**/api/links/${link.id}/text`;
+  const link = await (await page.request.post(`${base}/api/admin/v1/texts`, { data: { text: 'Original meeting notes' } })).json();
+  const path = `**/api/admin/v1/links/${link.id}/text`;
   await page.route(path, route => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: { code: 'internal' } }) }));
   await page.goto(`${base}/admin/`);
   const row = page.locator(`[data-link="${link.id}"]`);
@@ -151,11 +151,11 @@ test('failed initial body load retries and an edited body keeps the old content 
   await page.unroute(path);
   await row.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(row.locator('.preview')).toHaveText('Original meeting notes');
-  expect((await page.request.patch(`${base}/api/links/${link.id}`, { data: { text: 'Updated meeting notes' } })).ok()).toBe(true);
+  expect((await page.request.patch(`${base}/api/admin/v1/links/${link.id}`, { data: { text: 'Updated meeting notes' } })).ok()).toBe(true);
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route(path, async route => { await held; await route.continue(); });
-  const requested = page.waitForRequest(r => r.url().endsWith(`/api/links/${link.id}/text`));
+  const requested = page.waitForRequest(r => r.url().endsWith(`/api/admin/v1/links/${link.id}/text`));
   await row.getByRole('radio', { name: '7 days', exact: true }).click();
   await requested;
   await expect(row.locator('.preview')).toHaveText('Original meeting notes');
@@ -185,7 +185,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
     await page.screenshot({ path: info.outputPath('settings.png') });
     for (const format of ['plain', 'code']) {
       const text = format === 'plain' ? '下周安排：整理会议记录、核对日程，并更新项目清单。' : Array.from({ length: 36 }, (_, n) => `const entry${n} = '${'weekly schedule '.repeat(10)}';`).join('\n');
-      const link = await (await page.request.post(`${base}/api/texts`, { data: { text, format } })).json();
+      const link = await (await page.request.post(`${base}/api/admin/v1/texts`, { data: { text, format } })).json();
       await page.goto(`${base}/admin/`);
       const row = page.locator(`[data-link="${link.id}"]`);
       await row.locator('button.main').click();

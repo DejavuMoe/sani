@@ -99,10 +99,10 @@ SANI_BASE_URL=https://s.example.com ./sani
 **API**：在设置里创建令牌，然后：
 
 ```sh
-curl -X POST https://s.example.com/api/links \
+curl -X POST https://s.example.com/api/v1/shorten \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com/some/long/path", "slug": "demo"}'
+  -d '{"target_url": "https://example.com/some/long/path", "slug": "demo"}'
 ```
 
 每个接口和错误码的说明见 [HTTP API](docs/reference/api.md)。
@@ -189,3 +189,5 @@ make load             # 上面的压测
 ## 许可证
 
 [MIT](LICENSE)
+
+对外 `/api/v1` 使用限定范围的 `sani-see-v1-2026-10-10` HTTP 兼容配置；后台操作使用 `/api/admin/v1`。升级前先在旧后台导出 JSON，正常停机并完整备份数据库、文件与配置；新版执行 `sani preflight` 后原地迁移，无需重新导入。回滚必须恢复升级前完整快照并使用旧镜像/二进制。详见[兼容矩阵](docs/reference/api.md#see)和[升级说明](docs/guide/operations.md#upgrade)。

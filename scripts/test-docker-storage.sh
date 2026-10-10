@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Exercise the default Compose deployment and permission repair against an image.
 set -euo pipefail
-image=${1:?usage: bash scripts/test-docker-storage.sh IMAGE}
+image=${1:?usage: bash scripts/test-docker-storage.sh IMAGE [OLD_BIN]}
+old_bin=${2:-}
+if [ -n "$old_bin" ]; then old_bin=$(realpath "$old_bin"); test -x "$old_bin"; fi
 work=$(mktemp -d)
 name=sani-storage-${work##*.}
 name=${name,,}
@@ -72,4 +74,26 @@ test "$(sudo stat -c '%u:%g' "$work/bind/sani.db")" = 65532:65532
 docker logs "$name-bind" 2>&1 | grep -q setup_code
 docker restart "$name-bind" >/dev/null
 healthy "$name-bind"
+
+if [ -n "$old_bin" ]; then
+  # Run the same HTTP/snapshot drill as UID 65532 on a real bind mount. Node
+  # is only the test harness; /sani is copied from the image under test.
+  sudo install -d -m 750 -o 65532 -g 65532 "$work/upgrade"
+  docker cp "$name-bind:/sani" "$work/sani"
+  install -m 755 "$old_bin" "$work/old-sani"
+  install -m 644 scripts/compat.mjs "$work/compat.mjs"
+  printf '%s\n' "$name" >"$work/mount-marker"
+  sudo install -m 644 "$work/mount-marker" "$work/upgrade/mount-marker"
+  docker run --rm --user 65532:65532 \
+    --mount "type=bind,src=$work/upgrade,dst=/work" \
+    --mount "type=bind,src=$work/sani,dst=/sani,readonly" \
+    --mount "type=bind,src=$work/old-sani,dst=/old-sani,readonly" \
+    --mount "type=bind,src=$work/compat.mjs,dst=/compat.mjs,readonly" \
+    --tmpfs /full:rw,size=16m,uid=65532,gid=65532,mode=0700 \
+    -e TMPDIR=/work -e BIN=/sani -e OLD_BIN=/old-sani -e MOUNT_MARKER="$name" -e SANI_TEST_FULL_DIR=/full \
+    node:24-alpine sh -ec 'test "$(cat /work/mount-marker)" = "$MOUNT_MARKER"; node /compat.mjs --upgrade; id -u > /work/uid'
+  test "$(sudo cat "$work/upgrade/uid")" = 65532
+  test "$(sudo stat -c '%u:%g' "$work/upgrade/uid")" = 65532:65532
+  echo 'storage: image binary upgrade and complete snapshot rollback as UID 65532 on bind storage passed'
+fi
 echo 'storage: default Compose, initialized bind, recreation, permission repair and restart passed'

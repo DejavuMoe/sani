@@ -88,6 +88,10 @@ func applyOptions(l *store.Link, p *store.Patch) {
 // save inserts a new link under the requested slug, or a generated one, and
 // reports problems to the client.
 func (s *Server) save(w http.ResponseWriter, r *http.Request, l *store.Link, slug *string) bool {
+	return !s.resourceError(w, r, s.saveLink(r, l, slug))
+}
+
+func (s *Server) saveLink(r *http.Request, l *store.Link, slug *string) error {
 	var err error
 	if slug != nil && *slug != "" {
 		l.Slug = *slug
@@ -95,19 +99,10 @@ func (s *Server) save(w http.ResponseWriter, r *http.Request, l *store.Link, slu
 	} else {
 		err = s.createGenerated(r, l)
 	}
-	if tagError(w, err) {
-		return false
+	if err == nil {
+		s.cache.Invalidate(links.Key(l.Slug))
 	}
-	if errors.Is(err, store.ErrSlugTaken) {
-		writeError(w, http.StatusConflict, "slug_taken", "this slug is already in use")
-		return false
-	}
-	if err != nil {
-		s.internalError(w, r, err)
-		return false
-	}
-	s.cache.Invalidate(links.Key(l.Slug))
-	return true
+	return err
 }
 
 func (s *Server) createText(w http.ResponseWriter, r *http.Request) {
@@ -115,18 +110,23 @@ func (s *Server) createText(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSONMax(w, r, &in, maxTextBody) {
 		return
 	}
+	l, err := s.createTextResource(r, &in)
+	if !s.resourceError(w, r, err) {
+		writeJSON(w, http.StatusCreated, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
+	}
+}
+
+func (s *Server) createTextResource(r *http.Request, in *linkInput) (*store.Link, error) {
 	if in.Text == nil {
-		writeError(w, http.StatusBadRequest, "text_required", "text is required")
-		return
+		return nil, badInput("text_required", "text is required")
 	}
 	now := time.Now().UnixMilli()
-	p, ierr := s.resolveInput(r, &in, now)
+	p, ierr := s.resolveInput(r, in, now)
 	if ierr == nil {
 		ierr = checkKind(store.KindText, p)
 	}
 	if ierr != nil {
-		writeError(w, ierr.status, ierr.code, ierr.msg)
-		return
+		return nil, ierr
 	}
 	text := *p.Text
 	l := &store.Link{
@@ -147,9 +147,10 @@ func (s *Server) createText(w http.ResponseWriter, r *http.Request) {
 		l.Content.Format = *p.Format
 	}
 	applyOptions(l, p)
-	if s.save(w, r, l, p.Slug) {
-		writeJSON(w, http.StatusCreated, s.toDTO(s.baseURL(r), l, now))
+	if err := s.saveLink(r, l, p.Slug); err != nil {
+		return nil, err
 	}
+	return l, nil
 }
 
 // linkText returns the body of a text link, which listings leave out.
@@ -192,9 +193,15 @@ var uploadFields = map[string]bool{"slug": true, "title": true, "expiresAt": tru
 // multipart/form-data with a "file" part and optional fields named like the
 // JSON ones; the file is streamed to disk, never held in memory.
 func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
+	l, err := s.uploadFile(w, r, false)
+	if !s.resourceError(w, r, err) {
+		writeJSON(w, http.StatusCreated, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
+	}
+}
+
+func (s *Server) uploadFile(w http.ResponseWriter, r *http.Request, compat bool) (*store.Link, error) {
 	if s.opt.FilesURL == "" {
-		writeError(w, http.StatusConflict, "files_disabled", "sharing files needs SANI_FILES_URL")
-		return
+		return nil, &inputError{http.StatusConflict, "files_disabled", "sharing files needs SANI_FILES_URL"}
 	}
 	s.filesMu.RLock()
 	defer s.filesMu.RUnlock()
@@ -205,8 +212,7 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, limit+1<<20)
 	mr, err := r.MultipartReader()
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "upload_invalid", "send the file as multipart/form-data")
-		return
+		return nil, &inputError{http.StatusBadRequest, "upload_invalid", "send the file as multipart/form-data"}
 	}
 
 	var up *upload
@@ -224,56 +230,60 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 		}
 		var tooBig *http.MaxBytesError
 		if errors.As(err, &tooBig) {
-			writeError(w, http.StatusRequestEntityTooLarge, "file_too_large", tooLargeMsg)
-			return
+			return nil, &inputError{http.StatusRequestEntityTooLarge, "file_too_large", tooLargeMsg}
 		}
 		if err != nil {
-			writeError(w, http.StatusBadRequest, "upload_invalid", "the multipart body is malformed")
-			return
+			return nil, &inputError{http.StatusBadRequest, "upload_invalid", "the multipart body is malformed"}
 		}
 		name := part.FormName()
 		switch {
-		case name == "file" && up == nil:
+		case (name == "file" || name == "smfile" && compat) && up == nil:
 			up, err = s.receive(part, limit)
 			if errors.Is(err, errFileTooLarge) || errors.As(err, &tooBig) {
-				writeError(w, http.StatusRequestEntityTooLarge, "file_too_large", tooLargeMsg)
-				return
+				return nil, &inputError{http.StatusRequestEntityTooLarge, "file_too_large", tooLargeMsg}
 			}
 			if errors.Is(err, io.ErrUnexpectedEOF) {
-				writeError(w, http.StatusBadRequest, "upload_invalid", "the upload ended early")
-				return
+				return nil, &inputError{http.StatusBadRequest, "upload_invalid", "the upload ended early"}
 			}
 			if err != nil {
-				s.internalError(w, r, err)
-				return
+				return nil, err
 			}
-		case name == "file":
-			writeError(w, http.StatusBadRequest, "upload_invalid", "send one file at a time")
-			return
-		case uploadFields[name]:
+		case name == "file" || name == "smfile" && compat:
+			return nil, &inputError{http.StatusBadRequest, "upload_invalid", "send one file at a time"}
+		case uploadFields[name] && !compat || seeUploadFields[name] && compat:
 			v, err := io.ReadAll(io.LimitReader(part, 4<<10+1))
 			if err != nil || len(v) > 4<<10 {
-				writeError(w, http.StatusBadRequest, "upload_invalid", "the "+name+" field is too long")
-				return
+				return nil, &inputError{http.StatusBadRequest, "upload_invalid", "the " + name + " field is too long"}
+			}
+			if _, exists := fields[name]; exists {
+				return nil, badInput("upload_invalid", "duplicate multipart field")
 			}
 			fields[name] = string(v)
+		default:
+			if compat {
+				return nil, badInput("unsupported_parameter", "unsupported multipart field: "+name)
+			}
 		}
 		part.Close()
 	}
 	if up == nil || up.size == 0 {
-		writeError(w, http.StatusBadRequest, "file_required", "attach a file that is not empty")
-		return
+		return nil, &inputError{http.StatusBadRequest, "file_required", "attach a file that is not empty"}
 	}
 
-	in, ierr := formInput(fields)
+	var in *linkInput
+	var ierr *inputError
+	if compat {
+		in, ierr = s.seeFileInput(fields)
+	} else {
+		in, ierr = formInput(fields)
+	}
 	now := time.Now().UnixMilli()
 	var p *store.Patch
 	if ierr == nil {
 		p, ierr = s.resolveInput(r, in, now)
 	}
 	if ierr != nil {
-		writeError(w, ierr.status, ierr.code, ierr.msg)
-		return
+		return nil, ierr
 	}
 	l := &store.Link{
 		Kind:      store.KindFile,
@@ -285,12 +295,12 @@ func (s *Server) createFile(w http.ResponseWriter, r *http.Request) {
 		Content:   &store.Content{Name: up.name, Type: up.ctype, Size: up.size, SHA256: up.sum, File: up.file},
 	}
 	applyOptions(l, p)
-	if !s.save(w, r, l, p.Slug) {
-		return
+	if err := s.saveLink(r, l, p.Slug); err != nil {
+		return nil, err
 	}
 	up.file = "" // the link owns it now
 	s.log.Info("file shared", "slug", l.Slug, "bytes", l.Content.Size)
-	writeJSON(w, http.StatusCreated, s.toDTO(s.baseURL(r), l, now))
+	return l, nil
 }
 
 // formInput reads multipart fields as the JSON body of a create request.

@@ -1,4 +1,5 @@
 .git
+.upgrade-legacy
 bin
 data
 sani-data

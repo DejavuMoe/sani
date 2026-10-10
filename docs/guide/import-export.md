@@ -4,7 +4,7 @@
 
 ## 导出数据 {#export}
 
-在后台 设置 → 数据 中选择“导出全部链接”，可导出 JSON 或 CSV 文件。亦可通过 API 调用：[`GET /api/export`](../reference/api#export)（加 `?format=csv` 导出 CSV）。注意：导出仅涵盖短链接，不含文本与分享文件（二进制内容需通过[完整备份](./operations#backup)留存）。
+在后台 设置 → 数据 中选择“导出全部链接”，可导出 JSON 或 CSV 文件。亦可通过 API 调用：[`GET /api/admin/v1/export`](../reference/api#export)（加 `?format=csv` 导出 CSV）。注意：导出仅涵盖短链接，不含文本与分享文件（二进制内容需通过[完整备份](./operations#backup)留存）。
 
 导出的 JSON 数据结构如下（空字段自动省略）：
 
@@ -39,7 +39,7 @@ JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 
 
 ## 导入数据 {#import}
 
-在后台 设置 → 数据 区域拖入或点击选取文件。亦可通过 API 调用：[`POST /api/import`](../reference/api#import)（请求体直传文件二进制流）。
+在后台 设置 → 数据 区域拖入或点击选取文件。亦可通过 API 调用：[`POST /api/admin/v1/import`](../reference/api#import)（请求体直传文件二进制流）。
 
 系统自动识别文件内容格式，兼容以下数据源：
 

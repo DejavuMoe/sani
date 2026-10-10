@@ -91,28 +91,28 @@ try {
   assert.equal(cli(['version']).status, 0);
   assert.equal(cli(['healthcheck']).status, 0);
   assert.match(await (await request('/admin/')).text(), /<script/);
-  assert.equal((await json('/api/session')).needsSetup, true);
-  const setup = await request('/api/setup', {
+  assert.equal((await json('/api/admin/v1/session')).needsSetup, true);
+  const setup = await request('/api/admin/v1/setup', {
     method: 'POST', body: JSON.stringify({ code: 'smoke-setup-code', password }),
     headers: { 'Content-Type': 'application/json' },
   });
   cookie = setup.headers.get('set-cookie').split(';')[0];
-  const tag = await json('/api/tags', { name: 'Recovery', color: 'blue' });
-  const link = await json('/api/links', { slug: 'kept', url: 'https://example.com/never-fetched', tags: [tag.id] }, 201);
-  const note = await json('/api/texts', { slug: 'note', text: 'hello <world>\n', tags: [tag.id] }, 201);
+  const tag = await json('/api/admin/v1/tags', { name: 'Recovery', color: 'blue' });
+  const link = await json('/api/admin/v1/links', { slug: 'kept', url: 'https://example.com/never-fetched', tags: [tag.id] }, 201);
+  const note = await json('/api/admin/v1/texts', { slug: 'note', text: 'hello <world>\n', tags: [tag.id] }, 201);
   const bytes = Buffer.from('binary recovery fixture\0\xff\n', 'latin1');
   const form = new FormData();
   form.set('file', new Blob([bytes]), 'fixture.bin');
   form.set('tags', JSON.stringify([tag.id]));
-  const file = await (await request('/api/files', { method: 'POST', body: form, status: 201 })).json();
+  const file = await (await request('/api/admin/v1/files', { method: 'POST', body: form, status: 201 })).json();
   assert.equal(file.content.sha256, hash(bytes));
-  const token = await json('/api/tokens', { name: 'Recovery check' }, 201);
+  const token = await json('/api/admin/v1/tokens', { name: 'Recovery check' }, 201);
   await Promise.all(Array.from({ length: 32 }, async () => {
     const res = await request('/kept', { status: 302 });
     assert.equal(res.headers.get('location'), link.url);
     await res.text();
   }));
-  assert.equal((await json(`/api/links/${link.id}`)).clicks, 32);
+  assert.equal((await json(`/api/admin/v1/links/${link.id}`)).clicks, 32);
   // Verify stopped-service persistence; Go tests control the final-flush race.
   await stop();
   await mkdir(restored);
@@ -127,18 +127,18 @@ try {
   await cp(join(source, 'files'), join(restored, 'files'), { recursive: true });
   await start(restored);
   assert.equal(cli(['healthcheck']).status, 0);
-  assert.equal((await json('/api/session')).authenticated, true);
-  assert.equal((await json(`/api/links/${link.id}`)).clicks, 32);
+  assert.equal((await json('/api/admin/v1/session')).authenticated, true);
+  assert.equal((await json(`/api/admin/v1/links/${link.id}`)).clicks, 32);
   const redirect = await request('/kept', { status: 302 });
   assert.equal(redirect.headers.get('location'), link.url);
   await redirect.text();
-  const login = await request('/api/session', {
+  const login = await request('/api/admin/v1/session', {
     method: 'POST', body: JSON.stringify({ password }), headers: { 'Content-Type': 'application/json' },
   });
   cookie = login.headers.get('set-cookie').split(';')[0];
-  await request('/api/links');
-  assert.deepEqual((await json(`/api/links/${file.id}`)).tags, [tag.id]);
-  assert.equal((await json(`/api/links/${note.id}/text`)).text, 'hello <world>\n');
+  await request('/api/admin/v1/links');
+  assert.deepEqual((await json(`/api/admin/v1/links/${file.id}`)).tags, [tag.id]);
+  assert.equal((await json(`/api/admin/v1/links/${note.id}/text`)).text, 'hello <world>\n');
   assert.match(await (await request('/p/note')).text(), /hello &lt;world&gt;/);
   // Node fetch derives Host from the URL. Use HTTP directly to exercise the
   // separate files host on the same dynamically allocated loopback listener.
@@ -157,13 +157,13 @@ try {
   assert.equal(download.headers['x-content-type-options'], 'nosniff');
   assert.match(download.headers['content-security-policy'], /sandbox/);
   assert.equal(hash(download.bytes), hash(bytes));
-  assert.equal((await json('/api/tags')).items[0].count, 3);
+  assert.equal((await json('/api/admin/v1/tags')).items[0].count, 3);
   const reset = cli(['passwd'], { input: 'replacement-password\n' });
   assert.equal(reset.status, 0, reset.stderr.toString());
-  assert.equal((await json('/api/session')).authenticated, false);
-  await request('/api/links', { status: 401 });
-  await request('/api/links', { headers: { Authorization: `Bearer ${token.token}` } });
-  await request('/api/session', {
+  assert.equal((await json('/api/admin/v1/session')).authenticated, false);
+  await request('/api/admin/v1/links', { status: 401 });
+  await request('/api/admin/v1/links', { headers: { Authorization: `Bearer ${token.token}` } });
+  await request('/api/admin/v1/session', {
     method: 'POST', body: JSON.stringify({ password: 'replacement-password' }),
     headers: { 'Content-Type': 'application/json' },
   });

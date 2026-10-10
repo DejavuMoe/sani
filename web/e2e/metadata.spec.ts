@@ -22,7 +22,7 @@ test.afterAll(async () => {
 
 async function login(page: Page, lang = 'en', theme = 'light') {
   await page.addInitScript(({ lang, theme }) => { localStorage.setItem('sani.lang', lang); localStorage.setItem('sani.theme', theme); }, { lang, theme });
-  expect((await page.request.post(`${base}/api/session`, { data: { password } })).ok()).toBe(true);
+  expect((await page.request.post(`${base}/api/admin/v1/session`, { data: { password } })).ok()).toBe(true);
 }
 
 async function audit(page: Page) {
@@ -49,7 +49,7 @@ test('saved proxies persist, redact secrets and never forward a saved password t
   await page.locator('#metadata-password').fill('only-test-secret');
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(form.getByRole('status')).toContainText('Saved.');
-  let config = await (await page.request.get(`${base}/api/config`)).json();
+  let config = await (await page.request.get(`${base}/api/admin/v1/config`)).json();
   expect(config.metaProxy).toMatchObject({ scheme: 'http', host: '127.0.0.1', port: 1, auth: true, username: 'fixture', passwordSet: true });
   expect(JSON.stringify(config)).not.toContain('only-test-secret');
   await page.reload();
@@ -60,24 +60,24 @@ test('saved proxies persist, redact secrets and never forward a saved password t
   await page.locator('#metadata-host').fill('localhost');
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(form.getByRole('alert')).toContainText('Re-enter');
-  expect((await (await page.request.get(`${base}/api/config`)).json()).metaProxy.host).toBe('127.0.0.1');
+  expect((await (await page.request.get(`${base}/api/admin/v1/config`)).json()).metaProxy.host).toBe('127.0.0.1');
   await page.locator('#metadata-host').fill('127.0.0.1');
   await form.getByRole('button', { name: 'Test connection', exact: true }).click();
   await expect(form.getByRole('status')).toContainText('Could not');
   await expect(form.getByRole('button', { name: 'Retry connection' })).toBeEnabled();
-  expect((await (await page.request.get(`${base}/api/config`)).json()).metaProxy).toEqual(config.metaProxy);
+  expect((await (await page.request.get(`${base}/api/admin/v1/config`)).json()).metaProxy).toEqual(config.metaProxy);
   await form.getByRole('button', { name: 'Remove', exact: true }).click();
   await page.locator('#metadata-auth').click();
   await form.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(form.getByRole('status')).toContainText('Saved.');
-  config = await (await page.request.get(`${base}/api/config`)).json();
+  config = await (await page.request.get(`${base}/api/admin/v1/config`)).json();
   expect(config.metaProxy).toMatchObject({ auth: false, username: '', passwordSet: false });
 });
 
 for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (const width of [1544, 390, 320]) {
   test(`R5 settings geometry and open controls ${lang}/${theme}/${width}`, async ({ page }, info) => {
     await login(page, lang, theme);
-    expect((await page.request.patch(`${base}/api/config`, { data: { metaMode: 'direct' } })).ok()).toBe(true);
+    expect((await page.request.patch(`${base}/api/admin/v1/config`, { data: { metaMode: 'direct' } })).ok()).toBe(true);
     await page.setViewportSize({ width, height: 1040 });
     await page.goto(`${base}/admin/settings`);
     const form = page.locator('.metadata-form');
@@ -126,7 +126,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
 for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
   test(`custom color, calendar and tooltips ${lang}/${theme}`, async ({ page }, info) => {
     await login(page, lang, theme);
-    await page.request.patch(`${base}/api/config`, { data: { metaMode: 'off' } });
+    await page.request.patch(`${base}/api/admin/v1/config`, { data: { metaMode: 'off' } });
     await page.setViewportSize({ width: 390, height: 900 });
     await page.goto(`${base}/admin/`);
     const panel = page.locator('#create-panel-url');
@@ -157,7 +157,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await time.press('Enter');
     await expect(calendar.getByRole('button').last()).toBeDisabled();
     await expect(calendar.getByRole('button', { name: '2032-02-29', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    expect((await (await page.request.get(`${base}/api/links`)).json()).items).toEqual([]);
+    expect((await (await page.request.get(`${base}/api/admin/v1/links`)).json()).items).toEqual([]);
     await audit(page);
     await calendar.scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath('calendar.png') });
@@ -184,7 +184,7 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
     page.on('pageerror', e => errors.push(e.message));
     try {
       await login(page, lang, theme);
-      expect((await page.request.patch(`${base}/api/config`, { data: { metaMode: 'direct' } })).ok()).toBe(true);
+      expect((await page.request.patch(`${base}/api/admin/v1/config`, { data: { metaMode: 'direct' } })).ok()).toBe(true);
       await page.goto(`${base}/admin/settings`);
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(touch);
       const form = page.locator('.metadata-form');
@@ -259,7 +259,7 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       await expect(calendar.getByPlaceholder('YYYY-MM-DD')).toHaveCSS('font-size', '16px');
       await audit(page);
 
-      const response = await page.request.post(`${base}/api/texts`, { data: { text: 'const schedule = "weekly meeting";', format: 'code' } });
+      const response = await page.request.post(`${base}/api/admin/v1/texts`, { data: { text: 'const schedule = "weekly meeting";', format: 'code' } });
       expect(response.ok()).toBe(true);
       const link = await response.json();
       await page.reload();

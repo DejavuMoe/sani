@@ -4,7 +4,7 @@
 
 ## Export {#export}
 
-Settings → Data → “Export all links” gives you a JSON or CSV file. The API does the same: [`GET /api/export`](../reference/api#export), with `?format=csv` for CSV. Exports hold short links only, not shared texts and files; a [backup](./operations#backup) keeps those.
+Settings → Data → “Export all links” gives you a JSON or CSV file. The API does the same: [`GET /api/admin/v1/export`](../reference/api#export), with `?format=csv` for CSV. Exports hold short links only, not shared texts and files; a [backup](./operations#backup) keeps those.
 
 The JSON looks like this; fields without a value are left out:
 
@@ -39,7 +39,7 @@ An export holds each link’s settings and total clicks. It does **not** include
 
 ## Import {#import}
 
-In Settings → Data, drop a file onto “Import links” or click to choose one. With the API: [`POST /api/import`](../reference/api#import), with the file as the request body.
+In Settings → Data, drop a file onto “Import links” or click to choose one. With the API: [`POST /api/admin/v1/import`](../reference/api#import), with the file as the request body.
 
 Sani tells the format from the content and understands:
 

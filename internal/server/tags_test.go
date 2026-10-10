@@ -10,15 +10,15 @@ import (
 
 func TestDeleteTagAPIKeepsSharedContents(t *testing.T) {
 	e := newEnv(t, Options{FilesURL: "http://" + filesHost, FilesDir: t.TempDir()})
-	if r := e.req("DELETE", "/api/tags/1", nil); r.status != 401 {
+	if r := e.req("DELETE", "/api/admin/v1/tags/1", nil); r.status != 401 {
 		t.Fatal(r.status)
 	}
 	e.signIn()
-	tag := e.req("POST", "/api/tags", `{"name":"remove","color":"blue"}`).json()["id"]
-	path := fmt.Sprintf("/api/tags/%v", tag)
+	tag := e.req("POST", "/api/admin/v1/tags", `{"name":"remove","color":"blue"}`).json()["id"]
+	path := fmt.Sprintf("/api/admin/v1/tags/%v", tag)
 	ids := []any{tag}
 	link := e.create(map[string]any{"url": "https://example.com", "tags": ids})
-	text := e.req("POST", "/api/texts", map[string]any{"text": "retained text", "tags": ids}).json()
+	text := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": "retained text", "tags": ids}).json()
 	file := e.upload(map[string]string{"tags": fmt.Sprintf("[%v]", tag)}, "keep.txt", []byte("retained bytes")).json()
 	if r := e.req("DELETE", path, nil, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
 		t.Fatal(r.status)
@@ -27,12 +27,12 @@ func TestDeleteTagAPIKeepsSharedContents(t *testing.T) {
 		t.Fatalf("delete: %d %s", r.status, r.body)
 	}
 	for _, item := range []map[string]any{link, text, file} {
-		r := e.req("GET", fmt.Sprintf("/api/links/%v", item["id"]), nil)
+		r := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", item["id"]), nil)
 		if r.status != 200 || len(r.json()["tags"].([]any)) != 0 {
 			t.Fatalf("lost item: %d %s", r.status, r.body)
 		}
 	}
-	if r := e.req("GET", fmt.Sprintf("/api/links/%v/text", text["id"]), nil); r.status != 200 || !strings.Contains(string(r.body), "retained text") {
+	if r := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v/text", text["id"]), nil); r.status != 200 || !strings.Contains(string(r.body), "retained text") {
 		t.Fatalf("text lost: %s", r.body)
 	}
 	entries, err := os.ReadDir(e.srv.opt.FilesDir)
@@ -47,21 +47,21 @@ func TestDeleteTagAPIKeepsSharedContents(t *testing.T) {
 func TestTagAPIAndSharing(t *testing.T) {
 	e := newEnv(t, Options{FilesURL: "http://" + filesHost, FilesDir: t.TempDir()})
 	for _, method := range []string{"GET", "POST"} {
-		if r := e.req(method, "/api/tags", `{}`); r.status != 401 {
+		if r := e.req(method, "/api/admin/v1/tags", `{}`); r.status != 401 {
 			t.Fatalf("unauthenticated tags: %d", r.status)
 		}
 	}
 	e.signIn()
-	r := e.req("POST", "/api/tags", `{"name":"  private-group  ","color":"amber"}`)
+	r := e.req("POST", "/api/admin/v1/tags", `{"name":"  private-group  ","color":"amber"}`)
 	if r.status != 200 {
 		t.Fatalf("tag: %d %s", r.status, r.body)
 	}
 	id := r.json()["id"]
-	dup := e.req("POST", "/api/tags", `{"name":"PRIVATE-GROUP","color":"rose"}`)
+	dup := e.req("POST", "/api/admin/v1/tags", `{"name":"PRIVATE-GROUP","color":"rose"}`)
 	if dup.json()["id"] != id || dup.json()["color"] != "amber" {
 		t.Fatal(string(dup.body))
 	}
-	if r := e.req("POST", "/api/tags", `{"name":"x"}`, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
+	if r := e.req("POST", "/api/admin/v1/tags", `{"name":"x"}`, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
 		t.Fatal(r.status)
 	}
 	ids := []any{id}
@@ -69,7 +69,7 @@ func TestTagAPIAndSharing(t *testing.T) {
 	if !reflect.DeepEqual(l["tags"], ids) {
 		t.Fatal(l)
 	}
-	path := fmt.Sprintf("/api/links/%v", l["id"])
+	path := fmt.Sprintf("/api/admin/v1/links/%v", l["id"])
 	for _, tags := range []string{"null", "[0]", "[99999]", fmt.Sprintf("[%v,%v]", id, id), "[1,2,3,4,5,6]"} {
 		r := e.req("PATCH", path, `{"title":"must-not-save","tags":`+tags+`}`)
 		if r.code() != "tags_invalid" {
@@ -83,7 +83,7 @@ func TestTagAPIAndSharing(t *testing.T) {
 	if r := e.req("PATCH", path, `{"enabled":false}`); !reflect.DeepEqual(r.json()["tags"], ids) {
 		t.Fatal(string(r.body))
 	}
-	text := e.req("POST", "/api/texts", map[string]any{"text": "hello", "slug": "tag-note", "tags": ids})
+	text := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": "hello", "slug": "tag-note", "tags": ids})
 	if text.status != 201 || !reflect.DeepEqual(text.json()["tags"], ids) {
 		t.Fatal(string(text.body))
 	}
@@ -96,7 +96,7 @@ func TestTagAPIAndSharing(t *testing.T) {
 			t.Fatal("tag leaked to visitors")
 		}
 	}
-	if r := e.files("GET", "/api/tags"); r.status == 200 {
+	if r := e.files("GET", "/api/admin/v1/tags"); r.status == 200 {
 		t.Fatal("tags exposed on files origin")
 	}
 	entries, _ := os.ReadDir(e.srv.opt.FilesDir)
@@ -109,7 +109,7 @@ func TestTagAPIAndSharing(t *testing.T) {
 		t.Fatal("failed upload leaked a file")
 	}
 	for _, q := range []string{fmt.Sprintf("tag=%v&kind=file&q=note.txt", id), "tag=untagged"} {
-		r := e.req("GET", "/api/links?"+q, nil)
+		r := e.req("GET", "/api/admin/v1/links?"+q, nil)
 		want := float64(1)
 		if q == "tag=untagged" {
 			want = 0
@@ -119,11 +119,11 @@ func TestTagAPIAndSharing(t *testing.T) {
 		}
 	}
 	e.req("PATCH", path, `{"tags":[]}`)
-	if total := e.req("GET", "/api/links?tag=untagged", nil).json()["total"]; total != float64(1) {
+	if total := e.req("GET", "/api/admin/v1/links?tag=untagged", nil).json()["total"]; total != float64(1) {
 		t.Fatal(total)
 	}
 	// Explicit tags must not be silently discarded by reuse.
-	reused := e.req("POST", "/api/links", map[string]any{"url": "https://example.com/tagged", "reuse": true, "tags": ids})
+	reused := e.req("POST", "/api/admin/v1/links", map[string]any{"url": "https://example.com/tagged", "reuse": true, "tags": ids})
 	if reused.status != 201 || !reflect.DeepEqual(reused.json()["tags"], ids) {
 		t.Fatal(string(reused.body))
 	}
@@ -134,25 +134,25 @@ func TestTagExportImport(t *testing.T) {
 		t.Run(format, func(t *testing.T) {
 			source := newEnv(t, Options{})
 			source.signIn()
-			tag := source.req("POST", "/api/tags", `{"name":"发布,一组","color":"#5872a5"}`).json()["id"]
+			tag := source.req("POST", "/api/admin/v1/tags", `{"name":"发布,一组","color":"#5872a5"}`).json()["id"]
 			source.create(map[string]any{"url": "https://example.com/portable", "slug": "portable", "tags": []any{tag}})
-			exported := source.req("GET", "/api/export?format="+format, nil)
+			exported := source.req("GET", "/api/admin/v1/export?format="+format, nil)
 			target := newEnv(t, Options{})
 			target.signIn()
-			target.req("POST", "/api/tags", `{"name":"unrelated"}`)
-			r := target.req("POST", "/api/import", string(exported.body))
+			target.req("POST", "/api/admin/v1/tags", `{"name":"unrelated"}`)
+			r := target.req("POST", "/api/admin/v1/import", string(exported.body))
 			if r.status != 200 || r.json()["created"] != float64(1) {
 				t.Fatal(string(r.body))
 			}
-			links := target.req("GET", "/api/links", nil).json()["items"].([]any)
+			links := target.req("GET", "/api/admin/v1/links", nil).json()["items"].([]any)
 			ids := links[0].(map[string]any)["tags"].([]any)
-			catalog := target.req("GET", "/api/tags", nil).json()["items"].([]any)
+			catalog := target.req("GET", "/api/admin/v1/tags", nil).json()["items"].([]any)
 			got := catalog[1].(map[string]any)
 			if len(ids) != 1 || ids[0] != got["id"] || got["name"] != "发布,一组" || got["color"] != "#5872a5" || got["count"] != float64(1) {
 				t.Fatalf("import tags: %v %v", ids, catalog)
 			}
 			// Older exports without tags are still accepted.
-			r = target.req("POST", "/api/import", `{"app":"sani","version":1,"links":[{"slug":"legacy","url":"https://example.com/old"},{"slug":"foreign","url":"https://example.com/foreign","tags":["team"]}]}`)
+			r = target.req("POST", "/api/admin/v1/import", `{"app":"sani","version":1,"links":[{"slug":"legacy","url":"https://example.com/old"},{"slug":"foreign","url":"https://example.com/foreign","tags":["team"]}]}`)
 			if r.json()["created"] != float64(2) {
 				t.Fatal(string(r.body))
 			}

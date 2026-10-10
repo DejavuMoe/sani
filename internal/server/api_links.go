@@ -143,6 +143,8 @@ type linkInput struct {
 	Text   *string           `json:"text"`
 	Format *string           `json:"format"`
 	Tags   nullable[[]int64] `json:"tags"`
+
+	expectedSlug *string // internal identity for compatibility updates
 }
 
 type inputError struct {
@@ -155,6 +157,25 @@ func (e *inputError) Error() string { return e.msg }
 
 func badInput(code, msg string) *inputError {
 	return &inputError{status: http.StatusBadRequest, code: code, msg: msg}
+}
+
+func (s *Server) resourceError(w http.ResponseWriter, r *http.Request, err error) bool {
+	if err == nil {
+		return false
+	}
+	var in *inputError
+	switch {
+	case errors.As(err, &in):
+		writeError(w, in.status, in.code, in.msg)
+	case errors.Is(err, store.ErrNotFound):
+		writeError(w, http.StatusNotFound, "not_found", "no such link")
+	case errors.Is(err, store.ErrSlugTaken):
+		writeError(w, http.StatusConflict, "slug_taken", "this slug is already in use")
+	case tagError(w, err):
+	default:
+		s.internalError(w, r, err)
+	}
+	return true
 }
 
 func tooLarge(code, msg string) *inputError {
@@ -367,32 +388,40 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &in) {
 		return
 	}
-	if in.URL == nil {
-		writeError(w, http.StatusBadRequest, "url_required", "url is required")
+	l, reused, err := s.createURL(r, &in)
+	if s.resourceError(w, r, err) {
 		return
 	}
+	d := s.toDTO(s.baseURL(r), l, time.Now().UnixMilli())
+	d.Reused = reused
+	status := http.StatusCreated
+	if reused {
+		status = http.StatusOK
+	}
+	writeJSON(w, status, d)
+}
+
+func (s *Server) createURL(r *http.Request, in *linkInput) (*store.Link, bool, error) {
+	if in.URL == nil {
+		return nil, false, badInput("url_required", "url is required")
+	}
 	now := time.Now().UnixMilli()
-	p, ierr := s.resolveInput(r, &in, now)
+	p, ierr := s.resolveInput(r, in, now)
 	if ierr == nil {
 		ierr = checkKind(store.KindURL, p)
 	}
 	if ierr != nil {
-		writeError(w, ierr.status, ierr.code, ierr.msg)
-		return
+		return nil, false, ierr
 	}
 	plain := (p.Slug == nil || *p.Slug == "") && p.ExpiresAt == nil && p.MaxClicks == nil &&
 		p.Redirect == nil && p.Tags == nil && (p.Enabled == nil || *p.Enabled)
 	if in.Reuse && plain {
 		existing, err := s.store.FindPlainLink(r.Context(), *p.URL)
 		if err != nil && !errors.Is(err, store.ErrNotFound) {
-			s.internalError(w, r, err)
-			return
+			return nil, false, err
 		}
 		if existing != nil {
-			d := s.toDTO(s.baseURL(r), existing, now)
-			d.Reused = true
-			writeJSON(w, http.StatusOK, d)
-			return
+			return existing, true, nil
 		}
 	}
 	l := &store.Link{
@@ -414,13 +443,13 @@ func (s *Server) createLink(w http.ResponseWriter, r *http.Request) {
 		l.Meta = store.MetaFailed
 	}
 
-	if !s.save(w, r, l, p.Slug) {
-		return
+	if err := s.saveLink(r, l, p.Slug); err != nil {
+		return nil, false, err
 	}
 	if l.Meta == store.MetaPending {
 		s.fetchMetaLater(l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"))
 	}
-	writeJSON(w, http.StatusCreated, s.toDTO(s.baseURL(r), l, now))
+	return l, false, nil
 }
 
 // createGenerated inserts l under a fresh random slug, growing the slug when
@@ -478,53 +507,43 @@ func (s *Server) updateLink(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSONMax(w, r, &in, maxTextBody) {
 		return
 	}
+	l, err := s.updateResource(r, id, &in)
+	if !s.resourceError(w, r, err) {
+		writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
+	}
+}
+
+func (s *Server) updateResource(r *http.Request, id int64, in *linkInput) (*store.Link, error) {
 	now := time.Now().UnixMilli()
-	p, ierr := s.resolveInput(r, &in, now)
+	p, ierr := s.resolveInput(r, in, now)
 	if ierr != nil {
-		writeError(w, ierr.status, ierr.code, ierr.msg)
-		return
+		return nil, ierr
 	}
 	if p.Slug != nil && *p.Slug == "" {
-		writeError(w, http.StatusBadRequest, "slug_invalid", "slug cannot be empty")
-		return
+		return nil, badInput("slug_invalid", "slug cannot be empty")
 	}
 	current, err := s.store.GetLink(r.Context(), id)
-	if errors.Is(err, store.ErrNotFound) {
-		writeError(w, http.StatusNotFound, "not_found", "no such link")
-		return
-	}
+
 	if err != nil {
-		s.internalError(w, r, err)
-		return
+		return nil, err
 	}
 	if ierr := checkKind(current.Kind, p); ierr != nil {
-		writeError(w, ierr.status, ierr.code, ierr.msg)
-		return
+		return nil, ierr
 	}
 
+	p.ExpectedSlug = in.expectedSlug
 	p.FetchMeta = s.metadataFetcher() != nil
 	before, after, err := s.store.UpdateLink(r.Context(), id, *p, now)
-	if tagError(w, err) {
-		return
-	}
-	if errors.Is(err, store.ErrNotFound) {
-		writeError(w, http.StatusNotFound, "not_found", "no such link")
-		return
-	}
-	if errors.Is(err, store.ErrSlugTaken) {
-		writeError(w, http.StatusConflict, "slug_taken", "this slug is already in use")
-		return
-	}
+
 	if err != nil {
-		s.internalError(w, r, err)
-		return
+		return nil, err
 	}
 	s.cache.Invalidate(links.Key(before.Slug), links.Key(after.Slug))
 	if after.Kind == store.KindURL && after.Meta == store.MetaPending &&
 		(p.Title != nil || before.URL != after.URL) {
 		s.fetchMetaLater(after.ID, after.URL, after.Host, r.Header.Get("Accept-Language"))
 	}
-	writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), after, now))
+	return after, nil
 }
 
 func (s *Server) deleteLink(w http.ResponseWriter, r *http.Request) {

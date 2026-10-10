@@ -2,7 +2,9 @@ package store
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"strconv"
@@ -40,13 +42,14 @@ const (
 
 // Content describes what a text or file link shares.
 type Content struct {
-	Format Format
-	Name   string // a file's download name; a text's first line
-	Type   string // a file's media type
-	Size   int64  // bytes
-	Lines  int64  // lines of a text
-	SHA256 []byte // of a file
-	File   string // a file's name in the files directory
+	Format    Format
+	Name      string // a file's download name; a text's first line
+	Type      string // a file's media type
+	Size      int64  // bytes
+	Lines     int64  // lines of a text
+	SHA256    []byte // of a file
+	DeleteKey string // opaque authenticated deletion handle
+	File      string // a file's name in the files directory
 	// Text is the body of a text. Listings leave it empty; it is set when
 	// creating a link and read with TextBody.
 	Text string
@@ -89,7 +92,7 @@ type Target struct {
 const linkCols = `l.id, l.slug, l.url, l.host, l.title, l.meta, l.redirect, l.enabled,
 	l.expires_at, l.max_clicks, l.clicks, l.last_click_at, l.created_at, l.updated_at,
 	coalesce(f.type != '', 0), l.kind, coalesce(c.format, 0), coalesce(c.name, ''), coalesce(c.type, ''),
-	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, ''),
+	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, ''), coalesce(c.delete_key, ''),
 	(SELECT json_group_array(tag_id ORDER BY position) FROM link_tags WHERE link_id = l.id)`
 
 const linkFrom = `links l LEFT JOIN favicons f ON f.host = l.host LEFT JOIN contents c ON c.link_id = l.id`
@@ -102,7 +105,7 @@ func scanLink(row scanner) (*Link, error) {
 	var tags string
 	err := row.Scan(&l.ID, &l.Slug, &l.URL, &l.Host, &l.Title, &l.Meta, &l.Redirect, &l.Enabled,
 		&l.ExpiresAt, &l.MaxClicks, &l.Clicks, &l.LastClickAt, &l.CreatedAt, &l.UpdatedAt, &l.HasIcon,
-		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File, &tags)
+		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File, &c.DeleteKey, &tags)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -170,12 +173,17 @@ func insertLink(ctx context.Context, tx *sql.Tx, l *Link) error {
 	}
 	if c := l.Content; c != nil {
 		var body any
+		if l.Kind == KindFile {
+			key := make([]byte, 24)
+			rand.Read(key)
+			c.DeleteKey = hex.EncodeToString(key)
+		}
 		if l.Kind == KindText {
 			body = c.Text
 		}
 		_, err = tx.ExecContext(ctx, `INSERT INTO contents
-			(link_id, format, name, type, size, lines, sha256, file, body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			l.ID, c.Format, c.Name, c.Type, c.Size, c.Lines, c.SHA256, c.File, body)
+			(link_id, format, name, type, size, lines, sha256, file, body, delete_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			l.ID, c.Format, c.Name, c.Type, c.Size, c.Lines, c.SHA256, c.File, body, c.DeleteKey)
 	}
 	if err != nil {
 		return err
@@ -237,18 +245,19 @@ func (s *Store) SlugAvailable(ctx context.Context, key string) (bool, error) {
 
 // Patch lists the fields an update changes; nil fields stay as they are.
 type Patch struct {
-	URL         *string
-	Slug        *string
-	Title       *string
-	Redirect    *int
-	Enabled     *bool
-	ExpiresAt   *int64
-	MaxClicks   *int64
-	Text        *string // replaces a text's body
-	Format      *Format
-	Tags        *[]int64
-	FetchMeta   bool // queue automatic titles when a URL or an empty title changes
-	RefreshMeta bool // refresh an automatic title without replacing a manual title
+	ExpectedSlug *string // optional identity check under the write lock
+	URL          *string
+	Slug         *string
+	Title        *string
+	Redirect     *int
+	Enabled      *bool
+	ExpiresAt    *int64
+	MaxClicks    *int64
+	Text         *string // replaces a text's body
+	Format       *Format
+	Tags         *[]int64
+	FetchMeta    bool // queue automatic titles when a URL or an empty title changes
+	RefreshMeta  bool // refresh an automatic title without replacing a manual title
 }
 
 // UpdateLink applies p and returns the link before and after the change.
@@ -257,6 +266,9 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 		var err error
 		if before, err = getLink(ctx, tx, id); err != nil {
 			return err
+		}
+		if p.ExpectedSlug != nil && links.Key(before.Slug) != links.Key(*p.ExpectedSlug) {
+			return ErrNotFound
 		}
 		var sets []string
 		var args []any

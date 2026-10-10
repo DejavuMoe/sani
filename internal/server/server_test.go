@@ -129,14 +129,14 @@ func (e *env) visit(path string, headers ...string) reply {
 
 func (e *env) signIn() {
 	e.t.Helper()
-	if r := e.req("POST", "/api/setup", map[string]string{"password": "correct horse", "code": "TEST-CODE-1234"}); r.status != 200 {
+	if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": "correct horse", "code": "TEST-CODE-1234"}); r.status != 200 {
 		e.t.Fatalf("setup: %d %s", r.status, r.body)
 	}
 }
 
 func (e *env) create(body map[string]any) map[string]any {
 	e.t.Helper()
-	r := e.req("POST", "/api/links", body)
+	r := e.req("POST", "/api/admin/v1/links", body)
 	if r.status != 201 {
 		e.t.Fatalf("create %v: %d %s", body, r.status, r.body)
 	}
@@ -149,51 +149,51 @@ func (e *env) flush() {
 
 func TestSetupAndLogin(t *testing.T) {
 	e := newEnv(t, Options{})
-	if m := e.req("GET", "/api/session", nil).json(); m["needsSetup"] != true || m["authenticated"] != false {
+	if m := e.req("GET", "/api/admin/v1/session", nil).json(); m["needsSetup"] != true || m["authenticated"] != false {
 		t.Fatalf("fresh session = %v", m)
 	}
-	if r := e.req("GET", "/api/links", nil); r.status != 401 {
+	if r := e.req("GET", "/api/admin/v1/links", nil); r.status != 401 {
 		t.Fatalf("unauthenticated list = %d", r.status)
 	}
-	if r := e.req("POST", "/api/setup", map[string]string{"password": "correct horse"}); r.code() != "setup_code" {
+	if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": "correct horse"}); r.code() != "setup_code" {
 		t.Fatalf("setup without the code: %s", r.body)
 	}
-	if r := e.req("POST", "/api/setup", map[string]string{"password": "correct horse", "code": "wrong-code-0000"}); r.status != 403 {
+	if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": "correct horse", "code": "wrong-code-0000"}); r.status != 403 {
 		t.Fatalf("setup with a wrong code: %d %s", r.status, r.body)
 	}
-	if r := e.req("POST", "/api/setup", map[string]string{"password": "short", "code": "test code 1234"}); r.code() != "password_short" {
+	if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": "short", "code": "test code 1234"}); r.code() != "password_short" {
 		t.Fatalf("short password: %s", r.body)
 	}
 	e.signIn()
-	if r := e.req("POST", "/api/setup", map[string]string{"password": "another password", "code": "test-code-1234"}); r.status != 409 {
+	if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": "another password", "code": "test-code-1234"}); r.status != 409 {
 		t.Fatalf("second setup = %d", r.status)
 	}
-	if m := e.req("GET", "/api/session", nil).json(); m["authenticated"] != true || m["needsSetup"] != false {
+	if m := e.req("GET", "/api/admin/v1/session", nil).json(); m["authenticated"] != true || m["needsSetup"] != false {
 		t.Fatalf("after setup = %v", m)
 	}
 
-	if r := e.req("DELETE", "/api/session", nil); r.status != 204 {
+	if r := e.req("DELETE", "/api/admin/v1/session", nil); r.status != 204 {
 		t.Fatalf("logout = %d", r.status)
 	}
-	if m := e.req("GET", "/api/session", nil).json(); m["authenticated"] != false {
+	if m := e.req("GET", "/api/admin/v1/session", nil).json(); m["authenticated"] != false {
 		t.Fatal("still signed in after logout")
 	}
-	if r := e.req("POST", "/api/session", map[string]string{"password": "wrong password"}); r.code() != "wrong_password" {
+	if r := e.req("POST", "/api/admin/v1/session", map[string]string{"password": "wrong password"}); r.code() != "wrong_password" {
 		t.Fatalf("wrong password: %d %s", r.status, r.body)
 	}
-	if r := e.req("POST", "/api/session", map[string]string{"password": "correct horse"}); r.status != 200 {
+	if r := e.req("POST", "/api/admin/v1/session", map[string]string{"password": "correct horse"}); r.status != 200 {
 		t.Fatalf("login = %d %s", r.status, r.body)
 	}
-	if r := e.req("GET", "/api/links", nil); r.status != 200 {
+	if r := e.req("GET", "/api/admin/v1/links", nil); r.status != 200 {
 		t.Fatalf("list after login = %d", r.status)
 	}
 
 	// Change the password; the current session survives.
-	r := e.req("PUT", "/api/password", map[string]string{"current": "correct horse", "password": "battery staple"})
+	r := e.req("PUT", "/api/admin/v1/password", map[string]string{"current": "correct horse", "password": "battery staple"})
 	if r.status != 204 {
 		t.Fatalf("change password = %d %s", r.status, r.body)
 	}
-	if r := e.req("GET", "/api/links", nil); r.status != 200 {
+	if r := e.req("GET", "/api/admin/v1/links", nil); r.status != 200 {
 		t.Fatal("current session lost after password change")
 	}
 }
@@ -210,38 +210,38 @@ func TestMaximumPasswordHTTPFlow(t *testing.T) {
 			e := newEnv(t, Options{})
 			protected := func() {
 				t.Helper()
-				if r := e.req("GET", "/api/links", nil); r.status != 200 || !json.Valid(r.body) {
+				if r := e.req("GET", "/api/admin/v1/links", nil); r.status != 200 || !json.Valid(r.body) {
 					t.Fatalf("protected API: %d %s", r.status, r.body)
 				}
 			}
 			logout := func() {
 				t.Helper()
-				if r := e.req("DELETE", "/api/session", nil); r.status != 204 {
+				if r := e.req("DELETE", "/api/admin/v1/session", nil); r.status != 204 {
 					t.Fatalf("logout: %d %s", r.status, r.body)
 				}
-				if r := e.req("GET", "/api/links", nil); r.status != 401 {
+				if r := e.req("GET", "/api/admin/v1/links", nil); r.status != 401 {
 					t.Fatalf("protected API after logout: %d %s", r.status, r.body)
 				}
 			}
 			login := func(password string) {
 				t.Helper()
-				if r := e.req("POST", "/api/session", map[string]string{"password": password}); r.status != 200 || r.json()["authenticated"] != true {
+				if r := e.req("POST", "/api/admin/v1/session", map[string]string{"password": password}); r.status != 200 || r.json()["authenticated"] != true {
 					t.Fatalf("login: %d %s", r.status, r.body)
 				}
 				protected()
 			}
-			if r := e.req("POST", "/api/setup", map[string]string{"password": tc.initial, "code": e.srv.opt.SetupCode}); r.status != 200 || r.json()["authenticated"] != true {
+			if r := e.req("POST", "/api/admin/v1/setup", map[string]string{"password": tc.initial, "code": e.srv.opt.SetupCode}); r.status != 200 || r.json()["authenticated"] != true {
 				t.Fatalf("setup: %d %s", r.status, r.body)
 			}
 			protected()
 			logout()
 			login(tc.initial)
-			if r := e.req("PUT", "/api/password", map[string]string{"current": tc.initial, "password": tc.replacement}); r.status != 204 {
+			if r := e.req("PUT", "/api/admin/v1/password", map[string]string{"current": tc.initial, "password": tc.replacement}); r.status != 204 {
 				t.Fatalf("change password: %d %s", r.status, r.body)
 			}
 			protected()
 			logout()
-			if r := e.req("POST", "/api/session", map[string]string{"password": tc.initial}); r.status != 401 || r.code() != "wrong_password" {
+			if r := e.req("POST", "/api/admin/v1/session", map[string]string{"password": tc.initial}); r.status != 401 || r.code() != "wrong_password" {
 				t.Fatalf("old password still works: %d %s", r.status, r.body)
 			}
 			login(tc.replacement)
@@ -252,15 +252,15 @@ func TestMaximumPasswordHTTPFlow(t *testing.T) {
 func TestLoginRateLimit(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	e.req("DELETE", "/api/session", nil)
+	e.req("DELETE", "/api/admin/v1/session", nil)
 	var last reply
 	for range 9 {
-		last = e.req("POST", "/api/session", map[string]string{"password": "nope nope"})
+		last = e.req("POST", "/api/admin/v1/session", map[string]string{"password": "nope nope"})
 	}
 	if last.status != 429 || last.header.Get("Retry-After") == "" {
 		t.Fatalf("after 9 failures: %d %s", last.status, last.body)
 	}
-	if r := e.req("POST", "/api/session", map[string]string{"password": "correct horse"}); r.status != 429 {
+	if r := e.req("POST", "/api/admin/v1/session", map[string]string{"password": "correct horse"}); r.status != 429 {
 		t.Fatal("a locked-out client must wait even with the right password")
 	}
 }
@@ -299,11 +299,11 @@ func TestCreateAndRedirect(t *testing.T) {
 	e.visit("/"+slug, "Referer", "https://t.co/xyz")
 
 	e.flush()
-	got := e.req("GET", fmt.Sprintf("/api/links/%v", l["id"]), nil).json()
+	got := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil).json()
 	if got["clicks"] != float64(3) {
 		t.Errorf("clicks = %v, want 3", got["clicks"])
 	}
-	stats := e.req("GET", fmt.Sprintf("/api/links/%v/stats?days=7", l["id"]), nil).json()
+	stats := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v/stats?days=7", l["id"]), nil).json()
 	days := stats["days"].([]any)
 	if len(days) != 7 || days[6].(map[string]any)["count"] != float64(3) {
 		t.Errorf("stats days = %v", days)
@@ -312,7 +312,7 @@ func TestCreateAndRedirect(t *testing.T) {
 	if len(refs) != 2 || refs[0].(map[string]any)["host"] != "" || refs[0].(map[string]any)["count"] != float64(2) {
 		t.Errorf("referrers = %v", refs)
 	}
-	ov := e.req("GET", "/api/overview?days=7", nil).json()
+	ov := e.req("GET", "/api/admin/v1/overview?days=7", nil).json()
 	if ov["links"] != float64(1) || ov["clicks"] != float64(3) || ov["today"] != float64(3) {
 		t.Errorf("overview = %v", ov)
 	}
@@ -353,12 +353,12 @@ func TestCustomSlugsAndValidation(t *testing.T) {
 		{map[string]any{"url": e.ts.URL + "/gh"}, "url_self"},
 	}
 	for _, c := range cases {
-		if r := e.req("POST", "/api/links", c.body); r.code() != c.code {
+		if r := e.req("POST", "/api/admin/v1/links", c.body); r.code() != c.code {
 			t.Errorf("%v: got %d %s, want %s", c.body, r.status, r.body, c.code)
 		}
 	}
 
-	check := func(slug string) map[string]any { return e.req("GET", "/api/slugs/"+slug, nil).json() }
+	check := func(slug string) map[string]any { return e.req("GET", "/api/admin/v1/slugs/"+slug, nil).json() }
 	if m := check("gh"); m["available"] != false || m["reason"] != "slug_taken" {
 		t.Errorf("check gh = %v", m)
 	}
@@ -397,27 +397,27 @@ func TestLimitsAndCacheInvalidation(t *testing.T) {
 		t.Fatal("an exhausted link must be gone for bots too")
 	}
 	e.flush()
-	if m := e.req("GET", "/api/links/"+id, nil).json(); m["status"] != "exhausted" || m["clicks"] != float64(2) {
+	if m := e.req("GET", "/api/admin/v1/links/"+id, nil).json(); m["status"] != "exhausted" || m["clicks"] != float64(2) {
 		t.Errorf("exhausted link = %v", m)
 	}
 
 	// Raising the limit reopens it; the change must bypass the cache.
-	e.req("PATCH", "/api/links/"+id, map[string]any{"maxClicks": nil})
+	e.req("PATCH", "/api/admin/v1/links/"+id, map[string]any{"maxClicks": nil})
 	if r := e.visit("/once"); r.status != 302 {
 		t.Fatalf("after clearing the limit = %d", r.status)
 	}
-	e.req("PATCH", "/api/links/"+id, map[string]any{"enabled": false})
+	e.req("PATCH", "/api/admin/v1/links/"+id, map[string]any{"enabled": false})
 	if r := e.visit("/once"); r.status != 410 {
 		t.Fatalf("disabled link = %d", r.status)
 	}
-	e.req("PATCH", "/api/links/"+id, map[string]any{"enabled": true, "url": "https://b.example", "redirect": 301})
+	e.req("PATCH", "/api/admin/v1/links/"+id, map[string]any{"enabled": true, "url": "https://b.example", "redirect": 301})
 	r := e.visit("/once")
 	if r.status != 301 || r.header.Get("Location") != "https://b.example" || !strings.Contains(r.header.Get("Cache-Control"), "public") {
 		t.Fatalf("after edit: %d %q %q", r.status, r.header.Get("Location"), r.header.Get("Cache-Control"))
 	}
 
 	// Renaming frees the old slug immediately.
-	e.req("PATCH", "/api/links/"+id, map[string]any{"slug": "twice"})
+	e.req("PATCH", "/api/admin/v1/links/"+id, map[string]any{"slug": "twice"})
 	if r := e.visit("/once"); r.status != 404 {
 		t.Errorf("old slug after rename = %d", r.status)
 	}
@@ -427,7 +427,7 @@ func TestLimitsAndCacheInvalidation(t *testing.T) {
 
 	// Expiry is enforced on the cached entry.
 	exp := time.Now().Add(time.Hour).UTC().Format(time.RFC3339)
-	e.req("PATCH", "/api/links/"+id, map[string]any{"expiresAt": exp})
+	e.req("PATCH", "/api/admin/v1/links/"+id, map[string]any{"expiresAt": exp})
 	if r := e.visit("/twice"); r.status != 301 {
 		t.Fatalf("before expiry = %d", r.status)
 	}
@@ -447,16 +447,16 @@ func TestDeleteAndRestore(t *testing.T) {
 	l := e.create(map[string]any{"url": "https://a.example", "slug": "gone"})
 	id := fmt.Sprint(l["id"])
 	e.visit("/gone") // cache it
-	if r := e.req("DELETE", "/api/links/"+id, nil); r.status != 204 {
+	if r := e.req("DELETE", "/api/admin/v1/links/"+id, nil); r.status != 204 {
 		t.Fatalf("delete = %d", r.status)
 	}
 	if r := e.visit("/gone"); r.status != 404 {
 		t.Fatalf("deleted link = %d", r.status)
 	}
-	if r := e.req("GET", "/api/links/"+id, nil); r.status != 404 {
+	if r := e.req("GET", "/api/admin/v1/links/"+id, nil); r.status != 404 {
 		t.Fatalf("GET deleted = %d", r.status)
 	}
-	if r := e.req("POST", "/api/links/"+id+"/restore", nil); r.status != 200 {
+	if r := e.req("POST", "/api/admin/v1/links/"+id+"/restore", nil); r.status != 200 {
 		t.Fatalf("restore = %d %s", r.status, r.body)
 	}
 	if r := e.visit("/gone"); r.status != 302 {
@@ -474,7 +474,7 @@ func TestBulk(t *testing.T) {
 	}
 	bulk := func(action string, ids ...any) []any {
 		t.Helper()
-		r := e.req("POST", "/api/links/bulk", map[string]any{"action": action, "ids": ids})
+		r := e.req("POST", "/api/admin/v1/links/bulk", map[string]any{"action": action, "ids": ids})
 		if r.status != 200 {
 			t.Fatalf("%s: %d %s", action, r.status, r.body)
 		}
@@ -525,7 +525,7 @@ func TestBulk(t *testing.T) {
 		{"action": "delete", "ids": []any{-1}},
 		{"action": "delete", "ids": tooMany},
 	} {
-		if r := e.req("POST", "/api/links/bulk", body); r.code() != "bulk_invalid" {
+		if r := e.req("POST", "/api/admin/v1/links/bulk", body); r.code() != "bulk_invalid" {
 			t.Errorf("%v: %d %s", body, r.status, r.body)
 		}
 	}
@@ -535,13 +535,13 @@ func TestCrossOriginRefused(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
 	body := map[string]any{"url": "https://evil.example"}
-	if r := e.req("POST", "/api/links", body, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
+	if r := e.req("POST", "/api/admin/v1/links", body, "Sec-Fetch-Site", "cross-site"); r.status != 403 {
 		t.Errorf("cross-site fetch = %d", r.status)
 	}
-	if r := e.req("POST", "/api/links", body, "Origin", "https://evil.example"); r.status != 403 {
+	if r := e.req("POST", "/api/admin/v1/links", body, "Origin", "https://evil.example"); r.status != 403 {
 		t.Errorf("foreign Origin = %d", r.status)
 	}
-	if r := e.req("POST", "/api/links", body, "Sec-Fetch-Site", "same-origin"); r.status != 201 {
+	if r := e.req("POST", "/api/admin/v1/links", body, "Sec-Fetch-Site", "same-origin"); r.status != 201 {
 		t.Errorf("same-origin = %d", r.status)
 	}
 }
@@ -549,12 +549,12 @@ func TestCrossOriginRefused(t *testing.T) {
 func TestAPITokens(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	tok := e.req("POST", "/api/tokens", map[string]string{"name": "Shortcuts"}).json()
+	tok := e.req("POST", "/api/admin/v1/tokens", map[string]string{"name": "Shortcuts"}).json()
 	secret, _ := tok["token"].(string)
 	if !strings.HasPrefix(secret, "sani_") || len(secret) != 48 {
 		t.Fatalf("token = %v", tok)
 	}
-	list := e.req("GET", "/api/tokens", nil)
+	list := e.req("GET", "/api/admin/v1/tokens", nil)
 	if strings.Contains(string(list.body), secret) {
 		t.Fatal("token list must not reveal secrets")
 	}
@@ -564,7 +564,7 @@ func TestAPITokens(t *testing.T) {
 
 	anon := &http.Client{}
 	create := func(auth string) int {
-		req, _ := http.NewRequest("POST", e.ts.URL+"/api/links", strings.NewReader(`{"url":"https://api.example"}`))
+		req, _ := http.NewRequest("POST", e.ts.URL+"/api/admin/v1/links", strings.NewReader(`{"url":"https://api.example"}`))
 		req.Header.Set("Authorization", auth)
 		resp, err := anon.Do(req)
 		if err != nil {
@@ -579,7 +579,7 @@ func TestAPITokens(t *testing.T) {
 	if s := create("Bearer sani_wrong"); s != 401 {
 		t.Fatalf("bad token = %d", s)
 	}
-	e.req("DELETE", fmt.Sprintf("/api/tokens/%v", tok["id"]), nil)
+	e.req("DELETE", fmt.Sprintf("/api/admin/v1/tokens/%v", tok["id"]), nil)
 	if s := create("Bearer " + secret); s != 401 {
 		t.Fatalf("revoked token = %d", s)
 	}
@@ -591,7 +591,7 @@ func TestImportExport(t *testing.T) {
 	e.create(map[string]any{"url": "https://taken.example", "slug": "taken"})
 
 	csv := "slug,url,title,clicks\nblog,https://blog.example,My blog,12\ntaken,https://x.example,,\n,https://noslug.example,,\nbad,javascript:alert(1),,\n"
-	r := e.req("POST", "/api/import", csv, "Content-Type", "text/csv")
+	r := e.req("POST", "/api/admin/v1/import", csv, "Content-Type", "text/csv")
 	m := r.json()
 	if m["created"] != float64(2) || len(m["skipped"].([]any)) != 2 {
 		t.Fatalf("csv import = %s", r.body)
@@ -599,14 +599,14 @@ func TestImportExport(t *testing.T) {
 
 	shlink := `{"shortUrls":{"data":[{"shortCode":"steam","longUrl":"https://store.steampowered.com",
 		"dateCreated":"2016-08-21T20:34:16+02:00","visitsSummary":{"total":328},"meta":{"maxVisits":1000}}]}}`
-	if m := e.req("POST", "/api/import", shlink).json(); m["created"] != float64(1) {
+	if m := e.req("POST", "/api/admin/v1/import", shlink).json(); m["created"] != float64(1) {
 		t.Fatalf("shlink import = %v", m)
 	}
 	if r := e.visit("/steam"); r.header.Get("Location") != "https://store.steampowered.com" {
 		t.Fatalf("imported link redirect = %d", r.status)
 	}
 
-	exp := e.req("GET", "/api/export", nil)
+	exp := e.req("GET", "/api/admin/v1/export", nil)
 	var doc struct {
 		Links []exportLink `json:"links"`
 	}
@@ -624,7 +624,7 @@ func TestImportExport(t *testing.T) {
 	if steam.Clicks != 329 || steam.MaxClicks != 1000 || steam.CreatedAt.Year() != 2016 {
 		t.Errorf("steam round trip = %+v", steam)
 	}
-	if r := e.req("GET", "/api/export?format=csv", nil); !strings.HasPrefix(string(r.body), "slug,url,title") {
+	if r := e.req("GET", "/api/admin/v1/export?format=csv", nil); !strings.HasPrefix(string(r.body), "slug,url,title") {
 		t.Errorf("csv export = %.60s", r.body)
 	}
 }
@@ -632,26 +632,26 @@ func TestImportExport(t *testing.T) {
 func TestConfig(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	if m := e.req("GET", "/api/config", nil).json(); m["baseUrlSource"] != "request" || m["baseUrl"] != e.ts.URL {
+	if m := e.req("GET", "/api/admin/v1/config", nil).json(); m["baseUrlSource"] != "request" || m["baseUrl"] != e.ts.URL {
 		t.Fatalf("config = %v", m)
 	}
-	if r := e.req("PATCH", "/api/config", map[string]any{"baseUrl": "https://s.example.com/path"}); r.code() != "base_url_invalid" {
+	if r := e.req("PATCH", "/api/admin/v1/config", map[string]any{"baseUrl": "https://s.example.com/path"}); r.code() != "base_url_invalid" {
 		t.Fatalf("path in base URL: %s", r.body)
 	}
-	m := e.req("PATCH", "/api/config", map[string]any{"baseUrl": "https://S.Example.com/"}).json()
+	m := e.req("PATCH", "/api/admin/v1/config", map[string]any{"baseUrl": "https://S.Example.com/"}).json()
 	if m["baseUrl"] != "https://s.example.com" || m["baseUrlSource"] != "setting" {
 		t.Fatalf("patched config = %v", m)
 	}
 	if l := e.create(map[string]any{"url": "https://x.example", "slug": "x"}); l["shortUrl"] != "https://s.example.com/x" {
 		t.Errorf("shortUrl with base = %v", l["shortUrl"])
 	}
-	if r := e.req("GET", "/api/links?q=https://s.example.com/x", nil); r.json()["total"] != float64(1) {
+	if r := e.req("GET", "/api/admin/v1/links?q=https://s.example.com/x", nil); r.json()["total"] != float64(1) {
 		t.Errorf("searching by short URL: %s", r.body)
 	}
 
 	fixed := newEnv(t, Options{BaseURL: "https://sani.example"})
 	fixed.signIn()
-	if r := fixed.req("PATCH", "/api/config", map[string]any{"baseUrl": "https://other.example"}); r.status != 409 {
+	if r := fixed.req("PATCH", "/api/admin/v1/config", map[string]any{"baseUrl": "https://other.example"}); r.status != 409 {
 		t.Errorf("env base URL must not be overridable: %d", r.status)
 	}
 }
@@ -706,7 +706,7 @@ func TestMetaFetchRefusesPrivateTargets(t *testing.T) {
 	l := e.create(map[string]any{"url": origin.URL + "/secret"})
 	var m map[string]any
 	for range 50 {
-		m = e.req("GET", fmt.Sprintf("/api/links/%v", l["id"]), nil).json()
+		m = e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil).json()
 		if m["meta"] != "pending" {
 			break
 		}
@@ -722,11 +722,11 @@ func TestSessionCookieTransport(t *testing.T) {
 		url, forwarded string
 		trust, secure  bool
 	}{
-		{"http://localhost/api/session", "", false, false},
-		{"https://s.example/api/session", "", false, true},
-		{"http://localhost/api/session", "https", false, false},
-		{"http://localhost/api/session", "https", true, true},
-		{"http://localhost/api/session", "http", true, false},
+		{"http://localhost/api/admin/v1/session", "", false, false},
+		{"https://s.example/api/admin/v1/session", "", false, true},
+		{"http://localhost/api/admin/v1/session", "https", false, false},
+		{"http://localhost/api/admin/v1/session", "https", true, true},
+		{"http://localhost/api/admin/v1/session", "http", true, false},
 	} {
 		s := &Server{opt: Options{TrustProxy: tc.trust}}
 		r := httptest.NewRequest("POST", tc.url, nil)
@@ -749,7 +749,7 @@ func TestStatsDaysBounds(t *testing.T) {
 		"": 30, "invalid": 30, "-1": 30, "0": 30, "1": 1,
 		"366": 366, "367": 366,
 	} {
-		r := httptest.NewRequest("GET", "/api/overview?days="+raw, nil)
+		r := httptest.NewRequest("GET", "/api/admin/v1/overview?days="+raw, nil)
 		if got := parseDays(r); got != want {
 			t.Errorf("days=%q: got %d, want %d", raw, got, want)
 		}
@@ -757,7 +757,7 @@ func TestStatsDaysBounds(t *testing.T) {
 	// Oversized values may parse or overflow depending on the architecture;
 	// either path must stay within the range used by the int32 day arithmetic.
 	for _, raw := range []string{"2147483648", "9223372036854775807", "99999999999999999999"} {
-		r := httptest.NewRequest("GET", "/api/overview?days="+raw, nil)
+		r := httptest.NewRequest("GET", "/api/admin/v1/overview?days="+raw, nil)
 		if got := parseDays(r); got < 1 || got > 366 {
 			t.Errorf("days=%q escaped bounds: %d", raw, got)
 		}
@@ -846,7 +846,7 @@ func TestRedirectQueryCannotChangeDestination(t *testing.T) {
 				l := e.create(map[string]any{"url": targets[i].location, "redirect": targets[i].code})
 				targets[i].slug = l["slug"].(string)
 			}
-			if r := e.req("DELETE", "/api/session", nil); r.status != 204 {
+			if r := e.req("DELETE", "/api/admin/v1/session", nil); r.status != 204 {
 				t.Fatalf("logout: %d", r.status)
 			}
 			for _, target := range targets {

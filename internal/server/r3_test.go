@@ -20,7 +20,7 @@ import (
 func TestCreationSettingsPersistenceAndPrecedence(t *testing.T) {
 	e := newEnv(t, Options{FetchMeta: true})
 	e.signIn()
-	r := e.req("PATCH", "/api/config", `{"slugLength":3,"excludeConfusable":false,"maxFileSize":200000000,"metaMode":"off"}`)
+	r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":3,"excludeConfusable":false,"maxFileSize":200000000,"metaMode":"off"}`)
 	if r.status != 200 || r.json()["fetchMeta"] != false || r.json()["maxFileSize"] != float64(200_000_000) {
 		t.Fatal(string(r.body))
 	}
@@ -34,16 +34,16 @@ func TestCreationSettingsPersistenceAndPrecedence(t *testing.T) {
 	if len(l["slug"].(string)) != 3 {
 		t.Fatal(l)
 	}
-	text := e.req("POST", "/api/texts", `{"text":"hello"}`)
+	text := e.req("POST", "/api/admin/v1/texts", `{"text":"hello"}`)
 	if len(text.json()["slug"].(string)) < 10 {
 		t.Fatal(string(text.body))
 	}
 	for _, body := range []string{`{"slugLength":2}`, `{"maxFileSize":99000001}`, `{"maxFileSize":4097000000}`, `{"metaMode":"invalid"}`, `{"slugLength":7,"baseUrl":"not an origin"}`} {
-		if r := e.req("PATCH", "/api/config", body); r.status != 400 {
+		if r := e.req("PATCH", "/api/admin/v1/config", body); r.status != 400 {
 			t.Fatal(string(r.body))
 		}
 	}
-	if r := e.req("PATCH", "/api/config", `{"metaMode":"proxy"}`); r.code() != "proxy_missing" {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"metaMode":"proxy"}`); r.code() != "proxy_missing" {
 		t.Fatal(string(r.body))
 	}
 	if e.srv.settings.Load().slugLength != 3 {
@@ -57,7 +57,7 @@ func TestCreationSettingsPersistenceAndPrecedence(t *testing.T) {
 	if cfg := e.srv.settings.Load(); cfg.slugLength != 9 || cfg.sources["slugLength"] != "env" {
 		t.Fatal(cfg)
 	}
-	if r := e.req("PATCH", "/api/config", `{"slugLength":5,"maxFileSize":1000000}`); r.code() != "config_env" {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":5,"maxFileSize":1000000}`); r.code() != "config_env" {
 		t.Fatal(string(r.body))
 	}
 	if e.srv.settings.Load().maxFileSize != 200_000_000 {
@@ -67,12 +67,12 @@ func TestCreationSettingsPersistenceAndPrecedence(t *testing.T) {
 
 func TestUploadCredentialReuseAndReceiptCapacity(t *testing.T) {
 	e := newShareEnv(t, Options{})
-	a := e.req("POST", "/api/tokens", `{"name":"a"}`).json()
+	a := e.req("POST", "/api/admin/v1/tokens", `{"name":"a"}`).json()
 	authA := "Bearer " + a["token"].(string)
-	r := e.req("POST", "/api/uploads", `{"name":"x","size":1}`, "Authorization", authA)
-	path := "/api/uploads/" + r.json()["id"].(string)
-	e.req("DELETE", fmt.Sprintf("/api/tokens/%v", a["id"]), nil)
-	b := e.req("POST", "/api/tokens", `{"name":"b"}`).json()
+	r := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":1}`, "Authorization", authA)
+	path := "/api/admin/v1/uploads/" + r.json()["id"].(string)
+	e.req("DELETE", fmt.Sprintf("/api/admin/v1/tokens/%v", a["id"]), nil)
+	b := e.req("POST", "/api/admin/v1/tokens", `{"name":"b"}`).json()
 	if a["id"] != b["id"] {
 		t.Fatal("fixture did not reuse the token ID")
 	}
@@ -82,11 +82,11 @@ func TestUploadCredentialReuseAndReceiptCapacity(t *testing.T) {
 		}
 	}
 	for range 34 {
-		r := e.req("POST", "/api/uploads", `{"name":"x","size":1}`)
+		r := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":1}`)
 		if r.status != 201 {
 			t.Fatal(string(r.body))
 		}
-		path := "/api/uploads/" + r.json()["id"].(string)
+		path := "/api/admin/v1/uploads/" + r.json()["id"].(string)
 		if r := e.req("PUT", path, "x", "Upload-Offset", "0"); r.status != 200 {
 			t.Fatal(string(r.body))
 		}
@@ -115,7 +115,7 @@ func TestDisabledRefreshKeepsCachedMetadata(t *testing.T) {
 			if err := e.srv.loadSettings(); err != nil {
 				t.Fatal(err)
 			}
-			r := e.req("POST", fmt.Sprintf("/api/links/%d/refresh", l.ID), nil)
+			r := e.req("POST", fmt.Sprintf("/api/admin/v1/links/%d/refresh", l.ID), nil)
 			if r.status != 200 || r.json()["title"] != "Cached title" || r.json()["meta"] != "ok" {
 				t.Fatal(string(r.body))
 			}
@@ -125,12 +125,12 @@ func TestDisabledRefreshKeepsCachedMetadata(t *testing.T) {
 
 func TestChunkUploadRetryOwnershipAndFinalize(t *testing.T) {
 	e := newShareEnv(t, Options{FilesDir: t.TempDir()})
-	r := e.req("POST", "/api/uploads", `{"name":"hello.txt","size":11,"slug":"chunk-file"}`)
+	r := e.req("POST", "/api/admin/v1/uploads", `{"name":"hello.txt","size":11,"slug":"chunk-file"}`)
 	if r.status != 201 {
 		t.Fatal(string(r.body))
 	}
 	id := r.json()["id"].(string)
-	path := "/api/uploads/" + id
+	path := "/api/admin/v1/uploads/" + id
 	if r := e.req("POST", path+"/complete", nil); r.code() != "upload_incomplete" {
 		t.Fatal(string(r.body))
 	}
@@ -142,7 +142,7 @@ func TestChunkUploadRetryOwnershipAndFinalize(t *testing.T) {
 			t.Fatalf("chunk: %d %s", r.status, r.body)
 		}
 	}
-	token := e.req("POST", "/api/tokens", `{"name":"other principal"}`).json()["token"].(string)
+	token := e.req("POST", "/api/admin/v1/tokens", `{"name":"other principal"}`).json()["token"].(string)
 	if r := e.req("DELETE", path, nil, "Authorization", "Bearer "+token); r.code() != "upload_not_found" {
 		t.Fatal(string(r.body))
 	}
@@ -177,21 +177,21 @@ func TestChunkUploadRetryOwnershipAndFinalize(t *testing.T) {
 
 func TestChunkUploadBoundsCleanupAndFailure(t *testing.T) {
 	e := newShareEnv(t, Options{FilesDir: t.TempDir()})
-	if r := e.req("POST", "/api/uploads", `{"name":"x","size":99000001}`); r.code() != "file_too_large" {
+	if r := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":99000001}`); r.code() != "file_too_large" {
 		t.Fatal(string(r.body))
 	}
 	ids := []string{}
 	for range 2 {
-		r := e.req("POST", "/api/uploads", `{"name":"x","size":2}`)
+		r := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":2}`)
 		if r.status != 201 {
 			t.Fatal(string(r.body))
 		}
 		ids = append(ids, r.json()["id"].(string))
 	}
-	if r := e.req("POST", "/api/uploads", `{"name":"x","size":2}`); r.code() != "upload_limit" {
+	if r := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":2}`); r.code() != "upload_limit" {
 		t.Fatal(string(r.body))
 	}
-	path := "/api/uploads/" + ids[0]
+	path := "/api/admin/v1/uploads/" + ids[0]
 	if r := e.req("PUT", path, "abc", "Upload-Offset", "0"); r.code() != "upload_invalid" {
 		t.Fatal(string(r.body))
 	}
@@ -234,7 +234,7 @@ func TestRemovedImportFormatsDoNotWrite(t *testing.T) {
 		"keyword,url\nx,https://example.com\n", "shortCode,longUrl\nx,https://example.com\n",
 		"slug,url\nx,https://example.com\ninvalid\n", "slug,url,url\nx,https://example.com,https://example.com\n",
 	} {
-		r := e.req("POST", "/api/import", body)
+		r := e.req("POST", "/api/admin/v1/import", body)
 		if r.code() != "import_unreadable" {
 			t.Fatalf("accepted unsupported input: %s: %s", body, r.body)
 		}
@@ -250,21 +250,21 @@ func TestRemovedImportFormatsDoNotWrite(t *testing.T) {
 func TestTagRenameRecolorReferences(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	id := e.req("POST", "/api/tags", `{"name":"work","color":"#ABCDEF"}`).json()["id"]
+	id := e.req("POST", "/api/admin/v1/tags", `{"name":"work","color":"#ABCDEF"}`).json()["id"]
 	l := e.create(map[string]any{"url": "https://example.com", "tags": []any{id}})
-	r := e.req("PATCH", fmt.Sprintf("/api/tags/%v", id), `{"name":"Work renamed","color":"#5872a5"}`)
+	r := e.req("PATCH", fmt.Sprintf("/api/admin/v1/tags/%v", id), `{"name":"Work renamed","color":"#5872a5"}`)
 	if r.status != 200 || r.json()["count"] != float64(1) {
 		t.Fatal(string(r.body))
 	}
-	if tags := e.req("GET", fmt.Sprintf("/api/links/%v", l["id"]), nil).json()["tags"].([]any); len(tags) != 1 || tags[0] != id {
+	if tags := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil).json()["tags"].([]any); len(tags) != 1 || tags[0] != id {
 		t.Fatal(tags)
 	}
-	e.req("POST", "/api/tags", `{"name":"taken"}`)
-	if r := e.req("PATCH", fmt.Sprintf("/api/tags/%v", id), `{"name":"TAKEN","color":"blue"}`); r.code() != "tag_taken" {
+	e.req("POST", "/api/admin/v1/tags", `{"name":"taken"}`)
+	if r := e.req("PATCH", fmt.Sprintf("/api/admin/v1/tags/%v", id), `{"name":"TAKEN","color":"blue"}`); r.code() != "tag_taken" {
 		t.Fatal(string(r.body))
 	}
 	for _, color := range []string{"red", "#abc", "#abcdef00", "var(--x)", "#zzzzzz"} {
-		if r := e.req("PATCH", fmt.Sprintf("/api/tags/%v", id), map[string]string{"name": "work", "color": color}); r.code() != "tags_invalid" {
+		if r := e.req("PATCH", fmt.Sprintf("/api/admin/v1/tags/%v", id), map[string]string{"name": "work", "color": color}); r.code() != "tags_invalid" {
 			t.Fatal(string(r.body))
 		}
 	}
@@ -285,10 +285,10 @@ func (b *heldChunk) Read(p []byte) (int, error) {
 }
 func TestSlowAndTruncatedChunkDoesNotBlockOtherUploads(t *testing.T) {
 	e := newShareEnv(t, Options{FilesDir: t.TempDir()})
-	id := e.req("POST", "/api/uploads", `{"name":"one","size":2}`).json()["id"].(string)
-	other := e.req("POST", "/api/uploads", `{"name":"two","size":1}`).json()["id"].(string)
+	id := e.req("POST", "/api/admin/v1/uploads", `{"name":"one","size":2}`).json()["id"].(string)
+	other := e.req("POST", "/api/admin/v1/uploads", `{"name":"two","size":1}`).json()["id"].(string)
 	entered, release := make(chan struct{}), make(chan struct{})
-	req := httptest.NewRequest("PUT", e.ts.URL+"/api/uploads/"+id, &heldChunk{entered, release, strings.NewReader("a")})
+	req := httptest.NewRequest("PUT", e.ts.URL+"/api/admin/v1/uploads/"+id, &heldChunk{entered, release, strings.NewReader("a")})
 	req.ContentLength = 2
 	req.Header.Set("Upload-Offset", "0")
 	u, _ := url.Parse(e.ts.URL + "/api/")
@@ -299,11 +299,11 @@ func TestSlowAndTruncatedChunkDoesNotBlockOtherUploads(t *testing.T) {
 	done := make(chan struct{})
 	go func() { e.srv.ServeHTTP(rec, req); close(done) }()
 	<-entered
-	busy := e.req("DELETE", "/api/uploads/"+id, nil)
+	busy := e.req("DELETE", "/api/admin/v1/uploads/"+id, nil)
 	e.srv.expireUploads(time.Now().Add(2 * time.Hour))
 	// The inactive other session expired; create another and transfer while the first waits.
-	other = e.req("POST", "/api/uploads", `{"name":"two","size":1}`).json()["id"].(string)
-	second := e.req("PUT", "/api/uploads/"+other, "b", "Upload-Offset", "0")
+	other = e.req("POST", "/api/admin/v1/uploads", `{"name":"two","size":1}`).json()["id"].(string)
+	second := e.req("PUT", "/api/admin/v1/uploads/"+other, "b", "Upload-Offset", "0")
 	close(release)
 	<-done
 	if busy.code() != "upload_busy" || second.status != 200 || rec.Code != 400 {
@@ -313,17 +313,17 @@ func TestSlowAndTruncatedChunkDoesNotBlockOtherUploads(t *testing.T) {
 	if err != nil || stat.Size() != 0 || e.srv.uploads[id].offset != 0 {
 		t.Fatal("partial chunk advanced", err)
 	}
-	if r := e.req("PUT", "/api/uploads/"+id, "ab", "Upload-Offset", "0"); r.status != 200 {
+	if r := e.req("PUT", "/api/admin/v1/uploads/"+id, "ab", "Upload-Offset", "0"); r.status != 200 {
 		t.Fatal(string(r.body))
 	}
 }
 
 func TestChunkCompletionConflictKeepsBytesForRetry(t *testing.T) {
 	e := newShareEnv(t, Options{FilesDir: t.TempDir()})
-	id := e.req("POST", "/api/uploads", `{"name":"x","size":2,"slug":"race-file"}`).json()["id"].(string)
-	path := "/api/uploads/" + id
+	id := e.req("POST", "/api/admin/v1/uploads", `{"name":"x","size":2,"slug":"race-file"}`).json()["id"].(string)
+	path := "/api/admin/v1/uploads/" + id
 	e.req("PUT", path, "ab", "Upload-Offset", "0")
-	conflict := e.req("POST", "/api/texts", `{"text":"occupied","slug":"race-file"}`)
+	conflict := e.req("POST", "/api/admin/v1/texts", `{"text":"occupied","slug":"race-file"}`)
 	if conflict.status != 201 {
 		t.Fatal(string(conflict.body))
 	}
@@ -334,7 +334,7 @@ func TestChunkCompletionConflictKeepsBytesForRetry(t *testing.T) {
 	if err != nil || string(data) != "ab" {
 		t.Fatal("failed finalize lost bytes", err)
 	}
-	e.req("DELETE", fmt.Sprintf("/api/links/%v", conflict.json()["id"]), nil)
+	e.req("DELETE", fmt.Sprintf("/api/admin/v1/links/%v", conflict.json()["id"]), nil)
 	if r := e.req("POST", path+"/complete", nil); r.status != 201 {
 		t.Fatal(string(r.body))
 	}

@@ -25,7 +25,7 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 				if format == "csv" {
 					body = []byte(fmt.Sprintf("url,slug,expires_at\nhttps://example.com/,%s,%v\n", slug, value))
 				}
-				r := e.req("POST", "/api/import", string(body))
+				r := e.req("POST", "/api/admin/v1/import", string(body))
 				var result struct {
 					Created int             `json:"created"`
 					Skipped []importProblem `json:"skipped"`
@@ -49,16 +49,16 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 				if l.ExpiresAt != maxMS {
 					t.Fatalf("expiry changed: %d", l.ExpiresAt)
 				}
-				if r := e.req("GET", fmt.Sprintf("/api/links/%d", l.ID), nil); r.status != 200 || !json.Valid(r.body) || r.json()["expiresAt"] != last {
+				if r := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%d", l.ID), nil); r.status != 200 || !json.Valid(r.body) || r.json()["expiresAt"] != last {
 					t.Fatalf("detail broken: %d %s", r.status, r.body)
 				}
 			}
-			for _, path := range []string{"/api/links", "/api/export"} {
+			for _, path := range []string{"/api/admin/v1/links", "/api/admin/v1/export"} {
 				if r := e.req("GET", path, nil); r.status != 200 || !json.Valid(r.body) {
 					t.Fatalf("%s broken: %d %s", path, r.status, r.body)
 				}
 			}
-			if r := e.req("GET", "/api/export?format=csv", nil); r.status != 200 || !strings.Contains(string(r.body), "9999-12-31T23:59:59Z") {
+			if r := e.req("GET", "/api/admin/v1/export?format=csv", nil); r.status != 200 || !strings.Contains(string(r.body), "9999-12-31T23:59:59Z") {
 				t.Fatalf("CSV export broken: %d %s", r.status, r.body)
 			}
 		})
@@ -70,9 +70,9 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 		if expiry != last {
 			want = http.StatusBadRequest
 		}
-		for _, path := range []string{"/api/links", "/api/texts"} {
+		for _, path := range []string{"/api/admin/v1/links", "/api/admin/v1/texts"} {
 			body := map[string]any{"expiresAt": expiry}
-			if path == "/api/links" {
+			if path == "/api/admin/v1/links" {
 				body["url"] = "https://example.com/"
 			} else {
 				body["text"] = "shared text"
@@ -88,7 +88,7 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 		}
 	}
 	l := e.create(map[string]any{"url": "https://example.com/", "expiresAt": last})
-	path := fmt.Sprintf("/api/links/%v", l["id"])
+	path := fmt.Sprintf("/api/admin/v1/links/%v", l["id"])
 	for _, expiry := range []string{last, "9999-12-31T23:59:59-01:00"} {
 		r := e.req("PATCH", path, map[string]any{"expiresAt": expiry})
 		if expiry == last && (r.status != 200 || r.json()["expiresAt"] != last) || expiry != last && (r.status != 400 || r.code() != "expires_invalid") {
@@ -98,7 +98,7 @@ func TestExpiryBoundsAtEveryInput(t *testing.T) {
 			t.Fatalf("rejected patch changed expiry: %v", got)
 		}
 	}
-	for _, path := range []string{"/api/links", "/api/export"} {
+	for _, path := range []string{"/api/admin/v1/links", "/api/admin/v1/export"} {
 		if r := e.req("GET", path, nil); r.status != 200 || !json.Valid(r.body) {
 			t.Fatalf("%s broken after rejected writes: %d %s", path, r.status, r.body)
 		}

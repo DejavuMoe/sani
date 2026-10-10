@@ -34,10 +34,10 @@ SANI_LISTEN=127.0.0.1:$PORT SANI_DATA_DIR=$DATA SANI_PASSWORD=$PASSWORD SANI_FET
 PID=$!
 for _ in $(seq 50); do curl -fs "$BASE/healthz" >/dev/null && break; sleep 0.1; done
 
-curl -fs -c "$JAR" -H 'Content-Type: application/json' -d "{\"password\":\"$PASSWORD\"}" "$BASE/api/session" >/dev/null
+curl -fs -c "$JAR" -H 'Content-Type: application/json' -d "{\"password\":\"$PASSWORD\"}" "$BASE/api/admin/v1/session" >/dev/null
 api() { curl -fs -b "$JAR" -H 'Content-Type: application/json' "$@"; }
-api -d '{"url":"https://example.com/landing?utm_source=load","slug":"hot"}' "$BASE/api/links" >/dev/null
-api -d '{"url":"https://example.com/other","slug":"limited","maxClicks":1000000000}' "$BASE/api/links" >/dev/null
+api -d '{"url":"https://example.com/landing?utm_source=load","slug":"hot"}' "$BASE/api/admin/v1/links" >/dev/null
+api -d '{"url":"https://example.com/other","slug":"limited","maxClicks":1000000000}' "$BASE/api/admin/v1/links" >/dev/null
 
 run() {
 	local name=$1 path=$2
@@ -54,7 +54,7 @@ run "unknown slug (negative cache)" /nope
 
 # Clicks are flushed every 2s; give the last batch time to land.
 sleep 3
-COUNTED=$(api "$BASE/api/links/1" | grep -oE '"clicks":[0-9]+' | grep -oE '[0-9]+$')
+COUNTED=$(api "$BASE/api/admin/v1/links/1" | grep -oE '"clicks":[0-9]+' | grep -oE '[0-9]+$')
 echo
 echo "== /hot: $SERVED redirects served, $COUNTED clicks recorded"
 if [ "$SERVED" != "$COUNTED" ]; then

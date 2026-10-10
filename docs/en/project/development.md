@@ -109,6 +109,7 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 
 - `make check test`, and the Go tests on macOS and Windows as well;
 - the end-to-end tests, and axe over the admin app;
+- direct HTTP contracts, old-binary upgrades and full-snapshot rollback, including non-root Docker bind-storage faults;
 - a docs build, with axe over every page;
 - a build of the image for every release platform, which is then started and has to pass its health check;
 - the release archives for every platform;
@@ -135,3 +136,9 @@ Push to Forgejo: `origin` must point to `ssh://git@ssh.via.moe/dejavu/sani.git`.
 The release workflow first makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.9.4-rc.1` is marked as a pre-release. Images always use full version tags; no `latest` or floating tags are published.
 
 Locally, `make web dist VERSION=v0.2.0` produces the same archives as the release. Building one commit twice gives byte-for-byte identical files.
+
+HTTP contract and upgrade gates: run `make compat` after `make install`; run `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill` with the schema-5 baseline binary. `make check test`, `make e2e`, and `make smoke` remain required. The contract script uses Node built-ins, fetch and FormData, with no s.ee SDK dependency.
+
+The 2026-10-10 SDK ablation used the same production source and Go 1.27.2 before review fixes. The old SDK checks and the replacement 15-operation direct HTTP checks both passed. Both `dev` Linux binaries were 17,555,616 bytes with SHA-256 `bee156f83025009a3ad05b80188018af19319249fac6928995385c15dd639c40`, identical byte for byte. The isolated SDK Go module, JS workspace and its dependencies were removed and the original project lockfile restored. This establishes that the SDK was a replaceable test client, not a runtime dependency; later fixes need not produce the same binary hash.
+
+Docker storage drill: build the local image, then run `bash scripts/test-docker-storage.sh sani:upgrade /absolute/path/to/old-sani`. It extracts the actual image binary and reuses the HTTP/migration/rollback drill as UID 65532 on bind storage in a temporary Node test container. Node is only the test harness; the production image remains scratch. It also verifies refusal of a read-only database and real ENOSPC on an isolated 16 MiB tmpfs: three failed starts leave no partial copies, and the old schema and files pass preflight after space is freed.

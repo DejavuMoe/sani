@@ -99,10 +99,10 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 **API.** Create a token in Settings, then:
 
 ```sh
-curl -X POST https://s.example.com/api/links \
+curl -X POST https://s.example.com/api/v1/shorten \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com/some/long/path", "slug": "demo"}'
+  -d '{"target_url": "https://example.com/some/long/path", "slug": "demo"}'
 ```
 
 The [API reference](docs/en/reference/api.md) covers every endpoint and error code.
@@ -189,3 +189,5 @@ For a complete backup including files, stop all writers before copying the datab
 ## License
 
 [MIT](LICENSE)
+
+The external `/api/v1` API supports the bounded `sani-see-v1-2026-10-10` HTTP profile; admin operations use `/api/admin/v1`. Before upgrading, export JSON in the old admin app, stop cleanly, and snapshot the database, files and configuration. Run `sani preflight` with the new binary; upgrade in place without reimport. Rollback requires the full pre-upgrade snapshot and old binary/image. See the [compatibility matrix](docs/en/reference/api.md#see) and [upgrade guide](docs/en/guide/operations.md#upgrade).

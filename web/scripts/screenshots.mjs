@@ -35,7 +35,7 @@ async function scene(name, { lang, theme, width, height, origin = base, signIn =
     hasTouch: phone,
   });
   await ctx.addInitScript(([t, l]) => (localStorage.setItem('sani.theme', t), localStorage.setItem('sani.lang', l)), [theme, lang]);
-  if (signIn) await ctx.request.post(`${origin}/api/session`, { data: { password } });
+  if (signIn) await ctx.request.post(`${origin}/api/admin/v1/session`, { data: { password } });
   const page = await ctx.newPage();
   await page.goto(`${origin}/admin/`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);

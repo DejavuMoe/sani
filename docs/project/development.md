@@ -109,6 +109,7 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 - `make check test`，另外在 macOS 和 Windows 上运行 Go 测试；
 - 端到端测试，以及对管理界面的 axe 检查；
+- 直接 HTTP 契约、旧二进制升级与完整快照回滚，以及非 root Docker 绑定存储故障演练；
 - 构建文档站，对每一页做 axe 检查；
 - 为每个发布平台试构建镜像，启动它，等健康检查通过；
 - 构建全部二进制文件的压缩包；
@@ -135,3 +136,9 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 发布流程会先确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.9.4-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
 
 在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。
+
+HTTP 契约与升级门槛：`make install` 后执行 `make compat`，并使用 schema 5 基线二进制执行 `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`。仍需 `make check test`、`make e2e`、`make smoke`。契约脚本使用 Node 标准库、fetch 和 FormData，不依赖 s.ee SDK。
+
+2026-10-10 的 SDK 消融实验在审查修复前、同一源代码和 Go 1.27.2 下，分别运行移除前 SDK 测试和移除后 15 项直接 HTTP 测试，均通过。两个 `dev` Linux 二进制均为 17,555,616 字节，SHA-256 同为 `bee156f83025009a3ad05b80188018af19319249fac6928995385c15dd639c40`，逐字节一致。移除独立 SDK Go 模块、JS 工作区及其依赖，恢复原项目锁文件；这证明 SDK 仅是可替换的测试客户端，不是运行依赖，不代表后续修复后的二进制必须具有同一摘要。
+
+Docker 存储演练：先构建本地镜像，再执行 `bash scripts/test-docker-storage.sh sani:upgrade /absolute/path/to/old-sani`。脚本从待测镜像提取真实二进制，在 UID 65532、真实绑定目录和临时 Node 测试容器中复用完整 HTTP/迁移/回滚演练；Node 仅用于测试，正式镜像仍为 scratch。额外验证只读数据库被预检拒绝，以及隔离的 16 MiB tmpfs 耗尽产生真实 ENOSPC：三次失败启动不遗留半成品副本，释放空间后旧 schema 与文件仍可预检。

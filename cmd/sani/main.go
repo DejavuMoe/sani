@@ -41,6 +41,7 @@ Usage:
   sani serve        start the server
   sani passwd       set a new admin password and sign out every session
   sani backup FILE  write a consistent copy of the database to FILE ("-": stdout)
+  sani preflight    check an existing database and shared files without migrating
   sani healthcheck  exit 0 if the local server answers /healthz
   sani version      print the version
 
@@ -60,6 +61,8 @@ func main() {
 		err = passwd()
 	case "backup":
 		err = backup()
+	case "preflight":
+		err = preflight()
 	case "healthcheck":
 		err = healthcheck()
 	case "version", "-v", "--version":
@@ -94,8 +97,36 @@ func openStore(ctx context.Context, cfg *config.Config) (*store.Store, error) {
 		return nil, fmt.Errorf("stat database: %w", err)
 	}
 	newDatabase := errors.Is(err, os.ErrNotExist) || info.Size() == 0
+	var backup string
+	var beforeVersion int
+	if !newDatabase {
+		v, err := store.SchemaVersion(ctx, path)
+		if err != nil {
+			return nil, err
+		}
+		newDatabase = v == 0
+		beforeVersion = v
+		if !newDatabase {
+			backup, err = prepareUpgrade(ctx, cfg, path, v)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	st, err := store.Open(ctx, path)
 	if err != nil {
+		if backup != "" {
+			// Avoid one full copy per restart after a rolled-back migration. Keep
+			// the safety copy whenever the old database cannot be verified intact.
+			report, checkErr := store.Preflight(context.Background(), path, filepath.Join(cfg.DataDir, "files"))
+			if checkErr == nil && report.Schema == beforeVersion {
+				if removeErr := os.Remove(backup); removeErr != nil {
+					err = errors.Join(err, fmt.Errorf("remove failed-upgrade safety copy %s: %w", backup, removeErr))
+				}
+			} else {
+				err = errors.Join(err, fmt.Errorf("retained safety copy %s: old schema could not be verified: %v", backup, checkErr))
+			}
+		}
 		return nil, err
 	}
 	// Mark new installs even when passwd opens the database before serve.

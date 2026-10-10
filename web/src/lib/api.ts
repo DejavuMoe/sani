@@ -159,7 +159,7 @@ export function setUnauthorizedHandler(fn: () => void) {
 async function request<T>(method: string, path: string, body?: unknown, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`/api${path}`, {
+    res = await fetch(`/api/admin/v1${path}`, {
       method,
       headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
       body: body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
@@ -194,7 +194,7 @@ function sendUpload<T>(method: string, path: string, body: XMLHttpRequestBodyIni
     const abort = () => xhr.abort();
     const clean = () => signal?.removeEventListener('abort', abort);
     if (signal?.aborted) { reject(new DOMException('upload canceled', 'AbortError')); return; }
-    xhr.open(method, '/api' + path);
+    xhr.open(method, '/api/admin/v1' + path);
     xhr.responseType = 'json';
     for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value);
     xhr.upload.onprogress = e => e.lengthComputable && onProgress?.(e.loaded, e.total);

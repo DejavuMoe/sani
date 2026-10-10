@@ -22,7 +22,7 @@ func TestIndependentSlugCreation(t *testing.T) {
 	e := newShareEnv(t, Options{})
 	for _, lengths := range [][3]int{{5, 10, 10}, {32, 5, 12}, {3, 32, 3}, {5, 3, 32}} {
 		t.Run(fmt.Sprint(lengths), func(t *testing.T) {
-			r := e.req("PATCH", "/api/config", map[string]any{
+			r := e.req("PATCH", "/api/admin/v1/config", map[string]any{
 				"slugLength": lengths[0], "textSlugLength": lengths[1], "fileSlugLength": lengths[2], "excludeConfusable": false,
 			})
 			if r.status != 200 {
@@ -48,23 +48,23 @@ func TestIndependentSlugCreation(t *testing.T) {
 				}
 				return l
 			}
-			check(e.req("POST", "/api/links", `{"url":"https://example.com"}`), "url", lengths[0])
+			check(e.req("POST", "/api/admin/v1/links", `{"url":"https://example.com"}`), "url", lengths[0])
 			for _, format := range []string{"plain", "code"} {
-				check(e.req("POST", "/api/texts", map[string]string{"text": "hello", "format": format}), "text", lengths[1])
+				check(e.req("POST", "/api/admin/v1/texts", map[string]string{"text": "hello", "format": format}), "text", lengths[1])
 			}
 			check(e.upload(nil, "x.txt", []byte("x")), "file", lengths[2])
-			r = e.req("POST", "/api/uploads", `{"name":"chunk.txt","size":2}`)
+			r = e.req("POST", "/api/admin/v1/uploads", `{"name":"chunk.txt","size":2}`)
 			if r.status != 201 {
 				t.Fatal(string(r.body))
 			}
-			path := "/api/uploads/" + r.json()["id"].(string)
+			path := "/api/admin/v1/uploads/" + r.json()["id"].(string)
 			for offset := range 2 {
 				if r := e.req("PUT", path, "x", "Upload-Offset", fmt.Sprint(offset)); r.status != 200 {
 					t.Fatal(string(r.body))
 				}
 			}
 			l := check(e.req("POST", path+"/complete", nil), "file", lengths[2])
-			if r := e.req("PATCH", "/api/config", `{"slugLength":7,"textSlugLength":8,"fileSlugLength":9}`); r.status != 200 {
+			if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":7,"textSlugLength":8,"fileSlugLength":9}`); r.status != 200 {
 				t.Fatal(string(r.body))
 			}
 			if r := e.req("POST", path+"/complete", nil); r.status != 200 || r.json()["slug"] != l["slug"] {
@@ -74,16 +74,16 @@ func TestIndependentSlugCreation(t *testing.T) {
 	}
 	// Explicit slugs and existing links do not inherit generation lengths.
 	url := e.create(map[string]any{"url": "https://example.com/manual", "slug": "u"})
-	text := e.req("POST", "/api/texts", `{"text":"manual","slug":"t"}`)
+	text := e.req("POST", "/api/admin/v1/texts", `{"text":"manual","slug":"t"}`)
 	file := e.upload(map[string]string{"slug": "f"}, "manual.txt", []byte("x"))
 	if text.status != 201 || text.json()["slug"] != "t" || file.status != 201 || file.json()["slug"] != "f" {
 		t.Fatalf("manual slugs: %s %s", text.body, file.body)
 	}
-	if r := e.req("PATCH", "/api/config", `{"slugLength":32,"textSlugLength":32,"fileSlugLength":32}`); r.status != 200 {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":32,"textSlugLength":32,"fileSlugLength":32}`); r.status != 200 {
 		t.Fatal(string(r.body))
 	}
 	for _, l := range []map[string]any{url, text.json(), file.json()} {
-		if r := e.req("GET", fmt.Sprintf("/api/links/%v", l["id"]), nil); r.status != 200 || r.json()["slug"] != l["slug"] {
+		if r := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil); r.status != 200 || r.json()["slug"] != l["slug"] {
 			t.Fatal("existing slug changed", string(r.body))
 		}
 	}
@@ -92,7 +92,7 @@ func TestIndependentSlugCreation(t *testing.T) {
 func TestIndependentSlugPatchAtomicity(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	if r := e.req("PATCH", "/api/config", `{"slugLength":7,"textSlugLength":8,"fileSlugLength":9,"baseUrl":"https://old.example.com"}`); r.status != 200 {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":7,"textSlugLength":8,"fileSlugLength":9,"baseUrl":"https://old.example.com"}`); r.status != 200 {
 		t.Fatal(string(r.body))
 	}
 	current := e.srv.settings.Load()
@@ -104,7 +104,7 @@ func TestIndependentSlugPatchAtomicity(t *testing.T) {
 		for _, invalid := range []string{"-1", "0", "2", "33", "3.5", `""`, `"5"`, "true", "[]", "{}", "999999999999999999999"} {
 			body := map[string]any{"slugLength": 12, "textSlugLength": 13, "fileSlugLength": 14, "baseUrl": "https://new.example.com", "excludeConfusable": false}
 			body[key] = json.RawMessage(invalid)
-			r := e.req("PATCH", "/api/config", body)
+			r := e.req("PATCH", "/api/admin/v1/config", body)
 			if r.status != 400 || r.code() != "config_invalid" && r.code() != "bad_json" {
 				t.Fatalf("%s=%s accepted: %d %s", key, invalid, r.status, r.body)
 			}
@@ -116,7 +116,7 @@ func TestIndependentSlugPatchAtomicity(t *testing.T) {
 		}
 	}
 	// Null retains the existing optional-field semantics of slugLength.
-	if r := e.req("PATCH", "/api/config", `{"slugLength":null,"textSlugLength":null,"fileSlugLength":null}`); r.status != 200 || r.json()["textSlugLength"] != float64(8) || r.json()["fileSlugLength"] != float64(9) {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":null,"textSlugLength":null,"fileSlugLength":null}`); r.status != 200 || r.json()["textSlugLength"] != float64(8) || r.json()["fileSlugLength"] != float64(9) {
 		t.Fatal(string(r.body))
 	}
 	// A database failure must leave both the base URL and generation settings intact.
@@ -129,7 +129,7 @@ func TestIndependentSlugPatchAtomicity(t *testing.T) {
 		t.Fatal(err)
 	}
 	current = e.srv.settings.Load()
-	if r := e.req("PATCH", "/api/config", `{"textSlugLength":3,"fileSlugLength":32,"baseUrl":"https://new.example.com"}`); r.status != 500 {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"textSlugLength":3,"fileSlugLength":32,"baseUrl":"https://new.example.com"}`); r.status != 500 {
 		t.Fatal(string(r.body))
 	}
 	after, err := e.srv.store.Setting(context.Background(), store.SettingCreation)
@@ -149,7 +149,7 @@ func TestIndependentSlugEnvironmentLocks(t *testing.T) {
 			opt.FileSlugLengthFromEnv = i == 2
 			e := newEnv(t, opt)
 			e.signIn()
-			r := e.req("GET", "/api/config", nil)
+			r := e.req("GET", "/api/admin/v1/config", nil)
 			if r.status != 200 {
 				t.Fatal(string(r.body))
 			}
@@ -167,7 +167,7 @@ func TestIndependentSlugEnvironmentLocks(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			r = e.req("PATCH", "/api/config", map[string]any{"slugLength": 12, "textSlugLength": 13, "fileSlugLength": 14, "baseUrl": "https://new.example.com"})
+			r = e.req("PATCH", "/api/admin/v1/config", map[string]any{"slugLength": 12, "textSlugLength": 13, "fileSlugLength": 14, "baseUrl": "https://new.example.com"})
 			if r.status != 409 || r.code() != "config_env" {
 				t.Fatal(string(r.body))
 			}
@@ -181,7 +181,7 @@ func TestIndependentSlugEnvironmentLocks(t *testing.T) {
 					patch[key] = 3
 				}
 			}
-			r = e.req("PATCH", "/api/config", patch)
+			r = e.req("PATCH", "/api/admin/v1/config", patch)
 			if r.status != 200 || r.json()[locked] != float64(7+i) {
 				t.Fatal("one env lock blocked independent settings", string(r.body))
 			}
@@ -265,7 +265,7 @@ func TestIndependentSlugMigrationAndRestart(t *testing.T) {
 					// A URL-only PATCH after migration must preserve both share defaults.
 					if !opt.SlugLengthFromEnv {
 						w := httptest.NewRecorder()
-						s.patchConfig(w, httptest.NewRequest("PATCH", "/api/config", strings.NewReader(`{"slugLength":31}`)))
+						s.patchConfig(w, httptest.NewRequest("PATCH", "/api/admin/v1/config", strings.NewReader(`{"slugLength":31}`)))
 						if w.Code != 200 || s.settings.Load().textSlugLength != want[0] || s.settings.Load().fileSlugLength != want[1] {
 							t.Fatal("URL-only patch affected shares", w.Body.String())
 						}
@@ -320,10 +320,10 @@ func TestIndependentSlugStoredValidation(t *testing.T) {
 func TestIndependentSlugImportKeepsURLSemantics(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
-	if r := e.req("PATCH", "/api/config", `{"slugLength":3,"textSlugLength":32,"fileSlugLength":32,"excludeConfusable":false}`); r.status != 200 {
+	if r := e.req("PATCH", "/api/admin/v1/config", `{"slugLength":3,"textSlugLength":32,"fileSlugLength":32,"excludeConfusable":false}`); r.status != 200 {
 		t.Fatal(string(r.body))
 	}
-	r := e.req("POST", "/api/import", `{"app":"sani","version":1,"links":[{"url":"https://example.com/generated"},{"slug":"manual","url":"https://example.com/manual"}]}`)
+	r := e.req("POST", "/api/admin/v1/import", `{"app":"sani","version":1,"links":[{"url":"https://example.com/generated"},{"slug":"manual","url":"https://example.com/manual"}]}`)
 	if r.status != 200 || r.json()["created"] != float64(2) {
 		t.Fatal(string(r.body))
 	}

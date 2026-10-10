@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,13 +23,23 @@ import (
 )
 
 func TestOpenStoreInitializesOnlyNewDatabases(t *testing.T) {
-	for _, state := range []string{"absent", "empty", "legacy", "legacy-settings", "initialized"} {
+	for _, state := range []string{"absent", "empty", "interrupted", "legacy", "legacy-settings", "initialized"} {
 		t.Run(state, func(t *testing.T) {
 			ctx := context.Background()
 			cfg := &config.Config{DataDir: t.TempDir()}
 			path := filepath.Join(cfg.DataDir, "sani.db")
 			want := `{"version":1}`
 			switch state {
+			case "interrupted":
+				db, err := sql.Open("sqlite", filepath.ToSlash(path))
+				if err != nil {
+					t.Fatal(err)
+				}
+				_, err = db.Exec("VACUUM")
+				db.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
 			case "empty":
 				if err := os.WriteFile(path, nil, 0600); err != nil {
 					t.Fatal(err)
@@ -141,7 +152,7 @@ func TestServeSlugLengthStartup(t *testing.T) {
 					t.Fatal(err)
 				}
 				client := &http.Client{Jar: jar, Timeout: 5 * time.Second}
-				resp, err := client.Post(base+"/api/session", "application/json", strings.NewReader(`{"password":"correct horse"}`))
+				resp, err := client.Post(base+"/api/admin/v1/session", "application/json", strings.NewReader(`{"password":"correct horse"}`))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -149,7 +160,7 @@ func TestServeSlugLengthStartup(t *testing.T) {
 				if resp.StatusCode != http.StatusOK {
 					t.Fatalf("login: %d", resp.StatusCode)
 				}
-				resp, err = client.Get(base + "/api/config")
+				resp, err = client.Get(base + "/api/admin/v1/config")
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -26,7 +26,7 @@ func TestDownloadsChargeOnlyContentResponses(t *testing.T) {
 				if kind == "file" {
 					l = e.upload(map[string]string{"slug": "limited", "maxClicks": "1"}, "data.txt", []byte(data)).json()
 				} else {
-					l = e.req("POST", "/api/texts", map[string]any{"slug": "limited", "text": data, "maxClicks": 1}).json()
+					l = e.req("POST", "/api/admin/v1/texts", map[string]any{"slug": "limited", "text": data, "maxClicks": 1}).json()
 				}
 				if l["id"] == nil {
 					t.Fatalf("create: %v", l)
@@ -127,7 +127,7 @@ func TestReclaimedLinkCannotInheritPendingClicks(t *testing.T) {
 	for range 5 {
 		e.visit("/reclaimed")
 	}
-	if r := e.req("DELETE", fmt.Sprintf("/api/links/%v", old["id"]), nil); r.status != 204 {
+	if r := e.req("DELETE", fmt.Sprintf("/api/admin/v1/links/%v", old["id"]), nil); r.status != 204 {
 		t.Fatal(r.status)
 	}
 	next := e.create(map[string]any{"slug": "reclaimed", "url": "https://example.com/new", "maxClicks": 1})
@@ -169,7 +169,7 @@ func TestCountDuringCommittedFlushAndCacheReplacement(t *testing.T) {
 	var once sync.Once
 	release := func() { once.Do(func() { close(sk.release) }) }
 	defer release()
-	got := e.req("GET", fmt.Sprintf("/api/links/%v", l["id"]), nil).json()
+	got := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil).json()
 	if got["clicks"] != float64(1) {
 		t.Fatalf("committed batch counted twice: %v", got)
 	}

@@ -8,6 +8,7 @@
 | [`sani passwd`](#sani-passwd) | Set a new admin password and sign out every device |
 | [`sani backup`](#sani-backup) | Write a consistent copy of the database to a file or standard output |
 | [`sani healthcheck`](#sani-healthcheck) | Check that the local service is healthy |
+| [`sani preflight`](#sani-preflight) | Check database, file references, hashes and permissions without migrating. |
 | [`sani version`](#sani-version) | Print the version |
 | `sani help` | Print the usage text |
 
@@ -57,3 +58,13 @@ Requests `/healthz` from the local service and exits with 0 on a `200`, and 1 ot
 ## `sani version`
 
 Prints the version, such as `sani v0.3.0`. Builds from source take it from `git describe`, or use `dev` without Git metadata. `sani -v` and `sani --version` do the same.
+
+## `sani preflight`
+
+Run the **new binary** against stopped data or an isolated full copy, with the original deployment environment. Outputs JSON (`schema`, `target`, `files`, `file_bytes`, `stored_base_url`) and exits 0 only after SQLite integrity/foreign-key checks, every stored file's size/SHA-256 check (including soft-deleted rows), write access to the database and existing WAL/SHM, and temporary directory write probes pass. Missing/corrupt files, unsupported schemas and permission failures are diagnostic errors. It never migrates or changes stored credentials; short-lived probe files are removed.
+
+```sh
+SANI_DATA_DIR=/path/to/stopped-data ./new-sani preflight
+```
+
+The database must be schema 1–6, or an empty schema-0 database left by an interrupted first initialization. This scans all referenced file bytes; allow time for large stores. Probes do not guarantee enough free disk space. Normal startup of an older schema runs these checks, creates a private `sani.db.pre-vN-to-v6-TIMESTAMP.db` database safety copy, then migrates in one immediate transaction. Concurrent migration writers serialize or fail with an explicit lock error; retry after the other instance stops. Failed upgrades roll back all pending migrations. A failed attempt removes its safety copy only after verifying the old schema, integrity and files, preventing repeated restarts from accumulating copies; otherwise it retains the copy and reports its path. Successful migrations retain their copy. The database safety copy is **not** a replacement for the full pre-upgrade database/files/config snapshot. Current-schema startup does not rehash all files; run preflight explicitly when needed.

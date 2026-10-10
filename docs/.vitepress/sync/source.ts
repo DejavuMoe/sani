@@ -64,7 +64,7 @@ export function envVars(): EnvVar[] {
 
 /** "GET /api/links" and so on, as registered in internal/server/api.go. */
 export function apiRoutes(): string[] {
-  const src = read('internal/server/api.go');
+  const src = read('internal/server/api.go') + '\n' + read('internal/server/api_see.go');
   return [...src.matchAll(/mux\.Handle(?:Func)?\("([A-Z]+) (\/api\/[^"]*)"/g)].map((m) => `${m[1]} ${m[2]}`);
 }
 
@@ -78,6 +78,9 @@ const httpStatus: Record<string, number> = {
   TooManyRequests: 429,
   InternalServerError: 500,
   BadGateway: 502,
+  UnsupportedMediaType: 415,
+  ServiceUnavailable: 503,
+  NotImplemented: 501,
 };
 
 /** Every error code the API can answer with, and its HTTP status. */
@@ -97,6 +100,7 @@ export function errorCodes(): Map<string, Set<number>> {
     }
     for (const m of src.matchAll(/\bbadInput\("([a-z_]+)"/g)) add(m[1], 400);
     for (const m of src.matchAll(/\btooLarge\("([a-z_]+)"/g)) add(m[1], 413);
+    for (const m of src.matchAll(/&inputError\{(?:http\.Status(\w+)|(\d+)),\s*"([a-z_]+)"/g)) add(m[3], m[1] ? httpStatus[m[1]] : Number(m[2]));
     // Slug and URL rule violations reach the client through badInput.
     const table = /var linkErrors = map\[error\]string\{([^}]*)\}/.exec(src);
     if (table) for (const m of table[1].matchAll(/"([a-z_]+)"/g)) add(m[1], 400);

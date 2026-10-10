@@ -54,7 +54,7 @@ const screens = [
     name: `r3-tag-${mode}-${width}`, path:'/admin/', viewport:{width,height:860},
     run:async page => {
       if (mode === 'edit') {
-        await page.request.post(`${base}/api/tags`, {data:{name:'QA color',color:'#5872a5'}});
+        await page.request.post(`${base}/api/admin/v1/tags`, {data:{name:'QA color',color:'#5872a5'}});
         await page.reload();
       }
       await page.locator('#create-panel-url .tag-add').click();
@@ -115,7 +115,7 @@ const screens = [
     name: 'visitor-file',
     // The seeded file has a generated slug.
     path: async (request) => {
-      const res = await request.get(`${base}/api/links?kind=file`);
+      const res = await request.get(`${base}/api/admin/v1/links?kind=file`);
       return `/p/${(await res.json()).items[0].slug}`;
     },
   },
@@ -127,7 +127,7 @@ for (const [locale, theme] of ['zh-CN', 'en-US'].flatMap((locale) => ['light', '
   for (const s of screens) {
     const ctx = await browser.newContext({ colorScheme: theme, locale, bypassCSP: true, viewport: s.viewport });
     await ctx.addInitScript((t) => localStorage.setItem('sani.theme', t), theme);
-    if (s.auth !== false) await ctx.request.post(`${base}/api/session`, { data: { password } });
+    if (s.auth !== false) await ctx.request.post(`${base}/api/admin/v1/session`, { data: { password } });
     const page = await ctx.newPage();
     const path = typeof s.path === 'function' ? await s.path(ctx.request) : s.path;
     await page.goto((s.origin ?? base) + path, { waitUntil: 'networkidle' });

@@ -80,6 +80,24 @@ jobs:
           path: web/playwright-report
           retention-days: 7
 
+  compatibility:
+    name: HTTP contract and snapshot rollback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 8e374df55bdbd4a45353c1f6eeec2bfc3a671635
+          path: .upgrade-legacy
+      - run: make -C .upgrade-legacy install build
+      - run: OLD_BIN=.upgrade-legacy/bin/sani make upgrade-drill
+      - name: Upgrade and rollback on non-root Docker bind storage
+        run: |
+          docker build -t sani:upgrade .
+          bash scripts/test-docker-storage.sh sani:upgrade .upgrade-legacy/bin/sani
+
   docs:
     name: Docs
     runs-on: ubuntu-24.04

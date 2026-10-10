@@ -27,7 +27,7 @@ func TestShlinkCSVImport(t *testing.T) {
 	if err := w.Error(); err != nil {
 		t.Fatal(err)
 	}
-	r := e.req("POST", "/api/import", body.String(), "Content-Type", "text/csv")
+	r := e.req("POST", "/api/admin/v1/import", body.String(), "Content-Type", "text/csv")
 	var result struct {
 		Created int             `json:"created"`
 		Skipped []importProblem `json:"skipped"`
@@ -43,7 +43,7 @@ func TestShlinkCSVImport(t *testing.T) {
 	var exported struct {
 		Links []exportLink `json:"links"`
 	}
-	r = e.req("GET", "/api/export", nil)
+	r = e.req("GET", "/api/admin/v1/export", nil)
 	if err := json.Unmarshal(r.body, &exported); err != nil || len(exported.Links) != 2 {
 		t.Fatalf("export: %s, %v", r.body, err)
 	}
@@ -57,7 +57,7 @@ func TestShlinkCSVImport(t *testing.T) {
 	if l := exported.Links[1]; l.Slug != "untagged" || len(l.Tags) != 0 || l.Title != "" || l.Clicks != 0 {
 		t.Fatalf("changed empty fields: %+v", l)
 	}
-	r = e.req("POST", "/api/import", body.String(), "Content-Type", "text/csv")
+	r = e.req("POST", "/api/admin/v1/import", body.String(), "Content-Type", "text/csv")
 	if r.status != http.StatusOK || r.json()["created"] != float64(0) {
 		t.Fatalf("duplicate import: %d %s", r.status, r.body)
 	}
@@ -104,7 +104,7 @@ func TestExternalShlinkCSV(t *testing.T) {
 	e := newEnv(t, Options{BaseURL: "https://zsh.moe", FetchMeta: false})
 	e.signIn()
 	for _, want := range []float64{82, 0} {
-		r := e.req("POST", "/api/import", string(data), "Content-Type", "text/csv")
+		r := e.req("POST", "/api/admin/v1/import", string(data), "Content-Type", "text/csv")
 		if r.status != 200 || r.json()["created"] != want {
 			t.Fatalf("import status=%d, created=%v", r.status, r.json()["created"])
 		}

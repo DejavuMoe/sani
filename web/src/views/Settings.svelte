@@ -143,7 +143,7 @@
 
   const apiOrigin = location.origin;
   const curl = $derived(
-    `curl -X POST ${apiOrigin}/api/links \\\n  -H "Authorization: Bearer ${revealed?.token ?? 'sani_…'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"url": "https://example.com/some/long/path"}'`,
+    `curl -X POST ${apiOrigin}/api/v1/shorten \\\n  -H "Authorization: Bearer ${revealed?.token ?? 'sani_…'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"target_url": "https://example.com/some/long/path"}'`,
   );
 
   // Bookmarklet: opens the compact "shorten this page" window.
@@ -423,8 +423,8 @@
           <p class="hint">{t('settings.exportHint')}</p>
         </div>
         <div class="pair">
-          <a class="dl" href="/api/export" download>JSON</a>
-          <a class="dl" href="/api/export?format=csv" download>CSV</a>
+          <a class="dl" href="/api/admin/v1/export" download>JSON</a>
+          <a class="dl" href="/api/admin/v1/export?format=csv" download>CSV</a>
         </div>
       </div>
       <div class="tool column backup-help"><h3>{t('settings.backup')}</h3><p class="hint">{t('settings.backupHint')}</p><a href={i18n.lang === 'zh' ? 'https://sani.zsh.moe/guide/operations#backup-files' : 'https://sani.zsh.moe/en/guide/operations#backup-files'} target="_blank" rel="noopener">{t('settings.backupGuide')}</a></div>

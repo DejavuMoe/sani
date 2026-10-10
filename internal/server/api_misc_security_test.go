@@ -42,7 +42,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	exported := source.req("GET", "/api/export?format=csv", nil)
+	exported := source.req("GET", "/api/admin/v1/export?format=csv", nil)
 	if exported.status != http.StatusOK {
 		t.Fatalf("export: %d %s", exported.status, exported.body)
 	}
@@ -75,7 +75,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 	var doc struct {
 		Links []exportLink `json:"links"`
 	}
-	jsonExport := source.req("GET", "/api/export", nil)
+	jsonExport := source.req("GET", "/api/admin/v1/export", nil)
 	if err := json.Unmarshal(jsonExport.body, &doc); err != nil || len(doc.Links) != len(cases) {
 		t.Fatalf("JSON export: %s, %v", jsonExport.body, err)
 	}
@@ -86,7 +86,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 	}
 	target := newEnv(t, Options{})
 	target.signIn()
-	r := target.req("POST", "/api/import", string(jsonExport.body))
+	r := target.req("POST", "/api/admin/v1/import", string(jsonExport.body))
 	if r.status != http.StatusOK || r.json()["created"] != float64(len(cases)) {
 		t.Fatalf("import: %d %s", r.status, r.body)
 	}
@@ -141,12 +141,12 @@ func TestImportedExtremeClicksRemainUsable(t *testing.T) {
 		`{"app":"sani","version":1,"links":[{"slug":"second","url":"https://example.com/second","clicks":"9223372036854775807"}]}`,
 		"slug,url,clicks\nthird,https://example.com/third,9007199254740993\n",
 	} {
-		r := e.req("POST", "/api/import", body)
+		r := e.req("POST", "/api/admin/v1/import", body)
 		if r.status != http.StatusOK || r.json()["created"] != float64(1) {
 			t.Fatalf("import %d: %d %s", i, r.status, r.body)
 		}
 		var totals struct{ Links, Clicks int64 }
-		r = e.req("GET", "/api/overview", nil)
+		r = e.req("GET", "/api/admin/v1/overview", nil)
 		if err := json.Unmarshal(r.body, &totals); err != nil || r.status != http.StatusOK ||
 			totals.Links != int64(i+1) || totals.Clicks != math.MaxInt64 {
 			t.Fatalf("overview after import %d: %d %s, %v", i, r.status, r.body, err)
@@ -158,7 +158,7 @@ func TestImportedExtremeClicksRemainUsable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := "/api/links/" + strconv.FormatInt(target.ID, 10)
+	path := "/api/admin/v1/links/" + strconv.FormatInt(target.ID, 10)
 	if r := e.visit("/extreme"); r.status != http.StatusFound {
 		t.Fatalf("extreme redirect: %d %s", r.status, r.body)
 	}
@@ -185,13 +185,13 @@ func TestImportedExtremeClicksRemainUsable(t *testing.T) {
 	if err != nil || l.Clicks != math.MaxInt64 {
 		t.Fatalf("persisted click is no longer an int64: %+v, %v", l, err)
 	}
-	for _, endpoint := range []string{path, path + "/stats", "/api/overview", "/api/export", "/api/export?format=csv"} {
+	for _, endpoint := range []string{path, path + "/stats", "/api/admin/v1/overview", "/api/admin/v1/export", "/api/admin/v1/export?format=csv"} {
 		if r := e.req("GET", endpoint, nil); r.status != http.StatusOK {
 			t.Errorf("unreadable after click, %s: %d %s", endpoint, r.status, r.body)
 		}
 	}
 	var totals struct{ Links, Clicks int64 }
-	r = e.req("GET", "/api/overview", nil)
+	r = e.req("GET", "/api/admin/v1/overview", nil)
 	if err := json.Unmarshal(r.body, &totals); err != nil || totals.Links != 3 || totals.Clicks != math.MaxInt64 {
 		t.Fatalf("overview after click and flush: %s, %v", r.body, err)
 	}

@@ -19,7 +19,7 @@ test.beforeAll(async () => {
 test.afterAll(async () => { if (server?.exitCode === null) await new Promise<void>(resolve=>{server.once('exit',()=>resolve());server.kill('SIGTERM');}); });
 async function login(page: Page, lang='en', theme='light') {
   await page.addInitScript(({lang,theme})=>{localStorage.setItem('sani.lang',lang);localStorage.setItem('sani.theme',theme);},{lang,theme});
-  expect((await page.request.post(`${base}/api/session`,{data:{password}})).ok()).toBe(true);
+  expect((await page.request.post(`${base}/api/admin/v1/session`,{data:{password}})).ok()).toBe(true);
 }
 async function audit(page: Page) {
   for (const dialog of await page.locator('dialog[open]').all()) await expect(dialog).toHaveCSS('opacity', '1');
@@ -35,11 +35,11 @@ const failed = {status:503,contentType:'application/json',body:JSON.stringify({e
 
 test('tag Enter chooses the exact normalized match; manager deletion retries and keeps all content', async ({page})=>{
   await login(page);
-  for (const name of ['devops','dev','Café']) await page.request.post(`${base}/api/tags`,{data:{name,color:'blue'}});
-  const tag=(await (await page.request.post(`${base}/api/tags`,{data:{name:'remove-global'}})).json()).id;
-  const link=await (await page.request.post(`${base}/api/links`,{data:{url:'https://example.com/r7',tags:[tag]}})).json();
-  const text=await (await page.request.post(`${base}/api/texts`,{data:{text:'Retain this body',tags:[tag]}})).json();
-  const file=await (await page.request.post(`${base}/api/files`,{multipart:{tags:JSON.stringify([tag]),file:{name:'keep.txt',mimeType:'text/plain',buffer:Buffer.from('retain bytes')}}})).json();
+  for (const name of ['devops','dev','Café']) await page.request.post(`${base}/api/admin/v1/tags`,{data:{name,color:'blue'}});
+  const tag=(await (await page.request.post(`${base}/api/admin/v1/tags`,{data:{name:'remove-global'}})).json()).id;
+  const link=await (await page.request.post(`${base}/api/admin/v1/links`,{data:{url:'https://example.com/r7',tags:[tag]}})).json();
+  const text=await (await page.request.post(`${base}/api/admin/v1/texts`,{data:{text:'Retain this body',tags:[tag]}})).json();
+  const file=await (await page.request.post(`${base}/api/admin/v1/files`,{multipart:{tags:JSON.stringify([tag]),file:{name:'keep.txt',mimeType:'text/plain',buffer:Buffer.from('retain bytes')}}})).json();
   await page.goto(`${base}/admin/`);
   await page.locator('#create-panel-url .tag-add').click();
   const pop=page.locator('.tag-pop:popover-open');
@@ -54,58 +54,58 @@ test('tag Enter chooses the exact normalized match; manager deletion retries and
   await manager.getByRole('button',{name:'Delete tag remove-global',exact:true}).click();
   const confirm=page.getByRole('dialog',{name:'Delete tag “remove-global”?',exact:true});
   await expect(confirm).toContainText('3 items');
-  await page.route(`**/api/tags/${tag}`,route=>route.request().method()==='DELETE'?route.fulfill(failed):route.continue());
+  await page.route(`**/api/admin/v1/tags/${tag}`,route=>route.request().method()==='DELETE'?route.fulfill(failed):route.continue());
   await confirm.getByRole('button',{name:'Delete tag',exact:true}).click();await expect(confirm.getByRole('alert')).toBeVisible();
   await capture(page,'tag-delete-error');
-  expect((await (await page.request.get(`${base}/api/links/${link.id}`)).json()).tags).toEqual([tag]);
-  await page.unroute(`**/api/tags/${tag}`);await confirm.getByRole('button',{name:'Retry deletion',exact:true}).click();
+  expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}`)).json()).tags).toEqual([tag]);
+  await page.unroute(`**/api/admin/v1/tags/${tag}`);await confirm.getByRole('button',{name:'Retry deletion',exact:true}).click();
   await expect(confirm).not.toBeVisible();await expect(manager.getByLabel('Search tags')).toBeFocused();
-  for (const item of [link,text,file]) {const res=await page.request.get(`${base}/api/links/${item.id}`);expect(res.ok()).toBe(true);expect((await res.json()).tags).toEqual([]);}
+  for (const item of [link,text,file]) {const res=await page.request.get(`${base}/api/admin/v1/links/${item.id}`);expect(res.ok()).toBe(true);expect((await res.json()).tags).toEqual([]);}
   await manager.getByRole('button',{name:'Close',exact:true}).click();await expect(page.locator('#create-panel-url .tag-add')).toBeFocused();
 });
 
 test('slow creation locks submitted fields, failure preserves the draft, and editing has one leave guard', async ({page})=>{
   await login(page);await page.goto(`${base}/admin/`);
   let release!:()=>void;const held=new Promise<void>(resolve=>release=resolve);
-  await page.route('**/api/links',async route=>{if(route.request().method()==='POST'){await held;await route.fulfill(failed);}else await route.continue();});
+  await page.route('**/api/admin/v1/links',async route=>{if(route.request().method()==='POST'){await held;await route.fulfill(failed);}else await route.continue();});
   await page.locator('#composer-url').fill('https://example.com/draft');await page.locator('#create-panel-url .go').click();
   await expect(page.locator('#composer-url')).toBeDisabled();await expect(page.locator('#composer-slug')).toBeDisabled();
   release();await expect(page.locator('#composer-url')).toBeEnabled();await expect(page.locator('#composer-url')).toHaveValue('https://example.com/draft');
-  await page.unroute('**/api/links');
-  const link=await (await page.request.post(`${base}/api/texts`,{data:{text:'Original body',slug:'r7-edit'}})).json();
+  await page.unroute('**/api/admin/v1/links');
+  const link=await (await page.request.post(`${base}/api/admin/v1/texts`,{data:{text:'Original body',slug:'r7-edit'}})).json();
   await page.reload();const row=page.locator('.row',{hasText:'/p/r7-edit'});await row.locator('button.main').click();await row.getByRole('button',{name:/^Edit/}).click();
   const body=page.locator(`#edit-text-${link.id}`);await body.fill('Keep my changed body');
   await page.getByRole('link',{name:'Settings',exact:true}).click();const guard=page.getByRole('dialog',{name:'Save changes before leaving?'});
   await capture(page,'edit-leave');
   await guard.getByRole('button',{name:'Keep editing'}).click();await expect(body).toHaveValue('Keep my changed body');
-  await page.route(`**/api/links/${link.id}`,route=>route.request().method()==='PATCH'?route.fulfill(failed):route.continue());
+  await page.route(`**/api/admin/v1/links/${link.id}`,route=>route.request().method()==='PATCH'?route.fulfill(failed):route.continue());
   await body.press('Escape');await guard.getByRole('button',{name:'Save and leave'}).click();
   await expect(page.locator('.editor .error-text')).toBeVisible();await expect(body).toHaveValue('Keep my changed body');
   await capture(page,'edit-error');
-  await page.unroute(`**/api/links/${link.id}`);await page.getByRole('link',{name:'Settings',exact:true}).click();await guard.getByRole('button',{name:'Save and leave'}).click();
-  await expect(page).toHaveURL(/settings$/);expect((await (await page.request.get(`${base}/api/links/${link.id}/text`)).json()).text).toBe('Keep my changed body');
+  await page.unroute(`**/api/admin/v1/links/${link.id}`);await page.getByRole('link',{name:'Settings',exact:true}).click();await guard.getByRole('button',{name:'Save and leave'}).click();
+  await expect(page).toHaveURL(/settings$/);expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Keep my changed body');
 });
 
 test('query and statistics errors offer retry without presenting empty data or a false range', async ({page})=>{
-  await login(page);await page.request.post(`${base}/api/texts`,{data:{text:'Statistics fixture',slug:'r7-query'}});
+  await login(page);await page.request.post(`${base}/api/admin/v1/texts`,{data:{text:'Statistics fixture',slug:'r7-query'}});
   await page.goto(`${base}/admin/`);await expect(page.locator('.row').first()).toBeVisible();
-  await page.route('**/api/links?*',route=>route.fulfill(failed));await page.getByRole('searchbox').fill('r7-query');
+  await page.route('**/api/admin/v1/links?*',route=>route.fulfill(failed));await page.getByRole('searchbox').fill('r7-query');
   await expect(page.locator('.list-section [role=alert]')).toContainText('Filtering failed');await expect(page.locator('.list-section .pick')).toBeDisabled();
   await capture(page,'query-error');
-  await page.unroute('**/api/links?*');await page.locator('.list-section [role=alert]').getByRole('button',{name:'Retry'}).click();await expect(page.locator('.row')).toHaveCount(1);
+  await page.unroute('**/api/admin/v1/links?*');await page.locator('.list-section [role=alert]').getByRole('button',{name:'Retry'}).click();await expect(page.locator('.row')).toHaveCount(1);
   await page.locator('.row button.main').click();await expect(page.locator('.detail .chart-placeholder')).toHaveCount(0);
-  await page.route('**/api/links/*/stats?*',route=>route.fulfill(failed));await page.locator('.detail').getByRole('radio',{name:'7 days',exact:true}).click();
+  await page.route('**/api/admin/v1/links/*/stats?*',route=>route.fulfill(failed));await page.locator('.detail').getByRole('radio',{name:'7 days',exact:true}).click();
   await expect(page.locator('.detail [role=alert]')).toContainText('last 30 days');
   await capture(page,'stats-stale');
-  await page.unroute('**/api/links/*/stats?*');await page.locator('.detail [role=alert]').getByRole('button',{name:'Retry'}).click();await expect(page.locator('.detail [role=alert]')).toHaveCount(0);
+  await page.unroute('**/api/admin/v1/links/*/stats?*');await page.locator('.detail [role=alert]').getByRole('button',{name:'Retry'}).click();await expect(page.locator('.detail [role=alert]')).toHaveCount(0);
 });
 
 test('token failure is unknown, and import downloads every skipped row', async ({page})=>{
-  await login(page);await page.route('**/api/tokens',route=>route.fulfill(failed));await page.goto(`${base}/admin/settings`);
+  await login(page);await page.route('**/api/admin/v1/tokens',route=>route.fulfill(failed));await page.goto(`${base}/admin/settings`);
   await expect(page.getByRole('alert')).toContainText('token count is unknown');
   await expect(page.getByRole('button',{name:'Create token',exact:true})).toBeDisabled();
   await capture(page,'tokens-error');
-  await page.unroute('**/api/tokens');await page.getByRole('alert').getByRole('button',{name:'Retry'}).click();await expect(page.getByText('No tokens yet',{exact:true})).toBeVisible();
+  await page.unroute('**/api/admin/v1/tokens');await page.getByRole('alert').getByRole('button',{name:'Retry'}).click();await expect(page.getByText('No tokens yet',{exact:true})).toBeVisible();
   await page.locator('input[type=file]').setInputFiles({name:'skips.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({app:'sani',version:1,links:Array.from({length:27},(_,i)=>({slug:`bad-${i}`,url:'javascript:bad'}))}))});
   const result=page.locator('.import-result');await expect(result).toContainText('Skipped 27');
   await capture(page,'settings-import');
@@ -115,7 +115,7 @@ test('token failure is unknown, and import downloads every skipped row', async (
 
 test('browser back and list search preserve a dirty editor until an explicit choice', async ({page}) => {
   await login(page);
-  const link = await (await page.request.post(`${base}/api/texts`, {data:{text:'History fixture',slug:'r7-history'}})).json();
+  const link = await (await page.request.post(`${base}/api/admin/v1/texts`, {data:{text:'History fixture',slug:'r7-history'}})).json();
   await page.goto(`${base}/admin/settings`);
   await page.getByRole('link',{name:'Back',exact:true}).click();
   const row = page.locator('.row',{hasText:'/p/r7-history'});
@@ -133,7 +133,7 @@ test('browser back and list search preserve a dirty editor until an explicit cho
   await expect(page).toHaveURL(/admin\/$/);await expect(body).toHaveValue('Do not lose this draft');
   await page.goBack();await guard.getByRole('button',{name:'Discard changes'}).click();
   await expect(page).toHaveURL(/settings$/);
-  expect((await (await page.request.get(`${base}/api/links/${link.id}/text`)).json()).text).toBe('History fixture');
+  expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('History fixture');
 });
 
 test('an uploading file stays locked but can be canceled without losing its draft', async ({page}) => {
@@ -141,7 +141,7 @@ test('an uploading file stays locked but can be canceled without losing its draf
   const panel = page.getByRole('tabpanel',{name:'Files',exact:true});
   await panel.locator('input[type=file]').setInputFiles({name:'cancel-me.txt',mimeType:'text/plain',buffer:Buffer.from('retain upload draft')});
   let release!:()=>void;const held = new Promise<void>(resolve => release=resolve);
-  await page.route('**/api/files',async route => { await held; await route.abort(); });
+  await page.route('**/api/admin/v1/files',async route => { await held; await route.abort(); });
   try {
     await panel.locator('.go').click();
     await expect(panel.locator('.slug input')).toBeDisabled();
@@ -154,7 +154,7 @@ test('an uploading file stays locked but can be canceled without losing its draf
 
 for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','dark',320],['en','light',1280]] as const) {
   test(`R9 control groups and expanded controls ${lang}/${theme}/${width}`,async({page},info)=>{
-    await login(page,lang,theme);await page.request.post(`${base}/api/tags`,{data:{name:'dev'}});expect((await page.request.post(`${base}/api/links`,{data:{url:`https://example.com/r9/${lang}/${theme}/${width}`}})).ok()).toBe(true);await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
+    await login(page,lang,theme);await page.request.post(`${base}/api/admin/v1/tags`,{data:{name:'dev'}});expect((await page.request.post(`${base}/api/admin/v1/links`,{data:{url:`https://example.com/r9/${lang}/${theme}/${width}`}})).ok()).toBe(true);await page.setViewportSize({width,height:900});await page.goto(`${base}/admin/`);
     const compact = width <= 640 ? 44 : 32, field = width <= 640 ? 44 : 36;
     const heights = async (selector: string, height: number) => {
       const controls = page.locator(selector);
@@ -210,7 +210,7 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
 test('narrow tag toolbars keep management and more actions for every small catalog size', async ({page}) => {
   await login(page);
   for (const width of [320,390]) for (let count=0;count<=5;count++) {
-    await page.route('**/api/tags', async route => {
+    await page.route('**/api/admin/v1/tags', async route => {
       const response = await route.fetch();
       const catalog = await response.json();
       catalog.items = Array.from({length:count},(_,i)=>({id:100+i,name:`tag-${i}`,color:'blue',count:0}));
@@ -223,6 +223,6 @@ test('narrow tag toolbars keep management and more actions for every small catal
     await manage.press('Enter');
     const dialog=page.getByRole('dialog',{name:'Manage tags',exact:true});await expect(dialog).toBeVisible();
     await dialog.getByRole('button',{name:'Close',exact:true}).click();await expect(manage).toBeFocused();
-    await page.unroute('**/api/tags');
+    await page.unroute('**/api/admin/v1/tags');
   }
 });

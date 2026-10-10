@@ -136,7 +136,7 @@ Open the admin app in your phone’s browser and add it to your home screen: San
 Create a token in Settings → API tokens, then call the [HTTP API](../reference/api) from scripts, Shortcuts or browser extensions:
 
 ```sh
-curl https://s.example.com/api/links \
+curl https://s.example.com/api/admin/v1/links \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/some/long/path"}'

@@ -11,7 +11,7 @@
 {#if host && icon && !failed}
   <img
     class="fav"
-    src="/api/favicons/{encodeURIComponent(host)}"
+    src="/api/admin/v1/favicons/{encodeURIComponent(host)}"
     alt=""
     width={size}
     height={size}

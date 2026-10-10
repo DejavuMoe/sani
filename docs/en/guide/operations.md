@@ -95,6 +95,15 @@ In an isolated local instance, check `/healthz`, login, URL redirects, text bodi
 
 ## Upgrading {#upgrade}
 
+This release removes old management API routes and introduces `/api/admin/v1` plus the bounded `/api/v1` compatibility profile. Before upgrading, **export JSON in the old admin app**, then stop the instance cleanly and make a complete snapshot of the database (including any WAL/SHM), `files/`, Compose/environment/secrets, proxy/domain configuration and the pinned old image/binary. Keep it outside the live data directory. JSON contains URL links and tags only; it cannot restore shared texts/files, credentials or complete statistics. CSV is an optional additional copy. **Normal upgrades migrate in place; do not export/reimport as the upgrade path.**
+
+Before first startup, run the new binary's [`preflight`](../reference/cli#sani-preflight) against stopped data or its full copy, under the deployment UID (Docker `65532:65532`) and original configuration. With Compose, after selecting the verified target image and stopping the old service, run `docker compose run --rm --no-deps sani preflight`. Review the report and resolve missing/corrupt files or permission errors. Leave space for a database safety copy, SQLite transaction/WAL and uploaded files. Startup creates a database-only safety copy before migrating schema 1–5 to 6, preserves IDs/slugs/password/token/session hashes/settings/statistics/file names, and adds random file deletion keys. Existing public URLs and milliseconds remain unchanged. Configure the existing canonical main domain before using `/api/v1`; do not guess an old domain from a Host header.
+
+Validate old login/session/token, redirects (including old long targets), raw text, file download SHA-256, tags and statistics. Repeat startup and run direct HTTP contract checks. If startup fails, retain stderr and the untouched full snapshot; diagnose the named preflight/migration step and retry after fixing the cause. For rollback, stop the new instance, preserve its failed data separately, restore the **complete pre-upgrade snapshot into an empty directory**, then start the pinned old binary/image with its old configuration. Never point an old binary at schema 6 or mix files/config from different snapshots. Writes made after upgrading are not in the old snapshot.
+
+Repository drill (disposable fixtures, never production): `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`. The script creates an old schema-5 instance, exports JSON, saves stopped data/files/config, upgrades, tests HTTP contracts and old public URLs, verifies repeat startup and missing-file rejection, then restores the full snapshot and boots the old binary. CI uses baseline commit `8e374df55bdbd4a45353c1f6eeec2bfc3a671635`. This complements `make smoke` and does not replace rehearsing your deployment's snapshot restore.
+
+
 Read the target release’s [changelog](../project/changelog), pin its version tag or image digest, and [verify downloaded artifacts](./deploy#verify). Take a [complete stopped-service backup](#backup-files) and retain the old binary or image and configuration. For this upgrade backup, omit the restart at the end of the backup example until the version has been replaced:
 
 ::: code-group
@@ -179,3 +188,5 @@ SQLite waits at most 1 second per external write-lock attempt; cancellation of a
 **Uploads fail with “too large”, though the file is under the limit.** The reverse proxy refuses the body before Sani sees it: raise nginx’s `client_max_body_size`, or the equivalent in your proxy.
 
 **The admin app only says “The admin app is not part of this build”.** The binary was built with plain `go build`, without the frontend. Rebuild with `make build`.
+
+Compatibility API deletion is permanent in SQLite; files are reclaimed asynchronously by the same ten-minute sweeper and age threshold. Management deletions retain the one-hour restore window.

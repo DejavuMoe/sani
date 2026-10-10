@@ -136,7 +136,7 @@
 在 设置 → API 令牌 中生成持久令牌，即可在自动化脚本、快捷指令（iOS Shortcuts）或插件中调用 [HTTP API](../reference/api)：
 
 ```sh
-curl https://s.example.com/api/links \
+curl https://s.example.com/api/admin/v1/links \
   -H "Authorization: Bearer sani_…" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/some/long/path"}'

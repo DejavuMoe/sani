@@ -36,7 +36,7 @@ async function shoot(name, opts = {}) {
     [theme, lang],
   );
   if (auth) {
-    const r = await ctx.request.post(`${base}/api/session`, { data: { password } });
+    const r = await ctx.request.post(`${base}/api/admin/v1/session`, { data: { password } });
     if (!r.ok()) throw new Error(`sign-in failed: ${r.status()}`);
   }
   const page = await ctx.newPage();

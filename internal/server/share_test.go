@@ -58,19 +58,19 @@ func (e *env) upload(fields map[string]string, filename string, data []byte) rep
 		fw.Write(data)
 	}
 	mw.Close()
-	return e.req("POST", "/api/files", buf.String(), "Content-Type", mw.FormDataContentType())
+	return e.req("POST", "/api/admin/v1/files", buf.String(), "Content-Type", mw.FormDataContentType())
 }
 
 func (e *env) clicksOf(id any) float64 {
 	e.t.Helper()
 	e.flush()
-	return e.req("GET", fmt.Sprintf("/api/links/%v", id), nil).json()["clicks"].(float64)
+	return e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v", id), nil).json()["clicks"].(float64)
 }
 
 func TestTextShare(t *testing.T) {
 	e := newShareEnv(t, Options{})
 	text := "<b>hi</b>\n\tline two\n"
-	r := e.req("POST", "/api/texts", map[string]any{"text": text, "format": "code"})
+	r := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": text, "format": "code"})
 	if r.status != 201 {
 		t.Fatalf("create text: %d %s", r.status, r.body)
 	}
@@ -113,10 +113,10 @@ func TestTextShare(t *testing.T) {
 		t.Errorf("visits = %v, want the page and two raw fetches", n)
 	}
 
-	if body := e.req("GET", fmt.Sprintf("/api/links/%v/text", l["id"]), nil).json()["text"]; body != text {
+	if body := e.req("GET", fmt.Sprintf("/api/admin/v1/links/%v/text", l["id"]), nil).json()["text"]; body != text {
 		t.Errorf("text endpoint = %q", body)
 	}
-	r = e.req("PATCH", fmt.Sprintf("/api/links/%v", l["id"]), map[string]any{"text": "second\n", "format": "plain", "title": "Notes"})
+	r = e.req("PATCH", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), map[string]any{"text": "second\n", "format": "plain", "title": "Notes"})
 	if c := r.json()["content"].(map[string]any); r.status != 200 || c["preview"] != "second" || c["format"] != "plain" || r.json()["title"] != "Notes" {
 		t.Fatalf("edit text: %d %s", r.status, r.body)
 	}
@@ -130,29 +130,29 @@ func TestTextShare(t *testing.T) {
 		body map[string]any
 		code string
 	}{
-		{fmt.Sprintf("/api/links/%v", l["id"]), map[string]any{"url": "https://example.com"}, "kind_mismatch"},
-		{fmt.Sprintf("/api/links/%v", link["id"]), map[string]any{"text": "x"}, "kind_mismatch"},
-		{fmt.Sprintf("/api/links/%v", l["id"]), map[string]any{"format": "markdown"}, "format_invalid"},
-		{fmt.Sprintf("/api/links/%v", l["id"]), map[string]any{"text": " \n "}, "text_required"},
+		{fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), map[string]any{"url": "https://example.com"}, "kind_mismatch"},
+		{fmt.Sprintf("/api/admin/v1/links/%v", link["id"]), map[string]any{"text": "x"}, "kind_mismatch"},
+		{fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), map[string]any{"format": "markdown"}, "format_invalid"},
+		{fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), map[string]any{"text": " \n "}, "text_required"},
 	} {
 		if r := e.req("PATCH", tc.path, tc.body); r.code() != tc.code {
 			t.Errorf("PATCH %v: %d %s, want %s", tc.body, r.status, r.body, tc.code)
 		}
 	}
-	if r := e.req("POST", fmt.Sprintf("/api/links/%v/refresh", l["id"]), nil); r.code() != "kind_mismatch" {
+	if r := e.req("POST", fmt.Sprintf("/api/admin/v1/links/%v/refresh", l["id"]), nil); r.code() != "kind_mismatch" {
 		t.Errorf("refresh a text: %d %s", r.status, r.body)
 	}
-	if r := e.req("POST", "/api/texts", map[string]any{"text": strings.Repeat("x", 1<<20+1)}); r.status != 413 || r.code() != "text_too_large" {
+	if r := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": strings.Repeat("x", 1<<20+1)}); r.status != 413 || r.code() != "text_too_large" {
 		t.Errorf("oversized text: %d %s", r.status, r.code())
 	}
-	if r := e.req("POST", "/api/texts", map[string]any{"slug": "x"}); r.code() != "text_required" {
+	if r := e.req("POST", "/api/admin/v1/texts", map[string]any{"slug": "x"}); r.code() != "text_required" {
 		t.Errorf("no text: %s", r.code())
 	}
 }
 
 func TestTextViewLimit(t *testing.T) {
 	e := newShareEnv(t, Options{})
-	l := e.req("POST", "/api/texts", map[string]any{"text": "once", "maxClicks": 1, "slug": "secret"}).json()
+	l := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": "once", "maxClicks": 1, "slug": "secret"}).json()
 	if l["slug"] != "secret" {
 		t.Fatalf("custom slug: %v", l)
 	}
@@ -241,15 +241,15 @@ func TestFileShare(t *testing.T) {
 		t.Errorf("failed uploads left files behind: %v", stored)
 	}
 
-	if items := e.req("GET", "/api/links?kind=file&q=report", nil).json()["items"].([]any); len(items) != 1 {
+	if items := e.req("GET", "/api/admin/v1/links?kind=file&q=report", nil).json()["items"].([]any); len(items) != 1 {
 		t.Errorf("kind filter and name search found %d", len(items))
 	}
-	if links := e.req("GET", "/api/export", nil).json()["links"]; links != nil && len(links.([]any)) != 0 {
+	if links := e.req("GET", "/api/admin/v1/export", nil).json()["links"]; links != nil && len(links.([]any)) != 0 {
 		t.Errorf("export includes shares: %v", links)
 	}
 
 	// Deleting the link frees the file once the link is purged.
-	e.req("DELETE", fmt.Sprintf("/api/links/%v", l["id"]), nil)
+	e.req("DELETE", fmt.Sprintf("/api/admin/v1/links/%v", l["id"]), nil)
 	if r := e.files("GET", "/"+slug); r.status != 404 {
 		t.Errorf("deleted file = %d", r.status)
 	}
@@ -263,7 +263,7 @@ func TestFileShare(t *testing.T) {
 
 func TestFilesOriginServesOnlyShares(t *testing.T) {
 	e := newShareEnv(t, Options{})
-	for _, p := range []string{"/admin/", "/api/links", "/healthz", "/"} {
+	for _, p := range []string{"/admin/", "/api/admin/v1/links", "/healthz", "/"} {
 		if r := e.files("GET", p); r.status != 404 || strings.Contains(string(r.body), "<") {
 			t.Errorf("files origin %s = %d %q", p, r.status, r.body)
 		}
@@ -274,7 +274,7 @@ func TestFilesOriginServesOnlyShares(t *testing.T) {
 	if r := e.files("GET", "/robots.txt"); !strings.Contains(string(r.body), "Disallow: /") {
 		t.Errorf("robots.txt = %q", r.body)
 	}
-	if r := e.req("PATCH", "/api/config", map[string]any{"baseUrl": "https://files.test"}); r.code() != "base_url_invalid" {
+	if r := e.req("PATCH", "/api/admin/v1/config", map[string]any{"baseUrl": "https://files.test"}); r.code() != "base_url_invalid" {
 		t.Errorf("base URL on the files host: %s", r.code())
 	}
 }
@@ -285,7 +285,7 @@ func TestSharingFilesNeedsFilesURL(t *testing.T) {
 	if r := e.upload(nil, "a.txt", []byte("a")); r.status != 409 || r.code() != "files_disabled" {
 		t.Fatalf("upload without files origin: %d %s", r.status, r.code())
 	}
-	l := e.req("POST", "/api/texts", map[string]any{"text": "still works"}).json()
+	l := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": "still works"}).json()
 	if l["content"].(map[string]any)["rawUrl"] != nil {
 		t.Errorf("rawUrl without files origin = %v", l["content"])
 	}
