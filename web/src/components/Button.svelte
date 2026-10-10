@@ -68,7 +68,6 @@
       background-color var(--fast) var(--ease),
       border-color var(--fast) var(--ease),
       color var(--fast) var(--ease),
-      opacity var(--fast) var(--ease),
       transform 80ms var(--ease);
   }
 

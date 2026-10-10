@@ -51,3 +51,5 @@ WSL `make check test` 通过（Go race、57 项 Vitest、Svelte 0 errors/0 warni
 
 
 发布前截图复核补充：旧的窄屏 nth-child 规则曾误隐藏空目录／少量标签时的“管理标签”或“更多标签”。现仅隐藏带 aria-pressed 的标签筛选项，并在 320/390px、0–5 个标签目录中验证两个入口可见、键盘打开与焦点返回。最终候选 `make check test e2e smoke docs VERSION=v0.9.4` 全部通过，E2E 总数为 80。文档的 16 张实际界面截图重新生成。
+
+最终远端 CI 曾捕获密码显示按钮由禁用转为可用时的 opacity 过渡低对比度。共享 Button 移除 opacity 过渡，保留其他状态反馈，并增加启用后立即为 opacity 1 的断言；未跳过或放宽 axe。文档截图按实际文件 SHA256 生成缓存版本，避免 CDN 的旧图片覆盖新文档。

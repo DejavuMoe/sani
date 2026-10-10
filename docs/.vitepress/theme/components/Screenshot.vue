@@ -5,6 +5,7 @@
 import { withBase } from 'vitepress';
 import { computed, ref } from 'vue';
 import { useLang } from '../i18n';
+import { data as revisions } from '../../data/screenshots.data';
 
 type Scene = 'dashboard' | 'detail' | 'mobile' | 'setup';
 
@@ -22,7 +23,10 @@ const sizes = { dashboard: [1280, 800], detail: [1280, 860], mobile: [390, 844],
 const NARROW = '(max-width: 640px)';
 
 const { lang, pick } = useLang();
-const src = (theme: 'light' | 'dark', scene: Scene = props.name) => withBase(`/screenshots/${scene}-${theme}-${lang.value}.png`);
+const src = (theme: 'light' | 'dark', scene: Scene = props.name) => {
+  const name = `${scene}-${theme}-${lang.value}.png`;
+  return withBase(`/screenshots/${name}?v=${revisions[name]}`);
+};
 const size = computed(() => sizes[props.name]);
 const dialog = ref<HTMLDialogElement>();
 const open = () => dialog.value?.showModal();

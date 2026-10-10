@@ -89,6 +89,8 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) for (con
     await page.locator('#metadata-auth').click();
     await page.locator('#metadata-user').fill('demo');
     await page.locator('#metadata-password').fill('new-test-password');
+    // Becoming enabled must restore readable text immediately, without an opacity fade.
+    expect(await form.locator('.secret button').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
     const geometry = await page.evaluate(() => {
       const rows = [...document.querySelectorAll('.inline-form,.metadata-form .secret:not(.stored)')].map(row => {
         const rects = [...row.querySelectorAll('input,button')].map(el => el.getBoundingClientRect());

@@ -6,6 +6,7 @@
 
 2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.
 
+- Restore readable button text immediately when enabled; version documentation screenshots by content so updated pages do not reuse stale images.
 - Apply approved R9 control sizes: 32px desktop toolbars, 36px fields and 38px menu rows, with 44px controls on narrow or touch screens. Align tag search and filters, management entry styling and About typography.
 - Complete tag management with search, unused tags, global editing and atomic deletion that retains content.
 - Protect submitted drafts and unsaved item edits; preserve loaded pages and selection during refresh.
