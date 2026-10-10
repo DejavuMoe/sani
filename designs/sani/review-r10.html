@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sani · R10 原型审阅</title>
+  <link rel="icon" href="src/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/fonts.css">
+  <style>
+    :root{color-scheme:light;--bg:#f7f7f5;--surface:#fff;--text:#24231f;--muted:#69665f;--line:#dedbd4;--accent:#2d4be0;font:14px/1.65 "Inter Variable",system-ui,"Microsoft YaHei",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}main{max-width:1440px;margin:auto;padding:32px}header{display:flex;justify-content:space-between;gap:20px;align-items:start}h1{font-size:26px;font-weight:600;letter-spacing:-.03em;margin:2px 0 8px}p{margin:0;color:var(--muted)}.eyebrow{font:12px "IBM Plex Mono",monospace;color:var(--muted)}a{color:inherit;text-underline-offset:4px}.open{display:inline-flex;align-items:center;min-height:36px;padding:4px 14px;background:var(--text);color:var(--surface);border-radius:7px;text-decoration:none;white-space:nowrap}.toolbar{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:24px 0 14px;padding-block:14px;border-block:1px solid var(--line)}.group{display:flex;gap:4px;flex-wrap:wrap}.group+ .group{padding-left:16px;border-left:1px solid var(--line)}button{font:inherit;font-size:13px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--muted);min-height:32px;padding:2px 10px;cursor:pointer}button:hover{background:#eeece7;color:var(--text)}button[aria-pressed=true]{background:var(--surface);border-color:var(--line);color:var(--text);box-shadow:0 1px 2px #00000006}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.scenes{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px}.canvas{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pane{min-width:0}.pane-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 2px 9px}.pane-head strong{font-size:13px;font-weight:600}.pane-head span{font-size:12px;color:var(--muted)}.frame-shell{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);height:740px}iframe{width:100%;height:100%;border:0;display:block}.phone .frame-shell{max-width:392px;margin:auto}.phone .pane-head{max-width:392px;margin:auto}.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}.notes h2{font-size:13px;margin:0 0 6px}.notes p{font-size:12px}.status{font-size:12px;margin-top:24px} @media(max-width:800px){main{padding:20px 16px}header{flex-wrap:wrap}.canvas{grid-template-columns:1fr}.canvas>.pane:last-child{order:-1}.notes{grid-template-columns:1fr;gap:16px}.group+ .group{padding-left:0;border:0}.toolbar{gap:8px}.frame-shell{height:680px}}
+  </style>
+</head>
+<body>
+<main>
+  <header><div><div class="eyebrow">SANI / DESIGN REVIEW / R10</div><h1>更轻的控件，更清楚的层次</h1><p>对照 R9，检查密度、对齐、多语言和实际操作。两侧都是可交互原型。</p></div><a class="open" id="open" href="prototype-r10.html?scene=r8-settings&focus=defaults&lang=zh&theme=light&chrome=0" target="_blank" rel="noopener">打开 R10 ↗</a></header>
+  <div class="toolbar">
+    <div class="group" role="group" aria-label="原型语言"><button data-lang="zh" aria-pressed="true">中文</button><button data-lang="en" aria-pressed="false">English</button></div>
+    <div class="group" role="group" aria-label="原型主题"><button data-theme="light" aria-pressed="true">浅色</button><button data-theme="dark" aria-pressed="false">深色</button></div>
+    <div class="group" role="group" aria-label="预览尺寸"><button data-size="wide" aria-pressed="true">并排</button><button data-size="phone" aria-pressed="false">手机 · 390</button></div>
+  </div>
+  <nav class="scenes" aria-label="审阅场景">
+    <button data-scene="defaults" aria-pressed="true">数字与单位</button><button data-scene="metadata" aria-pressed="false">连接与密码</button><button data-scene="dashboard" aria-pressed="false">创建与列表</button><button data-scene="tags" aria-pressed="false">标签管理</button><button data-scene="text" aria-pressed="false">文本与选项</button><button data-scene="file" aria-pressed="false">文件上传</button><button data-scene="edit" aria-pressed="false">内容编辑</button><button data-scene="retry" aria-pressed="false">失败与重试</button><button data-scene="locked" aria-pressed="false">锁定字段</button><button data-scene="setup" aria-pressed="false">首次设置</button><button data-scene="about" aria-pressed="false">长文本</button>
+  </nav>
+  <div class="canvas" id="canvas">
+    <section class="pane"><div class="pane-head"><strong>R9 · 已批准版本</strong><span>对照基线</span></div><div class="frame-shell"><iframe id="before" title="R9 原型对照" src="prototype-r9.html?scene=r8-settings&lang=zh&theme=light&chrome=0"></iframe></div></section>
+    <section class="pane"><div class="pane-head"><strong>R10 · 待审批</strong><span>本轮提案</span></div><div class="frame-shell"><iframe id="after" title="R10 待审批原型" src="prototype-r10.html?scene=r8-settings&lang=zh&theme=light&chrome=0"></iframe></div></section>
+  </div>
+  <div class="notes">
+    <section><h2>尺寸有分工</h2><p>桌面常规动作 28px、字段 32px；窄屏数字框 36px、普通字段 40px。按钮保留额外触控区域，文字与数字不随外框一起缩小。</p></section>
+    <section><h2>同一套组件</h2><p>数字与单位复用 UnitInput，成组按钮、字段与分段选项共享尺寸。旧版样式保留在历史入口，R10 清理了重复尺寸声明和已被替代的控件。</p></section>
+    <section><h2>细节可以实际操作</h2><p>试着修改短码长度、切换代理、打开标签和日期菜单。选项支持方向键与首尾键，关闭浮层后返回入口；系统减少动态效果时停用位移动效。</p></section>
+  </div>
+  <p class="status">此页为原型审阅工具。数据为隔离示例，保存、连接测试与上传采用模拟状态；生产代码尚未应用 R10。<a href="r10-handoff.md">查看变更与验证记录</a></p>
+</main>
+<script>
+  const state={lang:'zh',theme:'light',size:'wide',scene:'defaults'};
+  const scenes={defaults:['r8-settings','defaults'],metadata:['r5-socks','metadata'],dashboard:['r8-dashboard',''],tags:['r7-tags',''],text:['r7-text-create',''],file:['r7-file-create',''],edit:['r7-edit',''],retry:['r6-settings-retry','defaults'],locked:['r6-settings-locked','defaults'],setup:['r8-setup',''],about:['r8-settings-long','about']};
+  function render(){
+    const [scene,focus]=scenes[state.scene];
+    const params=new URLSearchParams({scene,focus,lang:state.lang,theme:state.theme,chrome:'0'});
+    const embed=new URLSearchParams(params);embed.delete('focus');
+    for(const [id,rev] of [['before','r9'],['after','r10']])document.getElementById(id).src=`prototype-${rev}.html?${embed}`;
+    document.getElementById('open').href=`prototype-r10.html?${params}`;
+    document.getElementById('canvas').classList.toggle('phone',state.size==='phone');
+    for(const key of Object.keys(state))for(const button of document.querySelectorAll(`[data-${key}]`))button.setAttribute('aria-pressed',String(button.dataset[key]===state[key]));
+  }
+  for(const id of ['before','after'])document.getElementById(id).addEventListener('load',event=>{
+    const frame=event.target,doc=frame.contentDocument,focus=scenes[state.scene][1];
+    if(!focus || !doc?.documentElement)return;
+    const selector=focus==='defaults'?'#r6-defaults':focus==='metadata'?'#r5-meta':'.st-about';
+    const deadline=performance.now()+10000;
+    function place(){
+      if(frame.contentDocument!==doc)return;
+      const target=doc.querySelector(selector);
+      // Prototype mounting may follow iframe load; keep the wait within this navigation.
+      if(!target){if(performance.now()<deadline)requestAnimationFrame(place);return;}
+      doc.fonts.ready.then(()=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.scrollTo(0,target.getBoundingClientRect().top+frame.contentWindow.scrollY-76)));
+    }
+    place();
+  });
+  for(const key of Object.keys(state))for(const button of document.querySelectorAll(`[data-${key}]`))button.addEventListener('click',()=>{state[key]=button.dataset[key];render();});
+</script>
+</body>
+</html>

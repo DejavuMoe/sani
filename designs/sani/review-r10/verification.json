@@ -1,0 +1,1275 @@
+{
+  "status": "passed",
+  "approval": "needs-review",
+  "sourceBaseline": "b02f1ab154eab420ed9106a0bc2f8c940f076afa",
+  "verifiedAt": "2026-10-10T13:55:40.266815+00:00",
+  "environment": "Debian WSL build mirror; Playwright Chromium; canonical Windows source",
+  "command": "node designs/sani/tools/r10-check.mjs",
+  "scriptSha256": "2c86a90373e376aa0f26f310c68ed939823bcaa1e50c4f62f78dddc5afc0f53b",
+  "stateCount": 171,
+  "renderOrInteractionFailures": 0,
+  "browserErrors": [],
+  "axeViolations": 0,
+  "checks": [
+    "128 normal states: 16 scenes x 2 widths x 2 languages x 2 themes",
+    "18 pointer/keyboard and async recovery states",
+    "24 narrow/tablet/short-viewport states",
+    "1 enlarged-text stress state (26px controls; not browser zoom)",
+    "Review hub: iframe focus does not scroll parent; language/theme/scene switching; 390px fit",
+    "Menu keyboard focus/return; unit focus; busy-button width stability; save and connection retry",
+    "No native select/date/color/number controls or title tooltips in inspected states"
+  ],
+  "states": [
+    {
+      "name": "r8-settings-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-text-create-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-file-create-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-setup-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "login-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-settings-locked-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-query-error-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tokens-error-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-empty-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-code-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-import-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-long-zh-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-text-create-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-file-create-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-setup-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "login-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-settings-locked-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-query-error-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tokens-error-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-empty-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-code-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-import-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-long-zh-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-text-create-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-file-create-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-setup-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "login-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-settings-locked-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-query-error-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tokens-error-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-empty-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-code-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-import-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-long-en-light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-text-create-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-file-create-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-setup-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "login-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-settings-locked-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-query-error-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tokens-error-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-empty-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r6-code-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-import-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-long-en-dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r5-socks-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-dashboard-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tags-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-text-create-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-file-create-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-edit-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-setup-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "login-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-settings-locked-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-query-error-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tokens-error-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-empty-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-code-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-import-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-long-zh-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r5-socks-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-dashboard-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tags-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-text-create-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-file-create-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-edit-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-setup-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "login-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-settings-locked-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-query-error-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tokens-error-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-empty-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-code-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-import-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-long-zh-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r5-socks-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-dashboard-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tags-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-text-create-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-file-create-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-edit-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-setup-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "login-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-settings-locked-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-query-error-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tokens-error-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-empty-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-code-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-import-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-long-en-light-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r5-socks-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-dashboard-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tags-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-text-create-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-file-create-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-edit-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-setup-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "login-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-settings-locked-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-query-error-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-tokens-error-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-empty-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r6-code-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r7-import-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-long-en-dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-invalid-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-saving-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-error-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "connection-error-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-color-open-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-validation-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-no-results-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "kind-menu-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "date-open-zh",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-invalid-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-saving-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "defaults-error-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "connection-error-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-color-open-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-validation-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "tag-no-results-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "kind-menu-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "date-open-en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "r8-settings-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "r5-socks-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "r7-tags-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "r7-edit-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "r8-dashboard-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "menu-boundary-320-740",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      }
+    },
+    {
+      "name": "r8-settings-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "menu-boundary-768-900",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-settings-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "r5-socks-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "r7-tags-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "r7-edit-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "r8-dashboard-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "menu-boundary-390-300",
+      "viewport": {
+        "width": 390,
+        "height": 300
+      }
+    },
+    {
+      "name": "r8-settings-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "r5-socks-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-tags-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "r7-edit-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "r8-dashboard-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "menu-boundary-640-900",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      }
+    },
+    {
+      "name": "large-text-stress",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "assets": {
+    "r9": {
+      "stylesheets": 15,
+      "cssBytes": 98320,
+      "localScripts": 30,
+      "localScriptBytes": 448528
+    },
+    "r10": {
+      "stylesheets": 3,
+      "cssBytes": 91007,
+      "localScripts": 30,
+      "localScriptBytes": 434378
+    }
+  },
+  "contentAudit": {
+    "classifiedStrings": 893,
+    "errors": 0,
+    "warnings": 25,
+    "warningType": "Reviewed DOM metadata: record IDs, theme and scene markers"
+  },
+  "limitations": [
+    "Prototype state only: no production API, upload, proxy or account validation",
+    "Chromium only; no Safari, Firefox or physical touch-device acceptance",
+    "No production make check/test/e2e rerun in this design-only change",
+    "Asset sizes are local file bytes, not transfer timing or runtime performance",
+    "Trailing CSS whitespace was removed after the browser run; rendered rules are unchanged",
+    "Codex in-app browser intermittently logs an unattributed MutationObserver error on the iframe comparison page; standalone Playwright Chromium review check is clean. The comparison page no longer uses MutationObserver."
+  ],
+  "reviewFollowup": {
+    "command": "node designs/sani/tools/r10-check.mjs --review",
+    "status": "passed",
+    "browserErrors": [],
+    "change": "Bounded iframe mounting check, scoped to current navigation.",
+    "standaloneInAppR10": "Rendered successfully, console error list empty in final clean tab"
+  },
+  "numericTypographyFollowup": {
+    "command": "node designs/sani/tools/r10-check.mjs --settings",
+    "status": "passed",
+    "states": 16,
+    "failures": 0,
+    "browserErrors": [],
+    "axeViolations": 0,
+    "computedDesktop": {
+      "fontSize": "13px",
+      "fontWeight": "400",
+      "textAlign": "start",
+      "paddingInline": "10px"
+    },
+    "copyAndBehaviorChanged": false,
+    "screenshots": [
+      "numeric-desktop.png",
+      "numeric-phone.png"
+    ]
+  }
+}

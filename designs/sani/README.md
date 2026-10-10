@@ -1,9 +1,10 @@
 # Sani UI prototype
 
-A layered reconstruction of the current Sani UI: the admin app (`web/src`) and
-the visitor pages the Go server renders (`internal/server`). It matches
-production pixel for pixel in the compared states. Change a layer here, get it
-reviewed, then implement it in `web/`.
+Design history and interactive prototypes for the Sani admin app (`web/src`)
+and the visitor pages (`internal/server`). Each revision's handoff records its
+source baseline, approval, and implementation evidence. R10 is an approved
+revision; it does not yet describe the production UI. Review a change here
+before implementing it in `web/`.
 
 Nothing in `web/` or `internal/` imports from `designs/`, and nothing here
 ships. Production code and tests stay the functional truth; this prototype
@@ -12,6 +13,8 @@ becomes the visual and interaction truth once a version is approved
 R5 and R6 are approved and implemented. R7 is approved and implemented.
 
 ## Revisions
+
+R10 is **approved for implementation**: [interactive R9 / R10 comparison](http://127.0.0.1:4311/sani/review-r10.html), [prototype](http://127.0.0.1:4311/sani/prototype-r10.html?scene=r8-settings&focus=defaults&lang=zh&theme=light&chrome=0). Compact shared controls, aligned units, multilingual typography and interaction polish: [r10-handoff.md](r10-handoff.md). This revision has not been applied to production.
 
 R9 is **approved and implemented**: [review hub](http://127.0.0.1:4311/sani/review-r9.html), [prototype](http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0). Shared control geometry and measured group alignment: [r9-handoff.md](r9-handoff.md). Prototype evidence: `review-r9/`; production evidence: `implementation-r9/`.
 

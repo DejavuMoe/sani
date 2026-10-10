@@ -572,6 +572,63 @@
       "limitations": [
         "Screenshot alone does not approve a solution or establish hidden interaction behavior."
       ]
+    },
+    {
+      "id": "r10-control-feedback",
+      "type": "screenshot",
+      "location": "User attachments codex-clipboard-660e31fa and codex-clipboard-385fdf6d",
+      "roles": [
+        "visual-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Raw captures remain outside the repository. Prototype uses existing sanitized fixtures.",
+      "licenseOrPermission": "User-provided UI evidence",
+      "localCopies": [],
+      "observations": [
+        "Numeric fields and proxy connection segmented controls appear oversized relative to their labels.",
+        "R9 rendered at a 552px viewport: numeric fields 76 by 44 CSS pixels; proxy segmented outer frame 44px, stretched to 505px.",
+        "R10 follow-up browser comment on #r6-defaults: centered numeric values feel oversized and bold. Computed desktop font is 13px/500; ordinary fields use weight 400."
+      ],
+      "inferences": [
+        "Use shared compact geometry and content-sized choices, preserve readable type and keyboard behavior.",
+        "Use regular 400 weight and ordinary input start alignment with shared 10px padding; retain existing font sizes and geometry."
+      ],
+      "limitations": [
+        "Cropped reference scale is unknown. Screenshot pixels do not establish CSS pixel sizes or hidden interactions."
+      ]
+    },
+    {
+      "id": "r10-current-production",
+      "type": "code",
+      "location": "b02f1ab154eab420ed9106a0bc2f8c940f076afa: web/src/views/Settings.svelte, web/src/components/Menu.svelte, web/src/lib/i18n.svelte.ts",
+      "roles": [
+        "functional-truth",
+        "content-authority"
+      ],
+      "trust": "authoritative-content-source",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Repository license",
+      "localCopies": [
+        "src/r10/screens.jsx",
+        "src/r10/copy.js",
+        "src/r10/states.jsx",
+        "src/r10/components.jsx"
+      ],
+      "observations": [
+        "Resource creation example uses POST /api/v1/links and target_url.",
+        "Normal upgrades migrate the database; JSON export plus complete stopped snapshot are required.",
+        "Menu placement is clamped to the viewport and listeners are removed on unmount."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Prototype uses React and synthetic async state; Svelte implementation requires a later approved change."
+      ]
     }
   ]
 }

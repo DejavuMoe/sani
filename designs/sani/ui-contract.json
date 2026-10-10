@@ -7,7 +7,7 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "implementation-r9/content-inventory.json",
+    "inventory": "review-r10/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -995,6 +995,66 @@
       },
       "status": "implemented",
       "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md. Implemented after approval 5958500; see r9-handoff.md and implementation-r9/ for measured production evidence."
+    },
+    {
+      "id": "r10-shared-controls",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r10.html",
+        "assetPath": "prototype-r10.html",
+        "files": [
+          "src/r10/app.css",
+          "src/r10/app.jsx",
+          "src/r10/components.jsx",
+          "src/r10/controls.css",
+          "src/r10/copy.js",
+          "src/r10/data.jsx",
+          "src/r10/defaults.jsx",
+          "src/r10/screens.jsx",
+          "src/r10/states.jsx"
+        ],
+        "states": [
+          "defaults-ready-invalid-saving-error-retry-saved-locked",
+          "proxy-direct-http-socks-auth-test-retry",
+          "tags-filter-edit-color-empty",
+          "create-link-text-file",
+          "date-open-valid-invalid",
+          "login-setup-offline",
+          "menu-open-focus-return",
+          "zh-en-light-dark-desktop-mobile"
+        ],
+        "stableIds": [
+          "r6-defaults",
+          "r5-meta",
+          "r7-tag-manager"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/",
+        "files": [
+          "web/src/app.css",
+          "web/src/components/Button.svelte",
+          "web/src/components/Segmented.svelte",
+          "web/src/components/Menu.svelte",
+          "web/src/views/Settings.svelte",
+          "web/src/components/TagManager.svelte",
+          "web/src/components/TagPicker.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/UnitInput.svelte",
+          "web/src/components/MetadataSettings.svelte",
+          "web/src/tags.css"
+        ],
+        "interfaces": [
+          "Existing Sani admin API; no backend contract change proposed"
+        ],
+        "tests": [
+          "web/e2e/r7.spec.ts",
+          "web/e2e/r10.spec.ts",
+          "web/e2e/r6.spec.ts",
+          "web/e2e/metadata.spec.ts"
+        ]
+      },
+      "status": "approved"
     }
   ]
 }

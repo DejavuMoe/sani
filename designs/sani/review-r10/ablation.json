@@ -1,0 +1,35 @@
+[
+  {
+    "revision": "r9",
+    "input": {
+      "width": 76,
+      "height": 44,
+      "font": "16px"
+    },
+    "rowHeight": 97,
+    "sectionHeight": 701.84375,
+    "segmentHeight": 44
+  },
+  {
+    "revision": "density-only",
+    "input": {
+      "width": 54,
+      "height": 40,
+      "font": "16px"
+    },
+    "rowHeight": 95.5,
+    "sectionHeight": 689.34375,
+    "segmentHeight": 44
+  },
+  {
+    "revision": "r10",
+    "input": {
+      "width": 54,
+      "height": 36,
+      "font": "16px"
+    },
+    "rowHeight": 85.890625,
+    "sectionHeight": 592.515625,
+    "segmentHeight": 36
+  }
+]
