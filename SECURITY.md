@@ -10,7 +10,7 @@ reproduce it. Chinese or English are both fine.
 Reports are answered as soon as possible. Once a fix is released, the advisory is
 published with credit to you, unless you’d rather stay anonymous.
 
-请不要公开提交 issue，而是通过 GitHub 的[私密漏洞报告](https://github.com/DejavuMoe/sani/security/advisories/new)告诉我们，附上版本号、攻击者能做到什么，以及复现方法。
+请勿通过公开 issue 报告安全漏洞。请通过 GitHub [私密漏洞报告](https://github.com/DejavuMoe/sani/security/advisories/new)提交，并注明程序版本（可通过 `sani version` 查看）、安全影响与利用场景以及复现步骤。中英文均可。
 
 ## Supported versions
 

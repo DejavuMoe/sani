@@ -8,7 +8,7 @@ const workloadNames = { list: '列表', search: '搜索', 'click-sort': '按点�
 
 # 性能
 
-<p class="lead">短链跳转为 Sani 最核心的工作负载，其执行链路上每个环节均针对极低延迟与高确定性深入优化。以下展示跳转基准与存储容量压测数据。</p>
+<p class="lead">短链接跳转是 Sani 的核心负载路径，针对内存命中与低延迟执行了专项优化。本文记录重定向基准测试、计数核对及容量度量数据。</p>
 
 <PerfChart />
 
@@ -19,9 +19,9 @@ const workloadNames = { list: '列表', search: '搜索', 'click-sort': '按点�
 1. 编译启用优化的本地二进制，挂载临时数据目录启动并关闭异步元数据抓取。
 2. 预设两条基准链接：`/hot` 为无限制常规链接；`/limited` 设定高访问上限以覆盖原子计数器损耗。
 3. 使用 [bombardier](https://github.com/codesenberg/bombardier) 对 `/hot`、`/limited` 及未命中路径 `/nope` 展开全量压测，每路径施加 {{ benchmark.connections }} 并发连接，持续 {{ benchmark.duration }}。请求携带完整桌面端 User-Agent 与 Referer 标头，保证每次跳转均触发统计计数。
-4. 等待内存最后一批点击安全落库后，比对 `/hot` 记录的点击总量与 bombardier 压测统计的跳转总量，二者必须绝对一致。
+4. 等待内存最后一批点击安全落库后，比对 `/hot` 记录的点击总量与 bombardier 压测统计的跳转总量，二者需完全一致。
 
-本次测试运行于一台 {{ benchmark.cores }} 核笔记本（{{ benchmark.cpu }}，{{ benchmark.environment }}），压测程序与 Sani 本机同跑且竞争 CPU。同机多次测试通常存在约 10% 波动。生产落地时网络往返与反向代理会引入附加延迟，但不属于 Sani 自身开销。
+本次测试运行于一台 {{ benchmark.cores }} 核笔记本（{{ benchmark.cpu }}，{{ benchmark.environment }}），压测程序与 Sani 本机同跑且竞争 CPU。同机多次测试通常存在约 10% 的合理波动。生产部署中网络往返与反向代理会引入额外延迟，不属于 Sani 进程内部的处理耗时。
 
 ## 压测计数核对
 

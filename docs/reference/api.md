@@ -1,6 +1,6 @@
 # HTTP API
 
-<p class="lead">Sani 自有 HTTP API：使用令牌创建和管理链接、文本与文件，使用同一实例的后台能力完成设置、批量操作和恢复。</p>
+<p class="lead">Sani 提供基于令牌鉴权的 HTTP API，用于创建与管理短链接、文本与文件分享，并提供配置管理、批量操作与数据恢复等能力。</p>
 
 ::: warning 版本说明
 本页对应 v0.9.7。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
@@ -8,7 +8,7 @@
 
 ## 设计与约定 {#design}
 
-资源分类与 `target_url`、`custom_slug` 等命名借鉴了 [s.ee 的 API 设计](https://s.ee/docs/developers/api/)。协议由 Sani 自己定义，无需接入其 SDK。以下是 Sani 的具体设计：
+资源分类与 `target_url`、`custom_slug` 等字段命名参考了 [s.ee 的 API 设计](https://s.ee/docs/developers/api/)。协议由 Sani 自行定义与实现，无需引入外部 SDK。具体设计约定如下：
 
 - `/api/v1` 提供 12 个资源操作；`/api/admin/v1` 提供后台需要的设置、会话、令牌、标签编辑、批量操作、导入导出和恢复等操作。两者共享 SQLite、文件目录、缓存、点击聚合与业务规则。后台可通过数字 ID 管理所有资源，资源 API 通过短码或稳定文件标识定位。
 - 遵循 [HTTP 方法和状态语义](https://www.rfc-editor.org/rfc/rfc9110.html)：POST 创建返回 **201**，`Location` 指向公开短链或分享页；PATCH 部分更新返回 **200**；DELETE 永久删除返回 **204**，没有响应体。GET 与 HEAD 不创建或删除资源。查询返回 200，错误方法返回 **405** 与 `Allow`，不存在的路径返回 **404**（均在鉴权后）。

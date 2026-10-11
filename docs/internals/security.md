@@ -58,7 +58,7 @@ API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。�
 
 ## 元数据抓取与 SSRF 深度防御 {#fetching}
 
-服务端替用户访问任意外部网址，是 SSRF（服务端请求伪造）的典型入口。Sani 构筑了双重网络校验屏障：
+服务端拉取外部网页时存在潜在的 SSRF（服务端请求伪造）风险。Sani 在网络层实现了双重校验机制：
 
 1. **请求前静态过滤**：仅限 `http` 与 `https`；拒收 `localhost`、无点主机名及以 `.localhost`、`.local`、`.internal`、`.lan`、`.home.arpa` 结尾的内部域名；预解析域名，若任一解析 IP 命中私网则立即阻断。
 2. **连接时拨号拦截**：直连请求在建立连接时再次校验目标 IP，阻断解析结果切换至受限地址的 DNS 重绑定路径。配置的代理地址属于例外，见下方信任边界。
@@ -115,7 +115,7 @@ API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。�
 
 ## 报告安全问题 {#reporting}
 
-若发现安全隐患，请勿公开发布 issue，请通过 GitHub 的 [私密漏洞报告通道](https://github.com/DejavuMoe/sani/security/advisories/new) 提交。
+若发现安全漏洞，请勿通过公开 issue 反馈，请通过 GitHub 的[私密漏洞报告通道](https://github.com/DejavuMoe/sani/security/advisories/new)提交。
 
 后台保存或 `SANI_META_PROXY` 提供的专用代理都通过 CONNECT/SOCKS5 固定已校验的公网 IP，失败不直连。后台保存的代理密码以可恢复形式存储在受限数据库及其备份中，未加密；API 仅返回是否已设置密码，错误响应不含传输细节或凭据。更换协议、主机、端口或账号不能沿用旧密码。连接测试需鉴权，使用固定目标、12 秒截止时间、单并发及至少 5 秒启动间隔，不保存设置。旧环境代理保留原有信任边界，详见[配置](../reference/configuration#sani-meta-proxy)。
 

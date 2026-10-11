@@ -1,6 +1,6 @@
 # 部署
 
-<p class="lead">Sani 本身为轻量 HTTP 服务，生产部署通常由前置反向代理提供 HTTPS。下方的配置生成器会基于你输入的域名，直接生成仓库适配好的配置文件。</p>
+<p class="lead">Sani 为独立 HTTP 服务，生产部署通常由前置反向代理提供 HTTPS 终结。下方的配置生成器可根据输入的域名直接生成对应的部署配置文件。</p>
 
 ## 生成配置
 
@@ -19,9 +19,9 @@ docker compose up -d
 
 `compose.yaml` 的关键特性：
 
-- **仅监听本地回环**：端口映射为 `127.0.0.1:8080:8080`，外部请求全部经由反代转发。
-- **绑定本地目录**：SQLite 数据库与文件上传保存在 Compose 文件旁的 `./sani-data`，绑定到容器内 `/data`，容器重建不删除这个目录。默认不使用命名卷。
-- **极小基础镜像**：基于 `scratch` 构建，大小仅约 25 MB，仅含 `sani` 可执行文件与 CA 证书。以 `65532` 非特权用户运行且无 shell。如需执行命令可直接调用 `/sani`（例如 `docker exec -it sani /sani passwd`）。
+- **仅监听本地回环**：端口映射为 `127.0.0.1:8080:8080`，外部请求全部经由反向代理转发。
+- **绑定本地目录**：SQLite 数据库与文件上传保存在 Compose 文件旁的 `./sani-data`，绑定到容器内 `/data`，容器重建不会丢失该目录中的持久化数据。默认不使用命名卷。
+- **极小基础镜像**：基于 `scratch` 构建，大小仅约 25 MB，仅含 `sani` 可执行文件与 CA 证书。以 `65532` 非特权用户运行且无 shell。如需执行维护命令可直接调用容器内的 `/sani`（例如 `docker exec -it sani /sani passwd`）。
 - **内置健康检查**：已配置 `HEALTHCHECK`，可通过 `docker ps` 查看容器 `healthy` 状态。
 
 ### 镜像版本
@@ -82,7 +82,7 @@ docker compose logs --tail=50 sani
 docker exec sani /sani healthcheck
 ```
 
-已有数据不要删除目录或换成空卷；不要用 `chmod 777` 或改为 root 运行来绕过权限。如果所有权正确仍报错，再检查挂载是否只读、磁盘空间和宿主机的 SELinux 策略。这里的 UID/GID 适用于普通 Docker Engine；启用了 rootless 或 user namespace 映射时，需要按映射后的宿主 UID/GID 授权。
+已有数据切勿随意删除目录或换成空卷；亦不建议使用 `chmod 777` 或改为 root 用户运行来规避权限问题。如果所有权正确仍报错，需排查挂载是否只读、磁盘空间是否充足及宿主机 SELinux/AppArmor 策略。这里的 UID/GID 适用于普通 Docker Engine；若启用了 Rootless 或 user namespace 映射，需按映射后的宿主 UID/GID 执行授权。
 
 ## systemd 服务管理 {#binaries}
 
@@ -246,7 +246,7 @@ CDN 绕过规则不能清除浏览器已保存的 301/308 跳转。无限制永�
 
 支持两种初始化方式：
 
-- **设置码（推荐）**：未初始化密码前，Sani 每次启动都会生成随机设置码并打印在日志中。若已配置 `SANI_BASE_URL`，日志会提供带 hash 的直接设置链接（如 `https://s.example.com/admin/#setup=k7m2-p9x4-hq3d`）。Hash 锚点不会发送至服务端，不会在反代访问日志中留下痕迹。
+- **设置码（推荐）**：未初始化密码前，Sani 每次启动都会生成随机设置码并打印在日志中。若已配置 `SANI_BASE_URL`，日志会提供带 hash 的直接设置链接（如 `https://s.example.com/admin/#setup=k7m2-p9x4-hq3d`）。Hash 锚点不会发送至服务端，不会在反向代理访问日志中留下记录。
 - **环境变量 `SANI_PASSWORD`**：适用于自动化编排。启动时若检测到与数据库当前密码不一致将自动覆盖，并令所有活跃会话失效；此模式下管理后台中将禁用密码修改。
 
 ## 升级与回退 {#upgrade}

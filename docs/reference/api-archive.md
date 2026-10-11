@@ -10,7 +10,7 @@ next: false
 :::
 
 
-<p class="lead">Sani 管理界面的全部交互均构建于这套标准 JSON API 之上。界面具备的完整能力，均可通过脚本与自动化程序直接调用。</p>
+<p class="lead">本篇归档记录 v0.9.4 及更早版本所使用的 HTTP API。管理界面的各项功能均可通过脚本与自动化程序直接调用。</p>
 
 ## 交互约定 {#conventions}
 

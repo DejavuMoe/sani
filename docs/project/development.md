@@ -57,12 +57,12 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 
 ## 架构核心原则（不变量）
 
-- **跳转路径零 DB 交互**：缓存命中时绝不触碰 SQLite，更不等待磁盘 I/O。修改 `redirect.go`、`cache` 或 `clicks` 前后必须运行 `make bench` 评估延迟基线。
-- **坚守纯 Go 零 cgo 依赖**：SQLite 采用 `modernc.org/sqlite`，确保全静态链接并支持 `scratch` 裸容器运行。
-- **坚守安全防护边界**：爬虫抓取层预解析与 Dial 拨号双重防 SSRF、危险 URL 协议过滤、首登日志设置码机制、会话 Cookie 严防跨站（Strict + /api/ 限域）、CSRF 拦截与后台强 CSP 策略。
+- **跳转路径无 DB 交互**：缓存命中时直接从内存返回，不触发 SQLite 查询与磁盘 I/O。修改 `redirect.go`、`cache` 或 `clicks` 前后必须运行 `make bench` 评估延迟基线。
+- **不依赖 cgo**：SQLite 采用 `modernc.org/sqlite`，确保完全静态链接并支持 `scratch` 容器环境。
+- **维护既有安全防护边界**：元数据抓取层预解析与 Dial 拨号双重防 SSRF、危险 URL 协议过滤、首次运行日志设置码机制、会话 Cookie 限域（SameSite=Strict 且限定为 `/api/` 作用域）、跨站防护与后台严格 CSP 策略。
 - **外部输入严格施加容量边界**：任何以客户端输入为 Key 的映射结构必须配置显式容量上限。
 - **UI 文案双语同源**：文案统一维护于 `web/src/lib/i18n.svelte.ts`。中文表达地道自然，拒绝生硬机器直译。
-- **坚决不引入重量级 UI 与图标依赖**：图标采用 `Icon.svelte` 矢量手绘；下拉框使用原生 Popover API，弹窗使用原生 `<dialog>`。
+- **不引入第三方 UI 与图标库**：图标采用 `Icon.svelte` 矢量手绘；下拉菜单使用 Popover API，弹窗使用原生 `<dialog>`。
 - **无障碍（A11y）验收**：要求文本对比度满足 WCAG AA，操作支持键盘。管理端 `pnpm --dir web a11y` 检查主要页面的中文/英文与浅色/深色组合；文档站 `pnpm --dir docs a11y` 检查所有页面的双语双主题。axe 扫描应零违规，仍需人工核对焦点与键盘交互。
 - **统一 API 错误协议**：所有异常统一响应 `{"error": {"code": "…", "message": "…"}}`，前端基于 `code` 路由至对应多语言文案。
 
