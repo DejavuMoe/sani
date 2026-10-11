@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -168,7 +169,7 @@ func serve() error {
 		attrs := []any{"setup_code", setupCode}
 		if cfg.BaseURL != "" {
 			// The fragment stays in the browser, so the code never reaches access logs.
-			attrs = append(attrs, "url", cfg.BaseURL+"/admin/#setup="+setupCode)
+			attrs = append(attrs, "url", cfg.BaseURL+"/admin/#setup="+url.QueryEscape(setupCode))
 		}
 		log.Warn("no admin password yet: open /admin/ and enter this setup code, or set SANI_PASSWORD", attrs...)
 		if !log.Enabled(ctx, slog.LevelWarn) {
@@ -398,7 +399,7 @@ func backup() error {
 }
 
 func healthcheck() error {
-	listen := os.Getenv("SANI_LISTEN")
+	listen := strings.TrimSpace(os.Getenv("SANI_LISTEN"))
 	if listen == "" {
 		listen = ":8080"
 	}

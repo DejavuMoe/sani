@@ -20,6 +20,11 @@
   const picked = $derived(links.picked.has(link.id));
   const fresh = $derived(links.fresh.has(link.id));
   const parts = $derived(displayParts(link.url));
+  const iconHost = $derived.by(() => {
+    const authority = link.url.match(/^[a-z][a-z0-9+.-]*:\/\/([^/?#]*)/i)?.[1] ?? '';
+    // Restore only the display prefix; URL.hostname would also rewrite Unicode hosts.
+    return authority.slice(authority.lastIndexOf('@') + 1).toLowerCase().startsWith('www.') ? `www.${link.host}` : link.host;
+  });
   const spark = $derived(link.spark ?? new Array(14).fill(0));
   const sparkTotal = $derived(spark.reduce((a, b) => a + b, 0));
   const shared = $derived(link.kind !== 'url' && link.content ? link.content : null);
@@ -103,7 +108,7 @@
             <span class="kind"><Icon name={link.kind === 'text' ? 'text' : 'file'} size={14} /></span>
             <span class={['title', !link.title && link.kind === 'text' && 'excerpt']}>{sharedTitle}</span>
           {:else}
-            <Favicon host={link.host} icon={link.icon} size={14} />
+            <Favicon host={link.host} {iconHost} icon={link.icon} size={14} />
             {#if link.title}
               <span class="title">{link.title}</span>
             {:else if link.meta === 'pending'}

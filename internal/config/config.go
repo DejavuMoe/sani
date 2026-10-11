@@ -143,6 +143,10 @@ func Load() (*Config, error) {
 			collect(fmt.Errorf("SANI_PASSWORD: %w", err))
 		}
 	}
+	// Match the separators ignored by the setup verifier.
+	if c.SetupCode != "" && strings.Trim(c.SetupCode, "- \t") == "" {
+		collect(fmt.Errorf("SANI_SETUP_CODE: must contain a character other than dashes, spaces or tabs"))
+	}
 	c.TrustProxy, err = envBool("SANI_TRUST_PROXY", false)
 	collect(err)
 	c.FetchMeta, err = envBool("SANI_FETCH_META", true)

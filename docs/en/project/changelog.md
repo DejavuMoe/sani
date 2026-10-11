@@ -2,6 +2,22 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## v0.9.7
+
+2026-10-11 · Fix 23 reproduced issues in the admin app, metadata tasks, imports and operations tools. Database schema stays at 6 with no new migration.
+
+- Preserve editor and composer drafts across session expiry for manual saving after sign-in, including recovery when the initial text load failed authentication. Canceling selection leaves no hidden selected rows, and deletion respects draft protection. Deliberate sign-out still clears drafts.
+- Restore rows after failed deletion under short-URL searches and remove rows and counts that no longer match after saving. Search consistently handles Unicode case and NFC, with wildcard characters treated literally.
+- Validate new visit limits as integers from 1 to 10¹²; only blank input means unlimited. Preserve unchanged larger imported limits when editing other fields. Failed upload retries recalculate relative expiry, while resumed chunk sessions retain their original deadline.
+- Parse decimal/exponent JSON integers exactly, skip rows with invalid counters or visit limits, and reject fields belonging to other resource kinds during chunked upload. Explicit default ports no longer bypass self-link checks.
+- Commit metadata only for its current task, cancel or replace superseded tasks on metadata-affecting edits or refreshes, and settle canceled queued work during orderly shutdown. Decode file titles once, retain stale icons after failed refresh with a one-day retry delay, and use the full hostname for `www` favicon lookup.
+- Honor `Accept-Encoding` quality values and exclusions. Public text pages try a compatible copy method when the clipboard API is absent or rejects, then show success or manual-copy feedback.
+- Encode special characters in setup links, reject setup codes made only of ignored separators, and trim healthcheck listen addresses consistently with startup.
+- Correct systemd symlink-directory backup instructions and literal dollar escaping in generated Compose root URLs. Load checks require their own child to become ready, use a fresh password and stop on an occupied port.
+- Add per-issue failure regressions, concurrency/cancellation tests, CLI and Compose checks, and browser coverage across both languages, themes and desktop/mobile sizes.
+
+When upgrading from v0.9.5 or v0.9.6, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.7`, then reload the admin app to continue using the existing schema 6 data. Upgrades from v0.9.4 or earlier still require the API adjustments and migration steps under [upgrade and rollback](../guide/operations#upgrade).
+
 ## v0.9.6
 
 2026-10-11 · Fix missing authentication on admin import example downloads and add management resource access regressions. Database schema stays at 6 with no new migration.

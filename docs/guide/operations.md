@@ -77,11 +77,16 @@ backup="/root/sani-full-$(date +%Y%m%d-%H%M%S)"
 sudo test ! -e "$backup"
 sudo systemctl stop sani
 test "$(systemctl show sani -p ExecMainStatus --value)" = 0
-sudo cp -a /var/lib/sani "$backup"
+sudo cp -aH -- /var/lib/sani "$backup"
+sudo test -d "$backup"
+sudo test ! -L "$backup"
+sudo test -f "$backup/sani.db"
 sudo systemctl start sani
 ```
 
 :::
+
+systemd 的 `DynamicUser` 可能让 `/var/lib/sani` 成为指向私有状态目录的符号链接。`cp -aH` 会复制命令行源路径指向的目录内容；随后确认备份根目录不是符号链接且包含数据库，再启动服务。
 
 建议将该目录作为完整灾备归档，记录对应的 Sani 版本、备份时间及环境变量。复制到异地后校验文件大小与 SHA-256。如需热备方案，应使用底层存储卷或文件系统级的原子快照，并独立演练验证，不可依赖先后复制顺序来推断一致性。
 

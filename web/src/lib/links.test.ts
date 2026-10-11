@@ -161,6 +161,124 @@ describe('lists racing local writes', () => {
 
 
 describe('management state recovery', () => {
+  it('BUG-01 keeps cancelled selection outside the picked set and protects the draft from deletion', async () => {
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    links.togglePick(old.id);
+    expect(editor.pending).not.toBeNull();
+    editor.pending = null;
+    expect(links.picking).toBe(false);
+    expect([...links.picked]).toEqual([]);
+    await links.remove(old);
+    expect(api.deleteLink).not.toHaveBeenCalled();
+    expect(editor.pending).not.toBeNull();
+    expect(links.items).toEqual([old]);
+  });
+
+  it('BUG-01 resumes the complete selection action once after discarding the draft', () => {
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    links.togglePick(old.id);
+    expect([...links.picked]).toEqual([]);
+    editor.leave();
+    expect(links.picking).toBe(true);
+    expect([...links.picked]).toEqual([old.id]);
+    links.togglePick(old.id);
+    expect([...links.picked]).toEqual([]);
+  });
+
+  it('BUG-01 guards bulk deletion of a dirty editor even with an existing picked ID', async () => {
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    links.picked.add(old.id);
+    vi.mocked(api.bulk).mockResolvedValue({ items: [old] });
+    vi.mocked(api.links).mockResolvedValue(list([]));
+    await links.bulk('delete');
+    expect(api.bulk).not.toHaveBeenCalled();
+    expect(editor.pending).not.toBeNull();
+    expect(links.items).toEqual([old]);
+  });
+
+  it.each(['/old', 'http://localhost/old', ' /p/old '])('BUG-22 restores a failed deletion in the %s search', async query => {
+    links.query = query;
+    vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
+    await links.remove(old);
+    expect(links.items).toEqual([old]);
+    expect(links.total).toBe(1);
+  });
+
+  it('BUG-23 removes an edited last search match and its count immediately', async () => {
+    links.query = 'Before';
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    editor.saving = true;
+    vi.mocked(api.updateLink).mockResolvedValue(fresh);
+    await links.update(old.id, { title: fresh.title }, true);
+    expect(links.items).toEqual([]);
+    expect(links.total).toBe(0);
+    expect(links.expandedId).toBeNull();
+    expect(links.editingId).toBeNull();
+  });
+
+  it('BUG-23 retains a dirty search result during an unrelated metadata update', () => {
+    links.query = 'Before';
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    links.upsert(fresh);
+    expect(links.items).toEqual([old]);
+    expect(links.total).toBe(1);
+    expect(links.refreshFailed).toBe(true);
+  });
+
+  it('BUG-23 preserves a dirty editor while a tag request or save is pending', () => {
+    links.query = 'Before';
+    links.expandedId = old.id; links.editingId = old.id;
+    editor.check = () => true;
+    editor.saving = true;
+    links.upsert(fresh);
+    expect(links.items).toEqual([old]);
+    expect(links.total).toBe(1);
+    expect(links.editingId).toBe(old.id);
+    expect(links.refreshFailed).toBe(true);
+  });
+
+  it.each(['https://short.example:443', 'http://short.example:80', 'https://例子.test'])('BUG-22/23 preserves the exact short origin %s during reconciliation', async origin => {
+    const link = { ...old, shortUrl: `${origin}/old` };
+    links.items = [link];
+    links.query = link.shortUrl;
+    links.upsert({ ...link, clicks: 1 });
+    expect(links.items).toHaveLength(1);
+    vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
+    await links.remove(link);
+    expect(links.items).toHaveLength(1);
+    expect(links.total).toBe(1);
+  });
+
+  it('BUG-23 keeps normalized Unicode matches and treats wildcard characters literally', () => {
+    links.query = 'e\u0301';
+    links.upsert({ ...fresh, title: 'ÉCLAIR' });
+    expect(links.items).toHaveLength(1);
+    links.query = '%';
+    links.upsert({ ...fresh, title: 'Nothing matches' });
+    expect(links.items).toEqual([]);
+    expect(links.total).toBe(0);
+  });
+
+  it('BUG-23 keeps a text first-line match after an unrelated edit', () => {
+    links.query = 'first line';
+    const text = { ...fresh, kind: 'text' as const, url: '', content: { format: 'plain' as const, preview: 'The first line', lines: 2, size: 20, rawUrl: null } };
+    links.upsert(text);
+    expect(links.items).toEqual([text]);
+    expect(links.total).toBe(1);
+  });
+
+  it.each([['οσ', 'ΟΣ'], ['ib', 'İB']])('BUG-03/23 follows server case normalization for %s', (query, title) => {
+    links.query = query;
+    links.upsert({ ...fresh, title });
+    expect(links.items).toHaveLength(1);
+    expect(links.total).toBe(1);
+  });
+
   it('protects a dirty row from background removal and explicit deletion', async () => {
     links.tag = 1; links.expandedId = 1; links.editingId = 1;
     editor.check = () => true;

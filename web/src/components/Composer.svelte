@@ -6,6 +6,7 @@
   import { toISO, type Expiry } from '../lib/expiry';
   import { errorText, t } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
+  import { validMaxClicks } from '../lib/max-clicks';
   import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { hostOf, stripScheme } from '../lib/url';
@@ -101,7 +102,7 @@
       return;
     }
     const limit = maxClicks.trim();
-    if (limit && !/^[1-9]\d*$/.test(limit)) {
+    if (!validMaxClicks(limit)) {
       more = true;
       error = { field: 'more', text: t('err.max_clicks_invalid') };
       return;

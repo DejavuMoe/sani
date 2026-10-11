@@ -85,6 +85,8 @@ Without it, as long as there’s no password, Sani generates a code at every sta
 
 Set it when an automated setup needs to know the code in advance.
 
+A nonempty configured code cannot consist only of dashes, spaces and tabs; configuration validation rejects it. An unset or whitespace-only value still uses a generated code.
+
 ## Links
 
 ### `SANI_SLUG_LENGTH`

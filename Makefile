@@ -19,6 +19,7 @@ check:
 test:
 	$(RUN) go test -race ./...
 	$(RUN) pnpm --dir web test
+	$(RUN) node --test scripts/load.regression.test.mjs
 
 # The frontend builds into internal/webui/dist, which the binary embeds.
 web:

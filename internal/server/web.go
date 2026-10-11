@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -169,9 +170,17 @@ func (a *webApp) serveRootFile(w http.ResponseWriter, r *http.Request, name stri
 
 func (a *webApp) serveAsset(w http.ResponseWriter, r *http.Request, f *asset) {
 	h := w.Header()
+	h.Set("Vary", "Accept-Encoding")
+	body, encoding, ok := f.negotiate(strings.Join(r.Header.Values("Accept-Encoding"), ","))
+	if !ok {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 	h.Set("Content-Type", f.ctype)
 	h.Set("ETag", f.etag)
-	h.Set("Vary", "Accept-Encoding")
+	if encoding != "" {
+		h.Set("Content-Encoding", encoding)
+	}
 	if f.immutable {
 		h.Set("Cache-Control", "public, max-age=31536000, immutable")
 	} else {
@@ -181,20 +190,62 @@ func (a *webApp) serveAsset(w http.ResponseWriter, r *http.Request, f *asset) {
 		w.WriteHeader(http.StatusNotModified)
 		return
 	}
-	body := f.body
-	accept := r.Header.Get("Accept-Encoding")
-	switch {
-	case f.br != nil && strings.Contains(accept, "br"):
-		h.Set("Content-Encoding", "br")
-		body = f.br
-	case f.gz != nil && strings.Contains(accept, "gzip"):
-		h.Set("Content-Encoding", "gzip")
-		body = f.gz
-	}
 	h.Set("Content-Length", itoa(len(body)))
 	w.WriteHeader(http.StatusOK)
 	if r.Method != http.MethodHead {
 		w.Write(body)
+	}
+}
+
+func (f *asset) negotiate(accept string) ([]byte, string, bool) {
+	codings := [...]string{"br", "gzip", "identity", "*"}
+	quality := [...]float64{-1, -1, -1, -1}
+	for part := range strings.SplitSeq(accept, ",") {
+		coding, params, hasParams := strings.Cut(strings.TrimSpace(part), ";")
+		for i, name := range codings {
+			if !strings.EqualFold(strings.TrimSpace(coding), name) {
+				continue
+			}
+			q := 1.0
+			if hasParams {
+				key, value, _ := strings.Cut(strings.TrimSpace(params), "=")
+				value = strings.TrimSpace(value)
+				q = 0
+				valid := value == "0" || value == "1" ||
+					len(value) >= 2 && len(value) <= 5 && (value[0] == '0' || value[0] == '1') &&
+						value[1] == '.' && strings.Trim(value[2:], "0123456789") == ""
+				if strings.EqualFold(strings.TrimSpace(key), "q") && valid {
+					if parsed, err := strconv.ParseFloat(value, 64); err == nil && parsed <= 1 {
+						q = parsed
+					}
+				}
+			}
+			quality[i] = q
+		}
+	}
+	best, selected := 0.0, -1
+	for i, body := range [][]byte{f.br, f.gz, f.body} {
+		q := quality[i]
+		if q < 0 && i != 2 {
+			q = quality[3]
+		}
+		if body != nil && q > best {
+			best, selected = q, i
+		}
+	}
+	// Implicit identity is a fallback; an explicit quality competes with compression.
+	if selected < 0 && quality[2] != 0 && (quality[2] >= 0 || quality[3] != 0) {
+		selected = 2
+	}
+	switch selected {
+	case 0:
+		return f.br, "br", true
+	case 1:
+		return f.gz, "gzip", true
+	case 2:
+		return f.body, "", true
+	default:
+		return nil, "", false
 	}
 }
 

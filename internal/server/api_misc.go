@@ -408,10 +408,18 @@ func (s *Server) recordToLink(r *http.Request, rec map[string]string, now time.T
 		}
 		l.ExpiresAt = ms
 	}
-	if v, err := strconv.ParseInt(pick(rec, clicksFields), 10, 64); err == nil && v > 0 {
+	if value := pick(rec, clicksFields); value != "" {
+		v, err := strconv.ParseInt(value, 10, 64)
+		if err != nil || v < 0 {
+			return nil, "clicks_invalid"
+		}
 		l.Clicks = v
 	}
-	if v, err := strconv.ParseInt(pick(rec, maxFields), 10, 64); err == nil && v > 0 {
+	if value := pick(rec, maxFields); value != "" {
+		v, err := strconv.ParseInt(value, 10, 64)
+		if err != nil || v < 0 {
+			return nil, "max_clicks_invalid"
+		}
 		l.MaxClicks = v
 	}
 	if v, err := strconv.Atoi(rec["redirect"]); err == nil {
@@ -539,17 +547,26 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 			case bool:
 				rec[normalizeKey(k)] = strconv.FormatBool(x)
 			default:
-				if v != nil && slices.Contains(expiresFields, normalizeKey(k)) {
+				if v != nil && (slices.Contains(expiresFields, normalizeKey(k)) ||
+					slices.Contains(clicksFields, normalizeKey(k)) || slices.Contains(maxFields, normalizeKey(k))) {
 					b, _ := json.Marshal(v)
-					rec[normalizeKey(k)] = string(b) // reject malformed expiry instead of clearing it
+					rec[normalizeKey(k)] = string(b) // reject malformed values instead of clearing them
 				}
 			}
 		}
 		// Shlink nests counters and limits:
 		// "visitsSummary": {"total": n}, "meta": {"validUntil": t, "maxVisits": n}.
 		if m, ok := obj["visitsSummary"].(map[string]any); ok {
-			if t, ok := m["total"].(json.Number); ok {
-				rec["visits"] = importNumber(t)
+			if t := m["total"]; t != nil {
+				switch t := t.(type) {
+				case json.Number:
+					rec["visits"] = importNumber(t)
+				case string:
+					rec["visits"] = t
+				default:
+					b, _ := json.Marshal(t)
+					rec["visits"] = string(b)
+				}
 			}
 		}
 		if m, ok := obj["meta"].(map[string]any); ok {
@@ -564,8 +581,16 @@ func parseJSONRecords(data []byte) ([]map[string]string, error) {
 					rec["validuntil"] = string(b)
 				}
 			}
-			if v, ok := m["maxVisits"].(json.Number); ok {
-				rec["maxvisits"] = importNumber(v)
+			if v := m["maxVisits"]; v != nil {
+				switch v := v.(type) {
+				case json.Number:
+					rec["maxvisits"] = importNumber(v)
+				case string:
+					rec["maxvisits"] = v
+				default:
+					b, _ := json.Marshal(v)
+					rec["maxvisits"] = string(b)
+				}
 			}
 		}
 		out = append(out, rec)
@@ -577,11 +602,36 @@ func importNumber(n json.Number) string {
 	if _, err := n.Int64(); err == nil {
 		return n.String()
 	}
-	// JSON numbers may use decimal or exponent notation.
-	if f, err := n.Float64(); err == nil {
-		return strconv.FormatFloat(f, 'f', -1, 64)
+	// Normalize exact integers without float rounding or exponent-sized allocations.
+	raw := n.String()
+	digits, exponent := raw, "0"
+	if i := strings.IndexAny(digits, "eE"); i >= 0 {
+		digits, exponent = digits[:i], digits[i+1:]
 	}
-	return n.String()
+	sign := ""
+	if strings.HasPrefix(digits, "-") {
+		sign, digits = "-", digits[1:]
+	}
+	fraction := 0
+	if i := strings.IndexByte(digits, '.'); i >= 0 {
+		fraction = len(digits) - i - 1
+		digits = digits[:i] + digits[i+1:]
+	}
+	digits = strings.TrimLeft(digits, "0")
+	if digits == "" {
+		return "0"
+	}
+	e, err := strconv.ParseInt(exponent, 10, 64)
+	limit := int64(len(raw)) + 19
+	if err != nil || e > limit || e < -limit {
+		return raw
+	}
+	significant := strings.TrimRight(digits, "0")
+	shift := e - int64(fraction) + int64(len(digits)-len(significant))
+	if shift < 0 || int64(len(significant))+shift > 19 {
+		return raw
+	}
+	return sign + significant + strings.Repeat("0", int(shift))
 }
 
 func parseCSVRecords(data []byte) ([]map[string]string, error) {

@@ -88,7 +88,8 @@ Times can be RFC 3339 (`2026-09-29T08:00:00Z`), `2026-09-29 08:00:00`, `2026-09-
 - **Creation times** in the future are ignored.
 - **Expiry** is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch or exceeds UTC years 0000–9999 skips the row with `expires_invalid`; Unix seconds are also checked for overflow before conversion to milliseconds. Empty values and `0` mean never, and valid past expiry dates are preserved. Check skipped rows, correct the source file and import again.
 - **Counter ceiling:** per-link and overall click totals saturate at `9223372036854775807` (the int64 maximum). Summing large imports or counting later visits cannot overflow these totals. Links without a visit limit continue to work at the ceiling.
-- **Limits:** files up to 32 MB, and at most 100,000 links per import.
+- **Counter validation:** imported click counts and visit limits must be integers from `0` to `9223372036854775807`. Decimal or exponent notation in JSON numbers is parsed exactly, without floating-point rounding. Negative, fractional, malformed or out-of-range values skip the entire row with `clicks_invalid` or `max_clicks_invalid`. Empty values and `0` mean zero clicks or unlimited visits; an invalid limit is never silently cleared.
+- **Limits:** files up to 32 MiB, and at most 100,000 links per import.
 
 Afterwards you see how many links were imported and which rows were skipped. Through the API the result looks like this:
 
@@ -102,6 +103,6 @@ Afterwards you see how many links were imported and which rows were skipped. Thr
 }
 ```
 
-The reasons are [API error codes](../reference/api#errors).
+Skip reasons and the response structure are described in the [API import reference](../reference/api#import).
 
 The import result previews the first 20 skipped records and offers a JSON download containing every skipped record. URL export is for migration; a complete backup also preserves shared text and files through the database and file directory. See [backup and restore](./operations#backup-files).

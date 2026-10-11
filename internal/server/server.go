@@ -84,6 +84,8 @@ type Server struct {
 	jobs     sync.WaitGroup
 	requests sync.WaitGroup
 	jobSlots chan struct{}
+	metaMu   sync.Mutex
+	metaJobs map[int64]*metadataJob
 
 	filesHost string        // host[:port] of FilesURL
 	filesMu   sync.RWMutex  // uploads hold a read lock until ownership transfers or cleanup finishes

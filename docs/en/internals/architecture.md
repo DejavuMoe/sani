@@ -84,15 +84,17 @@ Upload requests share a file lifecycle read lock until the database owns the fil
 
 After a link is created, a background task fetches the destination: it reads at most 1 MiB and follows at most 5 redirects. The request carries your browser’s language preferences, so titles usually come in the language you read.
 
-- **Title.** The first of `og:title`, `twitter:title` and `<title>`. For files such as PDFs, the file name.
+- **Title.** The first of `og:title`, `twitter:title` and `<title>`. For non-HTML files such as PDFs, the file name comes from the final URL's last escaped path segment, percent-decoded exactly once.
 - **Icon.** Chosen from the icons the page declares: images close to 64 pixels and SVGs first, then `apple-touch-icon` and larger images, and `/favicon.ico` last, trying at most 4. An icon must be at most 256 KiB, and its content must really be an image.
-- **Reuse.** Icons are stored per host, so other links to the same site share them. An icon older than 30 days is fetched again the next time it’s needed; after a failure, Sani waits a day before trying again.
+- **Reuse.** Icons are stored by the full hostname; `www.example.com` and `example.com` have separate entries. An icon older than 30 days is fetched again when next needed. A failed refresh keeps the old image and becomes eligible to retry on demand after one day.
+
+Each link's pending metadata belongs to its current task. Destination or title edits cancel or replace the task as needed; an explicit refresh replaces the current task. An old task cannot commit the new task's title state. Queued and running tasks track at most 1,024 links; excess work is marked failed for manual retry. During orderly shutdown, canceled queued tasks also attempt to record failure so a restart does not leave them stuck as pending.
 
 The fetcher checks destination hosts and direct dial addresses for private networks. With an environment proxy, the proxy's DNS and forwarding policy remain an operator trust boundary; see [Security](./security#fetching).
 
 ## The admin app
 
-The admin app is written in Svelte 5 and TypeScript and built with Vite, without UI or icon libraries. The build output is precompressed with Brotli and gzip and embedded in the binary with Go’s `embed`, and each browser gets the precompressed version it supports.
+The admin app is written in Svelte 5 and TypeScript and built with Vite, without UI or icon libraries. The build output is precompressed with Brotli and gzip and embedded in the binary with Go’s `embed`. Responses honor `Accept-Encoding` quality values and exclusions when choosing Brotli, gzip or uncompressed `identity`, with no runtime compression; if no representation is acceptable, the server returns `406`.
 
 Assets with hashed file names are cached for a year; `index.html` is revalidated every time and carries a strict Content Security Policy.
 

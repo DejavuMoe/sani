@@ -9,6 +9,7 @@
   import { errorText, i18n, t } from '../lib/i18n.svelte';
   import { mod, modEnter } from '../lib/keys';
   import { links } from '../lib/links.svelte';
+  import { validMaxClicks } from '../lib/max-clicks';
   import { session } from '../lib/session.svelte';
   import { byteLength, formatSize } from '../lib/size';
   import { toasts } from '../lib/toast.svelte';
@@ -136,7 +137,7 @@
       if (file.size > maxFile) return 'file_too_large';
     }
     if (blocking.includes(slugStatus)) return slugStatus === 'tooLong' ? 'slug_too_long' : `slug_${slugStatus}`;
-    if (maxClicks.trim() && !/^[1-9]\d*$/.test(maxClicks.trim())) return 'max_clicks_invalid';
+    if (!validMaxClicks(maxClicks)) return 'max_clicks_invalid';
     return null;
   }
 
@@ -174,7 +175,8 @@
         upload = new AbortController();
         progress = resume.offset / file!.size;
         const draft = JSON.stringify({ tags, slug, title, expiry, maxClicks });
-        if (draft !== lastFileDraft) { savedFileOptions = options; lastFileDraft = draft; }
+        // Only a continuing chunk session is bound to the earlier deadline.
+        if (!resume.id || draft !== lastFileDraft) { savedFileOptions = options; lastFileDraft = draft; }
         link = await links.createFile(file!, savedFileOptions ?? options, (sent, total) => (progress = sent / total), upload.signal, resume);
       }
       deliver(link.shortUrl);

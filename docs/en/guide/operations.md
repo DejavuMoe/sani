@@ -77,11 +77,16 @@ backup="/root/sani-full-$(date +%Y%m%d-%H%M%S)"
 sudo test ! -e "$backup"
 sudo systemctl stop sani
 test "$(systemctl show sani -p ExecMainStatus --value)" = 0
-sudo cp -a /var/lib/sani "$backup"
+sudo cp -aH -- /var/lib/sani "$backup"
+sudo test -d "$backup"
+sudo test ! -L "$backup"
+sudo test -f "$backup/sani.db"
 sudo systemctl start sani
 ```
 
 :::
+With systemd's `DynamicUser`, `/var/lib/sani` may be a symlink into private state storage. `cp -aH` copies the directory contents behind the command-line source path; the following checks confirm the backup root is not a symlink and contains the database before restarting the service.
+
 Keep this directory as one backup set, with the Sani version, time and configuration. Restrict access to the database and configuration; verify sizes and SHA-256 hashes after copying to another machine. If a full online backup is necessary, use storage that snapshots the database and files together and test its restore procedure. Copy order alone is not a consistency guarantee.
 
 ## Restoring

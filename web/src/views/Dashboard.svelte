@@ -8,6 +8,7 @@
   import { t } from '../lib/i18n.svelte';
   import { isMac, isTyping, plainKey } from '../lib/keys';
   import { links } from '../lib/links.svelte';
+  import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { ui } from '../lib/ui.svelte';
   import { extractURL, stripScheme } from '../lib/url';
@@ -22,7 +23,7 @@
     // Counts drift while the page sits open; refresh them quietly.
     let last = Date.now();
     const refresh = () => {
-      if (document.hidden || Date.now() - last < 10_000) return;
+      if (session.state !== 'ready' || document.hidden || Date.now() - last < 10_000) return;
       last = Date.now();
       links.refresh();
     };
@@ -76,6 +77,7 @@
   }
 
   function onkeydown(e: KeyboardEvent) {
+    if (session.state !== 'ready') return;
     if (overlayOpen()) return;
     if (links.stale && !['/','n','?','Escape'].includes(e.key)) return;
     // ⌘⌫ on a Mac, Delete elsewhere; a bare Backspace is too easy to hit.
@@ -155,6 +157,7 @@
   // Paste anywhere on the page: a link to shorten it, a file or other text
   // to share it.
   function onpaste(e: ClipboardEvent) {
+    if (session.state !== 'ready') return;
     if (isTyping(e.target) || document.querySelector('dialog[open]')) return;
     const file = e.clipboardData?.files[0];
     if (file) {
@@ -175,11 +178,13 @@
   }
 
   function ondragover(e: DragEvent) {
+    if (session.state !== 'ready') return;
     const types = e.dataTransfer?.types ?? [];
     if (types.includes('Files') || types.includes('text/uri-list') || types.includes('text/plain')) e.preventDefault();
   }
 
   function ondrop(e: DragEvent) {
+    if (session.state !== 'ready') return;
     if (isTyping(e.target)) return;
     const data = e.dataTransfer;
     const file = data?.files[0];

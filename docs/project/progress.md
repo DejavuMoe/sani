@@ -41,6 +41,12 @@ Sani 面向**单管理员、单个服务进程、本地持久化数据目录**�
 
 上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
 
+## v0.9.7 缺陷修复回归 {#v097-fixes}
+
+本次修复 23 项已复现问题，涵盖草稿与选择保护、搜索结果一致性、上传重试、精确整数导入、元数据任务取消与竞态、编码协商、公开文本复制，以及设置、健康检查和备份工具。数据库 schema 仍为 6，无新增迁移。
+
+浏览器回归入口为 `web/e2e/audit-regressions.spec.ts`、`web/e2e/ui-regressions.spec.ts`；列表状态与访问上限单测位于 `web/src/lib/links.test.ts`、`web/src/lib/max-clicks.test.ts`。Go 回归分布在 `cmd/sani`、`internal/config`、`internal/meta`、`internal/store` 与 `internal/server`。`make check test` 还会检查 Compose 美元符号保留和负载脚本的隔离场景；这些隔离测试不代替真实部署或容量验收。
+
 ## v0.9.6 后台资源鉴权回归 {#v096-auth}
 
 后台导入示例通过受保护的管理 API 下载，旧静态路径不再提供文件；登录页所需的公开资源与公开分享地址保持原有用途。回归入口：`internal/server/api_auth_boundary_test.go`、`internal/server/api_examples_test.go` 与 `web/e2e/app.spec.ts`，覆盖管理路由匿名访问、会话与令牌失效、GET／HEAD、条件请求、遗留构建文件及实际下载。数据库 schema 仍为 6，无新增迁移。

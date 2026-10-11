@@ -17,9 +17,30 @@ import (
 
 // copyScript unhides the copy button, which needs script to work. It is the
 // page's only script and the CSP admits it by hash.
-const copyScript = `for(const b of document.querySelectorAll("[data-copy]")){b.hidden=false;` +
-	`b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(document.getElementById("text").textContent);` +
-	`b.textContent=b.dataset.done;setTimeout(()=>b.textContent=b.dataset.label,1600)}catch(e){}})}`
+const copyScript = `for(const b of document.querySelectorAll("[data-copy]")){
+let timer;b.hidden=false;
+b.addEventListener("click",async()=>{
+clearTimeout(timer);
+const text=document.getElementById("text").textContent;
+let ok=false;
+if(navigator.clipboard&&window.isSecureContext){
+try{await navigator.clipboard.writeText(text);ok=true}catch(e){}
+}
+if(!ok){
+const ta=document.createElement("textarea"),active=document.activeElement,selection=document.getSelection();
+const previous=selection&&selection.rangeCount>0?selection.getRangeAt(0):null;
+ta.value=text;ta.readOnly=true;ta.style.cssText="position:fixed;top:-1000px;opacity:0";
+document.body.append(ta);
+try{ta.focus({preventScroll:true});ta.select();ok=document.execCommand("copy")}catch(e){}
+finally{
+ta.remove();
+if(previous&&selection){selection.removeAllRanges();selection.addRange(previous)}
+if(active instanceof HTMLElement)active.focus({preventScroll:true});
+}
+}
+b.textContent=ok?b.dataset.done:b.dataset.failed;
+if(ok)timer=setTimeout(()=>b.textContent=b.dataset.label,1600);
+})}`
 
 var shareCSP = func() string {
 	sum := sha256.Sum256([]byte(copyScript))
@@ -84,7 +105,7 @@ background:var(--soft);color:var(--muted);text-align:right;user-select:none;-web
 <p class="meta">{{.Meta}}</p>
 </div>
 {{if .Text}}<div class="actions">
-<button class="btn" type="button" data-copy data-label="{{.L.Copy}}" data-done="{{.L.Copied}}" hidden>{{.L.Copy}}</button>
+<button class="btn" type="button" data-copy data-label="{{.L.Copy}}" data-done="{{.L.Copied}}" data-failed="{{.L.CopyFailed}}" aria-live="polite" hidden>{{.L.Copy}}</button>
 {{if .RawURL}}<a class="btn" href="{{.RawURL}}">{{.L.Raw}}</a>
 <a class="btn" href="{{.DownloadURL}}">{{.L.Download}}</a>{{end}}
 </div>{{end}}
@@ -109,6 +130,7 @@ background:var(--soft);color:var(--muted);text-align:right;user-select:none;-web
 
 type shareLabels struct {
 	Copy, Copied, Raw, Download, DownloadFile, Unavailable string
+	CopyFailed                                             string
 	Text, Code, File, Until                                string
 	Line, Lines                                            string
 }
@@ -116,11 +138,13 @@ type shareLabels struct {
 var shareCopy = map[string]shareLabels{
 	"zh": {
 		Copy: "复制", Copied: "已复制", Raw: "原始文本", Download: "下载", DownloadFile: "下载文件",
+		CopyFailed:  "无法复制，请手动选择文本",
 		Unavailable: "暂时无法下载这个文件。", Text: "文本", Code: "代码", File: "文件",
 		Until: "这份分享在 %s 前有效。", Line: "%s 行", Lines: "%s 行",
 	},
 	"en": {
 		Copy: "Copy", Copied: "Copied", Raw: "Raw", Download: "Download", DownloadFile: "Download file",
+		CopyFailed:  "Copy failed. Select text manually.",
 		Unavailable: "This file can’t be downloaded right now.", Text: "Text", Code: "Code", File: "File",
 		Until: "Shared until %s.", Line: "%s line", Lines: "%s lines",
 	},

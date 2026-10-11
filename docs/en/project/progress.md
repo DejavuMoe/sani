@@ -41,6 +41,12 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
 
+## v0.9.7 bug-fix regressions {#v097-fixes}
+
+This release fixes 23 reproduced issues covering draft and selection guards, search membership, upload retries, exact integer imports, metadata cancellation and races, encoding negotiation, public text copying, and setup, healthcheck and backup tools. Database schema stays at 6 with no new migration.
+
+Browser regression entry points are `web/e2e/audit-regressions.spec.ts` and `web/e2e/ui-regressions.spec.ts`; list-state and visit-limit unit tests live in `web/src/lib/links.test.ts` and `web/src/lib/max-clicks.test.ts`. Go regressions span `cmd/sani`, `internal/config`, `internal/meta`, `internal/store` and `internal/server`. `make check test` also checks literal dollars in Compose and isolated load-helper scenarios; these isolated tests do not replace deployment or capacity acceptance.
+
 ## v0.9.6 admin resource authentication regressions {#v096-auth}
 
 Admin import examples download through the protected management API; old static paths no longer serve files. Public sign-in assets and public share URLs retain their intended roles. Regression entry points: `internal/server/api_auth_boundary_test.go`, `internal/server/api_examples_test.go` and `web/e2e/app.spec.ts`, covering anonymous management requests, expired or revoked credentials, GET/HEAD, conditional requests, stale frontend files and actual downloads. Database schema remains 6 with no new migration.

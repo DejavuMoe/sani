@@ -2,16 +2,16 @@
   import { hostHue } from '../lib/url';
   import Icon from './Icon.svelte';
 
-  let { host, icon, size = 16 }: { host: string; icon: boolean; size?: number } = $props();
+  let { host, iconHost, icon, size = 16 }: { host: string; iconHost: string; icon: boolean; size?: number } = $props();
 
   let failed = $state(false);
   const letter = $derived(([...host.replace(/^www\./, '')][0] ?? '').toUpperCase());
 </script>
 
-{#if host && icon && !failed}
+{#if iconHost && icon && !failed}
   <img
     class="fav"
-    src="/api/admin/v1/favicons/{encodeURIComponent(host)}"
+    src="/api/admin/v1/favicons/{encodeURIComponent(iconHost)}"
     alt=""
     width={size}
     height={size}

@@ -6,6 +6,7 @@
   import { errorText, t } from '../lib/i18n.svelte';
   import { mod, modEnter } from '../lib/keys';
   import { links } from '../lib/links.svelte';
+  import { validMaxClicks } from '../lib/max-clicks';
   import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { hostOf, sameSlug } from '../lib/url';
@@ -45,6 +46,7 @@
   let urlField = $state<HTMLTextAreaElement>();
   /** A text's body as saved; it can't be edited before it arrives. */
   let saved = $state<string | null>(null);
+  let retryTextAfterLogin = $state(false);
   const loaded = $derived(!isText || saved !== null);
 
   const prefix = $derived(hostOf(session.origin) + (isURL ? '' : '/p'));
@@ -92,16 +94,30 @@
       ready();
       return;
     }
+    loadText();
+  });
+  $effect(() => {
+    if (retryTextAfterLogin && !loaded && session.state === 'ready') {
+      retryTextAfterLogin = false;
+      loadText();
+    }
+  });
+
+  function loadText() {
     api.linkText(link.id).then(
       (r) => {
         start.text = r.text;
         form.text = r.text;
         saved = r.text;
+        errors.other = undefined;
         ready();
       },
-      (e) => (errors = { other: errorText(e instanceof ApiError ? e.code : 'unknown') }),
+      (e) => {
+        retryTextAfterLogin = e instanceof ApiError && e.code === 'unauthorized';
+        errors = { other: errorText(e instanceof ApiError ? e.code : 'unknown') };
+      },
     );
-  });
+  }
 
   function cancel() {
     links.editingId = null;
@@ -114,12 +130,12 @@
     if (isText && loaded && !form.text.trim()) { errors = { text: t('err.text_required') }; return false; }
     if (!form.slug.trim()) { errors = { slug: t('err.slug_invalid') }; return false; }
     if (blocking.includes(slugStatus)) { errors = { slug: t(`slug.${slugStatus}` as 'slug.taken') }; return false; }
-    if (form.maxClicks.trim() && !/^[1-9]\d*$/.test(form.maxClicks.trim())) { errors = { maxClicks: t('err.max_clicks_invalid') }; return false; }
+    if (form.maxClicks.trim() !== start.maxClicks && !validMaxClicks(form.maxClicks)) { errors = { maxClicks: t('err.max_clicks_invalid') }; return false; }
     const p = patch();
     if (!Object.keys(p).length) { editor.check = null; editor.saving = false; links.editingId = null; return true; }
     saving = true;
     try {
-      await links.update(link.id, p);
+      await links.update(link.id, p, true);
       editor.check = null; editor.saving = false;
       links.editingId = null;
       toasts.success(t('detail.saved'));

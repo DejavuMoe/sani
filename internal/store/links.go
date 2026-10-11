@@ -4,11 +4,14 @@ import (
 	"context"
 	"crypto/rand"
 	"database/sql"
+	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
+
+	"modernc.org/sqlite"
 
 	"github.com/DejavuMoe/sani/internal/links"
 )
@@ -542,12 +545,20 @@ var sortColumns = map[string]string{
 	"visited": "l.last_click_at",
 }
 
-func escapeLike(s string) string {
-	r := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
-	return r.Replace(s)
+func init() {
+	// SQLite's built-in case conversion only covers ASCII.
+	sqlite.MustRegisterDeterministicScalarFunction("sani_search_key", 1, func(_ *sqlite.FunctionContext, args []driver.Value) (driver.Value, error) {
+		s, _ := args[0].(string)
+		return links.Key(s), nil
+	})
 }
 
 func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error) {
+	// Canonical decomposition can triple UTF-8 length; bound it before normalizing.
+	if len(q.Search) > 3*links.MaxURLLength {
+		return &ListResult{Links: []*Link{}}, nil
+	}
+	q.Search = links.Key(q.Search)
 	col, ok := sortColumns[q.Sort]
 	if !ok {
 		col = sortColumns["created"]
@@ -570,10 +581,9 @@ func (s *Store) ListLinks(ctx context.Context, q ListQuery) (*ListResult, error)
 		args = append(args, *q.Kind)
 	}
 	if q.Search != "" {
-		pat := "%" + escapeLike(strings.ToLower(q.Search)) + "%"
-		where = append(where, `(l.slug_key LIKE ? ESCAPE '\' OR l.url LIKE ? ESCAPE '\' OR l.title LIKE ? ESCAPE '\'
-			OR c.name LIKE ? ESCAPE '\')`)
-		args = append(args, pat, pat, pat, pat)
+		where = append(where, `(instr(sani_search_key(l.slug), ?) > 0 OR instr(sani_search_key(l.url), ?) > 0
+			OR instr(sani_search_key(l.title), ?) > 0 OR instr(sani_search_key(c.name), ?) > 0)`)
+		args = append(args, q.Search, q.Search, q.Search, q.Search)
 	}
 
 	res := &ListResult{Links: []*Link{}}

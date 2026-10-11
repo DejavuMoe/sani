@@ -25,20 +25,24 @@
     <h1 class="message">{t('err.network')}</h1>
     <Button onclick={() => session.boot()}>{t('act.retry')}</Button>
   </main>
-{:else if session.state === 'ready'}
-  {#if router.current.name === 'settings'}
-    <Settings />
-  {:else if router.current.name === 'new'}
-    <NewLink />
-  {:else}
-    <Dashboard />
-  {/if}
-  <ShortcutsDialog />
-  <TagManager />
-  <LeaveEditorDialog />
 {/if}
 
-<Toaster />
+{#if session.state === 'ready' || session.expired}
+  <!-- Keep drafts in memory while reauthentication hides all private UI. -->
+  <div hidden={session.state !== 'ready'} inert={session.state !== 'ready'}>
+    {#if router.current.name === 'settings'}
+      <Settings />
+    {:else if router.current.name === 'new'}
+      <NewLink />
+    {:else}
+      <Dashboard />
+    {/if}
+    <ShortcutsDialog />
+    <TagManager />
+    <LeaveEditorDialog />
+    <Toaster />
+  </div>
+{/if}
 
 <style>
   .offline {

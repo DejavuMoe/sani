@@ -3,7 +3,7 @@
 <p class="lead">Sani 自有 HTTP API：使用令牌创建和管理链接、文本与文件，使用同一实例的后台能力完成设置、批量操作和恢复。</p>
 
 ::: warning 版本说明
-本页对应 v0.9.6。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
+本页对应 v0.9.7。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
 :::
 
 ## 设计与约定 {#design}
@@ -250,7 +250,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 | 字段 | 说明 |
 |---|---|
-| `url` | 目标网址。`example.com/a` 会补全为 `https://example.com/a`，`localhost` 和 IP 地址补全为 `http://`；域名转为小写，空格转为 `%20`；最长 8,192 字节。`javascript:`、`data:`、`file:` 等 13 种危险的网址类型会被拒绝，也不能指向本站的另一条短链接。`mailto:`、`tel:` 这类网址是允许的。 |
+| `url` | 目标网址。`example.com/a` 会补全为 `https://example.com/a`，`localhost` 和 IP 地址补全为 `http://`；域名转为小写，空格转为 `%20`；最长 8,192 字节。`javascript:`、`data:`、`file:` 等 13 种危险的网址类型会被拒绝，也不能指向本站的另一条短链接（包括显式写出 HTTP `:80` 或 HTTPS `:443` 的等价地址）。`mailto:`、`tel:` 这类网址是允许的。 |
 | `slug` | 短码，规则见[日常使用](../guide/usage#slugs)。开头的 `/` 会被去掉。不填或为空时自动生成。 |
 | `title` | 标题，连续的空白会合并，超过 300 个字符会被截断。不填时在后台自动获取。 |
 | `expiresAt` | RFC 3339 过期时间，必须晚于现在，转换到 UTC 后年份在 0000–9999 内，按毫秒保存。`null` 表示永久有效。 |
@@ -273,6 +273,8 @@ curl https://s.example.com/api/admin/v1/links \
 | `limit` | 每页数量，1 到 200，默认 50。 |
 | `cursor` | 上一页返回的 `next`。 |
 | `tag` | 一个标签 ID，或 `untagged`（未标记）；省略时不限标签。与搜索及类型筛选取交集，`total` 和游标分页均基于筛选结果。 |
+
+搜索词与被搜索字段均先做 Unicode NFC 规范化，再逐码点转为小写，按字面子串匹配；`%`、`_` 和反斜杠不是通配符。去除首尾空白及短链前缀后，搜索词超过 24,576 个 UTF-8 字节时返回空结果。
 
 ```json
 { "items": [ … ], "next": "kx3f2a.c", "total": 128 }
@@ -457,7 +459,7 @@ curl https://s.example.com/api/admin/v1/files \
 
 `GET /api/admin/v1/favicons/{host}`
 
-返回图标文件本身，没有图标时返回 `404`。`{host}` 就是[链接对象](#link-object)里的 `host`。图标来自第三方网站，所以返回时带有沙箱化的内容安全策略，即使是 SVG 也无法执行脚本。
+返回图标文件本身，没有图标时返回 `404`。`{host}` 使用目标 `url` 的完整主机名（不含端口），保留 `www.` 和存储的 Unicode 拼写；链接对象中的 `host` 已移除 `www.` 供界面展示，不能直接作为所有图标的查找键。图标来自第三方网站，所以返回时带有沙箱化的内容安全策略，即使是 SVG 也无法执行脚本。
 
 ## 导入与导出 {#import-export}
 
@@ -495,6 +497,8 @@ curl https://s.example.com/api/admin/v1/import \
 
 过期时间可以是受支持的日期字符串或 Unix 秒/毫秒时间戳，按毫秒保存。非空值若格式非法、早于 Unix 纪元、超出 UTC 年份 0000–9999 或在单位换算时溢出，该行以 `expires_invalid` 跳过。空值和 `0` 表示永久有效；合法的历史过期时间会保留。
 
+点击量和访问上限接受 `0`–`9223372036854775807` 的整数，JSON 数字的小数／指数形式也精确解析。非法或越界值分别以 `clicks_invalid` 或 `max_clicks_invalid` 作为跳过原因返回，整行不导入；空值和 `0` 表示零次点击／不限访问。导入原因位于成功响应的 `skipped` 中，不是 HTTP 错误响应。
+
 ### 分片上传 {#chunk-upload}
 
 四个端点均需鉴权并接受相同的同源校验。后台对超过 25,000,000 字节的文件使用此流程；较小文件继续调用 `POST /api/admin/v1/files`。
@@ -502,6 +506,8 @@ curl https://s.example.com/api/admin/v1/import \
 `POST /api/admin/v1/uploads`
 
 发送 JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`，可选链接字段 `title`、`tags`、`expiresAt`、`maxClicks`、`enabled`。请求体限制 16 KiB。返回 `201` 和 `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`。完整文件大小不得超过当前 `maxFileSize`。会话绑定具体登录会话或令牌凭据，不使用可复用的令牌数字 ID。
+
+`url`、`redirect`、`text` 和 `format` 不适用于文件；初始化时拒绝这些其他类型的字段，返回 `400 kind_mismatch`。完成阶段再次校验初始化时保存的字段，不从完成请求体读取新的链接选项。
 
 `PUT /api/admin/v1/uploads/{id}`
 
@@ -523,7 +529,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ```json
 {
-  "version": "v0.9.6",
+  "version": "v0.9.7",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
@@ -703,7 +709,7 @@ curl https://s.example.com/api/admin/v1/import \
 | `slug_reserved` | 400 | 短码被系统保留 |
 | `expires_invalid` | 400 | `expiresAt` 格式非法或超出 UTC 支持范围；导入时作为跳过原因返回 |
 | `expires_past` | 400 | `expiresAt` 早于当前时间 |
-| `max_clicks_invalid` | 400 | `maxClicks` 不是 0 到 10¹² 之间的整数 |
+| `max_clicks_invalid` | 400 | 普通写接口的 `maxClicks` 不是 0 到 10¹² 之间的整数；导入允许更大范围，并在成功响应中返回跳过原因，见[导入](#import) |
 | `redirect_invalid` | 400 | `redirect` 不是 301、302、307 或 308 |
 | `text_required` | 400 | 缺少文本，或者文本只有空白 |
 | `format_invalid` | 400 | `format` 不是 `plain` 或 `code` |

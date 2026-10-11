@@ -305,9 +305,22 @@ func (s *Server) pointsHere(r *http.Request, dest string) bool {
 	if err != nil || d.Host == "" {
 		return false
 	}
+	port := func(u *url.URL) string {
+		if p := u.Port(); p != "" {
+			return strings.TrimLeft(p, "0")
+		}
+		switch u.Scheme {
+		case "http":
+			return "80"
+		case "https":
+			return "443"
+		}
+		return ""
+	}
 	for _, origin := range []string{s.baseURL(r), s.requestOrigin(r)} {
 		o, err := url.Parse(origin)
-		if err == nil && strings.EqualFold(o.Host, d.Host) {
+		if err == nil && (strings.EqualFold(o.Host, d.Host) ||
+			strings.EqualFold(o.Hostname(), d.Hostname()) && port(o) == port(d)) {
 			seg := strings.Trim(d.Path, "/")
 			return seg != "" && !strings.Contains(seg, "/") && seg != "admin" && seg != "api"
 		}
@@ -533,16 +546,12 @@ func (s *Server) updateResource(r *http.Request, id int64, in *linkInput) (*stor
 
 	p.ExpectedSlug = in.expectedSlug
 	p.FetchMeta = s.metadataFetcher() != nil
-	before, after, err := s.store.UpdateLink(r.Context(), id, *p, now)
+	before, after, err := s.updateLinkMeta(r.Context(), id, *p, now, r.Header.Get("Accept-Language"))
 
 	if err != nil {
 		return nil, err
 	}
 	s.cache.Invalidate(links.Key(before.Slug), links.Key(after.Slug))
-	if after.Kind == store.KindURL && after.Meta == store.MetaPending &&
-		(p.Title != nil || before.URL != after.URL) {
-		s.fetchMetaLater(after.ID, after.URL, after.Host, r.Header.Get("Accept-Language"))
-	}
 	return after, nil
 }
 
@@ -663,11 +672,10 @@ func (s *Server) refreshLink(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.toDTO(s.baseURL(r), l, time.Now().UnixMilli()))
 		return
 	}
-	if _, l, err = s.store.UpdateLink(r.Context(), id, store.Patch{RefreshMeta: true}, 0); err != nil {
+	if err = s.refreshMeta(r.Context(), id, fetcher, r.Header.Get("Accept-Language")); err != nil {
 		s.internalError(w, r, err)
 		return
 	}
-	s.fetchMetaUsing(r.Context(), fetcher, l.ID, l.URL, l.Host, r.Header.Get("Accept-Language"), true)
 	if l, err = s.store.GetLink(r.Context(), id); err != nil {
 		s.internalError(w, r, err)
 		return

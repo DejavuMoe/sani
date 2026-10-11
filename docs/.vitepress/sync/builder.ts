@@ -61,7 +61,7 @@ export function buildCompose(src: string, o: BuilderInput): Built {
         /^(\s*)# (SANI_PASSWORD: )\S+ #.*$/,
         (m) => [o.password ? `${m[1]}${m[2]}"${o.password}" # fixed; no setup code needed` : KEEP],
       ],
-      [/^(\s*)# (SANI_ROOT_REDIRECT: )\S+( #.*)$/, (m) => [o.rootRedirect ? m[1] + m[2] + o.rootRedirect + m[3] : KEEP]],
+      [/^(\s*)# (SANI_ROOT_REDIRECT: )\S+( #.*)$/, (m) => [o.rootRedirect ? m[1] + m[2] + o.rootRedirect.replaceAll('$', () => '$$') + m[3] : KEEP]],
       [/^(\s*)# (SANI_FILES_URL: )\S+( #.*)$/, (m) => [o.filesDomain ? `${m[1]}${m[2]}https://${o.filesDomain}${m[3]}` : KEEP]],
     ],
     'compose.yaml',

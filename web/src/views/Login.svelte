@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import AuthShell from '../components/AuthShell.svelte';
   import Button from '../components/Button.svelte';
   import { api, ApiError } from '../lib/api';
@@ -15,6 +15,7 @@
   let timer: ReturnType<typeof setInterval> | undefined;
 
   onDestroy(() => clearInterval(timer));
+  onMount(() => { void tick().then(() => field?.focus()); });
 
   function countdown(seconds: number) {
     wait = seconds;

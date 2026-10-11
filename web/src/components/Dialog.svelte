@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { t } from '../lib/i18n.svelte';
+  import { session } from '../lib/session.svelte';
   import Icon from './Icon.svelte';
 
   let {
@@ -13,11 +14,16 @@
   }: { open?: boolean; title: string; width?: number; children: Snippet; dismissible?: boolean; onclose?: () => void } = $props();
 
   let dialog = $state<HTMLDialogElement>();
+  let suspendedClose = false;
 
   $effect(() => {
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    if (open && session.state === 'ready' && !dialog.open) dialog.showModal();
+    if ((!open || session.state !== 'ready') && dialog.open) {
+      // Closing a native modal releases Login without discarding its draft.
+      suspendedClose = session.state !== 'ready';
+      dialog.close();
+    }
   });
 </script>
 
@@ -26,7 +32,10 @@
   class="dialog"
   style:width="min({width}px, calc(100vw - 32px))"
   aria-label={title}
-  onclose={() => { open = false; onclose?.(); }}
+  onclose={() => {
+    if (suspendedClose) { suspendedClose = false; return; }
+    open = false; onclose?.();
+  }}
   oncancel={(e) => { if (!dismissible) e.preventDefault(); }}
   onclick={(e) => {
     // A click on the backdrop lands on the dialog element itself.

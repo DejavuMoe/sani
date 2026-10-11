@@ -106,7 +106,11 @@ func (s *Server) beginUpload(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusRequestEntityTooLarge, "file_too_large", "file exceeds the configured limit")
 		return
 	}
-	if _, ierr := s.resolveInput(r, &in.linkInput, time.Now().UnixMilli()); ierr != nil {
+	p, ierr := s.resolveInput(r, &in.linkInput, time.Now().UnixMilli())
+	if ierr == nil {
+		ierr = checkKind(store.KindFile, p)
+	}
+	if ierr != nil {
 		writeError(w, ierr.status, ierr.code, ierr.msg)
 		return
 	}
@@ -302,6 +306,9 @@ func (s *Server) completeUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().UnixMilli()
 	p, ierr := s.resolveInput(r, &up.input, now)
+	if ierr == nil {
+		ierr = checkKind(store.KindFile, p)
+	}
 	if ierr != nil {
 		writeError(w, ierr.status, ierr.code, ierr.msg)
 		return

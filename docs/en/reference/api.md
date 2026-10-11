@@ -3,7 +3,7 @@
 <p class="lead">Sani's HTTP API: create and manage links, texts and files with tokens, and use the same instance's admin capabilities for settings, bulk operations and recovery.</p>
 
 ::: warning Version
-This page describes v0.9.6. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
+This page describes v0.9.7. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
 :::
 
 ## Design and conventions {#design}
@@ -249,7 +249,7 @@ Only `url` is required.
 
 | Field | Meaning |
 |---|---|
-| `url` | The destination. `example.com/a` becomes `https://example.com/a`, and `localhost` or IP addresses get `http://`; the host is lowercased and spaces become `%20`; at most 8,192 bytes. Thirteen dangerous schemes such as `javascript:`, `data:` and `file:` are refused, and so is another short link on this server. Addresses like `mailto:` and `tel:` are fine. |
+| `url` | The destination. `example.com/a` becomes `https://example.com/a`, and `localhost` or IP addresses get `http://`; the host is lowercased and spaces become `%20`; at most 8,192 bytes. Thirteen dangerous schemes such as `javascript:`, `data:` and `file:` are refused, and so is another short link on this server, including equivalent addresses with explicit HTTP `:80` or HTTPS `:443` ports. Addresses like `mailto:` and `tel:` are fine. |
 | `slug` | The slug; see the rules under [Everyday use](../guide/usage#slugs). A leading `/` is dropped. Generated when missing or empty. |
 | `title` | The title. Runs of whitespace are collapsed, and titles over 300 characters are cut. Fetched in the background when missing. |
 | `expiresAt` | A future RFC 3339 expiry whose UTC year is within 0000–9999, stored with millisecond precision. `null` means never. |
@@ -272,6 +272,8 @@ Returns `201` with the new [link](#link-object).
 | `limit` | Links per page, 1 to 200, default 50. |
 | `cursor` | The `next` value from the previous page. |
 | `tag` | One tag ID, or `untagged`; omit to include all tags. Intersects search and type filters. Totals and cursor pagination reflect the filtered result. |
+
+The query and searched fields use Unicode NFC normalization followed by lowercase conversion of each code point, then literal substring matching; `%`, `_` and backslashes are not wildcards. After surrounding whitespace and short-link prefixes are removed, a query over 24,576 UTF-8 bytes returns an empty result.
 
 ```json
 { "items": [ … ], "next": "kx3f2a.c", "total": 128 }
@@ -456,7 +458,7 @@ Takes the same `days` parameter as [Statistics](#stats).
 
 `GET /api/admin/v1/favicons/{host}`
 
-Returns the icon itself, or `404` when there’s none. `{host}` is the `host` of a [link](#link-object). Icons come from third-party sites, so they’re served with a sandboxing Content Security Policy: not even an SVG can run scripts.
+Returns the icon itself, or `404` when there’s none. `{host}` is the full hostname from the destination `url`, without its port, preserving `www.` and the stored Unicode spelling. The link object's `host` omits `www.` for display and is not always a valid icon lookup key. Icons come from third-party sites, so they’re served with a sandboxing Content Security Policy: not even an SVG can run scripts.
 
 ## Import and export {#import-export}
 
@@ -494,6 +496,8 @@ curl https://s.example.com/api/admin/v1/import \
 
 Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds and is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch, exceeds UTC years 0000–9999 or overflows during unit conversion skips the row with `expires_invalid`. Empty values and `0` mean never; valid past expiry dates are preserved.
 
+Click counts and visit limits accept integers from `0` to `9223372036854775807`, including exact decimal/exponent JSON numbers. Invalid or out-of-range values skip the entire row with `clicks_invalid` or `max_clicks_invalid`. Empty values and `0` mean zero clicks or unlimited visits. These reasons appear in `skipped` within a successful import response, rather than as HTTP errors.
+
 ### Chunked uploads {#chunk-upload}
 
 All four endpoints require authentication and the same origin checks as the other API routes. The admin app uses this flow for files over 25,000,000 bytes; smaller files still use `POST /api/admin/v1/files`.
@@ -501,6 +505,8 @@ All four endpoints require authentication and the same origin checks as the othe
 `POST /api/admin/v1/uploads`
 
 Send JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`; link options `title`, `tags`, `expiresAt`, `maxClicks` and `enabled` are optional. Body limit: 16 KiB. Returns `201` with `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`. The complete size must fit the effective `maxFileSize`. Sessions belong to the exact authenticated session/token credential, not a reusable token ID.
+
+`url`, `redirect`, `text` and `format` do not apply to files; initialization rejects these fields for other resource types with `400 kind_mismatch`. Completion revalidates the fields saved at initialization and does not read new link options from its request body.
 
 `PUT /api/admin/v1/uploads/{id}`
 
@@ -522,7 +528,7 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
 
 ```json
 {
-  "version": "v0.9.6",
+  "version": "v0.9.7",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",
@@ -702,7 +708,7 @@ Returns `200` with `ok`, for health checks.
 | `slug_reserved` | 400 | The slug is reserved |
 | `expires_invalid` | 400 | Malformed `expiresAt` or a value outside the supported UTC range; imports return it as a skip reason |
 | `expires_past` | 400 | `expiresAt` is in the past |
-| `max_clicks_invalid` | 400 | `maxClicks` isn’t a whole number from 0 to 10¹² |
+| `max_clicks_invalid` | 400 | `maxClicks` in an ordinary write request is not an integer from 0 to 10¹²; imports allow a larger range and return skip reasons in a successful response, as described under [Import](#import) |
 | `redirect_invalid` | 400 | `redirect` isn’t 301, 302, 307 or 308 |
 | `text_required` | 400 | A text is missing or only whitespace |
 | `format_invalid` | 400 | `format` isn’t `plain` or `code` |

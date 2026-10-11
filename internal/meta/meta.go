@@ -425,7 +425,7 @@ func iconCandidate(attrs map[string]string, base *url.URL) (iconRef, bool) {
 }
 
 func fileTitle(u *url.URL) string {
-	name := path.Base(u.Path)
+	name := path.Base(u.EscapedPath())
 	if name == "/" || name == "." {
 		return ""
 	}

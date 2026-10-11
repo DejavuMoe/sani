@@ -93,6 +93,20 @@ class LinksStore {
   private matchesTag(link: Link) {
     return this.tag === null || (this.tag === 'untagged' ? !link.tags.length : link.tags.includes(this.tag));
   }
+
+  private matchesView(link: Link) {
+    // Go's search key lowercases each code point, without contextual sigma/dotted-I rules.
+    const key = (value: string) => Array.from(value.normalize('NFC'), char =>
+      char === '\u0130' ? 'i' : char.toLowerCase()).join('');
+    // Match the API's pasted short-URL search before comparing stored fields.
+    let query = this.query.trim();
+    const prefix = link.shortUrl.match(/^[^/]+:\/\/[^/]+\//)?.[0];
+    if (prefix && query.startsWith(prefix)) query = query.slice(prefix.length);
+    query = key(query.replace(/^\//, '').replace(/^p\//, ''));
+    const fields = [link.slug, link.title, link.url, link.content?.name ?? link.content?.preview ?? ''];
+    return (!query || fields.some(value => key(value).includes(query))) &&
+      (!this.kind || this.kind === link.kind) && this.matchesTag(link);
+  }
   /** First page for the current query has arrived. */
   loaded = $state(false);
   loading = $state(false);
@@ -271,29 +285,28 @@ class LinksStore {
       this.upsert(link);
       return;
     }
-    const q = this.query.toLowerCase();
-    const fields = [link.slug, link.title, link.url, link.content?.preview ?? '', link.content?.name ?? ''];
-    const visible = (!q || fields.some((s) => s.toLowerCase().includes(q))) && (!this.kind || this.kind === link.kind) && this.matchesTag(link);
-    if (!visible) return;
+    if (!this.matchesView(link)) return;
     ++this.revision;
     const at = this.sort === 'created' && index === 0 ? 0 : Math.min(index, this.items.length);
     this.items = [...this.items.slice(0, at), link, ...this.items.slice(at)];
     this.total += 1;
   }
 
-  upsert(link: Link) {
+  upsert(link: Link, fromEditor = false) {
     ++this.revision;
     const i = this.items.findIndex((l) => l.id === link.id);
     if (i < 0) return;
     const prev = this.items[i];
     // A delayed stats/metadata response must not undo a newer saved edit.
     if (Date.parse(link.updatedAt) < Date.parse(prev.updatedAt)) return;
-    if (!this.matchesTag(link)) {
-      if (this.editingId === link.id && editor.check?.() && !editor.saving) { this.refreshFailed = true; return; }
+    if (!this.matchesView(link)) {
+      // Only an acknowledged editor save may remove its dirty row from the filter.
+      if (this.editingId === link.id && editor.check?.() && !fromEditor) { this.refreshFailed = true; return; }
       this.items = this.items.filter(l => l.id !== link.id);
       this.total = Math.max(0, this.total - 1);
-      if (this.expandedId === link.id) this.expandedId = null;
-      if (this.editingId === link.id) this.editingId = null;
+      if (this.expandedId === link.id) this.expanded = null;
+      if (this.editingId === link.id) this.editing = null;
+      if (this.selectedId === link.id) this.selectedId = null;
       this.picked.delete(link.id);
       return;
     }
@@ -353,9 +366,9 @@ class LinksStore {
     poll(0);
   }
 
-  async update(id: number, input: LinkInput): Promise<Link> {
+  async update(id: number, input: LinkInput, fromEditor = false): Promise<Link> {
     const link = await api.updateLink(id, input);
-    this.upsert(link);
+    this.upsert(link, fromEditor);
     this.refreshTags();
     this.watchMeta(link);
     return link;
@@ -424,7 +437,9 @@ class LinksStore {
   /** Check or uncheck a link; with range, everything from the last one clicked. */
   togglePick(id: number, range = false) {
     if (this.stale) return;
+    if (!this.picking && editor.check?.()) { editor.request(() => this.togglePick(id, range)); return; }
     if (!this.picking) this.startPicking();
+    if (!this.picking) return;
     const ids = this.items.map((l) => l.id);
     const to = ids.indexOf(id);
     const from = range && this.anchor !== null ? ids.indexOf(this.anchor) : -1;
@@ -450,6 +465,10 @@ class LinksStore {
   async bulk(action: Exclude<BulkAction, 'restore'>) {
     const targets = this.items.filter((l) => this.picked.has(l.id));
     if (!targets.length || this.busy || this.stale) return;
+    if (action === 'delete' && targets.some(l => l.id === this.editingId) && editor.check?.()) {
+      editor.request(() => { void this.bulk(action); });
+      return;
+    }
     this.busy = true;
     try {
       if (action === 'delete') await this.bulkDelete(targets);

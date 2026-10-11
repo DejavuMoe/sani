@@ -39,6 +39,8 @@ class Session {
   async signOut() {
     try {
       await api.logout();
+      this.expired = false;
+      this.config = null;
       this.state = 'login';
     } catch (error) {
       toasts.error(errorText(error instanceof ApiError ? error.code : 'unknown'));
