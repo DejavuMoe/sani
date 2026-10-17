@@ -19,6 +19,8 @@ If a fresh instance without a password went to whoever opened it first, it would
 - **The session cookie** is `HttpOnly` and `SameSite=Strict`, only sent to addresses under `/api/`, and `Secure` over HTTPS. It lasts 30 days and is renewed at most once a day as you use it.
 - **Changing the password** in the admin app keeps the current session and signs out other devices. CLI and environment password replacements revoke all sessions. Password replacement and revocation share one transaction; an in-flight verification against an old password cannot issue a session after the change.
 
+`Secure` follows an actual TLS connection, or the proxy's `X-Forwarded-Proto: https` when `SANI_TRUST_PROXY` is enabled. Setting `SANI_BASE_URL=https://...` alone does not encrypt the current connection. Local HTTP sign-in remains supported, with cookies that omit `Secure`. Use HTTPS for a public admin interface: the repository's Nginx template overwrites the protocol header and redirects HTTP to HTTPS; Caddy also overwrites incoming forwarded headers and enables HTTPS redirects by default. The Compose and systemd templates restrict the backend port to loopback. Custom proxies must preserve these boundaries: passing through a client's protocol header or exposing the trusted HTTP backend publicly can leave sessions without transport protection. See [`SANI_TRUST_PROXY`](../reference/configuration#sani-trust-proxy).
+
 ## API tokens {#tokens}
 
 A token is `sani_` followed by 43 random characters (about 256 bits). The database stores only its hash, and the token itself is shown once, when you create it. Tokens have full access and survive password changes, so scripts don’t break when you change the password; in turn, a leaked token has to be revoked on its own.
@@ -111,7 +113,7 @@ Images and binaries are built by GitHub Actions from the tagged commit, without 
 - **Checksums.** Every release has a `SHA256SUMS` covering all archives.
 - **Build provenance.** Archives and images carry provenance signed by GitHub, recording the repository, commit and workflow that built them. `gh attestation verify` checks it; [Deployment](../guide/deploy#verify) shows how. Images also carry an SBOM listing everything inside.
 - **Reproducible.** Building one commit twice gives byte-for-byte identical archives.
-- **Dependency updates.** Dependabot proposes dependency updates regularly, and CI checks for known vulnerabilities with `govulncheck` every week.
+- **Dependency checks.** CI runs `govulncheck`, `pnpm audit` and `npm audit` on code changes and a weekly schedule to check Go, the admin app, docs and development tools for known vulnerabilities. The default branch submits dependency snapshots generated from lockfiles. Dependabot automatic updates are not currently enabled.
 
 ## Reporting a vulnerability {#reporting}
 

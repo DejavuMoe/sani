@@ -3,7 +3,7 @@
 <p class="lead">Sani 提供基于令牌鉴权的 HTTP API，用于创建与管理短链接、文本与文件分享，并提供配置管理、批量操作与数据恢复等能力。</p>
 
 ::: warning 版本说明
-本页对应 v0.9.7。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
+本页对应 v0.9.8。v0.9.4 及之前的部署请查看 [API 归档](./api-archive)，更早版本以对应 tag 为准。升级前必须完成后台 JSON 导出与数据库、文件、配置的完整备份，详见[升级与回滚](../guide/operations#upgrade)。
 :::
 
 ## 设计与约定 {#design}
@@ -529,7 +529,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 ```json
 {
-  "version": "v0.9.7",
+  "version": "v0.9.8",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

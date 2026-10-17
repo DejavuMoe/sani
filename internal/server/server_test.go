@@ -17,6 +17,7 @@ import (
 	"testing/fstest"
 	"time"
 
+	"github.com/DejavuMoe/sani/internal/auth"
 	"github.com/DejavuMoe/sani/internal/clicks"
 	"github.com/DejavuMoe/sani/internal/meta"
 	"github.com/DejavuMoe/sani/internal/store"
@@ -724,6 +725,7 @@ func TestSessionCookieTransport(t *testing.T) {
 	}{
 		{"http://localhost/api/admin/v1/session", "", false, false},
 		{"https://s.example/api/admin/v1/session", "", false, true},
+		{"https://s.example/api/admin/v1/session", "http", true, true},
 		{"http://localhost/api/admin/v1/session", "https", false, false},
 		{"http://localhost/api/admin/v1/session", "https", true, true},
 		{"http://localhost/api/admin/v1/session", "http", true, false},
@@ -741,6 +743,66 @@ func TestSessionCookieTransport(t *testing.T) {
 		if c.Secure != tc.secure || !c.HttpOnly || c.Path != "/api/" || c.SameSite != http.SameSiteStrictMode {
 			t.Errorf("%+v: unexpected cookie %s", tc, c)
 		}
+	}
+}
+
+func TestSessionCookieLifecycle(t *testing.T) {
+	for _, tc := range []struct {
+		name, origin, forwarded string
+		trust, secure           bool
+	}{
+		{"local HTTP", "http://localhost", "", true, false},
+		{"untrusted forwarded HTTPS", "http://localhost", "https", false, false},
+		{"TLS overrides forwarded HTTP", "https://s.example", "http", true, true},
+		{"trusted forwarded HTTPS", "http://localhost", "https", true, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// A public HTTPS URL does not change the transport of a local HTTP visit.
+			e := newEnv(t, Options{BaseURL: "https://s.example", TrustProxy: tc.trust})
+			request := func(method, path, body string, cookie *http.Cookie, status int) *httptest.ResponseRecorder {
+				t.Helper()
+				r := httptest.NewRequest(method, tc.origin+path, strings.NewReader(body))
+				r.Header.Set("Content-Type", "application/json")
+				r.Header.Set("X-Forwarded-Proto", tc.forwarded)
+				if cookie != nil {
+					r.AddCookie(cookie)
+				}
+				w := httptest.NewRecorder()
+				e.srv.ServeHTTP(w, r)
+				if w.Code != status {
+					t.Fatalf("%s %s: %d %s", method, path, w.Code, w.Body.String())
+				}
+				return w
+			}
+			checkCookie := func(w *httptest.ResponseRecorder, maxAge int) *http.Cookie {
+				t.Helper()
+				cookies := w.Result().Cookies()
+				if len(cookies) != 1 {
+					t.Fatalf("cookies = %v", cookies)
+				}
+				c := cookies[0]
+				if c.Name != sessionCookie || c.Secure != tc.secure || !c.HttpOnly || c.Path != "/api/" || c.Domain != "" || c.SameSite != http.SameSiteStrictMode || c.MaxAge != maxAge {
+					t.Fatalf("unexpected cookie attributes: %s", c)
+				}
+				return c
+			}
+			cookie := checkCookie(request("POST", "/api/admin/v1/setup", `{"password":"correct horse","code":"test-code-1234"}`, nil, 200), int(sessionTTL.Seconds()))
+			now := time.Now()
+			if err := e.srv.store.TouchSession(context.Background(), auth.HashSecret(cookie.Value), now.Add(-25*time.Hour).UnixMilli(), now.Add(time.Hour).UnixMilli()); err != nil {
+				t.Fatal(err)
+			}
+			renewed := checkCookie(request("GET", "/api/admin/v1/links", "", cookie, 200), int(sessionTTL.Seconds()))
+			if renewed.Value != cookie.Value {
+				t.Fatal("renewal changed the session secret")
+			}
+			cleared := checkCookie(request("DELETE", "/api/admin/v1/session", "", renewed, 204), -1)
+			if cleared.Value != "" {
+				t.Fatal("logout did not clear the cookie")
+			}
+			request("GET", "/api/admin/v1/links", "", renewed, 401)
+			cookie = checkCookie(request("POST", "/api/admin/v1/session", `{"password":"correct horse"}`, nil, 200), int(sessionTTL.Seconds()))
+			request("GET", "/api/admin/v1/links", "", cookie, 200)
+		})
 	}
 }
 

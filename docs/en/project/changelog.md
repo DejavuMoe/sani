@@ -2,11 +2,16 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.8
+
+2026-10-18 · Fix development collectors and dependency graph accuracy, enforce checks for the exact release commit, and verify session cookie boundaries behind reverse proxies. Database schema stays at 6 with no new migration.
 
 - Fix DOM content collectors used by prototype and accessibility checks: escape backslashes in identifiers and handle emoji, leading digits and a lone hyphen when `CSS.escape` is unavailable. Add browser regression coverage.
 - Submit GitHub dependency snapshots generated from the actual lockfiles to correct stale versions and unresolved pnpm catalogs in the static dependency graph, including development tools.
 - Require successful CI, known-vulnerability checks and every CodeQL job for the exact release commit before building archives or publishing images. Preserve the Forgejo → GitHub synchronization flow.
+- Add cookie attribute regressions for setup, sign-in, renewal and sign-out, and document the TLS, trusted-proxy and local HTTP boundaries. Isolated tests with the repository's Nginx and Caddy templates did not reproduce an HTTPS session missing `Secure`. Preserve local HTTP support without suppressing CodeQL rules.
+
+When upgrading from v0.9.5–v0.9.7, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.8`, then reload the admin app to continue using the existing schema 6 data. Upgrades from v0.9.4 or earlier still require the API adjustments and migration steps under [upgrade and rollback](../guide/operations#upgrade).
 
 ## v0.9.7
 

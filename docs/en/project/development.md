@@ -123,21 +123,21 @@ To release a new version:
 
 Push to Forgejo: `origin` must point to `ssh://git@ssh.via.moe/dejavu/sani.git`. Forgejo automatically mirrors pushes to GitHub, triggering application CI and release builds. `.woodpecker/docs.yml` deploys the documentation to `https://sani.zsh.moe` on Forgejo `master` pushes; pushing only to GitHub or only pushing a tag does not trigger documentation deployment.
 
-1. Turn the “Unreleased” section of both changelogs into a heading such as `## v0.9.7`, followed by the date. Update the full version tag in Compose, bilingual download examples and image verification examples.
-2. Run `make check test e2e smoke docs VERSION=v0.9.7` and `bash scripts/test-release-notes.sh`; confirm `scripts/release-notes.sh v0.9.7` generates the notes.
+1. Turn the “Unreleased” section of both changelogs into a heading such as `## v0.9.8`, followed by the date. Update the full version tag in Compose, bilingual download examples and image verification examples.
+2. Run `make check test e2e smoke docs VERSION=v0.9.8` and `bash scripts/test-release-notes.sh`; confirm `scripts/release-notes.sh v0.9.8` generates the notes.
 3. Commit, verify the Forgejo address with `git remote get-url origin`, then run `git push origin master`. Confirm GitHub mirrors the same commit, wait for that commit's CI and CodeQL to pass, and check Woodpecker documentation deployment.
 4. Create an annotated tag on the verified commit and push it to the same Forgejo remote:
 
    ```sh
-   git tag -a v0.9.7 -m "Sani v0.9.7"
-   git push origin refs/tags/v0.9.7
+   git tag -a v0.9.8 -m "Sani v0.9.8"
+   git push origin refs/tags/v0.9.8
    ```
 
 5. Wait for the GitHub Release to succeed and compare tag objects and target commits on Forgejo and GitHub. Verify every archive's SHA-256 and provenance, the multi-platform image and runtime version, and the live documentation's version and content in both languages. Never move, recreate or force-push a published tag; synchronize a missing tag by pushing its original object.
 
 The release workflow first runs `scripts/check-release.mjs` against the tagged commit. The latest CI and CodeQL runs on `master` for that exact SHA must have completed successfully. Push, scheduled and manually dispatched runs are accepted; pull request runs are not. CI must include a successful `Known vulnerabilities` job, all four CodeQL language jobs must be present, and every job must pass without failures or skips. A newer scheduled vulnerability failure cannot be bypassed with an older green run. Missing, pending or failed checks and API errors block both archive builds and image publishing. Once checks pass, rerun the original Release without moving the tag. The read-only preflight can also run separately: `node scripts/check-release.mjs OWNER/REPO COMMIT_SHA`, with an authenticated `gh` CLI.
 
-After the preflight, the release workflow makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.9.7-rc.1` is marked as a pre-release. Images always use full version tags; no `latest` or floating tags are published.
+After the preflight, the release workflow makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.9.8-rc.1` is marked as a pre-release. Images always use full version tags; no `latest` or floating tags are published.
 
 Locally, `make web dist VERSION=v0.2.0` produces the same archives as the release. Building one commit twice gives byte-for-byte identical files.
 

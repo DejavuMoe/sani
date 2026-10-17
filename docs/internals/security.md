@@ -19,6 +19,8 @@
 - **会话 Cookie**：注入 `HttpOnly` 与 `SameSite=Strict`，严格限定作用域为 `/api/` 路径，HTTPS 环境自动强制 `Secure`。默认有效期 30 天，每日首访自动续期。
 - **会话撤销**：后台修改密码保留当前会话并注销其他设备；`sani passwd` 与环境变量改密注销所有会话。密码替换与会话撤销在同一事务中完成，旧密码的在途校验结果不能在改密后再签发会话。
 
+`Secure` 依据实际 TLS 连接，或启用 `SANI_TRUST_PROXY` 后代理提供的 `X-Forwarded-Proto: https` 设置；`SANI_BASE_URL=https://...` 本身不代表当前连接已加密。本地 HTTP 登录仍受支持，其 Cookie 不带 `Secure`。公网后台应通过 HTTPS 访问：仓库的 Nginx 模板覆盖协议头并将 HTTP 重定向到 HTTPS，Caddy 默认也覆盖客户端传入的转发头并启用 HTTPS 重定向。Compose 与 systemd 模板将后端端口限制在回环地址。自定义代理必须保留这些边界；若透传客户端的协议头或将受信任的 HTTP 后端暴露公网，会话可能失去传输保护。详见 [`SANI_TRUST_PROXY`](../reference/configuration#sani-trust-proxy)。
+
 ## API 令牌控制 {#tokens}
 
 API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。数据库仅保存 SHA-256 哈希值，明文仅在创建时单次展示。令牌具备完整管理员权限且不受改密影响，确保自动化脚本不间断；若有泄漏可在后台单项撤销。
@@ -111,7 +113,7 @@ API 令牌形如 `sani_` 拼接 43 个随机高熵字符（约 256 位熵）。�
 - **完整性校验**：每个版本附带 `SHA256SUMS`，覆盖全部压缩包。
 - **构建来源证明**：压缩包和镜像包含 GitHub 签发的数字来源证明，记录仓库、提交及工作流信息。可通过 `gh attestation verify` 快速验证（详见[部署验证](../guide/deploy#verify)）。镜像内嵌 SBOM 依赖清单。
 - **确定性可复现构建**：同一源码提交在相同环境下构建出的压缩包逐字节一致。
-- **依赖审计**：Dependabot 定期提交依赖更新，CI 每周用 `govulncheck` 扫描已知漏洞。
+- **依赖审计**：CI 在代码变更与每周定时运行中，用 `govulncheck`、`pnpm audit` 和 `npm audit` 检查 Go、管理界面、文档与开发工具的已知漏洞。默认分支提交由锁文件生成的依赖快照；Dependabot 自动更新暂未启用。
 
 ## 报告安全问题 {#reporting}
 
