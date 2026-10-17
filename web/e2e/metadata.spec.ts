@@ -149,6 +149,8 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
     const calendar = panel.locator('.date-editor');
     await expect(calendar).toBeVisible();
+    // Audit the calendar after the closing menu's opacity transition finishes.
+    await expect(page.getByRole('menu')).toHaveCount(0);
     const date = calendar.getByPlaceholder('YYYY-MM-DD'), time = calendar.getByPlaceholder('HH:mm');
     await date.fill('2032-02-30');
     await expect(calendar.getByRole('alert')).toBeVisible();
