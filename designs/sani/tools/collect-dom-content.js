@@ -82,7 +82,8 @@
     if (globalObject.CSS && typeof globalObject.CSS.escape === "function") {
       return globalObject.CSS.escape(value);
     }
-    return String(value).replace(/[^a-zA-Z0-9_-]/g, function replaceUnsafe(character) {
+    // Escape whole code points, including characters invalid at the start of an identifier.
+    return String(value).replace(/./gsu, function replaceUnsafe(character) {
       return "\\" + character.codePointAt(0).toString(16) + " ";
     });
   }

@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- Fix DOM content collectors used by prototype and accessibility checks: escape backslashes in identifiers and handle emoji, leading digits and a lone hyphen when `CSS.escape` is unavailable. Add browser regression coverage.
 - Submit GitHub dependency snapshots generated from the actual lockfiles to correct stale versions and unresolved pnpm catalogs in the static dependency graph, including development tools.
 - Require successful CI, known-vulnerability checks and every CodeQL job for the exact release commit before building archives or publishing images. Preserve the Forgejo → GitHub synchronization flow.
 

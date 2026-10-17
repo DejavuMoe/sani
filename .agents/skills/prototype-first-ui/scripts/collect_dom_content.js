@@ -82,7 +82,8 @@
     if (globalObject.CSS && typeof globalObject.CSS.escape === "function") {
       return globalObject.CSS.escape(value);
     }
-    return String(value).replace(/[^a-zA-Z0-9_-]/g, function replaceUnsafe(character) {
+    // Escape whole code points, including characters invalid at the start of an identifier.
+    return String(value).replace(/./gsu, function replaceUnsafe(character) {
       return "\\" + character.codePointAt(0).toString(16) + " ";
     });
   }
@@ -101,7 +102,7 @@
       const stableId = current.getAttribute("data-screen-id") || current.getAttribute("data-component-id");
       if (stableId) {
         part += "[data-" + (current.hasAttribute("data-screen-id") ? "screen" : "component") + "-id=\"" +
-          String(stableId).replace(/"/g, "\\\"") + "\"]";
+          escapePart(stableId) + "\"]";
       } else if (current.classList && current.classList.length > 0) {
         part += "." + Array.from(current.classList).slice(0, 2).map(escapePart).join(".");
       }
