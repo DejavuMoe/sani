@@ -17,6 +17,57 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  dependency-graph:
+    name: Dependency graph (${{ matrix.manifest }})
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - manifest: web/package.json
+            manager: pnpm
+          - manifest: docs/package.json
+            manager: pnpm
+          - manifest: .agents/skills/baoyu-design/agents/gen-pptx/package.json
+            manager: npm
+          - manifest: .agents/skills/baoyu-design/agents/gen-pptx/package-lock.json
+            manager: npm
+          - manifest: .agents/skills/baoyu-design/agents/gen-video/package.json
+            manager: npm
+          - manifest: .agents/skills/baoyu-design/agents/gen-video/package-lock.json
+            manager: npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          version: 2026.10.2
+          install_args: node pnpm
+      # Let the package managers resolve catalogs, patches and multi-document locks.
+      - name: Export locked dependencies without installing packages
+        env:
+          MANIFEST: ${{ matrix.manifest }}
+          MANAGER: ${{ matrix.manager }}
+        run: |
+          directory="${MANIFEST%/*}"
+          if [ "$MANAGER" = pnpm ]; then
+            pnpm --filter "./$directory" sbom --sbom-format spdx --lockfile-only > "$RUNNER_TEMP/dependencies.spdx.json"
+          else
+            npm --prefix "$directory" sbom --sbom-format spdx --package-lock-only > "$RUNNER_TEMP/dependencies.spdx.json"
+          fi
+          node scripts/prepare-sbom.mjs "$RUNNER_TEMP/dependencies.spdx.json"
+      - uses: advanced-security/spdx-dependency-submission-action@b009efcf8b9d562a4569d2028c276522232e631f # v0.4.0
+        with:
+          filePath: ${{ runner.temp }}
+          filePattern: dependencies.spdx.json
+          manifestPath: ${{ matrix.manifest }}
+          correlator: dependency-graph-${{ matrix.manifest }}
+
   check:
     name: Check and test
     runs-on: ubuntu-24.04

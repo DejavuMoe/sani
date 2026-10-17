@@ -117,6 +117,8 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) 在推送、拉取请求和每周定时任务中扫描 Go、JavaScript/TypeScript、Python 与 GitHub Actions。Go 使用项目固定的工具链构建，其余语言直接分析源码。
 
+`master` 上的 CI 使用 pnpm/npm 从锁文件导出 SPDX，并向 GitHub 提交管理界面、文档站及两个开发工具的依赖快照，不安装这些包。快照对应原始清单路径，补齐 pnpm 双文档锁文件、`catalog:` 与静态图谱旧版本造成的遗漏。写权限仅用于默认分支的依赖提交，不向拉取请求开放；Dependabot 自动更新设置不变。
+
 发布一个新版本：
 
 推送入口是 Forgejo：`origin` 应指向 `ssh://git@ssh.via.moe/dejavu/sani.git`。Forgejo 收到推送后自动镜像到 GitHub，触发应用 CI 与发布构建。文档站由 `.woodpecker/docs.yml` 监听 Forgejo 的 `master` 推送并部署到 `https://sani.zsh.moe`；只推 GitHub 或只推标签不会触发这条文档部署流程。
@@ -133,7 +135,9 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 5. 等待 GitHub Release 成功，核对 Forgejo 与 GitHub 的标签对象及目标提交一致；验证所有压缩包的 SHA-256 与来源证明、多平台镜像和实际运行版本，以及线上中英文文档的版本和内容。已发布标签不得移动、重建或强推；补同步缺失标签时推送原有对象。
 
-发布流程会先确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.9.7-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
+发布流程先用 `scripts/check-release.mjs` 校验标签所指提交：该 SHA 在 `master` 上最新的 CI 与 CodeQL 必须完成且成功，接受推送、定时和手动运行，不接受拉取请求的运行记录。CI 必须包含已通过的 `Known vulnerabilities`，四种 CodeQL 语言的作业必须齐全，所有作业均不得失败或跳过；较新的定时漏洞检查失败时，不得使用旧的成功记录放行。缺失、仍在运行、失败或查询 API 出错都会在构建归档和推送镜像之前阻止发布；检查完成后重跑原 Release，不移动标签。只读预检也可单独运行：`node scripts/check-release.mjs OWNER/REPO COMMIT_SHA`，需要已登录的 `gh`。
+
+预检通过后，发布流程确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v0.9.7-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
 
 在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。
 

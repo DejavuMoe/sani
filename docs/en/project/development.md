@@ -117,6 +117,8 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 
 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) scans Go, JavaScript/TypeScript, Python and GitHub Actions on pushes, pull requests and a weekly schedule. Go is built with the pinned project toolchain; the other languages are analyzed directly from source.
 
+On `master`, CI uses pnpm/npm to export SPDX from lockfiles and submits dependency snapshots for the admin app, docs and both development tools without installing those packages. Snapshots use the original manifest paths to cover pnpm's two-document lockfile, `catalog:` references and stale static graph versions. Write access is limited to dependency submission on the default branch, never pull requests. Dependabot automatic update settings remain unchanged.
+
 To release a new version:
 
 Push to Forgejo: `origin` must point to `ssh://git@ssh.via.moe/dejavu/sani.git`. Forgejo automatically mirrors pushes to GitHub, triggering application CI and release builds. `.woodpecker/docs.yml` deploys the documentation to `https://sani.zsh.moe` on Forgejo `master` pushes; pushing only to GitHub or only pushing a tag does not trigger documentation deployment.
@@ -133,7 +135,9 @@ Push to Forgejo: `origin` must point to `ssh://git@ssh.via.moe/dejavu/sani.git`.
 
 5. Wait for the GitHub Release to succeed and compare tag objects and target commits on Forgejo and GitHub. Verify every archive's SHA-256 and provenance, the multi-platform image and runtime version, and the live documentation's version and content in both languages. Never move, recreate or force-push a published tag; synchronize a missing tag by pushing its original object.
 
-The release workflow first makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.9.7-rc.1` is marked as a pre-release. Images always use full version tags; no `latest` or floating tags are published.
+The release workflow first runs `scripts/check-release.mjs` against the tagged commit. The latest CI and CodeQL runs on `master` for that exact SHA must have completed successfully. Push, scheduled and manually dispatched runs are accepted; pull request runs are not. CI must include a successful `Known vulnerabilities` job, all four CodeQL language jobs must be present, and every job must pass without failures or skips. A newer scheduled vulnerability failure cannot be bypassed with an older green run. Missing, pending or failed checks and API errors block both archive builds and image publishing. Once checks pass, rerun the original Release without moving the tag. The read-only preflight can also run separately: `node scripts/check-release.mjs OWNER/REPO COMMIT_SHA`, with an authenticated `gh` CLI.
+
+After the preflight, the release workflow makes sure the English changelog has an entry for the version, and stops if it doesn’t. It then runs the checks and tests once more, builds the archives and `SHA256SUMS`, pushes the multi-platform image with an SBOM, records build provenance for both, and creates the GitHub release with notes taken from the changelog. A tag like `v0.9.7-rc.1` is marked as a pre-release. Images always use full version tags; no `latest` or floating tags are published.
 
 Locally, `make web dist VERSION=v0.2.0` produces the same archives as the release. Building one commit twice gives byte-for-byte identical files.
 

@@ -2,6 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Submit GitHub dependency snapshots generated from the actual lockfiles to correct stale versions and unresolved pnpm catalogs in the static dependency graph, including development tools.
+- Require successful CI, known-vulnerability checks and every CodeQL job for the exact release commit before building archives or publishing images. Preserve the Forgejo → GitHub synchronization flow.
+
 ## v0.9.7
 
 2026-10-11 · Fix 23 reproduced issues in the admin app, metadata tasks, imports and operations tools. Database schema stays at 6 with no new migration.
