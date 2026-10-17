@@ -4,3 +4,6 @@
 *.png binary
 *.ico binary
 *.woff2 binary
+
+.agents/** linguist-detectable=false
+designs/** linguist-detectable=false
