@@ -8,6 +8,7 @@
 - Align Unicode case comparison in tag and slug editors with the server and list search: Greek final sigma stays distinct, while dotted capital `İ` correctly matches plain `i`.
 - Preserve the original browser startup error in end-to-end tests without an additional teardown exception when no page was created. Add fault-injection regression coverage.
 - Update the app's Vite build tool to 8.3.3 and the docs dependency to 6.4.5 to fix development-server issues reported by dependency auditing, keeping the existing CI audit threshold.
+- Align the Go toolchain and container builder on 1.27.3 to fix the GO-2026-6809 certificate-trust issue in `crypto/x509`.
 
 If an older version used a data directory containing `%` or `#`, stop the service before upgrading, check the actual database location, and back up the database and shared files. This fix does not automatically locate or move data previously written to the wrong path; verify which instance owns the data before restoring it to the configured directory.
 
