@@ -11,7 +11,7 @@ allowBuilds:
 # VitePress 1.x still requests Vite 5. Use the patched Vite 6 line supported
 # by its Vue plugin; remove this override when VitePress updates its range.
 overrides:
-  'vitepress>vite': ^6.4.3
+  'vitepress>vite': ^6.4.5
 
 # VitePress 1.6.4 preview ignores --host; keep local previews on loopback.
 patchedDependencies:
