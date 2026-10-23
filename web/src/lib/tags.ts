@@ -1,9 +1,10 @@
 import type { TagColor } from './api';
+import { lookupKey } from './key';
 
 export const TAG_LIMIT = 5;
 export const TAG_NAME_LIMIT = 24;
 
-export const tagKey = (name: string) => name.trim().normalize('NFC').toLowerCase();
+export const tagKey = (name: string) => lookupKey(name.trim());
 
 export function normalizeTagColor(input: string): TagColor | null {
   const value = input.trim().toLowerCase();

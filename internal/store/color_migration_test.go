@@ -2,14 +2,13 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"path/filepath"
 	"testing"
 )
 
 func TestCustomColorsMigrateExistingTags(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "v4.db")
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}

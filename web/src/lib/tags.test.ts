@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeTagColor, tagHex, TAG_COLORS } from './tags';
+import { normalizeTagColor, tagHex, tagKey, TAG_COLORS } from './tags';
+
+describe('tag identity', () => {
+  it.each([
+    [' İ ', 'i'], [' ΟΣ ', 'οσ'], ['ος', 'ος'], ['Cafe\u0301', 'café'],
+  ])('uses the server key for %s', (name, key) => expect(tagKey(name)).toBe(key));
+});
 
 describe('tag colors', () => {
   it.each([

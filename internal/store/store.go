@@ -29,7 +29,7 @@ type Store struct {
 	r *sql.DB
 }
 
-func dsn(path string, writer bool) string {
+func openDatabase(path string, writer bool) (*sql.DB, error) {
 	q := url.Values{}
 	for _, p := range []string{
 		// SQLite's busy handler can outlive a canceled Go context. Keep
@@ -46,12 +46,26 @@ func dsn(path string, writer bool) string {
 	if writer {
 		q.Set("_txlock", "immediate")
 	}
-	return "file:" + strings.ReplaceAll(path, "?", "%3F") + "?" + q.Encode()
+	return openSQLite(path, q.Encode())
+}
+
+func openSQLite(path, query string) (*sql.DB, error) {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	uriPath := filepath.ToSlash(abs)
+	if !strings.HasPrefix(uriPath, "/") {
+		uriPath = "/" + uriPath
+	}
+	// A filesystem name must not become a URI escape, query or fragment.
+	u := url.URL{Scheme: "file", Path: uriPath, RawQuery: query}
+	return sql.Open("sqlite", u.String())
 }
 
 // Open opens (creating if needed) the database at path and migrates it.
 func Open(ctx context.Context, path string) (*Store, error) {
-	w, err := sql.Open("sqlite", dsn(path, true))
+	w, err := openDatabase(path, true)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +81,7 @@ func Open(ctx context.Context, path string) (*Store, error) {
 		return nil, err
 	}
 
-	r, err := sql.Open("sqlite", dsn(path, false))
+	r, err := openDatabase(path, false)
 	if err != nil {
 		w.Close()
 		return nil, err
@@ -111,7 +125,7 @@ func Backup(ctx context.Context, path, dst string) error {
 	if err := file.Close(); err != nil {
 		return err
 	}
-	db, err := sql.Open("sqlite", dsn(path, false))
+	db, err := openDatabase(path, false)
 	if err != nil {
 		return err
 	}

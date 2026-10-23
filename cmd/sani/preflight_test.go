@@ -46,7 +46,10 @@ func TestPreflightChecksFilePermissions(t *testing.T) {
 
 func TestFailedUpgradeDoesNotAccumulateSafetyCopies(t *testing.T) {
 	ctx := context.Background()
-	cfg := &config.Config{DataDir: t.TempDir()}
+	cfg := &config.Config{DataDir: filepath.Join(t.TempDir(), "literal%20#data")}
+	if err := os.MkdirAll(cfg.DataDir, 0700); err != nil {
+		t.Fatal(err)
+	}
 	path := filepath.Join(cfg.DataDir, "sani.db")
 	s, err := store.Open(ctx, path)
 	if err != nil {

@@ -30,11 +30,6 @@ func (s *Store) SetSetting(ctx context.Context, key, value string) error {
 	return err
 }
 
-func (s *Store) DeleteSetting(ctx context.Context, key string) error {
-	_, err := s.w.ExecContext(ctx, `DELETE FROM settings WHERE key = ?`, key)
-	return err
-}
-
 // SetSettings commits one validated configuration change, including removals.
 func (s *Store) SetSettings(ctx context.Context, values map[string]string) error {
 	return s.tx(ctx, func(tx *sql.Tx) error {
@@ -223,16 +218,6 @@ func (s *Store) Favicon(ctx context.Context, host string) (*Favicon, error) {
 		return nil, err
 	}
 	return &f, nil
-}
-
-// FaviconFetchedAt returns when a host's icon was last fetched, or 0.
-func (s *Store) FaviconFetchedAt(ctx context.Context, host string) (int64, error) {
-	var at int64
-	err := s.r.QueryRowContext(ctx, `SELECT fetched_at FROM favicons WHERE host = ?`, host).Scan(&at)
-	if errors.Is(err, sql.ErrNoRows) {
-		return 0, nil
-	}
-	return at, err
 }
 
 func (s *Store) PutFavicon(ctx context.Context, host string, f *Favicon) error {

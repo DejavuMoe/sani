@@ -2,6 +2,14 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Fix database paths containing `%`, `#` and other URI characters being interpreted as URIs. Database opening, password changes, backups, upgrade snapshots and read-only preflight now consistently use literal filenames, with relative and absolute path coverage on Windows and Linux. Database schema stays at 6 with no new migration.
+- Align Unicode case comparison in tag and slug editors with the server and list search: Greek final sigma stays distinct, while dotted capital `İ` correctly matches plain `i`.
+- Preserve the original browser startup error in end-to-end tests without an additional teardown exception when no page was created. Add fault-injection regression coverage.
+
+If an older version used a data directory containing `%` or `#`, stop the service before upgrading, check the actual database location, and back up the database and shared files. This fix does not automatically locate or move data previously written to the wrong path; verify which instance owns the data before restoring it to the configured directory.
+
 ## v0.9.8
 
 2026-10-18 · Fix development collectors and dependency graph accuracy, enforce checks for the exact release commit, and verify session cookie boundaries behind reverse proxies. Database schema stays at 6 with no new migration.

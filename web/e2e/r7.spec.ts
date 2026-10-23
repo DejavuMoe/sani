@@ -33,6 +33,62 @@ async function capture(page: Page, name: string) {
 }
 const failed = {status:503,contentType:'application/json',body:JSON.stringify({error:{code:'internal',message:'temporary failure'}})};
 
+for (const [lang, theme, width] of [['zh', 'light', 1280], ['en', 'dark', 390], ['zh', 'dark', 390], ['en', 'light', 1280]] as const) {
+  test(`AUD-002 tag identity matches the API: ${lang}/${theme}/${width}`, async ({page}) => {
+    await login(page, lang, theme);
+    await page.setViewportSize({width, height: 860});
+    const suffix = `${lang}-${theme}`;
+    const upper = `ΟΣ-${suffix}`, lower = `ος-${suffix}`;
+    const created = await page.request.post(`${base}/api/admin/v1/tags`, {data: {name: upper}});
+    expect(created.ok()).toBe(true);
+    await page.goto(`${base}/admin/`);
+    await page.locator('#create-panel-url .tag-add').click();
+    const pop = page.locator('.tag-pop:popover-open');
+    const search = pop.locator('.tag-search input');
+    await search.fill(lower);
+    await expect(pop.locator('.tag-create')).toBeVisible();
+    await search.press('Enter');
+    await expect(pop.getByRole('checkbox', {name: lower, exact: true})).toHaveAttribute('aria-checked', 'true');
+    await search.fill('');
+    await expect(pop.getByRole('checkbox', {name: upper, exact: true})).toHaveAttribute('aria-checked', 'false');
+    await pop.getByRole('checkbox', {name: upper, exact: true}).click();
+    await expect(pop.getByRole('checkbox', {name: lower, exact: true})).toHaveAttribute('aria-checked', 'true');
+    await audit(page);
+    await page.screenshot({path: test.info().outputPath('unicode-tags.png')});
+    await pop.getByRole('button', {name: /^(管理标签|Manage tags)$/, exact: true}).click();
+    await page.getByRole('button', {name: new RegExp(`^(编辑标签|Edit tag) ${lower}$`)}).click();
+    const dialog = page.getByRole('dialog', {name: /^(编辑标签|Edit tag)$/, exact: true});
+    await expect(dialog.getByRole('button', {name: /^(保存|Save)$/, exact: true})).toBeEnabled();
+    await dialog.getByRole('button', {name: /^(保存|Save)$/, exact: true}).click();
+    await expect(dialog).not.toBeVisible();
+    const tags = await (await page.request.get(`${base}/api/admin/v1/tags`)).json();
+    expect(tags.items.filter((tag: {name: string}) => [upper, lower].includes(tag.name))).toHaveLength(2);
+  });
+
+  test(`AUD-002 own slug aliases stay editable: ${lang}/${theme}/${width}`, async ({page}) => {
+    await login(page, lang, theme);
+    await page.setViewportSize({width, height: 860});
+    const suffix = `${lang}-${theme}`;
+    const created = await page.request.post(`${base}/api/admin/v1/links`, {data: {slug: `İtem-${suffix}`, url: 'https://example.com/unicode'}});
+    expect(created.ok()).toBe(true);
+    const link = await created.json();
+    await page.goto(`${base}/admin/`);
+    const row = page.locator(`.row[data-link="${link.id}"]`);
+    await row.locator('button.main').click();
+    await row.getByRole('button', {name: /^(编辑|Edit)/}).click();
+    const slug = page.locator(`#edit-slug-${link.id}`);
+    await slug.fill(`item-${suffix}`);
+    await expect(page.locator('.editor .slug')).not.toHaveClass(/checking/);
+    await expect(slug).not.toHaveAttribute('aria-invalid', 'true');
+    await audit(page);
+    await page.screenshot({path: test.info().outputPath('unicode-slug.png')});
+    await page.locator('.editor').getByRole('button', {name: /^(保存|Save)$/, exact: true}).click();
+    await expect(page.locator('.editor')).not.toBeVisible();
+    const saved = await page.request.get(`${base}/api/admin/v1/links/${link.id}`);
+    expect((await saved.json()).slug).toBe(`item-${suffix}`);
+  });
+}
+
 for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
   test(`resource menus stay in the viewport with pointer and keyboard: ${lang} ${theme}`, async ({page}) => {
     await login(page, lang, theme);

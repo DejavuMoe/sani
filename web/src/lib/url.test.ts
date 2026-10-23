@@ -63,4 +63,15 @@ describe('slugs', () => {
   it('strips the scheme for display', () => {
     expect(stripScheme('https://s.example.com/abc')).toBe('s.example.com/abc');
   });
+
+  it.each([
+    ['İtem', 'item', true],
+    ['İ', 'i\u0307', false],
+    ['ΟΣ', 'οσ', true],
+    ['ΟΣ', 'ος', false],
+    ['Cafe\u0301', 'CAFÉ', true],
+    ['𐐀', '𐐨', true],
+  ])('uses server identity for %s and %s', (a, b, equal) => {
+    expect(sameSlug(a, b)).toBe(equal);
+  });
 });

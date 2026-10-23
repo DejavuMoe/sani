@@ -19,6 +19,7 @@ check:
 test:
 	$(RUN) go test -race ./...
 	$(RUN) pnpm --dir web test
+	$(RUN) node --test web/scripts/e2e-cleanup.test.mjs
 	$(RUN) node --test scripts/load.regression.test.mjs
 	$(RUN) node --test scripts/check-release.test.mjs scripts/prepare-sbom.test.mjs
 

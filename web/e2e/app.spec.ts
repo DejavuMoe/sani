@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 
 // One server and database for the whole file: each test builds on the last,
@@ -7,17 +7,18 @@ test.describe.configure({ mode: 'serial' });
 
 const PASSWORD = 'correct horse battery';
 let page: Page;
+let context: BrowserContext | undefined;
 const pageErrors: string[] = [];
 
 test.beforeAll(async ({ browser }) => {
-  const context = await browser.newContext();
+  context = await browser.newContext();
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   page = await context.newPage();
   page.on('pageerror', (e) => pageErrors.push(e.message));
 });
 
 test.afterAll(async () => {
-  await page.context().close();
+  await context?.close();
   expect(pageErrors).toEqual([]);
 });
 

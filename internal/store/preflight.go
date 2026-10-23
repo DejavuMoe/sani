@@ -7,10 +7,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type PreflightReport struct {
@@ -50,16 +48,7 @@ func SchemaVersion(ctx context.Context, path string) (int, error) {
 func SchemaTarget() int { return len(migrations) }
 
 func openReadOnly(path string) (*sql.DB, error) {
-	abs, err := filepath.Abs(path)
-	if err != nil {
-		return nil, err
-	}
-	uriPath := filepath.ToSlash(abs)
-	if !strings.HasPrefix(uriPath, "/") {
-		uriPath = "/" + uriPath
-	}
-	u := url.URL{Scheme: "file", Path: uriPath, RawQuery: "mode=ro&_pragma=busy_timeout(1000)"}
-	db, err := sql.Open("sqlite", u.String())
+	db, err := openSQLite(path, "mode=ro&_pragma=busy_timeout(1000)")
 	if err != nil {
 		return nil, err
 	}

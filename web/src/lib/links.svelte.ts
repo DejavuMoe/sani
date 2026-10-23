@@ -17,6 +17,7 @@ import {
 } from './api';
 import { errorText, t } from './i18n.svelte';
 import { toasts } from './toast.svelte';
+import { lookupKey } from './key';
 
 const PAGE = 50;
 /** The server takes at most this many links per bulk request. */
@@ -95,16 +96,13 @@ class LinksStore {
   }
 
   private matchesView(link: Link) {
-    // Go's search key lowercases each code point, without contextual sigma/dotted-I rules.
-    const key = (value: string) => Array.from(value.normalize('NFC'), char =>
-      char === '\u0130' ? 'i' : char.toLowerCase()).join('');
     // Match the API's pasted short-URL search before comparing stored fields.
     let query = this.query.trim();
     const prefix = link.shortUrl.match(/^[^/]+:\/\/[^/]+\//)?.[0];
     if (prefix && query.startsWith(prefix)) query = query.slice(prefix.length);
-    query = key(query.replace(/^\//, '').replace(/^p\//, ''));
+    query = lookupKey(query.replace(/^\//, '').replace(/^p\//, ''));
     const fields = [link.slug, link.title, link.url, link.content?.name ?? link.content?.preview ?? ''];
-    return (!query || fields.some(value => key(value).includes(query))) &&
+    return (!query || fields.some(value => lookupKey(value).includes(query))) &&
       (!this.kind || this.kind === link.kind) && this.matchesTag(link);
   }
   /** First page for the current query has arrived. */

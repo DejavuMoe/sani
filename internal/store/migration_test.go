@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
-	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,7 +20,7 @@ func legacyFixture(t *testing.T, version int) (string, string) {
 	if err := os.Mkdir(files, 0700); err != nil {
 		t.Fatal(err)
 	}
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +138,7 @@ func TestCompatibilityMigrationFailureIsAtomic(t *testing.T) {
 		t.Run(mode, func(t *testing.T) {
 			path, _ := legacyFixture(t, 5)
 			ctx := context.Background()
-			db, err := sql.Open("sqlite", dsn(path, true))
+			db, err := openDatabase(path, true)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -226,7 +225,7 @@ func TestConcurrentMigratorsAndFilePagination(t *testing.T) {
 	errors := make(chan error, 2)
 	for range 2 {
 		go func() {
-			db, err := sql.Open("sqlite", dsn(path, true))
+			db, err := openDatabase(path, true)
 			ready.Done()
 			ready.Wait()
 			if err == nil {
@@ -270,7 +269,7 @@ func TestConcurrentMigratorsAndFilePagination(t *testing.T) {
 
 func TestSchemaZeroWithUnknownObjectsIsRefused(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "sani.db")
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}

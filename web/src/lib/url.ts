@@ -1,3 +1,5 @@
+import { lookupKey } from './key';
+
 /** Mirrors the server's leniency: "example.com/a" is a URL, "hello" is not. */
 export function looksLikeURL(raw: string): boolean {
   const s = raw.trim();
@@ -46,7 +48,7 @@ export function hostOf(origin: string): string {
 }
 
 export function sameSlug(a: string, b: string): boolean {
-  return a.normalize('NFC').toLowerCase() === b.normalize('NFC').toLowerCase();
+  return lookupKey(a) === lookupKey(b);
 }
 
 const slugPattern = /^[\p{L}\p{N}][\p{L}\p{N}\p{M}_.-]*$/u;

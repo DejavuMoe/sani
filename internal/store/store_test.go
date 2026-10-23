@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -123,7 +122,7 @@ func TestBackupRejectsExistingTargetsAndCleansFailures(t *testing.T) {
 func TestMigrationPreservesChildrenAndNeverReusesIDs(t *testing.T) {
 	ctx := context.Background()
 	path := filepath.Join(t.TempDir(), "v2.db")
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -255,7 +254,7 @@ func TestDatabaseLockWaitIsBounded(t *testing.T) {
 func TestFailedMigrationRollsBack(t *testing.T) {
 	ctx := context.Background()
 	path := filepath.Join(t.TempDir(), "broken-v2.db")
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -272,7 +271,7 @@ func TestFailedMigrationRollsBack(t *testing.T) {
 		s.Close()
 		t.Fatal("accepted an orphaned child during migration")
 	}
-	db, err = sql.Open("sqlite", dsn(path, true))
+	db, err = openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -507,7 +506,7 @@ func TestContents(t *testing.T) {
 func TestMigrateFromFirstSchema(t *testing.T) {
 	ctx := context.Background()
 	path := filepath.Join(t.TempDir(), "old.db")
-	db, err := sql.Open("sqlite", dsn(path, true))
+	db, err := openDatabase(path, true)
 	if err != nil {
 		t.Fatal(err)
 	}
