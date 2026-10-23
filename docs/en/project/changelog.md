@@ -2,7 +2,9 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.9
+
+2026-10-23 · Fix database paths, Unicode identity comparison and browser test cleanup, and update build dependencies. Database schema stays at 6 with no new migration.
 
 - Fix database paths containing `%`, `#` and other URI characters being interpreted as URIs. Database opening, password changes, backups, upgrade snapshots and read-only preflight now consistently use literal filenames, with relative and absolute path coverage on Windows and Linux. Database schema stays at 6 with no new migration.
 - Align Unicode case comparison in tag and slug editors with the server and list search: Greek final sigma stays distinct, while dotted capital `İ` correctly matches plain `i`.
@@ -11,6 +13,8 @@
 - Align the Go toolchain and container builder on 1.27.3 to fix the GO-2026-6809 certificate-trust issue in `crypto/x509`.
 
 If an older version used a data directory containing `%` or `#`, stop the service before upgrading, check the actual database location, and back up the database and shared files. This fix does not automatically locate or move data previously written to the wrong path; verify which instance owns the data before restoring it to the configured directory.
+
+When upgrading from v0.9.5–v0.9.8, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.9`, then reload the admin app to continue using the existing schema 6 data. Upgrades from v0.9.4 or earlier still require the API adjustments and migration steps under [upgrade and rollback](../guide/operations#upgrade).
 
 ## v0.9.8
 
