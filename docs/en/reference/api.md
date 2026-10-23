@@ -3,7 +3,7 @@
 <p class="lead">Sani's HTTP API: create and manage links, texts and files with tokens, and use the same instance's admin capabilities for settings, bulk operations and recovery.</p>
 
 ::: warning Version
-This page describes v0.9.9. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
+This page describes v0.9.10. For v0.9.4 and earlier deployments, see the [API archive](./api-archive); consult the matching tag for older versions. Export JSON in the old admin app and take a complete database, file and configuration snapshot before upgrading. See [upgrade and rollback](../guide/operations#upgrade).
 :::
 
 ## Design and conventions {#design}
@@ -528,7 +528,7 @@ Limits: 8 active sessions per instance, 2 per credential, 8 GiB of total reserve
 
 ```json
 {
-  "version": "v0.9.9",
+  "version": "v0.9.10",
   "baseUrl": "https://s.example.com",
   "baseUrlSource": "env",
   "requestOrigin": "https://s.example.com",

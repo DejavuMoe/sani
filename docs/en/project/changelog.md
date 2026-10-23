@@ -2,7 +2,9 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
-## Unreleased
+## v0.9.10
+
+2026-10-24 · Fix draft protection, chart range changes, encoded short-URL searches and narrow detail layouts, and remove an unused legacy helper. Database schema remains 6 with no new migration.
 
 - Fix discarded drafts remaining in the editor and disabling subsequent leave warnings after changing sort order, search or content type. Reopened editors retain full draft protection.
 - Fix chart rendering errors when shortening a date range with the keyboard while hovering. Track the hovered day by date so the chart stays consistent with the selected range.
