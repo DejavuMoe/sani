@@ -84,7 +84,7 @@ const profiles = [
   { lang: 'zh', theme: 'light', width: 390 },
 ] as const;
 
-async function login(page: Page, profile: (typeof profiles)[number] = profiles[0]) {
+async function login(page: Page, profile: { lang: 'en' | 'zh'; theme: 'light' | 'dark'; width: number } = profiles[0]) {
   await page.setViewportSize({ width: profile.width, height: 900 });
   await page.emulateMedia({ colorScheme: profile.theme });
   await page.addInitScript(({ lang, theme }) => {
@@ -126,10 +126,183 @@ async function openDetails(page: Page, id: number) {
   return row;
 }
 
+for (const lang of ['en', 'zh'] as const) for (const theme of ['light', 'dark'] as const) for (const width of [1280, 390, 320]) {
+  test(`AUD-007 detail QR, metadata and access rules fit ${lang}/${theme}/${width}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await login(page, { lang, theme, width });
+    const limits = { maxClicks: 42, expiresAt: '2050-06-15T12:00:00Z' };
+    const text = await create(page, { text: 'Shared notes', ...limits });
+    const url = await create(page, { url: 'https://example.com/layout', redirect: 301, ...limits });
+    const upload = await page.request.post(`${base}/api/admin/v1/files`, { multipart: {
+      file: { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Shared file') }, ...limits,
+    } });
+    expect(upload.status(), await upload.text()).toBe(201);
+    const file: Link = await upload.json();
+    await page.goto(`${base}/admin/`);
+    for (const link of [text, url, file]) {
+      await search(page, link.shortUrl);
+      const row = await openDetails(page, link.id);
+      await page.waitForFunction(id => [...document.querySelector(`[data-link="${id}"]`)!.getAnimations({ subtree: true })]
+        .every(animation => animation.playState !== 'running'), link.id);
+      const side = row.locator('.side');
+      await side.scrollIntoViewIfNeeded();
+      await expect(side.locator('.qr-actions button')).toHaveCount(2);
+      await expect(side.locator('.meta dd')).toHaveCount(link.kind === 'url' ? 4 : 3);
+      await expect(side.locator('.access-rules p')).toHaveCount(link.kind === 'url' ? 3 : 2);
+      const overflow = await side.evaluate(element => {
+        const card = element.closest('.card')!.getBoundingClientRect();
+        const side = element.getBoundingClientRect();
+        const left = Math.max(0, card.left, side.left);
+        const right = Math.min(innerWidth, card.right, side.right);
+        const outside = (rect: DOMRect) => rect.left < left - 1 || rect.right > right + 1;
+        const clipped: string[] = [];
+        for (const child of element.querySelectorAll('*')) {
+          if (outside(child.getBoundingClientRect())) clipped.push(child.className || child.tagName);
+          for (const node of child.childNodes) if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            if ([...range.getClientRects()].some(outside)) clipped.push(node.textContent);
+          }
+        }
+        return clipped;
+      });
+      expect(overflow, `${link.kind} detail must not hide overflowing elements or text`).toEqual([]);
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
 for (const profile of profiles) {
   const name = `${profile.lang}/${profile.theme}/${profile.width}`;
   test.describe(() => {
   test.use({ locale: profile.lang === 'zh' ? 'zh-CN' : 'en-US' });
+  for (const entry of ['sort', 'search', 'kind'] as const) {
+    test(`AUD-004 discard through ${entry} resets the editor and guards the next draft ${name}`, async ({ page }) => {
+      await login(page, profile);
+      const errors: string[] = [];
+      page.on('pageerror', error => errors.push(error.message));
+      const link = await create(page, { text: 'Saved body before editing' });
+      await page.goto(`${base}/admin/`);
+      const row = await openDetails(page, link.id);
+      const edit = row.getByRole('button', { name: profile.lang === 'zh' ? /^编辑/ : /^Edit/ });
+      await edit.click();
+      const body = page.locator(`#edit-text-${link.id}`);
+      await expect(body).toHaveValue('Saved body before editing');
+      await body.fill('Draft to discard');
+      const guard = page.getByRole('dialog', { name: profile.lang === 'zh' ? '保存修改后离开？' : 'Save changes before leaving?' });
+      const changeFilter = async (keyboard: boolean) => {
+        if (entry === 'search') {
+          await page.getByRole('searchbox').fill(link.slug);
+          return;
+        }
+        const trigger = page.locator(`.toolbar .${entry}`);
+        const option = page.getByRole('menuitemradio', {
+          name: entry === 'sort' ? (profile.lang === 'zh' ? '访问最多' : 'Most visits') : (profile.lang === 'zh' ? '文本' : 'Text'), exact: true,
+        });
+        if (keyboard) { await trigger.press('Enter'); await option.press('Enter'); }
+        else { await trigger.click(); await option.click(); }
+      };
+      await changeFilter(false);
+      await expect(guard).toBeVisible();
+      await guard.getByRole('button', { name: profile.lang === 'zh' ? '继续编辑' : 'Keep editing', exact: true }).click();
+      await expect(guard).not.toBeVisible();
+      await expect(body).toHaveValue('Draft to discard');
+      await changeFilter(true);
+      await expect(guard).toBeVisible();
+      const loaded = page.waitForResponse(r => r.url().includes('/api/admin/v1/links?') && r.request().method() === 'GET');
+      await guard.getByRole('button', { name: profile.lang === 'zh' ? '放弃修改' : 'Discard changes', exact: true }).press('Enter');
+      expect((await loaded).ok()).toBe(true);
+      await expect(guard).not.toBeVisible();
+      await expect(row.locator('.editor')).toHaveCount(0);
+      await edit.click();
+      await expect(body).toHaveValue('Saved body before editing');
+      await body.fill('New unsaved draft after discarding');
+      await page.getByRole('link', { name: profile.lang === 'zh' ? '设置' : 'Settings', exact: true }).click();
+      await expect(guard).toBeVisible();
+      await expect(page).toHaveURL(`${base}/admin/`);
+      await guard.getByRole('button', { name: profile.lang === 'zh' ? '继续编辑' : 'Keep editing', exact: true }).click();
+      await expect(body).toHaveValue('New unsaved draft after discarding');
+      expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Saved body before editing');
+      expect(errors).toEqual([]);
+    });
+  }
+
+  for (const [from, to] of [[30, 7], [90, 30]]) {
+    test(`AUD-005 hovered chart survives keyboard range ${from} to ${to} ${name}`, async ({ page }) => {
+      await login(page, profile);
+      const errors: string[] = [];
+      page.on('pageerror', error => errors.push(error.message));
+      const link = await create(page, { url: 'https://destination.invalid/chart' });
+      await page.goto(`${base}/admin/`);
+      const row = await openDetails(page, link.id);
+      const chart = row.locator('.chart');
+      const range = (days: number) => row.getByRole('radio', { name: `${days} ${profile.lang === 'zh' ? '天' : 'days'}`, exact: true });
+      await range(from).click();
+      await expect(chart.locator('tbody tr')).toHaveCount(from);
+      await chart.scrollIntoViewIfNeeded();
+      const box = await chart.locator('svg').boundingBox();
+      expect(box).not.toBeNull();
+      await page.mouse.move(box!.x + box!.width - 8, box!.y + 40);
+      await expect(chart.locator('.tip')).toBeVisible();
+      await expect(range(from)).toBeFocused();
+      const response = page.waitForResponse(r => r.url().endsWith(`/links/${link.id}/stats?days=${to}`));
+      await page.keyboard.press('ArrowLeft');
+      expect((await (await response).json()).days).toHaveLength(to);
+      await expect(range(to)).toBeChecked();
+      await expect(chart.locator('tbody tr')).toHaveCount(to);
+      expect(errors).toEqual([]);
+      await chart.focus();
+      await chart.press('End');
+      await expect(chart.locator('.tip')).toBeVisible();
+      await chart.press('Home');
+      await expect(chart.locator('.tip')).toBeVisible();
+      await chart.press('Escape');
+      await expect(chart.locator('.tip')).toHaveCount(0);
+      await range(90).click();
+      await expect(chart.locator('tbody tr')).toHaveCount(90);
+      await chart.scrollIntoViewIfNeeded();
+      const start = await chart.locator('svg').boundingBox();
+      expect(start).not.toBeNull();
+      await page.mouse.move(start!.x + 31, start!.y + 40);
+      await expect(chart.locator('.tip')).toBeVisible();
+      await page.keyboard.press('ArrowLeft');
+      await expect(chart.locator('tbody tr')).toHaveCount(30);
+      await expect(chart.locator('.tip')).toHaveCount(0);
+      await chart.focus();
+      await expect(chart.locator('.tip')).toBeVisible();
+      expect(errors).toEqual([]);
+    });
+  }
+
+  test(`AUD-006 encoded short URL search survives editing and stats refresh ${name}`, async ({ page }) => {
+    await login(page, profile);
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    const link = await create(page, { slug: `搜索-${profile.lang}-${profile.width}`, text: 'Unrelated saved body' });
+    await page.goto(`${base}/admin/`);
+    await search(page, link.slug);
+    const row = await openDetails(page, link.id);
+    const encoded = await row.locator('a.short-url').evaluate((a: HTMLAnchorElement) => a.href);
+    expect(encoded).toContain('%');
+    await search(page, encoded);
+    await expect(row).toBeVisible();
+    await expect(page.locator('.row')).toHaveCount(1);
+    await row.getByRole('button', { name: profile.lang === 'zh' ? /^编辑/ : /^Edit/ }).click();
+    await page.locator(`#edit-title-${link.id}`).fill('Edited under encoded search');
+    const saved = page.waitForResponse(r => r.request().method() === 'PATCH' && r.url() === `${base}/api/admin/v1/links/${link.id}`);
+    await row.locator('.editor button[type=submit]').click();
+    expect((await saved).ok()).toBe(true);
+    await expect(row.locator('.editor')).toHaveCount(0);
+    await expect(row).toBeVisible();
+    await row.getByRole('radio', { name: profile.lang === 'zh' ? '7 天' : '7 days', exact: true }).click();
+    await expect(row.locator('.chart tbody tr')).toHaveCount(7);
+    await expect(page.locator('.row')).toHaveCount(1);
+    await expect(page.getByRole('searchbox')).toHaveValue(encoded);
+    expect((await (await page.request.get(`${base}/api/admin/v1/links`, { params: { q: encoded } })).json()).total).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
   test(`BUG-01 canceled selection keeps the dirty text draft guarded on Delete ${name}`, async ({ page }) => {
     await login(page, profile);
     const link = await create(page, { text: 'Saved text before editing', title: `Draft ${name}` });

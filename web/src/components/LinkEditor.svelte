@@ -85,11 +85,17 @@
   }
 
   const checkDirty = () => dirty;
-  onDestroy(() => { if (editor.check === checkDirty || (editor.check === null && links.editingId === link.id)) { editor.check = null; editor.save = null; editor.saving = false; if (links.editingId === link.id) links.editingId = null; } });
+  onDestroy(() => {
+    if (editor.discard !== cancel) return;
+    editor.check = editor.save = editor.discard = null;
+    editor.saving = false;
+    if (links.editingId === link.id) links.editingId = null;
+  });
   $effect(() => { editor.saving = saving || tagBusy; });
   onMount(() => {
     editor.check = checkDirty;
     editor.save = save;
+    editor.discard = cancel;
     if (!isText) {
       ready();
       return;

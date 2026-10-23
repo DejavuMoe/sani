@@ -666,12 +666,17 @@
 
     .side {
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: flex-start;
       gap: 20px;
     }
 
     .meta {
       flex: 1;
+    }
+
+    .access-rules {
+      flex-basis: 100%;
     }
   }
 

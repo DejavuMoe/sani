@@ -2,6 +2,14 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
 
+## Unreleased
+
+- Fix discarded drafts remaining in the editor and disabling subsequent leave warnings after changing sort order, search or content type. Reopened editors retain full draft protection.
+- Fix chart rendering errors when shortening a date range with the keyboard while hovering. Track the hovered day by date so the chart stays consistent with the selected range.
+- Fix clipped detail content on narrow screens when QR codes, metadata and access rules competed for one row. Wrap the sidebar to the available width and give access rules a full row in both languages and themes.
+- Find Unicode short URLs encoded by the browser, including text and file share URLs. Apply the same matching rules after saving, statistics refreshes and failed-operation rollbacks; preserve literal percent characters in ordinary searches and destination URLs.
+- Remove an unused legacy hostname helper and its dedicated assertions while retaining coverage for the metadata hostname handling still used in production.
+
 ## v0.9.9
 
 2026-10-23 · Fix database paths, Unicode identity comparison and browser test cleanup, and update build dependencies. Database schema stays at 6 with no new migration.

@@ -133,15 +133,9 @@ func TestLocation(t *testing.T) {
 	}
 }
 
-func TestHost(t *testing.T) {
-	if h := Host("https://www.GitHub.com/x"); h != "github.com" {
-		t.Errorf("Host = %q", h)
-	}
+func TestFetchHost(t *testing.T) {
 	if h := FetchHost("https://www.GitHub.com:443/x"); h != "www.github.com" {
 		t.Errorf("FetchHost = %q", h)
-	}
-	if h := Host("mailto:a@b.c"); h != "" {
-		t.Errorf("Host(mailto) = %q", h)
 	}
 }
 

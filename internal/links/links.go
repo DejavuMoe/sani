@@ -289,16 +289,6 @@ func isIPLiteral(h string) bool {
 	return err == nil
 }
 
-// Host returns the lowercase hostname of an http(s) destination, without
-// port or a leading "www.". Other schemes return "".
-func Host(raw string) string {
-	u, err := url.Parse(raw)
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
-		return ""
-	}
-	return strings.TrimPrefix(strings.ToLower(u.Hostname()), "www.")
-}
-
 // FetchHost returns the exact hostname used to fetch page metadata.
 func FetchHost(raw string) string {
 	u, err := url.Parse(raw)

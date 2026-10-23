@@ -26,7 +26,7 @@ function held<T>() {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  editor.check = editor.save = editor.pending = null; editor.saving = false;
+  editor.check = editor.save = editor.discard = editor.pending = null; editor.saving = false;
   links.editingId = links.expandedId = null;
   links.tagsLoaded = links.tagsFailed = false;
   links.items = [{ ...old }];
@@ -161,6 +161,46 @@ describe('lists racing local writes', () => {
 
 
 describe('management state recovery', () => {
+  for (const kind of ['url', 'text', 'file'] as const) {
+    it.each(['审计', 'café'])('AUD-006 keeps %s ' + kind + ' results through updates and failed deletion', async slug => {
+      const link = { ...old, kind, slug, shortUrl: `http://localhost/${kind === 'url' ? '' : 'p/'}${slug}` };
+      links.items = [link];
+      links.query = new URL(link.shortUrl).href;
+      const updated = { ...link, clicks: 1 };
+      links.upsert(updated);
+      expect(links.items).toEqual([updated]);
+      expect(links.total).toBe(1);
+      vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
+      await links.remove(updated);
+      expect(links.items).toEqual([updated]);
+      expect(links.total).toBe(1);
+      links.query = new URL(link.shortUrl).pathname;
+      links.upsert({ ...updated, clicks: 2 });
+      expect(links.items).toHaveLength(1);
+      expect(links.items[0].clicks).toBe(2);
+      if (kind !== 'url') {
+        links.query = new URL(link.shortUrl).pathname.slice(1);
+        links.upsert({ ...updated, clicks: 3 });
+        expect(links.items).toHaveLength(1);
+        expect(links.items[0].clicks).toBe(3);
+      }
+    });
+  }
+
+  it.each([
+    ['external URL', 'https://destination.invalid/caf%C3%A9'],
+    ['literal search', '%C3%A9'],
+    ['single decode', 'http://localhost/%25C3%25A9'],
+    ['malformed escape', 'http://localhost/%GG'],
+    ['invalid UTF8', 'http://localhost/%FF'],
+  ])('AUD-006 preserves %s during local reconciliation', (_name, query) => {
+    const link = { ...old, url: 'https://destination.invalid/caf%C3%A9', title: 'Literal %C3%A9 %GG %FF' };
+    links.query = query;
+    links.upsert(link);
+    expect(links.items).toEqual([link]);
+    expect(links.total).toBe(1);
+  });
+
   it('BUG-01 keeps cancelled selection outside the picked set and protects the draft from deletion', async () => {
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;

@@ -15,7 +15,8 @@
   const AXIS = 22; // x tick labels
 
   let width = $state(0);
-  let active = $state<number | null>(null);
+  let activeDate = $state<string | null>(null);
+  const active = $derived(days.findIndex(d => d.date === activeDate));
   let tipWidth = $state(0);
 
   const plotW = $derived(Math.max(0, width - LEFT));
@@ -45,30 +46,30 @@
   function onpointermove(e: PointerEvent) {
     const box = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
     const i = Math.floor((e.clientX - box.left - LEFT) / slot);
-    active = i >= 0 && i < days.length ? i : null;
+    activeDate = days[i]?.date ?? null;
   }
 
   function onkeydown(e: KeyboardEvent) {
     const last = days.length - 1;
-    const cur = active ?? last;
+    const cur = active < 0 ? last : active;
     let next: number | null = null;
     if (e.key === 'ArrowLeft') next = Math.max(0, cur - 1);
     else if (e.key === 'ArrowRight') next = Math.min(last, cur + 1);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = last;
-    else if (e.key === 'Escape' && active !== null) {
-      active = null;
+    else if (e.key === 'Escape' && active >= 0) {
+      activeDate = null;
       e.stopPropagation();
       return;
     }
     if (next !== null) {
       e.preventDefault();
-      active = next;
+      activeDate = days[next]?.date ?? null;
     }
   }
 
   const tipLeft = $derived.by(() => {
-    if (active === null) return 0;
+    if (active < 0) return 0;
     const center = LEFT + (active + 0.5) * slot;
     const half = tipWidth / 2;
     return Math.max(half, Math.min(width - half, center));
@@ -85,12 +86,12 @@
   aria-label={label}
   tabindex="0"
   {onkeydown}
-  onfocus={() => (active ??= days.length - 1)}
-  onblur={() => (active = null)}
+  onfocus={() => { if (active < 0) activeDate = days.at(-1)?.date ?? null; }}
+  onblur={() => (activeDate = null)}
 >
   {#if width > 0 && days.length > 0}
-    <svg {width} {height} aria-hidden="true" {onpointermove} onpointerleave={() => (active = null)}>
-      {#if active !== null}
+    <svg {width} {height} aria-hidden="true" {onpointermove} onpointerleave={() => (activeDate = null)}>
+      {#if active >= 0}
         <rect class="band" x={LEFT + active * slot} y={TOP - 4} width={slot} height={plotH + 4} rx="4" />
       {/if}
       {#each ticks as tick, i (i)}
@@ -103,7 +104,7 @@
         {#if d.count > 0}
           {@const h = Math.max(2, (d.count / top) * plotH)}
           <path
-            class={['bar', i === days.length - 1 && 'today', active === i && 'on', active !== null && active !== i && 'off']}
+            class={['bar', i === days.length - 1 && 'today', active === i && 'on', active >= 0 && active !== i && 'off']}
             d={barPath(LEFT + i * slot + (slot - bar) / 2, TOP + plotH - h, bar, h)}
           />
         {/if}
@@ -114,7 +115,7 @@
     {#if peak === 0 && empty}
       <p class="empty" style:top="{TOP + plotH / 2}px" style:left="{LEFT}px">{empty}</p>
     {/if}
-    {#if active !== null}
+    {#if active >= 0}
       {@const d = days[active]}
       <div class="tip" bind:clientWidth={tipWidth} style:left="{tipLeft}px" style:top="{yOf(d.count)}px" aria-hidden="true">
         <strong>{t('chart.clicks', { n: d.count })}</strong>

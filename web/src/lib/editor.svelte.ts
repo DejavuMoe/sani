@@ -4,6 +4,7 @@ class EditorGuard {
   saving = $state(false);
   check: (() => boolean) | null = null;
   save: (() => Promise<boolean>) | null = null;
+  discard: (() => void) | null = null;
 
   request(action: () => void) {
     if (this.saving) return;
@@ -15,6 +16,7 @@ class EditorGuard {
     const action = this.pending;
     this.pending = null;
     this.check = null;
+    this.discard?.();
     action?.();
   }
 

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/DejavuMoe/sani/internal/clicks"
 	"github.com/DejavuMoe/sani/internal/links"
@@ -360,7 +361,13 @@ func (s *Server) listLinks(w http.ResponseWriter, r *http.Request) {
 	base := s.baseURL(r)
 	search := strings.TrimSpace(q.Get("q"))
 	// Pasting a short URL into search should find that link.
+	shortPath := strings.HasPrefix(search, base+"/") || strings.HasPrefix(search, "/") || strings.HasPrefix(search, "p/")
 	search = strings.TrimPrefix(search, base+"/")
+	if shortPath {
+		if decoded, err := url.PathUnescape(search); err == nil && utf8.ValidString(decoded) {
+			search = decoded
+		}
+	}
 	search = strings.TrimPrefix(search, "/")
 	search = strings.TrimPrefix(search, "p/")
 	lq.Search = search
