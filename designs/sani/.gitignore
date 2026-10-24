@@ -2,3 +2,5 @@
 content/
 screenshots/compare/*.png
 screenshots/review/
+review-r11/content/
+review-r11/rendered-content.json

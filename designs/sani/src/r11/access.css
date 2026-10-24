@@ -1,0 +1,55 @@
+/* R11 access controls, protected-row mark and metadata runs. */
+
+/* Composer rows: 6px inset under a 12px card puts 6px controls on concentric corners. */
+.cmp-options,
+.cmp-share .cmp-options { gap: 4px; padding: 6px 6px 6px 16px; }
+.cmp-options .opt,
+.cmp-share .cmp-go { border-radius: var(--radius-sm); }
+.cmp-options .opt.set { color: var(--text); }
+.cmp-options .opt .icon { color: var(--text-2); }
+.r11-access { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.r11-access .expiry { display: contents; }
+.r11-access .r4-date { flex-basis: 100%; }
+
+.r11-code { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+
+/* Popover: 12px outer, 4px inset, 8px fields and buttons. */
+.r11-pop { position: fixed; inset: auto; margin: 0; padding: 4px; border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); box-shadow: var(--hair-shadow), var(--shadow-pop); opacity: 1; transform: none; transition: opacity var(--normal) var(--ease), transform var(--normal) var(--ease), overlay var(--normal) allow-discrete, display var(--normal) allow-discrete; }
+.r11-pop[popover]:not(:popover-open) { opacity: 0; transform: translateY(-4px); }
+@starting-style { .r11-pop:popover-open { opacity: 0; transform: translateY(-4px); } }
+[data-theme="dark"] .r11-pop { background: var(--surface-2); }
+.r11-pop-body { display: grid; gap: 8px; padding: 8px 8px 4px; font-size: 13px; }
+.r11-pop-title { color: var(--text); font-weight: 600; }
+.r11-pw { display: flex; align-items: center; gap: 2px; height: var(--control-field); padding: 0 2px 0 10px; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2); border-radius: var(--radius); background: var(--surface); }
+.r11-pw:focus-within { --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent); box-shadow: var(--hair-shadow), 0 0 0 2px var(--accent-line); }
+.r11-pw.invalid { --hbt: var(--danger-line); --hbr: var(--danger-line); --hbb: var(--danger-line); --hbl: var(--danger-line); }
+.r11-pw input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: none; background: transparent; font-size: var(--input-font-size); }
+.r11-pw .btn { border-radius: var(--radius-sm); }
+.r11-unit { padding-right: 8px; color: var(--text-2); }
+.r11-pop .error-text { margin: 0; }
+.r11-pop-foot { display: flex; align-items: center; gap: 4px; margin: 4px -4px 0; padding-top: 8px; --hbt: var(--line); }
+.r11-pop-foot .btn { border-radius: var(--radius); }
+.r11-gap { flex: 1; }
+
+/* Rows: a quiet lock after the title; metadata runs use spacing, not dots. */
+.r11-lock { display: inline-grid; flex: none; place-items: center; color: var(--text-2); }
+.r11-meta-part + .r11-meta-part { margin-left: 12px; }
+
+/* Detail: masked value with two square actions aligned to the row's end. */
+.r11-pw-value { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; margin: -6px -6px -6px 0 !important; }
+.r11-pw-value .r11-code { margin-right: 4px; }
+
+/* Editor: input and generate share one height and top edge. */
+.r11-field-pair { display: flex; gap: 8px; }
+.r11-field-pair .field { flex: 1; min-width: 0; height: var(--control-field); }
+.r11-field-pair .btn { height: var(--control-field); }
+
+/* Unavailable state: one line with its fix. */
+.r11-unavailable { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding: 8px 8px 8px 14px; border-radius: var(--radius); background: var(--surface-2); color: var(--text-2); font-size: 13px; }
+.r11-unavailable strong { margin-right: 8px; color: var(--text); font-weight: 600; }
+
+.r11-upload-cancel { display: flex; justify-content: flex-end; padding: 0 6px 6px; }
+
+/* Editor: the switch shares the password row's baseline. */
+.le-switch-row { align-self: end; display: flex; align-items: center; min-height: var(--control-field); }
+

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Sani</title>
+    <script src="src/gen/visitor.js"></script>
+    <script src="src/fixtures.js"></script>
+  </head>
+  <body>
+    <script>
+      /*
+       * R11 visitor pages: the server-rendered status, share and password
+       * pages (web.go, sharepage.go) with Radix Slate/Indigo/Red tokens,
+       * hairlines and three type sizes (12, 13, 16). The password page is a
+       * plain form that works without script; here a mock answers it.
+       *
+       *   ?page=notfound|gone|error|share-notfound|share-gone|share-text|share-code
+       *        |share-file|share-file-off|unlock-text|unlock-file|unlock-url
+       *   &state=wrong|rate|empty  &lang=zh|en  &theme=light|dark  &until=1
+       */
+      (function () {
+        var V = window.SANI_VISITOR;
+        var F = window.SANI_FIXTURES;
+        var p = new URLSearchParams(location.search);
+        var page = p.get('page') || 'unlock-text';
+        var lang = p.get('lang') === 'en' ? 'en' : 'zh';
+        var theme = p.get('theme');
+        var host = new URL(F.config.baseUrl).host;
+        var htmlLang = { zh: 'zh-CN', en: 'en' }[lang];
+        var esc = function (s) {
+          return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&#34;', "'": '&#39;' }[c];
+          });
+        };
+
+        // Proposed copy for the password page and the share-page labels R11 adds.
+        var C = {
+          zh: { heading: '输入访问密码', label: '访问密码', submit: '继续', wrong: '密码不正确', empty: '请输入访问密码', rate: '尝试次数过多，请 1 分钟后再试' },
+          en: { heading: 'Enter the password', label: 'Password', submit: 'Continue', wrong: 'Incorrect password', empty: 'Enter the password to continue', rate: 'Too many attempts. Try again in a minute.' },
+        }[lang];
+
+        var light = ':root{--bg:#f9f9fb;--surface:#fff;--soft:#f0f0f3;--fg:#1c2024;--fg2:#60646c;--line:#d9d9e0;--line2:#cdced6;' +
+          '--accent:#3e63dd;--accent-hover:#3358d4;--ring:#c1d0ff;--focus:#8da4ef;--danger:#ce2c31;--danger-line:#eb8e90;--danger-ring:#fdbdbe;--on-accent:#fff}';
+        var dark = ':root{--bg:#111113;--surface:#18191b;--soft:#212225;--fg:#edeef0;--fg2:#b0b4ba;--line:#363a3f;--line2:#43484e;' +
+          '--accent:#3e63dd;--accent-hover:#5472e4;--ring:#304384;--focus:#435db1;--danger:#ff9592;--danger-line:#b54548;--danger-ring:#72232d;--on-accent:#fff}';
+        var tokens = theme === 'dark' ? dark + ':root{color-scheme:dark}' : theme === 'light' ? light + ':root{color-scheme:light}' :
+          ':root{color-scheme:light dark}' + light + '@media (prefers-color-scheme:dark){' + dark + '}';
+        var base = '*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}' +
+          'body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}' +
+          '.mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}' +
+          ':focus-visible{outline:2px solid var(--accent);outline-offset:2px}';
+        var center = 'body{display:grid;min-height:100dvh;place-items:center;padding:24px 16px}main{width:min(100%,320px);text-align:center}' +
+          'h1{margin:0;font-size:16px;font-weight:600;line-height:1.5}' +
+          '.where{margin:4px 0 0;color:var(--fg2);font-size:12px;overflow-wrap:anywhere}';
+        var statusCss = center + 'main{width:min(100%,400px)}.code{margin-bottom:12px;color:var(--fg2);font-size:12px}p{margin:8px 0 0;color:var(--fg2)}';
+        var unlockCss = center +
+          '.mark{display:grid;width:40px;height:40px;margin:0 auto 16px;place-items:center;border-radius:10px;background:var(--soft);color:var(--fg2)}' +
+          'form{display:grid;gap:8px;margin-top:24px;text-align:left}' +
+          'input{width:100%;height:40px;padding:0 12px;border:0;box-shadow:inset 0 0 0 .5px var(--line2);border-radius:8px;background:var(--surface);color:var(--fg);font:16px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;outline:none}' +
+          'input:focus{box-shadow:inset 0 0 0 .5px var(--focus),0 0 0 2px var(--ring)}input[aria-invalid=true]{box-shadow:inset 0 0 0 .5px var(--danger-line)}input[aria-invalid=true]:focus{box-shadow:inset 0 0 0 .5px var(--danger-line),0 0 0 2px var(--danger-ring)}' +
+          '.error{margin:0;color:var(--danger);font-size:12px}' +
+          'button{height:40px;border:0;border-radius:8px;background:var(--accent);color:var(--on-accent);font:inherit;font-weight:500;cursor:pointer}button:hover{background:var(--accent-hover)}' +
+          '.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}';
+        var shareCss = function (code) {
+          return 'main{width:min(100%,' + (code ? '1080px' : '760px') + ');margin:0 auto;padding:48px 24px 72px}' +
+            'h1{margin:0;font-size:16px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}' +
+            '.meta{display:flex;flex-wrap:wrap;gap:0 12px;margin:2px 0 0;color:var(--fg2);font-size:12px}' +
+            '.bar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}' +
+            '.actions{display:flex;flex-wrap:wrap;gap:4px}' +
+            '.btn{display:inline-flex;align-items:center;height:28px;padding:0 10px;border:0;box-shadow:inset 0 0 0 .5px var(--line2);border-radius:6px;background:var(--surface);color:var(--fg);font:inherit;font-weight:500;text-decoration:none;cursor:pointer}' +
+            '.btn:hover{background:var(--soft)}.btn.primary{box-shadow:none;background:var(--accent);color:var(--on-accent)}.btn.primary:hover{background:var(--accent-hover)}.btn[hidden]{display:none}' +
+            '.sheet::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .5px var(--line);pointer-events:none}.sheet{position:relative;overflow:hidden;border-radius:12px;background:var(--surface)}' +
+            'pre{margin:0;font:13px/1.7 "IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;tab-size:4}' +
+            '.plain pre{padding:20px 24px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:16px;line-height:1.75}' +
+            '.code{display:flex;overflow-x:auto}.code .ln{position:sticky;left:0;flex:none;padding:16px 12px 16px 16px;box-shadow:inset -.5px 0 0 var(--line);background:var(--soft);color:var(--fg2);text-align:right;user-select:none}.code .src{flex:1;padding:16px 20px}' +
+            '.file{display:flex;flex-direction:column;align-items:center;gap:4px;padding:40px 24px;text-align:center}.file svg{color:var(--fg2)}' +
+            '.file .name{margin-top:8px;font-weight:600;overflow-wrap:anywhere}.file .type{display:flex;gap:12px;color:var(--fg2);font-size:12px}.file .btn{margin-top:16px;height:36px;padding:0 16px;border-radius:8px}' +
+            '.file .sum{margin-top:16px;color:var(--fg2);font-size:12px;overflow-wrap:anywhere}.note{margin-top:16px;color:var(--fg2);font-size:12px}' +
+            '@media (max-width:640px){main{padding:24px 16px 56px}.plain pre{padding:16px}}';
+        };
+        var doc = function (title, css, body, script) {
+          return '<!doctype html>\n<html lang="' + htmlLang + '">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+            '<meta name="robots" content="noindex">\n<meta name="referrer" content="no-referrer">\n<title>' + esc(title) + '</title>\n' +
+            '<link rel="stylesheet" href="src/fonts.css">\n<style>\n' + tokens + base + css + '\n</style>\n</head>\n<body>\n' + body + (script ? '<script>' + script + '<\/script>\n' : '') + '</body>\n</html>\n';
+        };
+
+        function formatSize(n) {
+          var units = ['B', 'KB', 'MB', 'GB'], v = n, u = 0;
+          while (v >= 1024 && u < units.length - 1) { v /= 1024; u++; }
+          if (u === 0) return n + ' B';
+          return (v < 10 ? v.toFixed(1) : Math.round(v).toString()) + ' ' + units[u];
+        }
+        var groupDigits = function (n) { return String(n).replace(/\B(?=(\d{3})+$)/g, ','); };
+        var fmt = function (s, v) { return s.replace('%s', v); };
+        function formatWhen(ms) {
+          var d = new Date(ms), pad = function (n) { return String(n).padStart(2, '0'); };
+          if (lang === 'zh') return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ', ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+
+        var text = F.links.find(function (l) { return l.id === 10; });
+        var file = F.links.find(function (l) { return l.id === 9; });
+        var url = F.links.find(function (l) { return l.id === 4; });
+        var passwords = { 'unlock-text': '7KQ2MX', 'unlock-file': 'R4TQ8N', 'unlock-url': 'H3KP9W' };
+
+        function statusPage(kind, link) {
+          var t = V.pageCopy[lang][kind];
+          return doc(t.title, statusCss, '<main>\n<div class="code mono">' + V.pageStatus[kind] + '</div>\n<h1>' + esc(t.heading) + '</h1>\n<p>' + esc(t.body) + '</p>\n<p class="where mono">' + esc(link) + '</p>\n</main>\n');
+        }
+
+        function unlockPage(kind) {
+          var link = kind === 'unlock-text' ? text : kind === 'unlock-file' ? file : url;
+          var shown = host + '/' + (link.kind === 'url' ? '' : 'p/') + link.slug;
+          var state = p.get('state');
+          var err = state === 'wrong' ? C.wrong : state === 'rate' ? C.rate : state === 'empty' ? C.empty : '';
+          var lock = '<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="10" height="6.5" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>';
+          var body = '<main>\n<div class="mark">' + lock + '</div>\n<h1 id="heading">' + esc(C.heading) + '</h1>\n<p class="where mono">' + esc(shown) + '</p>\n' +
+            '<form method="post" novalidate>\n<label class="sr" for="password">' + esc(C.label) + '</label>\n' +
+            '<input id="password" name="password" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus' +
+            (state === 'wrong' ? ' value="7KQ2"' : '') + (err ? ' aria-invalid="true" aria-describedby="error"' : '') + '>\n' +
+            (err ? '<p class="error" id="error" role="alert">' + esc(err) + '</p>\n' : '') +
+            '<button type="submit"' + (state === 'rate' ? ' disabled' : '') + '>' + esc(C.submit) + '</button>\n</form>\n</main>\n';
+          // Mock of the POST: the prototype reloads into the matching result page.
+          var mock = 'document.querySelector("form").addEventListener("submit",function(e){e.preventDefault();' +
+            'var v=document.getElementById("password").value.trim().toUpperCase(),q=new URLSearchParams(location.search);' +
+            'if(!v)q.set("state","empty");else if(v===' + JSON.stringify(passwords[kind]) + '){q.delete("state");q.set("page",' + JSON.stringify(kind === 'unlock-text' ? 'share-text' : kind === 'unlock-file' ? 'share-file' : 'redirected') + ')}else q.set("state","wrong");' +
+            'location.search=q.toString()});';
+          return doc(C.heading, unlockCss, body, mock);
+        }
+
+        function sharePage(l, format, rawUrl) {
+          var L = V.shareCopy[lang], c = l.content, isText = l.kind === 'text', code = isText && format === 'code';
+          var meta = [], heading, body = '', numbers = '';
+          if (isText) {
+            heading = l.title || c.name || l.slug;
+            body = F.texts[String(l.id)];
+            if (code && c.lines > 1) numbers = Array.from({ length: c.lines }, function (_, i) { return i + 1; }).join('\n');
+            meta.push(code ? L.Code : L.Text, fmt(c.lines === 1 ? L.Line : L.Lines, groupDigits(c.lines)), formatSize(c.size));
+          } else {
+            heading = l.title || c.name;
+            meta.push(L.File, formatSize(c.size));
+          }
+          var s = '<main>\n<div class="bar">\n<div>\n<h1>' + esc(heading) + '</h1>\n<p class="meta">' + meta.map(function (m) { return '<span>' + esc(m) + '</span>'; }).join('') + '</p>\n</div>\n';
+          if (isText) {
+            s += '<div class="actions">\n<button class="btn" type="button" data-copy data-label="' + esc(L.Copy) + '" data-done="' + esc(L.Copied) + '" hidden>' + esc(L.Copy) + '</button>\n';
+            if (rawUrl) s += '<a class="btn" href="' + esc(rawUrl) + '">' + esc(L.Raw) + '</a>\n<a class="btn" href="' + esc(rawUrl + '/' + encodeURIComponent(l.slug) + '.txt') + '">' + esc(L.Download) + '</a>\n';
+            s += '</div>';
+          }
+          s += '\n</div>\n';
+          if (isText) {
+            s += code ? '<div class="sheet code" tabindex="0" role="region" aria-label="' + esc(L.Code) + '">' + (numbers ? '<pre class="ln" aria-hidden="true">\n' + numbers + '</pre>' : '') + '<pre class="src" id="text">\n' + esc(body) + '</pre></div>' :
+              '<div class="sheet plain"><pre id="text">\n' + esc(body) + '</pre></div>';
+          } else {
+            s += '<div class="sheet file">\n' + V.fileIcon + '\n<div class="name">' + esc(c.name) + '</div>\n<div class="type"><span>' + esc(c.type.split(';')[0]) + '</span><span>' + esc(formatSize(c.size)) + '</span></div>\n';
+            s += rawUrl ? '<a class="btn primary" href="' + esc(rawUrl) + '">' + esc(L.DownloadFile) + '</a>' : '<p class="note">' + esc(L.Unavailable) + '</p>';
+            s += '\n<div class="sum mono">SHA-256 ' + esc(c.sha256) + '</div>\n</div>';
+          }
+          if (p.get('until')) s += '\n<p class="note">' + esc(fmt(L.Until, formatWhen(Date.parse(F.capturedAt) + 7 * 864e5))) + '</p>';
+          s += '\n</main>\n';
+          var copy = 'for(const b of document.querySelectorAll("[data-copy]")){b.hidden=false;b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(document.getElementById("text").textContent);b.textContent=b.dataset.done;setTimeout(()=>b.textContent=b.dataset.label,1600)}catch(e){}})}';
+          return doc(heading, shareCss(code), s, copy);
+        }
+
+        var html;
+        if (page === 'unlock-text' || page === 'unlock-file' || page === 'unlock-url') html = unlockPage(page);
+        else if (page === 'share-code') html = sharePage(text, 'code', text.content.rawUrl);
+        else if (page === 'share-text') html = sharePage(text, 'plain', text.content.rawUrl);
+        else if (page === 'share-file') html = sharePage(file, null, file.content.rawUrl + '?t=…');
+        else if (page === 'share-file-off') html = sharePage(file, null, '');
+        else if (page === 'redirected') html = doc('302', statusCss, '<main data-proto-chrome=""><div class="code mono">302</div><p class="where mono">' + esc(url.url) + '</p></main>');
+        else {
+          var kind = V.pageCopy[lang][page] ? page : 'notfound';
+          var slug = { notfound: 'k3x9p', gone: 'talk', error: 'gh', 'share-notfound': 'p/k3x9p', 'share-gone': 'p/nginx-conf' }[kind];
+          html = statusPage(kind, host + '/' + slug);
+        }
+        document.open();
+        document.write(html);
+        document.close();
+      })();
+    </script>
+  </body>
+</html>

@@ -58,15 +58,15 @@ They do not replace those files.
 - 系统文件选择窗口及权限对话框不属于应用可绘制界面，不仿制；应用内入口仍需统一样式。以上规则同样用于新原型的评审工具条。
 - 视觉验收必须实际打开每个受影响控件，检查鼠标与键盘操作、中英文明暗主题、桌面及窄屏。只有收起截图、构建通过或 axe 通过均不足以证明符合设计；历史原型保留作为记录，新实现必须遵守当前约束。
 
-- Typography: Inter Variable for text, IBM Plex Mono for slugs, URLs and code. Chinese uses the system CJK fonts in `--font-sans`. Body text is 14px.
-- Density and layout: one 920px column with hairline-separated surfaces. Shadows only on floating layers (menus, dialogs, toasts). One accent on warm neutrals.
+- Typography: Inter Variable for text, IBM Plex Mono for slugs, URLs and code. Chinese uses the system CJK fonts in `--font-sans`. Since R11 a page uses at most four sizes: 12 (meta), 13 (body and controls), 16 (headings, phone inputs) and 20 (figures); nothing below 12px. Hierarchy comes from weight, colour step and spacing.
+- Density and layout: one 920px column with hairline-separated surfaces. Shadows only on floating layers (menus, popovers, dialogs, toasts). Since R11, colours come only from Radix Colors (Slate neutrals, Indigo accent, Red/Green/Amber states) used by their step roles; lines are 0.5px, drawn as inset shadows because browsers round thinner borders up to 1px; nested corners are concentric; no coloured edge on cards or rows; no "·" separators.
 - 新设置沿用现有的行布局、控件尺寸和间距；不为几个字段新增嵌套卡片、大块保底高度或重复的选择层级。互斥选项使用同一组 Segmented，按钮文字居中。同一行输入框与操作按钮必须等高、顶边对齐；按已批准的 R10，桌面字段为 32px，窄屏或粗指针为 40px；独立按钮为 28px / 36px，菜单行至少 36px / 44px。数字框为 32px / 36px 高，400 字重、起始侧对齐；按钮透明触控区域至少 44px 且不重叠。字号放大时控件允许增长与换行。
 - 控件验收包含实际几何检查：成组输入框与按钮的高度、顶边，以及分段按钮中文字的水平和垂直居中。必须在整页上下文中检查同类控件，不能仅凭局部截图或无障碍检测通过判定视觉一致。
 - 网页信息获取不引入付费或依赖免费额度的商业中继。R5 去除 Jina，保留后台配置 HTTP(S) / SOCKS5；未经验证的第三方服务不能作为可用功能展示。
 - Interaction: everything is reachable by keyboard, with the shortcuts in `capabilities.md`. Destructive actions offer undo rather than confirmation dialogs. Copying gives a toast with the copied value.
 - Forbidden: icon fonts or icon libraries, UI kits, opacity for dimming text (use the text tokens), new modal flows where an inline state works.
 - Accessibility: WCAG AA text contrast in both themes, axe clean, labels on every control, live regions for status changes.
-- Motion: 120ms and 180ms transitions on the `--ease` curves. Under `prefers-reduced-motion` everything drops to 1ms.
+- Motion (R11): hover and colour changes are instant; layers that enter or leave (menus, popovers, dialogs, toasts) use 250ms ease-out. No decorative pulses or loops. Under `prefers-reduced-motion` everything drops to 1ms.
 
 ## Privacy and multimodal evidence
 

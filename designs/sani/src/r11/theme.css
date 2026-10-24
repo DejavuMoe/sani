@@ -1,0 +1,167 @@
+/*
+ * R11 theme: Radix Colors (Slate, Indigo, Red, Green, Amber) mapped onto the
+ * existing token names, so every component keeps its rules.
+ *
+ * Radix steps: 1–2 backgrounds, 3–5 component states, 6–8 borders,
+ * 9–10 solid fills, 11–12 text. Slate 11 is the only secondary text step that
+ * clears 4.5:1, so hierarchy below it comes from weight and spacing.
+ */
+:root,
+:root[data-theme="light"] {
+  --bg: #f9f9fb;            /* slate 2 */
+  --surface: #ffffff;
+  --surface-2: #f0f0f3;     /* slate 3 */
+  --surface-3: #e8e8ec;     /* slate 4 */
+  --line: #d9d9e0;          /* slate 6 */
+  --line-2: #cdced6;        /* slate 7 */
+  --line-3: #b9bbc6;        /* slate 8 */
+  --text: #1c2024;          /* slate 12 */
+  --text-2: #60646c;        /* slate 11 */
+  --text-3: #60646c;        /* slate 11 */
+  --text-4: #b9bbc6;        /* slate 8, marks and disabled only */
+  --accent: #3e63dd;        /* indigo 9, also used as text: 5.1:1 */
+  --accent-hover: #3358d4;  /* indigo 10 */
+  --accent-text: #3a5bc7;   /* indigo 11 */
+  --accent-soft: #edf2fe;   /* indigo 3 */
+  --accent-line: #c1d0ff;   /* indigo 6 */
+  --solid: #3e63dd;         /* indigo 9 */
+  --solid-hover: #3358d4;   /* indigo 10 */
+  --on-solid: #ffffff;
+  --ink: #1c2024;
+  --ink-hover: #1c2024;
+  --on-ink: #ffffff;
+  --danger: #ce2c31;        /* red 11 */
+  --danger-line: #eb8e90;   /* red 8 */
+  --danger-soft: #feebec;   /* red 3 */
+  --success: #218358;       /* green 11 */
+  --warning: #ab6400;       /* amber 11 */
+  --toast: #1c2024;         /* slate 12 */
+  --on-toast: #fcfcfd;      /* slate 1 */
+  --on-toast-2: #b9bbc6;    /* slate 8 */
+  --shadow-pop: 0 8px 24px -8px rgb(28 32 36 / 0.18);
+  --scrim: rgb(28 32 36 / 0.32);
+  --selection: #d2deff;     /* indigo 5 */
+  --tone-success: #3dd68c;  /* green 11 (dark), on the dark toast */
+  --tone-error: #ff9592;    /* red 11 (dark), on the dark toast */
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #111113;            /* slate 1 */
+  --surface: #18191b;       /* slate 2 */
+  --surface-2: #212225;     /* slate 3 */
+  --surface-3: #272a2d;     /* slate 4 */
+  --line: #363a3f;          /* slate 6 */
+  --line-2: #43484e;        /* slate 7 */
+  --line-3: #5a6169;        /* slate 8 */
+  --text: #edeef0;          /* slate 12 */
+  --text-2: #b0b4ba;        /* slate 11 */
+  --text-3: #b0b4ba;        /* slate 11 */
+  --text-4: #5a6169;        /* slate 8 */
+  --accent: #9eb1ff;        /* indigo 11: indigo 9 is only 3.4:1 as text here */
+  --accent-hover: #d6e1ff;  /* indigo 12 */
+  --accent-text: #9eb1ff;
+  --accent-soft: #182449;   /* indigo 3 */
+  --accent-line: #304384;   /* indigo 6 */
+  --solid: #3e63dd;         /* indigo 9 */
+  --solid-hover: #5472e4;   /* indigo 10 */
+  --on-solid: #ffffff;
+  --ink: #edeef0;
+  --ink-hover: #edeef0;
+  --on-ink: #111113;
+  --danger: #ff9592;        /* red 11 */
+  --danger-line: #b54548;   /* red 8 */
+  --danger-soft: #3b1219;   /* red 3 */
+  --success: #3dd68c;       /* green 11 */
+  --warning: #ffca16;       /* amber 11 */
+  --toast: #212225;         /* slate 3 */
+  --on-toast: #edeef0;
+  --on-toast-2: #b0b4ba;
+  --shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.6);
+  --scrim: rgb(0 0 0 / 0.6);
+  --selection: #253974;     /* indigo 5 */
+  --tone-success: #3dd68c;
+  --tone-error: #ff9592;
+  color-scheme: dark;
+}
+
+/* Shape: one radius per nesting level. Outer 12 with 4 inside gives 8. */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --hair: 0.5px;
+  --ease: cubic-bezier(0, 0, 0.2, 1);
+  --ease-io: cubic-bezier(0, 0, 0.2, 1);
+  --fast: 0ms;
+  --normal: 250ms;
+}
+
+/*
+ * Hairlines. Browsers round a border under one device pixel up to a full
+ * pixel, so lines are inset 0.5px shadows: crisp at 2x, a light 1px at 1x.
+ * Each side's colour is a non-inherited property; app.css sets them where
+ * R10 set border colours, and any rule with its own shadow lists
+ * --hair-shadow first.
+ */
+@property --hbt { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbr { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbb { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbl { syntax: "<color>"; inherits: false; initial-value: transparent; }
+* {
+  --hair-shadow: inset 0 0.5px 0 var(--hbt), inset -0.5px 0 0 var(--hbr), inset 0 -0.5px 0 var(--hbb), inset 0.5px 0 0 var(--hbl);
+  box-shadow: var(--hair-shadow);
+}
+
+/* Controls and surfaces carry no shadow; only floating layers do. */
+.btn-secondary { box-shadow: var(--hair-shadow); }
+.seg { border-radius: var(--radius); padding: 2px; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line); box-shadow: var(--hair-shadow); }
+.seg > button { border-radius: var(--radius-sm); }
+.seg > button[aria-checked="true"] { --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2); box-shadow: var(--hair-shadow); }
+.switch-thumb { box-shadow: none; }
+.cmp, .cmp:focus-within, .cmp.dragging { box-shadow: var(--hair-shadow); }
+.menu, .tag-pop { padding: 4px; border-radius: var(--radius-lg); }
+.mi { border-radius: var(--radius); }
+.toast { border-radius: var(--radius-lg); }
+.toast-action, .toast-dismiss { border-radius: var(--radius); }
+.toast-success .tone { color: var(--tone-success); }
+.toast-error .tone { color: var(--tone-error); }
+.toast .detail, .toast-detail { color: var(--on-toast-2); }
+.hd { --hbb: transparent; box-shadow: var(--hair-shadow); }
+.hd.scrolled { --hbb: var(--line); }
+kbd { border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2); }
+.ll-box, .lr-box { border: 0; --hbt: var(--text-2); --hbr: var(--text-2); --hbb: var(--text-2); --hbl: var(--text-2); }
+
+/* Primary actions are the one solid fill: Indigo 9, hover 10. */
+.btn-primary,
+.btn-accent,
+.cmp-go { background: var(--solid); color: var(--on-solid); }
+[data-theme="dark"] .btn-accent { color: var(--on-solid); }
+.btn-primary:hover:not(:disabled),
+.btn-accent:hover:not(:disabled),
+.cmp-go:hover:not(:disabled) { background: var(--solid-hover); }
+.cmp-go-kbd { --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; background: #3a5bc7; color: var(--on-solid); } /* indigo 11 under white: 6.1:1 */
+
+/* Field focus: Indigo line and ring, error from Red 8. */
+.field:focus,
+.field:focus-visible,
+.slugf-boxed .slugf-box:focus-within,
+.ll-search:focus-within { --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent); box-shadow: var(--hair-shadow), 0 0 0 2px var(--accent-line); }
+.field[aria-invalid="true"] { --hbt: var(--danger-line); --hbr: var(--danger-line); --hbb: var(--danger-line); --hbl: var(--danger-line); }
+.field[aria-invalid="true"]:focus { box-shadow: var(--hair-shadow), 0 0 0 2px var(--danger-soft); }
+
+/* Selection is a fill, never a coloured edge. */
+.lr.selected .lr-line::before { display: none; }
+.lr.selected .lr-line { background: var(--surface-2); }
+
+/* Letter tiles and QR use the neutral scale. */
+.letter { background: var(--surface-3); color: var(--text-2); }
+.qr path { fill: #1c2024; }
+
+/* No decorative motion: pulses and breathing placeholders stand still. */
+.cmp.pulse { animation: none; }
+.lr-pending { animation: none; }
+.lr.fresh .lr-line { animation: none; background: var(--accent-soft); }
+.shake { animation: none; }
+.toast { animation-duration: 250ms; animation-timing-function: var(--ease); }
+

@@ -1065,6 +1065,89 @@
       },
       "status": "implemented",
       "notes": "Approved in ead108e; Svelte implementation and verification recorded in implementation-r10/verification.json and r10-handoff.md."
+    },
+    {
+      "id": "r11-access-and-visual",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-r11.html",
+        "assetPath": "prototype-r11.html",
+        "files": [
+          "prototype-r11.html",
+          "visitor-r11.html",
+          "src/r11/app.css",
+          "src/r11/theme.css",
+          "src/r11/access.css",
+          "src/r11/access.jsx",
+          "src/r11/patterns.jsx",
+          "src/r11/detail.jsx",
+          "src/r11/states.jsx",
+          "src/r11/screens.jsx",
+          "src/r11/controls.jsx",
+          "src/r11/tags.jsx",
+          "src/r11/management.jsx",
+          "src/r11/copy.js",
+          "src/r11/scenes.jsx",
+          "src/r11/app.jsx"
+        ],
+        "states": [
+          "create-url-text-file-with-expiry-limit-password",
+          "password-popover-generate-regenerate-invalid-confirm-remove",
+          "limit-popover",
+          "created-toast-link-and-password",
+          "row-protected",
+          "detail-masked-reveal-copy",
+          "editor-password-generate-clear",
+          "visitor-unlock-text-file-url",
+          "visitor-unlock-wrong-empty-rate",
+          "visitor-share-pages",
+          "zh-en-light-dark-1280-390"
+        ],
+        "stableIds": [
+          "create-tab-url",
+          "create-tab-text",
+          "create-tab-file",
+          "detail-10",
+          "edit-password-10"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/, /{slug}, /p/{slug}, files origin",
+        "files": [
+          "web/src/app.css",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/components/LinkRow.svelte",
+          "web/src/components/LinkDetail.svelte",
+          "web/src/components/LinkEditor.svelte",
+          "web/src/components/Icon.svelte",
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/lib/api.ts",
+          "internal/server/sharepage.go",
+          "internal/server/web.go",
+          "internal/server/redirect.go",
+          "internal/server/share.go",
+          "internal/store/store.go",
+          "internal/store/links.go",
+          "internal/cache/cache.go"
+        ],
+        "interfaces": [
+          "POST /api/links, /api/texts, /api/files: password",
+          "PATCH /api/links/{id}: password (empty removes)",
+          "error password_invalid",
+          "POST /{slug} and POST /p/{slug}: unlock form (proposed)",
+          "files origin ?t= signed download (proposed)"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "internal/server/share_test.go",
+          "internal/server/server_test.go",
+          "web/scripts/a11y.mjs"
+        ]
+      },
+      "status": "approved",
+      "notes": "R11 approved 2026-10-24: per-link access password for links, texts and files (stored retrievable, compared case-insensitively, follows the share expiry), plus the Radix Slate/Indigo palette, 0.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages. Content inventory: review-r11/content-inventory.json. Evidence: review-r11/verification.json, r11-handoff.md."
     }
   ]
 }

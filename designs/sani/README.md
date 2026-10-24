@@ -13,6 +13,8 @@ R5 and R6 are approved and implemented. R7 is approved and implemented.
 
 ## Revisions
 
+R11 is **approved**: [prototype](http://127.0.0.1:4311/sani/prototype-r11.html?scene=r11-text-password&lang=zh&theme=light), [visitor pages](http://127.0.0.1:4311/sani/visitor-r11.html?page=unlock-text&lang=zh&theme=light). Access passwords for links, texts and files; Radix Colors, 0.5px hairlines, four type sizes and reduced motion across the app: [r11-handoff.md](r11-handoff.md). Evidence: `review-r11/`.
+
 R10 is **approved and implemented**: [interactive R9 / R10 comparison](http://127.0.0.1:4311/sani/review-r10.html), [prototype](http://127.0.0.1:4311/sani/prototype-r10.html?scene=r8-settings&focus=defaults&lang=zh&theme=light&chrome=0). Compact shared controls, aligned units, multilingual typography and interaction polish: [r10-handoff.md](r10-handoff.md). Implementation evidence: `implementation-r10/verification.json`.
 
 R9 is **approved and implemented**: [review hub](http://127.0.0.1:4311/sani/review-r9.html), [prototype](http://127.0.0.1:4311/sani/prototype-r9.html?scene=r7-tags&lang=zh&theme=light&chrome=0). Shared control geometry and measured group alignment: [r9-handoff.md](r9-handoff.md). Prototype evidence: `review-r9/`; production evidence: `implementation-r9/`.
