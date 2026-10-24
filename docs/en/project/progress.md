@@ -42,6 +42,12 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0; publishing a release does not replace acceptance of a target deployment.
 
+## v1.0.1 patch release {#v101-release}
+
+v1.0.1 fixes modulo bias in generated access passwords using rejection sampling in both the admin app and R11 prototype. The alphabet, default six-character length and existing passwords are unchanged. Regression tests cover generation and unlock-cookie transport attributes, and bilingual documentation now aligns stable-release status and access-password boundaries. Database schema remains 7 with no new migration, under the existing 1.x compatibility promises.
+
+See the [v1.0.1 changelog](./changelog#v1-0-1) for changes and upgrade guidance, and the [v1.0.1 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.1) for published artifacts.
+
 ## v1.0.0 stable release {#v100-release}
 
 Released on 2026-10-24, v1.0.0 establishes compatibility promises for documented public contracts throughout 1.x. Links, texts and files support access passwords, and the admin app and visitor pages use the R11 visual rules. The database migrates to schema 7. Back up before upgrading; rollback requires the complete pre-upgrade snapshot. See the [changelog](./changelog#v1-0-0).

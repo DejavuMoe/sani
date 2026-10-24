@@ -2,9 +2,15 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.1
+
+2026-10-24 · Correct the random distribution of generated access passwords and align stable-release documentation. Database schema remains 7 with no new migration.
 
 - Remove modulo bias from generated access passwords with rejection sampling, giving each allowed character equal probability. The admin app and R11 prototype use the corrected algorithm; existing passwords are unchanged.
+- Add regression coverage for password generation and unlock-cookie transport attributes, and verify that query parameters cannot replace a short link's saved destination.
+- Align Chinese and English project status, version plans and access-password guidance, correcting outdated statements in configuration, API and security pages that shares have no access passwords.
+
+Upgrading from v1.0.0 needs no data migration and preserves public interfaces and existing links. The fix applies to newly generated passwords; it does not rotate existing passwords. Use the link editor to generate a replacement if needed. Take a complete snapshot before upgrading as described in [Backup and restore](../guide/operations#backup-files).
 
 ## v1.0.0
 

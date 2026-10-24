@@ -100,6 +100,8 @@ In an isolated local instance, check `/healthz`, login, URL redirects, text bodi
 
 ## Upgrading {#upgrade}
 
+**v1.0.1 corrects bias in generated access passwords** and retains schema 7, with no new migration from v1.0.0. Existing passwords are not rotated automatically; use the link editor to generate a replacement with the new algorithm if needed. Take a complete backup and verify the target artifacts before upgrading. See the [v1.0.1 changelog](../project/changelog#v1-0-1).
+
 **v1.0.0 adds access passwords and migrates to schema 7**, beginning the [1.x compatibility promise](../project/versioning#stable). Upgrades from schema 6 also require a clean stop and complete backup. Older versions cannot read schema 7; rollback requires the pre-upgrade snapshot. Existing links have no access password by default.
 
 **v0.9.5 includes breaking API changes and migration to schema 6**, a [one-time exception to the patch rule](../project/versioning#v095-exception). Follow this procedure when upgrading from v0.9.4 or earlier.
