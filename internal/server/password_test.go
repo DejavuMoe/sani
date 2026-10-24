@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"strings"
@@ -129,7 +130,12 @@ func TestPasswordShareAndFiles(t *testing.T) {
 	if r := e.files("GET", "/note?t="+token); r.status != 200 || string(r.body) != "the secret body" {
 		t.Fatalf("raw with token: %d %s", r.status, r.body)
 	}
-	if r := e.files("GET", "/note?t="+token[:len(token)-2]+"AA"); r.status != 403 {
+	forged, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	forged[len(forged)-1] ^= 1 // Always change the signature, even when it ends in AA.
+	if r := e.files("GET", "/note?t="+base64.RawURLEncoding.EncodeToString(forged)); r.status != 403 {
 		t.Fatalf("forged token: %d", r.status)
 	}
 	// A new password locks the share again and voids earlier tokens.

@@ -270,7 +270,7 @@ try {
     await stop();
     const refused = spawnSync(legacy, [], { env: oldConfig, encoding: 'utf8', timeout: 15000 });
     assert.notEqual(refused.status, 0);
-    assert.match(refused.stderr, /schema version 6 is newer/);
+    assert.match(refused.stderr, /schema version 7 is newer/);
     await start(source);
     await verify(fixture);
     const afterRestart = await request('/api/v1/files', { headers: { Authorization: `Bearer ${token.token}` } });
@@ -289,7 +289,7 @@ try {
     assert.equal(hash(await readFile(join(snapshot, 'data/sani.db'))), snapshotHash);
     assert.equal(hash(await readFile(join(snapshot, 'config.json'))), configHash);
   }
-  console.log(upgrade ? 'upgrade drill: schema 5 -> 6, repeated startup, old credentials/IDs/URLs/bytes, rejected broken files/read-only database, HTTP contract and old-binary snapshot rollback passed' : 'public API: direct HTTP contract passed');
+  console.log(upgrade ? 'upgrade drill: schema 5 -> 7, repeated startup, old credentials/IDs/URLs/bytes, rejected broken files/read-only database, HTTP contract and old-binary snapshot rollback passed' : 'public API: direct HTTP contract passed');
 } finally {
   if (processState?.child.exitCode === null && processState.child.signalCode === null) {
     const exited = once(processState.child, 'exit'); processState.child.kill('SIGKILL'); await exited;

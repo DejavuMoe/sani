@@ -123,6 +123,9 @@ async function openDetails(page: Page, id: number) {
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   await expect(row.locator('.detail')).toBeVisible();
   await expect(row.locator('.chart-placeholder')).toHaveCount(0);
+  // Preview loading and the slide transition can still move the edit button.
+  await expect(row.locator('.preview-shell[aria-busy=true]')).toHaveCount(0);
+  await expect.poll(() => row.evaluate(el => el.getAnimations({ subtree: true }).filter(a => a.playState === 'running').length)).toBe(0);
   return row;
 }
 
