@@ -4,7 +4,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 # Status
 
-<p class="lead">The latest release is {{ status.latestVersion }}; unreleased changes appear at the top of the changelog. This page lists implemented capabilities, production acceptance checks and remaining scope. An implemented feature does not mean a particular deployment has passed acceptance.</p>
+<p class="lead">The latest release is {{ status.latestVersion }}. Sani is now maintained as a stable 1.x series. This page records delivered capabilities, acceptance checks and future plans; see the <a href="./changelog">changelog</a> for individual releases.</p>
 
 ## Where things stand {#current}
 
@@ -14,11 +14,12 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Admin app | <span class="sn-status done">Done</span> | English and Chinese, light and dark, keyboard control, bulk actions, QR codes, bookmarklet, phone share menu |
 | Tags | <span class="sn-status done">Done</span> | Colored tags for links, texts and files; assign during creation or editing, filter by tag or Untagged, and transfer through JSON/CSV, since v0.5.0 |
 | Texts and files | <span class="sn-status done">Done</span> | Plain text and code at `/p/`, file uploads served from a domain of their own, since v0.3.0 |
+| Access passwords | <span class="sn-status done">Done</span> | Password protection for links, texts and files, visitor verification, failure rate limits and password import/export, since v1.0.0 |
 | HTTP API | <span class="sn-status done">Done</span> | Every feature, with API tokens |
 | Import and export | <span class="sn-status done">Done</span> | Import Sani and Shlink CSV/JSON; export URL links as Sani JSON or CSV |
 | Deployment | <span class="sn-status done">Done</span> | A Docker image built `FROM scratch`; systemd, Caddy and nginx examples |
 | Operations | <span class="sn-status done">Done</span> | Online database snapshots, stopped-service database and file backups, password reset, health checks |
-| Documentation | <span class="sn-status done">Done</span> | This site: English and Chinese, checked against the source at build time |
+| Documentation | <span class="sn-status done">Done</span> | English and Chinese, with build-time source checks for covered configuration, API and other rules |
 | Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
 | Continuous integration | <span class="sn-status done">Done</span> | Go tests on Linux, macOS and Windows, cross-compilation for every release target, E2E, axe and known-vulnerability scans; results belong to the specific commit |
 | Hosted docs | <span class="sn-status done">Done</span> | Chinese and English documentation is live at [sani.zsh.moe](https://sani.zsh.moe) |
@@ -39,11 +40,17 @@ Run the following checks for each release candidate commit. A previous release's
 | Documentation and SEO | `make docs`, docs output and publishing checks | Bilingual descriptions match the code; page summaries, canonical URLs, language alternates and sitemap match the actual pages |
 | Distribution and supply chain | CI, CodeQL and Release workflows for the candidate | Platform tests, archives, containers and dependency scans pass; verify the version, checksums and provenance of published artifacts separately |
 
-Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The compatibility promises for 1.0 require the separate [versioning gates](./versioning#before-1); passing local checks does not automatically make a 1.0 release.
+Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0; publishing a release does not replace acceptance of a target deployment.
+
+## v1.0.0 stable release {#v100-release}
+
+Released on 2026-10-24, v1.0.0 establishes compatibility promises for documented public contracts throughout 1.x. Links, texts and files support access passwords, and the admin app and visitor pages use the R11 visual rules. The database migrates to schema 7. Back up before upgrading; rollback requires the complete pre-upgrade snapshot. See the [changelog](./changelog#v1-0-0).
+
+Published artifacts are available in the [v1.0.0 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.0). [CI](https://github.com/DejavuMoe/sani/actions/runs/40078432630), [CodeQL](https://github.com/DejavuMoe/sani/actions/runs/40078432553) and the [release workflow](https://github.com/DejavuMoe/sani/actions/runs/40079106305) passed for release commit `52fbd8a`. The following version sections retain historical delivery and acceptance records; their schemas and interface rules describe those versions.
 
 ## v0.9.7 bug-fix regressions {#v097-fixes}
 
-This release fixes 23 reproduced issues covering draft and selection guards, search membership, upload retries, exact integer imports, metadata cancellation and races, encoding negotiation, public text copying, and setup, healthcheck and backup tools. Database schema stays at 6 with no new migration.
+v0.9.7 fixed 23 reproduced issues covering draft and selection guards, search membership, upload retries, exact integer imports, metadata cancellation and races, encoding negotiation, public text copying, and setup, healthcheck and backup tools. That version kept database schema 6 with no new migration.
 
 Browser regression entry points are `web/e2e/audit-regressions.spec.ts` and `web/e2e/ui-regressions.spec.ts`; list-state and visit-limit unit tests live in `web/src/lib/links.test.ts` and `web/src/lib/max-clicks.test.ts`. Go regressions span `cmd/sani`, `internal/config`, `internal/meta`, `internal/store` and `internal/server`. `make check test` also checks literal dollars in Compose and isolated load-helper scenarios; these isolated tests do not replace deployment or capacity acceptance.
 
@@ -97,7 +104,7 @@ These five batches are included in v0.4.0. Verification entry points are listed 
 
 ## Build-time checks {#checks}
 
-Before every docs build, the documentation is compared with the source, and any mismatch fails the build. What you see here is what this build of the docs actually passed.
+Before every docs build, scripts compare covered configuration, API, error-code and parameter rules with the source; mismatches in those checks fail the build. Project status, plans and other prose still need manual review. Passing these checks does not establish that every description matches the current release.
 
 <SyncStatus part="checks" />
 
@@ -114,7 +121,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 ## Next {#next}
 
 1. **Listening.** Sani is out in public; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
-2. **Settling for 1.0.** Stabilize the public API, configuration and upgrade path; internal database schemas may still migrate. Complete the compatibility checklist and restore drill before release. [Versioning](./versioning) defines the boundaries.
+2. **Maintaining 1.x compatibility.** Preserve documented HTTP API, environment-variable and upgrade contracts in subsequent releases; internal schemas may evolve through migrations. Continue compatibility and backup/restore checks for each release. Schedule incompatible changes for a major release under [Versioning](./versioning).
 
 Under consideration, not decided:
 

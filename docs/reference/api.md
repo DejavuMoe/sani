@@ -379,7 +379,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 ## 文本和文件 {#shares}
 
-分享是一种不跳转、而是展示内容的链接：访问者在 `/p/{slug}` 打开它，原始内容从[文件域名](./configuration#sani-files-url)提供。分享和短链接共用短码命名空间，`gh` 不能既是短链接又是分享。它们同样有 `title`、`enabled`、`expiresAt` 和 `maxClicks`，同样有[统计](#stats)；列表、删除、恢复和批量接口对它们一视同仁。自动生成的文本／代码和文件分享短码分别使用 [`textSlugLength`、`fileSlugLength`](#config)，新安装均默认 10 位，可独立设为 3–32 位，不含 `/p/`。分享始终排除易混淆字符，不受网址长度或 `excludeConfusable` 影响；生成重试与碰撞扩长规则不变。低于 10 位仍会按设置生成，较短的短码更容易被猜中，知道地址的人即可访问。手动指定的短码沿用原有规则。
+分享是一种不跳转、而是展示内容的链接：访问者在 `/p/{slug}` 打开它，原始内容从[文件域名](./configuration#sani-files-url)提供。分享和短链接共用短码命名空间，`gh` 不能既是短链接又是分享。它们同样有 `title`、`enabled`、`expiresAt` 和 `maxClicks`，同样有[统计](#stats)；列表、删除、恢复和批量接口对它们一视同仁。自动生成的文本／代码和文件分享短码分别使用 [`textSlugLength`、`fileSlugLength`](#config)，新安装均默认 10 位，可独立设为 3–32 位，不含 `/p/`。分享始终排除易混淆字符，不受网址长度或 `excludeConfusable` 影响；生成重试与碰撞扩长规则不变。低于 10 位仍会按设置生成，较短的短码更容易被猜中；未设置[访问密码](#access-password)时，知道地址的人即可在分享有效时访问。手动指定的短码沿用原有规则。
 
 分享的 `content`：
 

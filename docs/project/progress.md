@@ -4,7 +4,7 @@ import { data as status } from '../.vitepress/data/status.data'
 
 # 研发进度
 
-<p class="lead">最近发布版本为 {{ status.latestVersion }}，尚未发布的修改列在更新日志顶部。本页列出已实现能力、生产验收入口与后续范围；功能已实现不等于某个部署已通过验收。</p>
+<p class="lead">最近发布版本为 {{ status.latestVersion }}。Sani 已进入 1.x 稳定维护阶段，本页记录已交付能力、验收入口与后续计划；各版本变更见<a href="./changelog">更新日志</a>。</p>
 
 ## 功能现状 {#current}
 
@@ -14,11 +14,12 @@ import { data as status } from '../.vitepress/data/status.data'
 | 管理界面 | <span class="sn-status done">已完成</span> | 中英双语、深浅主题、键盘快捷键、批量操作、二维码、书签小脚本、PWA 分享菜单 |
 | 标签管理 | <span class="sn-status done">已完成</span> | 短链接、文本与文件的彩色标签，创建与编辑时分配，按标签或未标记筛选，JSON/CSV 迁移（v0.5.0 起） |
 | 文本与文件分享 | <span class="sn-status done">已完成</span> | `/p/` 路由下的纯文本与代码展示、独立文件域名安全下载（v0.3.0 起） |
+| 访问密码 | <span class="sn-status done">已完成</span> | 链接、文本与文件的密码保护，访客验证、错误限流及密码导入导出（v1.0.0 起） |
 | HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
 | 导入与导出 | <span class="sn-status done">已完成</span> | 导入 Sani、Shlink CSV/JSON；导出网址链接为 Sani JSON 或 CSV |
 | 部署生态 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的极简 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
 | 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
-| 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期与源码规则强一致性核对 |
+| 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期核对配置、接口等已纳入检查的源码规则 |
 | 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |
 | 持续集成（CI） | <span class="sn-status done">已完成</span> | Linux/macOS/Windows Go 测试、全部发布平台交叉编译、E2E、axe 无障碍核查和已知漏洞扫描；结果以具体提交的流水线为准 |
 | 线上文档站点 | <span class="sn-status done">已完成</span> | 官方中英双语文档已部署：[sani.zsh.moe](https://sani.zsh.moe) |
@@ -39,11 +40,17 @@ Sani 面向**单管理员、单个服务进程、本地持久化数据目录**�
 | 文档与 SEO | `make docs`、文档输出与发布脚本检查 | 源码与双语说明对齐，页面描述、canonical、语言替代链接及站点地图对应实际页面 |
 | 分发与供应链 | 当前提交的 CI、CodeQL 及 Release 工作流 | 跨平台测试、归档、容器、依赖扫描通过；正式制品另核对版本、校验和与来源证明 |
 
-上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。1.0 的兼容承诺需单独满足[版本与兼容](./versioning#before-1)，不由完成一轮本地检查自动触发。
+上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。v1.0.0 起执行[1.x 兼容承诺](./versioning#stable)；版本发布不替代目标部署的验收。
+
+## v1.0.0 稳定版交付 {#v100-release}
+
+v1.0.0 于 2026-10-24 发布，确立 1.x 对已文档化公开契约的兼容承诺。链接、文本和文件均支持访问密码，后台与访客页面采用 R11 视觉规范。数据库迁移至 schema 7；升级前备份，回滚时恢复升级前的完整快照，详见[更新日志](./changelog#v1-0-0)。
+
+正式制品见 [v1.0.0 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.0)。发布提交 `52fbd8a` 的 [CI](https://github.com/DejavuMoe/sani/actions/runs/40078432630)、[CodeQL](https://github.com/DejavuMoe/sani/actions/runs/40078432553) 与[发布流水线](https://github.com/DejavuMoe/sani/actions/runs/40079106305)均已通过。以下版本章节保留历史交付与验收记录，其中的 schema 和界面规则对应各自版本。
 
 ## v0.9.7 缺陷修复回归 {#v097-fixes}
 
-本次修复 23 项已复现问题，涵盖草稿与选择保护、搜索结果一致性、上传重试、精确整数导入、元数据任务取消与竞态、编码协商、公开文本复制，以及设置、健康检查和备份工具。数据库 schema 仍为 6，无新增迁移。
+v0.9.7 修复 23 项已复现问题，涵盖草稿与选择保护、搜索结果一致性、上传重试、精确整数导入、元数据任务取消与竞态、编码协商、公开文本复制，以及设置、健康检查和备份工具。该版本数据库 schema 仍为 6，无新增迁移。
 
 浏览器回归入口为 `web/e2e/audit-regressions.spec.ts`、`web/e2e/ui-regressions.spec.ts`；列表状态与访问上限单测位于 `web/src/lib/links.test.ts`、`web/src/lib/max-clicks.test.ts`。Go 回归分布在 `cmd/sani`、`internal/config`、`internal/meta`、`internal/store` 与 `internal/server`。`make check test` 还会检查 Compose 美元符号保留和负载脚本的隔离场景；这些隔离测试不代替真实部署或容量验收。
 
@@ -97,7 +104,7 @@ API 契约与迁移入口：`make contract`、`OLD_BIN=/absolute/path/to/old-san
 
 ## 构建期一致性校验 {#checks}
 
-每次编译文档站点前，脚本会自动将文档中的配置、接口、错误码及参数与代码进行双向断言比对；任何偏差均会立刻阻断构建。
+每次编译文档站点前，脚本会核对已纳入规则的配置、接口、错误码及参数；这些检查发现偏差时会阻断构建。研发状态、规划及其他说明文字仍需人工核对，检查通过不代表所有文案都已与当前版本对齐。
 
 <SyncStatus part="checks" />
 
@@ -114,7 +121,7 @@ API 契约与迁移入口：`make contract`、`OLD_BIN=/absolute/path/to/old-san
 ## 后续演进规划 {#next}
 
 1. **收集社区反馈**：Sani 已完成核心能力建设，后续重点进行稳定维护与体验打磨。欢迎在 [GitHub Issues](https://github.com/DejavuMoe/sani/issues) 提交建议。
-2. **面向 1.0 版本定型**：冻结对外 HTTP API、环境变量规范与升级契约（数据库内部表结构仍保留迁移弹性）。发布前完成跨版本兼容测试与灾难恢复演练；演化准则参见[版本与兼容](./versioning)。
+2. **维护 1.x 兼容性**：后续发布保持已文档化的 HTTP API、环境变量与升级契约兼容；数据库内部表结构可通过迁移演进。每次发布继续执行兼容检查与备份恢复验证；不兼容变更按[版本与兼容](./versioning)安排主版本升级。
 
 待评估功能（视复杂度而定）：
 

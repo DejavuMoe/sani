@@ -71,9 +71,9 @@ From v0.7.0, Git tags, GitHub Releases and container images use the same full `v
 
 Something that is going away is first marked deprecated in the changelog and the docs, and keeps working for the rest of that major version. It’s only removed in the next major version.
 
-## Acceptance before 1.0 {#before-1}
+## Stable release acceptance {#before-1}
 
-v1.0.0 must pass these release gates; applicable checks continue for later releases:
+v1.0.0 has been released. These gates continue to apply to subsequent stable releases:
 
 - Settle the public API, configuration defaults, CLI, reserved paths, export formats and release filenames, with bilingual references checked against the source.
 - Exercise incremental database upgrades, preserving URLs, texts, files, statistics and credentials. Roll back failed migrations, reject newer schemas in older binaries, and rehearse a complete restore.

@@ -55,7 +55,7 @@ The app shell, scripts, styles and icons needed by the sign-in page are public a
 - **Inert responses.** Everything from the files domain is sent with `Content-Security-Policy: default-src 'none'; sandbox`, `X-Content-Type-Options: nosniff`, `Cross-Origin-Resource-Policy: same-origin` and `X-Frame-Options: DENY`. Files are always attachments, never shown in place; a text is `text/plain`. Even a browser that opened one in a tab would run no script and load nothing.
 - **Escaped pages.** The page at `/p/{slug}` on the short domain shows a text through Go’s `html/template`, so markup appears as written. Its Content Security Policy allows no script except the copy button’s, by hash, and the page loads nothing from anywhere.
 - **Only you create them.** Texts and files are created through the API like links, so they need the password or a token. Visitors can’t upload.
-- **Guessing.** Shares have no public listing. Generated slugs always use the 31 look-alike-free characters. On new installations, text/code and file shares each default to 10 characters (about 8 × 10¹⁴ combinations), [independently configurable from 3 to 32](../reference/configuration#sani-text-slug-length). Values below 10 are allowed; the advisory is not access control. Shorter slugs are easier to guess, and anyone with the address can open a share. URL length and look-alike settings do not change share settings. `robots.txt` asks crawlers to avoid `/p/` and the files domain, but cannot stop malicious scanning.
+- **Guessing.** Shares have no public listing. Generated slugs always use the 31 look-alike-free characters. On new installations, text/code and file shares each default to 10 characters (about 8 × 10¹⁴ combinations), [independently configurable from 3 to 32](../reference/configuration#sani-text-slug-length). Values below 10 are allowed; the advisory is not access control. Shorter slugs are easier to guess. Without an access password, anyone with the address can open a valid share. URL length and look-alike settings do not change share settings. `robots.txt` asks crawlers to avoid `/p/` and the files domain, but cannot stop malicious scanning.
 - **On disk.** Uploads stream to a temporary file in `files/` and get a random 128-bit name once complete; the name a visitor sees is only kept in the database, without its path, control characters or bidirectional overrides. A stored name is checked before a file is opened, so a damaged row can’t reach outside the directory. Unreferenced files are swept every 10 minutes.
 
 ## Fetching titles and icons {#fetching}
@@ -102,9 +102,13 @@ Everything whose size someone outside controls has an explicit limit:
 | Cached unknown slugs | `64 × max(1, floor(SANI_CACHE_SIZE / 256))` |
 | Fetched pages and icons | 1 MiB and 256 KiB |
 
+## Access passwords {#access-password}
+
+Links, texts and files can require an access password. Before verification, pages hide the title, destination and content; failed attempts are rate-limited. See the [API reference](../reference/api#access-password) for unlock lifetimes, download credentials and invalidation rules. Access passwords are recoverable from the database, visible to administrators and included in JSON/CSV exports. Protect the database, backups and exports as credential-bearing files. Unlike access passwords, the administrator sign-in password is stored as an Argon2id hash.
+
 ## Visitor privacy {#privacy}
 
-Visitor statistics keep aggregate counts and referrer hosts, without IP addresses, User-Agents or tracking cookies. Failed sign-in logs may contain client IPs, and reverse proxies may keep access logs separately; see [Statistics](../guide/statistics) and [Logs](../guide/operations#logs). Error and share pages ask search engines not to index them, but `robots.txt` only guides cooperative crawlers and is not access control. Anyone with a valid share URL can read it; a random slug is not authentication for sensitive data.
+Visitor statistics keep aggregate counts and referrer hosts, without IP addresses, User-Agents or tracking cookies. Failed sign-in logs may contain client IPs, and reverse proxies may keep access logs separately; see [Statistics](../guide/statistics) and [Logs](../guide/operations#logs). Error and share pages ask search engines not to index them, but `robots.txt` only guides cooperative crawlers and is not access control. Without an access password, anyone with a valid share URL can read it; a random slug is not access control. Access passwords verify a shared secret, not individual visitor identity, and do not provide end-to-end encryption.
 
 ## Release files {#releases}
 
