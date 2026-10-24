@@ -12,8 +12,18 @@ import { stripScheme } from './url';
 const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 
 export function generatePassword(length = 6): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(length));
-  return Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join('');
+  const bytes = new Uint8Array(length);
+  const limit = 256 - (256 % ALPHABET.length);
+  let password = '';
+  while (password.length < length) {
+    crypto.getRandomValues(bytes);
+    for (const b of bytes) {
+      if (b >= limit) continue; // Reject the incomplete range to keep characters equally likely.
+      password += ALPHABET[b % ALPHABET.length];
+      if (password.length === length) break;
+    }
+  }
+  return password;
 }
 
 /** Mirrors links.CleanPassword: empty, or 4 to 64 characters without control characters. */

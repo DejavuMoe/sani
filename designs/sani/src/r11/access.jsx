@@ -14,8 +14,18 @@ Object.assign(window.SANI_ICONS, {
 // Readable characters only: no 0/O, 1/I/L.
 const PW_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 function genPassword(n = 6) {
-  const bytes = crypto.getRandomValues(new Uint8Array(n));
-  return [...bytes].map((b) => PW_ALPHABET[b % PW_ALPHABET.length]).join('');
+  const bytes = new Uint8Array(n);
+  const limit = 256 - (256 % PW_ALPHABET.length);
+  let password = '';
+  while (password.length < n) {
+    crypto.getRandomValues(bytes);
+    for (const b of bytes) {
+      if (b >= limit) continue; // Reject the incomplete range to keep characters equally likely.
+      password += PW_ALPHABET[b % PW_ALPHABET.length];
+      if (password.length === n) break;
+    }
+  }
+  return password;
 }
 function passwordProblem(s) {
   const n = [...s.trim()].length;

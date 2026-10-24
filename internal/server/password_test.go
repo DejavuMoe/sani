@@ -3,6 +3,8 @@ package server
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -145,6 +147,40 @@ func TestPasswordShareAndFiles(t *testing.T) {
 	}
 	if r := e.files("GET", "/note?t="+token); r.status != 403 {
 		t.Fatalf("old token after a password change: %d", r.status)
+	}
+}
+
+func TestUnlockCookieTransport(t *testing.T) {
+	for _, tc := range []struct {
+		name, origin, forwarded string
+		trust, secure           bool
+	}{
+		{"local HTTP", "http://localhost", "", false, false},
+		{"direct TLS", "https://localhost", "", false, true},
+		{"untrusted forwarded HTTPS", "http://localhost", "https", false, false},
+		{"trusted forwarded HTTPS", "http://localhost", "https", true, true},
+		{"trusted forwarded HTTP", "http://localhost", "http", true, false},
+		{"TLS overrides forwarded HTTP", "https://localhost", "http", true, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e := newShareEnv(t, Options{TrustProxy: tc.trust})
+			if r := e.req("POST", "/api/admin/v1/texts", map[string]any{"text": "secret", "slug": "transport", "password": "abcd"}); r.status != 201 {
+				t.Fatalf("create share: %d %s", r.status, r.body)
+			}
+			r := httptest.NewRequest(http.MethodPost, tc.origin+"/p/transport", strings.NewReader("password=abcd"))
+			r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			r.Header.Set("X-Forwarded-Proto", tc.forwarded)
+			w := httptest.NewRecorder()
+			e.srv.ServeHTTP(w, r)
+			cookies := w.Result().Cookies()
+			if w.Code != http.StatusSeeOther || len(cookies) != 1 {
+				t.Fatalf("unlock: status=%d cookies=%v", w.Code, cookies)
+			}
+			c := cookies[0]
+			if c.Name != unlockCookie || c.Secure != tc.secure || !c.HttpOnly || c.Path != "/p/transport" || c.Domain != "" || c.SameSite != http.SameSiteLaxMode || c.MaxAge != int(unlockLifetime.Seconds()) {
+				t.Fatalf("unexpected unlock cookie: %s", c)
+			}
+		})
 	}
 }
 

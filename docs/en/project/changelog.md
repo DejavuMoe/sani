@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Remove modulo bias from generated access passwords with rejection sampling, giving each allowed character equal probability. The admin app and R11 prototype use the corrected algorithm; existing passwords are unchanged.
+
 ## v1.0.0
 
 2026-10-24 · First stable release, establishing compatibility guarantees for public contracts throughout 1.x. Access passwords, and a new visual system for the admin app and visitor pages. The database moves to schema 7.
