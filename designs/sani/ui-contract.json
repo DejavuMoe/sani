@@ -1074,7 +1074,6 @@
         "assetPath": "prototype-r11.html",
         "files": [
           "prototype-r11.html",
-          "visitor-r11.html",
           "src/r11/app.css",
           "src/r11/theme.css",
           "src/r11/access.css",
@@ -1148,6 +1147,59 @@
       },
       "status": "approved",
       "notes": "R11 approved 2026-10-24: per-link access password for links, texts and files (stored retrievable, compared case-insensitively, follows the share expiry), plus the Radix Slate/Indigo palette, 0.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages. Content inventory: review-r11/content-inventory.json. Evidence: review-r11/verification.json, r11-handoff.md."
+    },
+    {
+      "id": "r11-visitor-pages",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "visitor-r11.html",
+        "assetPath": "visitor-r11.html",
+        "files": [
+          "visitor-r11.html",
+          "src/gen/visitor.js",
+          "src/fixtures.js"
+        ],
+        "states": [
+          "unlock-text",
+          "unlock-file",
+          "unlock-url",
+          "unlock-wrong",
+          "unlock-empty",
+          "unlock-rate",
+          "share-text",
+          "share-code",
+          "share-file",
+          "share-file-off",
+          "notfound",
+          "share-gone",
+          "zh-en-light-dark-1280-390"
+        ],
+        "stableIds": [
+          "visitor-unlock",
+          "share-page"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/{slug}, /p/{slug}, files origin",
+        "files": [
+          "internal/server/web.go",
+          "internal/server/sharepage.go",
+          "internal/server/redirect.go",
+          "internal/server/share.go"
+        ],
+        "interfaces": [
+          "GET/POST /{slug}",
+          "GET/POST /p/{slug}",
+          "files origin ?t="
+        ],
+        "tests": [
+          "internal/server/share_test.go",
+          "internal/server/server_test.go",
+          "web/e2e/app.spec.ts"
+        ]
+      },
+      "status": "approved",
+      "notes": "R11 approved 2026-10-24: password page and Radix/hairline visitor styles. See r11-handoff.md."
     }
   ]
 }
