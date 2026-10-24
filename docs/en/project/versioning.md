@@ -4,7 +4,7 @@
 
 ## Version numbers {#semver}
 
-Sani uses [semantic versioning](https://semver.org), with the one-time v0.9.5 exception documented below. A version looks like `major.minor.patch`:
+Sani uses [semantic versioning](https://semver.org), with the v0.9.5 and v0.9.11 exceptions documented below. A version looks like `major.minor.patch`:
 
 - **Patch releases** (0.1.0 → 0.1.1) only fix things; still back up and read the changelog before upgrading.
 - **Minor releases** (1.1 → 1.2) add things without breaking what exists.
@@ -17,6 +17,10 @@ Sani uses [semantic versioning](https://semver.org), with the one-time v0.9.5 ex
 **v0.9.5 includes breaking API changes and is not an ordinary compatible patch.** During early development before 1.0, this release makes a one-time exception to the patch rule above: old management routes are removed, the admin app uses `/api/admin/v1`, the resource API uses `/api/v1`, and the database moves to schema 6. Update automation scripts. Existing public short links, text shares, file downloads, credentials, tokens and resource IDs are retained.
 
 Export JSON in the old admin app, stop cleanly and back up the database, files and configuration. Run preflight before the in-place migration; rollback requires the complete pre-upgrade snapshot and old version. See the [v0.9.5 changelog](./changelog#v0-9-5) and [upgrade steps](../guide/operations#upgrade). This exception does not relax compatibility requirements for later patches.
+
+### v0.9.11 feature-release exception {#v0911-exception}
+
+**v0.9.11 adds access passwords and migrates to schema 7; it is not a bug-fix-only patch.** This release retains the requested v0.9.11 version number as another explicit exception to the patch rule. Existing public addresses and access without passwords are preserved. Back up the database, files and configuration before upgrading; older versions cannot read schema 7, so rollback requires the complete pre-upgrade snapshot. See the [v0.9.11 changelog](./changelog#v0-9-11). This exception does not relax compatibility requirements for later releases.
 
 ## What stays the same {#stable}
 
