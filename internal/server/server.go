@@ -65,6 +65,7 @@ type Server struct {
 	fetcher *meta.Fetcher
 	log     *slog.Logger
 	logins  *auth.Limiter
+	unlocks *auth.Limiter // wrong access passwords per client and link
 	web     *webApp
 	pages   *pages
 	api     http.Handler
@@ -91,6 +92,7 @@ type Server struct {
 	filesMu   sync.RWMutex  // uploads hold a read lock until ownership transfers or cleanup finishes
 	downloads chan struct{} // bounds concurrent file downloads
 	share     *template.Template
+	unlockKey []byte // signs unlocked-share cookies and raw-download tokens
 }
 
 func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetcher, ui fs.FS, log *slog.Logger) (*Server, error) {
@@ -113,6 +115,8 @@ func New(opt Options, st *store.Store, rec *clicks.Recorder, fetcher *meta.Fetch
 		fetcher:   fetcher,
 		log:       log,
 		logins:    auth.NewLimiter(8, 15*time.Minute),
+		unlocks:   auth.NewLimiter(5, time.Minute),
+		unlockKey: newUnlockSecret(),
 		pages:     newPages(),
 		jobSlots:  make(chan struct{}, 3),
 		downloads: make(chan struct{}, maxDownloads),
@@ -168,6 +172,7 @@ func (s *Server) loadTarget(ctx context.Context, key string) (*cache.Entry, erro
 		Enabled:   t.Enabled,
 		ExpiresAt: t.ExpiresAt,
 		MaxClicks: t.MaxClicks,
+		Password:  t.Password,
 	}
 	e.Clicks = s.clicks.Counter(t.ID, t.Clicks)
 	return e, nil

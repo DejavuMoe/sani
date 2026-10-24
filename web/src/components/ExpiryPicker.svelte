@@ -2,7 +2,7 @@
   import { expiryLabel, presets, presetLabel, toLocalInput, type Expiry } from '../lib/expiry';
   import { t } from '../lib/i18n.svelte';
   import DateEditor from './DateEditor.svelte';
-  import Icon from './Icon.svelte';
+  import Icon, { type IconName } from './Icon.svelte';
   import Menu from './Menu.svelte';
   import MenuItem from './MenuItem.svelte';
 
@@ -10,8 +10,9 @@
     value = $bindable<Expiry>({ preset: 'never' }),
     triggerClass = 'picker',
     showLabel = true,
+    icon,
     id,
-  }: { value?: Expiry; triggerClass?: string; showLabel?: boolean; id?: string } = $props();
+  }: { value?: Expiry; triggerClass?: string; showLabel?: boolean; icon?: IconName; id?: string } = $props();
 
   const custom = $derived('at' in value);
 
@@ -26,9 +27,10 @@
 <span class="expiry">
   <Menu triggerClass={triggerClass} label={t('composer.expiry')} minWidth={176}>
     {#snippet button()}
+      {#if icon}<Icon name={icon} size={14} />{/if}
       {#if showLabel}<span class="k">{t('composer.expiry')}</span>{/if}
       <span class="v">{custom ? t('expiry.custom').replace('…', '') : expiryLabel(value)}</span>
-      <Icon name="chevronDown" size={14} class="chev" />
+      {#if !icon}<Icon name="chevronDown" size={14} class="chev" />{/if}
     {/snippet}
     {#snippet children(close)}
       {#each presets as p (p)}
@@ -65,7 +67,7 @@
   }
 
   .sep {
-    height: 1px;
+    height: 0.5px;
     margin: 4px 6px;
     background: var(--line);
   }

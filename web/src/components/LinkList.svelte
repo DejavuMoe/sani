@@ -290,7 +290,7 @@
     max-width: 360px;
     height: var(--control-compact);
     padding: 0 8px 0 11px;
-    border: 1px solid transparent;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     border-radius: var(--radius);
     color: var(--text-3);
     cursor: text;
@@ -306,23 +306,23 @@
 
   .search.active {
     max-width: 480px;
-    border-color: var(--line-2);
+    --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     background: var(--surface);
   }
 
   .search:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 14%, transparent);
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 14%, transparent);
   }
 
   .search input {
     flex: 1;
     min-width: 0;
     height: 100%;
-    border: 0;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     background: transparent;
     color: var(--text);
-    font-size: var(--input-font-size, 13.5px);
+    font-size: var(--input-font-size, 13px);
   }
 
   .search input:focus {
@@ -356,7 +356,7 @@
   .count {
     margin-left: 6px;
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
     white-space: nowrap;
   }
 
@@ -436,10 +436,10 @@
     height: 44px;
     margin-bottom: 10px;
     padding: 0 8px 0 16px;
-    border: 1px solid var(--accent-line);
+    border: 0; --hbt: var(--accent-line); --hbr: var(--accent-line); --hbb: var(--accent-line); --hbl: var(--accent-line);
     border-radius: var(--radius-lg);
     background: var(--surface);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--hair-shadow), var(--shadow-pop);
   }
 
   .bulkbar .all {
@@ -455,18 +455,14 @@
     width: 16px;
     height: 16px;
     place-items: center;
-    border: 1.5px solid var(--text-3);
+    border: 0; --hbt: var(--text-2); --hbr: var(--text-2); --hbb: var(--text-2); --hbl: var(--text-2);
     border-radius: var(--radius-xs);
     color: #fff;
   }
 
   .bulkbar .box.on {
-    border-color: var(--accent);
-    background: var(--accent);
-  }
-
-  :global([data-theme='dark']) .bulkbar .box.on {
-    color: #0d0f1c;
+    --hbt: var(--solid); --hbr: var(--solid); --hbb: var(--solid); --hbl: var(--solid);
+    background: var(--solid);
   }
 
   .dash {
@@ -533,7 +529,7 @@
 
   .card {
     overflow: hidden;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);
     transition: opacity var(--normal) var(--ease);
@@ -549,7 +545,7 @@
     gap: 14px;
     height: 34px;
     padding: 0 10px 0 16px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 0; --hbb: var(--line);
     color: var(--text-3);
     font-size: 12px;
   }
@@ -614,12 +610,12 @@
   }
 
   li + li {
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .blank {
     padding: 56px 24px 64px;
-    border: 1px dashed transparent;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     color: var(--text-2);
     text-align: center;
   }
@@ -630,7 +626,7 @@
     width: min(100%, 320px);
     margin: 0 auto 26px;
     overflow: hidden;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);
     mask-image: linear-gradient(to bottom, #000 30%, transparent);
@@ -645,7 +641,7 @@
   }
 
   .blank-art > span + span {
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .blank-art i {
@@ -673,14 +669,14 @@
   .blank h2 {
     margin-bottom: 8px;
     color: var(--text);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
   }
 
   .blank p {
     max-width: 420px;
     margin: 0 auto;
-    font-size: 13.5px;
+    font-size: 13px;
     line-height: 1.65;
   }
 
@@ -718,7 +714,7 @@
     gap: 16px;
     height: 60px;
     padding: 0 16px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
     animation: breathe 1.1s ease-in-out var(--d) infinite alternate;
   }
 
@@ -762,7 +758,7 @@
   .more {
     padding: 14px;
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
     text-align: center;
   }
 

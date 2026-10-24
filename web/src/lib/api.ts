@@ -40,6 +40,8 @@ export interface Link {
   status: LinkStatus;
   expiresAt: string | null;
   maxClicks: number | null;
+  /** Access password; null when the link has none. */
+  password: string | null;
   clicks: number;
   lastClickAt: string | null;
   createdAt: string;
@@ -58,6 +60,8 @@ export interface LinkInput {
   enabled?: boolean;
   expiresAt?: string | null;
   maxClicks?: number | null;
+  /** An empty string removes the password. */
+  password?: string;
   reuse?: boolean;
   text?: string;
   format?: TextFormat;
@@ -70,6 +74,7 @@ export interface FileFields {
   title?: string;
   expiresAt?: string;
   maxClicks?: number;
+  password?: string;
 }
 
 export interface DayCount {

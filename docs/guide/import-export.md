@@ -29,7 +29,9 @@
 }
 ```
 
-CSV 格式的列头依次为：`slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks`、`created_at` 和 `tags`。
+设置了访问密码的链接还带有 `password` 字段。
+
+CSV 格式的列头依次为：`slug`、`url`、`title`、`redirect`、`enabled`、`expires_at`、`max_clicks`、`clicks`、`created_at`、`tags` 和 `password`。
 
 CSV 导出会为可能被电子表格解释为公式的字段添加单引号前缀（包括以 `=`、`+`、`-`、`@` 或控制字符开头的字段）。重新导入 CSV 时，该前缀会作为原始数据保留；需要无损导出与迁移时请选择 JSON。
 
@@ -67,6 +69,7 @@ JSON 的每条链接可带 `tags: [{"name":"工作","color":"blue"}]`；CSV 的 
 | 点击量 | `clicks`、`visits`、`visitsCount` |
 | 过期时间 | `expiresAt`、`expires_at`、`validUntil` |
 | 访问上限 | `maxClicks`、`max_clicks`、`maxVisits` |
+| 访问密码 | `password`（4–64 个字符，不合法时以 `password_invalid` 跳过该行） |
 | 重定向类型 | `redirect`（301、302、307 或 308） |
 | 启用状态 | `enabled`（`true` 或 `false`） |
 

@@ -15,7 +15,7 @@
   let input = $state<HTMLInputElement>();
   let open = $state(false);
   let query = $state('');
-  let color = $state<TagColor>('#5872a5');
+  let color = $state<TagColor>('#0090ff');
   let colorValid = $state(true);
   let error = $state('');
   const normalized = $derived(query.trim().normalize('NFC'));

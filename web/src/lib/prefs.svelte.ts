@@ -48,7 +48,7 @@ class Prefs {
     // Swap colors in one frame instead of letting every transition animate.
     root.classList.add('theme-switching');
     root.dataset.theme = next;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#111110' : '#f7f7f5');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#111113' : '#f9f9fb');
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
   }
 }

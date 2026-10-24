@@ -64,7 +64,7 @@ func TestFailedUpgradeDoesNotAccumulateSafetyCopies(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Recreate schema 5; the colliding table fails migration 6 after ADD COLUMN.
-	_, err = db.Exec(`DROP INDEX contents_delete_key; ALTER TABLE contents DROP COLUMN delete_key; PRAGMA user_version=5; CREATE TABLE contents_delete_key(value TEXT);`)
+	_, err = db.Exec(`ALTER TABLE links DROP COLUMN password; DROP INDEX contents_delete_key; ALTER TABLE contents DROP COLUMN delete_key; PRAGMA user_version=5; CREATE TABLE contents_delete_key(value TEXT);`)
 	db.Close()
 	if err != nil {
 		t.Fatal(err)

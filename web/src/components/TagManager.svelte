@@ -14,7 +14,7 @@
   const id = $props.id();
   let query = $state(''), unused = $state(false);
   let editing = $state<Tag | null>(null), removing = $state<Tag | null>(null);
-  let name = $state(''), color = $state<TagColor>('#5872a5'), colorValid = $state(true);
+  let name = $state(''), color = $state<TagColor>('#0090ff'), colorValid = $state(true);
   let busy = $state(false), error = $state('');
   let search = $state<HTMLInputElement>(), nameInput = $state<HTMLInputElement>();
   let returnTo: HTMLElement | null = null;

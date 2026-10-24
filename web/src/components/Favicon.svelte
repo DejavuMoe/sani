@@ -37,7 +37,7 @@
   :global([data-theme='dark']) .fav {
     padding: 1px;
     border-radius: 4px;
-    background: #ecebe6;
+    background: #edeef0; /* slate 12 (dark): light-designed icons need a light tile */
     box-sizing: content-box;
     margin: -1px;
   }
@@ -47,17 +47,13 @@
     flex: none;
     place-items: center;
     border-radius: 4px;
-    background: oklch(0.93 0.03 var(--h));
-    color: oklch(0.42 0.07 var(--h));
-    font-size: 10px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: 12px;
     font-weight: 650;
     line-height: 1;
   }
 
-  :global([data-theme='dark']) .letter {
-    background: oklch(0.3 0.035 var(--h));
-    color: oklch(0.84 0.06 var(--h));
-  }
 
   .blank,
   :global([data-theme='dark']) .blank {

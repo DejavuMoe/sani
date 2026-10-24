@@ -13,7 +13,7 @@ vi.mock('./i18n.svelte', () => ({ t: (key: string) => key, errorText: (key: stri
 const old: Link = {
   id: 1, kind: 'url', slug: 'old', title: 'Before', url: 'https://example.com', host: 'example.com',
   shortUrl: 'http://localhost/old', content: null, tags: [1], meta: 'manual', icon: false,
-  enabled: true, status: 'active', redirect: 302, clicks: 0, lastClickAt: null, expiresAt: null, maxClicks: null,
+  enabled: true, status: 'active', redirect: 302, clicks: 0, lastClickAt: null, expiresAt: null, maxClicks: null, password: null,
   createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z',
 };
 const fresh = { ...old, title: 'Saved', updatedAt: '2026-01-02T00:00:00Z' };

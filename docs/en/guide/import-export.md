@@ -29,7 +29,9 @@ The JSON looks like this; fields without a value are left out:
 }
 ```
 
-The CSV columns are `slug`, `url`, `title`, `redirect`, `enabled`, `expires_at`, `max_clicks`, `clicks`, `created_at` and `tags`.
+Links with an access password also carry a `password` field.
+
+The CSV columns are `slug`, `url`, `title`, `redirect`, `enabled`, `expires_at`, `max_clicks`, `clicks`, `created_at`, `tags` and `password`.
 
 CSV exports prefix cells that a spreadsheet could interpret as formulas with an apostrophe, including cells starting with `=`, `+`, `-`, `@` or control characters. CSV imports retain that protective prefix as data; choose JSON for lossless exports and migration.
 
@@ -67,6 +69,7 @@ Sani recognizes each field by its column (or JSON key) name. Names are case-inse
 | Clicks | `clicks`, `visits`, `visitsCount` |
 | Expires | `expiresAt`, `expires_at`, `validUntil` |
 | Visit limit | `maxClicks`, `max_clicks`, `maxVisits` |
+| Password | `password` (4 to 64 characters; an invalid one skips the row with `password_invalid`) |
 | Redirect | `redirect` (301, 302, 307 or 308) |
 | Enabled | `enabled` (`true` or `false`) |
 

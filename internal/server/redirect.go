@@ -19,7 +19,9 @@ var (
 // redirect resolves /{slug}. It is the hot path: a cache hit costs a map
 // lookup, and counting a click is an in-memory increment.
 func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+	// POST only answers a password form; it is refused below for any link
+	// without one.
+	if r.Method != http.MethodGet && r.Method != http.MethodHead && r.Method != http.MethodPost {
 		w.Header().Set("Allow", "GET, HEAD")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -44,7 +46,27 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
-	if !s.admit(e, s.countable(r), r, now) {
+	count := s.countable(r)
+	if e.Password != "" {
+		// The form shows nothing about the link, so an unavailable one says so
+		// first. A correct password is a visit like any other.
+		if !s.admit(e, false, r, now) {
+			s.pages.render(w, r, pageGone, slug)
+			return
+		}
+		if !s.guard(w, r, e, slug) {
+			return
+		}
+		// The form's own page is the Referer; it says nothing about where
+		// the visitor came from.
+		r.Header.Del("Referer")
+		count = s.countableVisit(r)
+	} else if r.Method == http.MethodPost {
+		w.Header().Set("Allow", "GET, HEAD")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if !s.admit(e, count, r, now) {
 		s.pages.render(w, r, pageGone, slug)
 		return
 	}
@@ -55,6 +77,11 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 	}
 	h := w.Header()
 	h["Location"] = []string{loc}
+	if r.Method == http.MethodPost {
+		h["Cache-Control"] = cacheLimited
+		w.WriteHeader(http.StatusSeeOther)
+		return
+	}
 	if e.ExpiresAt != 0 || e.MaxClicks > 0 {
 		h["Cache-Control"] = cacheLimited
 	} else if e.Code == http.StatusMovedPermanently || e.Code == http.StatusPermanentRedirect {
@@ -69,9 +96,12 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 // link: not a HEAD, prefetch, crawler, link preview or the owner testing
 // the link from the dashboard.
 func (s *Server) countable(r *http.Request) bool {
-	if r.Method != http.MethodGet {
-		return false
-	}
+	return r.Method == http.MethodGet && s.countableVisit(r)
+}
+
+// countableVisit is countable without the method check, for the password
+// form's POST, which is the visit itself.
+func (s *Server) countableVisit(r *http.Request) bool {
 	h := r.Header
 	if p := h.Get("Sec-Purpose"); p != "" && strings.Contains(p, "prefetch") {
 		return false

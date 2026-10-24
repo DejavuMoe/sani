@@ -28,12 +28,11 @@
     width: 34px;
     height: 20px;
     border-radius: 10px;
-    background: var(--line-2);
-    transition: background-color var(--normal) var(--ease);
+    background: var(--line-3);
   }
 
   .switch[aria-checked='true'] {
-    background: var(--accent);
+    background: var(--solid);
   }
 
   .thumb {
@@ -44,8 +43,7 @@
     height: 16px;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
-    transition: transform var(--normal) var(--ease);
+    box-shadow: var(--hair-shadow);
   }
 
   .switch[aria-checked='true'] .thumb {

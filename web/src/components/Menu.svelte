@@ -117,18 +117,18 @@
     max-height: calc(100dvh - 16px);
     overflow: auto;
     overscroll-behavior: contain;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--hair-shadow), var(--shadow-pop);
     opacity: 1;
     transform: none;
     transition:
-      opacity 120ms var(--ease),
-      transform 120ms var(--ease),
-      overlay 120ms allow-discrete,
-      display 120ms allow-discrete;
+      opacity 250ms var(--ease),
+      transform 250ms var(--ease),
+      overlay 250ms allow-discrete,
+      display 250ms allow-discrete;
   }
 
   .menu:not(:popover-open) {
@@ -145,6 +145,6 @@
 
   :global([data-theme='dark']) .menu {
     background: var(--surface-2);
-    border-color: var(--line-2);
+    --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
   }
 </style>

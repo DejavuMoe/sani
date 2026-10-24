@@ -136,7 +136,7 @@
   }
 
   h1 {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
@@ -144,13 +144,13 @@
   .lead {
     margin: 6px 0 24px;
     color: var(--text-2);
-    font-size: 13.5px;
+    font-size: 13px;
     line-height: 1.6;
   }
 
   .field {
     height: var(--control-field);
-    font-size: var(--input-font-size, 15px);
+    font-size: var(--input-font-size, 16px);
   }
 
   .code {
@@ -162,7 +162,7 @@
     border-radius: var(--radius-xs);
     background: var(--surface-2);
     color: var(--text-2);
-    font: 11.5px var(--font-mono);
+    font: 12px var(--font-mono);
     white-space: nowrap;
   }
 

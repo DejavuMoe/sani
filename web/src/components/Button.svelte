@@ -63,7 +63,7 @@
     min-height: max(var(--control-size), calc(1lh + 8px));
     max-width: 100%;
     padding: 3px 10px;
-    border: 1px solid transparent;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     border-radius: var(--radius);
     font-size: 13px;
     font-weight: 500;
@@ -71,11 +71,6 @@
     white-space: normal;
     text-align: center;
     user-select: none;
-    transition:
-      background-color var(--fast) var(--ease),
-      border-color var(--fast) var(--ease),
-      color var(--fast) var(--ease),
-      transform 80ms var(--ease);
   }
 
   .btn:active:not(:disabled) {
@@ -85,13 +80,13 @@
   .btn:disabled {
     color: var(--text-3);
     background: var(--surface-2);
-    border-color: var(--line);
+    --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
   }
 
   .btn[aria-busy='true'] {
     cursor: progress;
   }
-  .ghost:disabled, .danger:disabled { background: transparent; border-color: transparent; }
+  .ghost:disabled, .danger:disabled { background: transparent; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; }
   .btn[aria-busy='true'] > .spinner { position: absolute; inset: 0; margin: auto; }
   .btn[aria-busy='true'] > .text, .btn[aria-busy='true'] :global(.icon) { opacity: 0; }
   .btn[aria-busy='true'] > .text { white-space: nowrap; }
@@ -104,32 +99,28 @@
   }
 
   .primary {
-    background: var(--ink);
-    color: var(--on-ink);
+    background: var(--solid);
+    color: var(--on-solid);
   }
 
   .primary:hover:not(:disabled) {
-    background: var(--ink-hover);
+    background: var(--solid-hover);
   }
 
   .accent {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  :global([data-theme='dark']) .accent {
-    color: #0d0f1c;
+    background: var(--solid);
+    color: var(--on-solid);
   }
 
   .accent:hover:not(:disabled) {
-    background: var(--accent-hover);
+    background: var(--solid-hover);
   }
 
   .secondary {
-    border-color: var(--line-2);
+    --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     background: var(--surface);
     color: var(--text);
-    box-shadow: 0 1px 0 rgb(28 27 25 / 0.03);
+    box-shadow: var(--hair-shadow);
   }
 
   .secondary:hover:not(:disabled) {
@@ -163,8 +154,7 @@
   }
 
   .spinner {
-    border: 1.5px solid currentColor;
-    border-right-color: transparent;
+    border: 1.5px solid currentColor; border-right-color: transparent;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }

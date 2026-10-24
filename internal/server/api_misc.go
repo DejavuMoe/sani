@@ -175,6 +175,7 @@ type exportLink struct {
 	Enabled   *bool       `json:"enabled,omitempty"`
 	ExpiresAt *time.Time  `json:"expiresAt,omitempty"`
 	MaxClicks int64       `json:"maxClicks,omitempty"`
+	Password  string      `json:"password,omitempty"`
 	Clicks    int64       `json:"clicks,omitempty"`
 	CreatedAt *time.Time  `json:"createdAt,omitempty"`
 }
@@ -231,7 +232,7 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", `attachment; filename="sani-links-`+stamp+`.csv"`)
 		w.Header().Set("Cache-Control", "no-store")
 		cw := csv.NewWriter(w)
-		cw.Write([]string{"slug", "url", "title", "redirect", "enabled", "expires_at", "max_clicks", "clicks", "created_at", "tags"})
+		cw.Write([]string{"slug", "url", "title", "redirect", "enabled", "expires_at", "max_clicks", "clicks", "created_at", "tags", "password"})
 		for _, l := range all {
 			exp := ""
 			if l.ExpiresAt != 0 {
@@ -243,7 +244,7 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 			}
 			tags, _ := json.Marshal(tagsOf(l))
 			row := []string{l.Slug, l.URL, l.Title, strconv.Itoa(l.Redirect), strconv.FormatBool(l.Enabled), exp, max,
-				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339), string(tags)}
+				strconv.FormatInt(l.Clicks, 10), time.UnixMilli(l.CreatedAt).UTC().Format(time.RFC3339), string(tags), l.Password}
 			for i, v := range row {
 				row[i] = escapeCSVCell(v)
 			}
@@ -256,7 +257,7 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 	for i, l := range all {
 		enabled := l.Enabled
 		out[i] = exportLink{Tags: tagsOf(l), Slug: l.Slug, URL: l.URL, Title: l.Title, Redirect: l.Redirect, Enabled: &enabled,
-			ExpiresAt: msTime(l.ExpiresAt), MaxClicks: l.MaxClicks, Clicks: l.Clicks, CreatedAt: msTime(l.CreatedAt)}
+			ExpiresAt: msTime(l.ExpiresAt), MaxClicks: l.MaxClicks, Password: l.Password, Clicks: l.Clicks, CreatedAt: msTime(l.CreatedAt)}
 	}
 	w.Header().Set("Content-Disposition", `attachment; filename="sani-links-`+stamp+`.json"`)
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -421,6 +422,13 @@ func (s *Server) recordToLink(r *http.Request, rec map[string]string, now time.T
 			return nil, "max_clicks_invalid"
 		}
 		l.MaxClicks = v
+	}
+	if value := rec["password"]; value != "" {
+		pw, err := links.CleanPassword(value)
+		if err != nil {
+			return nil, "password_invalid"
+		}
+		l.Password = pw
 	}
 	if v, err := strconv.Atoi(rec["redirect"]); err == nil {
 		switch v {

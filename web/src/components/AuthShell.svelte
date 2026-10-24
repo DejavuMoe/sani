@@ -75,7 +75,7 @@
     padding: 0 8px;
     border-radius: var(--radius-sm);
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   footer button:hover {

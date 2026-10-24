@@ -89,7 +89,6 @@ func TestAdminRejectsUnsupportedProtectionBeforeWriting(t *testing.T) {
 	e := newShareEnv(t, Options{})
 	for _, path := range []string{"/api/admin/v1/links", "/api/admin/v1/texts"} {
 		for _, body := range []string{
-			`{"url":"https://example.org","password":"secret"}`,
 			`{"text":"secret","is_private":1}`,
 			`{"url":"https://example.org","domain":"foreign.example"}`,
 			`{"url":"https://example.org"} {"password":"secret"}`,
@@ -99,7 +98,7 @@ func TestAdminRejectsUnsupportedProtectionBeforeWriting(t *testing.T) {
 			}
 		}
 	}
-	for _, field := range []string{"password", "is_private", "domain"} {
+	for _, field := range []string{"is_private", "domain"} {
 		if r := e.upload(map[string]string{field: "secret"}, "secret.txt", []byte("private?")); r.status != 400 {
 			t.Fatalf("upload ignored %s", field)
 		}

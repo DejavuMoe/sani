@@ -23,9 +23,10 @@ type Entry struct {
 	Location  string // value for the Location header
 	Code      int
 	Enabled   bool
-	Kind      uint8 // 0 redirects; other kinds share content and have no Location
-	ExpiresAt int64 // unix ms, 0 = never
-	MaxClicks int64 // 0 = unlimited
+	Kind      uint8  // 0 redirects; other kinds share content and have no Location
+	ExpiresAt int64  // unix ms, 0 = never
+	MaxClicks int64  // 0 = unlimited
+	Password  string // access password; empty means none
 	Clicks    *atomic.Int64
 }
 

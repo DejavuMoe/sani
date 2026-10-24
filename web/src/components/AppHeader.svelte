@@ -52,12 +52,11 @@
     z-index: 20;
     top: 0;
     background: var(--bg);
-    box-shadow: 0 1px 0 transparent;
-    transition: box-shadow var(--normal) var(--ease);
+    box-shadow: var(--hair-shadow);
   }
 
   .top.scrolled {
-    box-shadow: 0 1px 0 var(--line);
+    --hbb: var(--line);
   }
 
   .inner {

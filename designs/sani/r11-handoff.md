@@ -77,3 +77,32 @@ node designs/sani/tools/r11-css.mjs D:\Forgejo\sani   # 从 R10 重新派生 src
 - 设置页只套用了新的颜色、线条和字号，文案和说明文字没有逐条审阅，建议下一轮单独审。
 - 访问者页面的解锁是用脚本模拟的表单提交；短链解锁成功后的跳转用一个原型占位页表示。
 - 本轮没有提交、推送或部署；生产代码、Go 和数据库都没有改动。
+
+## 实施（2026-10-24）
+
+按批准提交 `5cad78e`、`bf8600a` 实施，实施门禁通过（PYTHONUTF8=1 下运行，见下方说明）。原型只作为视觉与交互依据，生产代码不引用 `designs/`。
+
+| 表面 | 生产实现 | 验证 |
+|---|---|---|
+| 存储与 API | schema 7 `links.password`；`internal/links` 校验与不区分 ASCII 大小写的恒定时间比较；`password` 字段、`password_invalid`；导入导出；受保护的分享在管理接口中不返回 `rawUrl`；复用普通链接时排除带密码的链接 | `internal/server/password_test.go`、`internal/store/migration_test.go`（schema 1–6 → 7） |
+| 访问者 | `internal/server/unlock.go`：无脚本表单页；短链 303 跳转并计数，不记住状态；分享设置限定路径、12 小时有效的 HMAC Cookie；文件域名需 1 小时有效的 `t`；每客户端每链接 1 分钟内错 5 次后返回 429；状态页与分享页改用 R11 样式 | Go 测试、`web/e2e/access.spec.ts` |
+| 后台 | `AccessBar`、`AccessPopover`、`LimitPicker`、`PasswordPicker`、`lib/access.ts`；列表锁形标记；详情显示、复制密码；编辑器密码字段；复制时连同密码一起复制；全局 Radix token、0.5px 阴影细线、四档字号、250ms 动效 | `make e2e` 共 182 项、`designs/sani/tools/r11-impl.mjs` |
+
+### 与原型的差异
+
+- **跳转热路径**：未设密码的跳转只多一次字符串判空。基准对比 5 轮平均：基线 540 ns/op，R11 528 ns/op，两者都是 440 B/op、5 次分配，差异在噪声范围内。
+- **英文文案**：英文 `Password` 改为 `Access password`，避免与重新登录时的账号密码字段同名。中文仍为「访问密码」。
+- **成功色**：Radix Green 11 放在 Slate 2 背景上对比度只有 4.48:1，改用同属 Radix 的 Grass 11（浅色 `#2a7e3b`，深色 `#71d083`），达到 4.8:1。
+- **短链密码页的 CSP**：`form-action` 额外放行目标网址的来源。浏览器会把表单提交后的 303 重定向也算作表单目标，只写 `'self'` 时跳转会被拦截。这个问题由端到端测试发现，Go 测试已补上对应断言。
+- **字体**：访问者页面受 CSP 限制不加载网页字体，生产中使用系统字体，原型中使用 Inter 和 IBM Plex Mono。
+- **布局修正**：英文宽屏下文本创建框的选项行会换行，此时提交按钮保持在行末。密码页报错状态只保留一层红色焦点环。
+- **删除的提示与文案键**：删除了统计口径折叠说明、分片上传提示、「停用后…」提示及其对应的文案键。
+
+### 验证
+
+- 在 WSL 中运行 `make check`、`make test`、`make e2e`（182 项）、`make docs`，全部通过。Go 新增 5 组密码测试，原有 3 处测试随新列和新字段同步更新。
+- `designs/sani/tools/r11-impl.mjs`：基于种子数据启动真实 `bin/sani`，覆盖 zh/en、明暗主题、1280 和 390 宽度，共 40 个状态，0 失败。检查项包括 axe、每页字号不超过四种、最小字号 12px、实线边框、中点分隔符、`title` 属性和横向溢出。截图与 `verification.json` 在 `implementation-r11/`，已逐张查看关键截图。
+- 生产文案审计：`R11_CONTENT_DIR=implementation-r11` 下运行 `tools/r11-content.mjs` 和 `content_audit.py`，501 条全部归类，0 错误，24 条 `data-*` 元数据警告。
+- 用 `web/scripts/screenshots.mjs` 重新生成了文档站截图（双语、明暗主题共 16 张）。
+- 未验证：Safari、Firefox、真机触控与软键盘、1x 显示器上细线的观感；`make smoke`、`make contract`、`make upgrade-drill` 本轮没有运行。
+- 实施门禁脚本在 Windows 默认 GBK 编码下读取 git 输出会失败，需设 `PYTHONUTF8=1` 运行，这是脚本本身的问题，与实现无关。

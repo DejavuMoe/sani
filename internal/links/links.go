@@ -4,6 +4,7 @@ package links
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"errors"
 	"net/netip"
 	"net/url"
@@ -29,6 +30,7 @@ var (
 	ErrSlugInvalid  = errors.New("slug contains unsupported characters")
 	ErrSlugTooLong  = errors.New("slug is too long")
 	ErrSlugReserved = errors.New("slug is reserved")
+	ErrPassword     = errors.New("password must be 4 to 64 characters without control characters")
 )
 
 // Alphabet for generated slugs: lowercase letters and digits without the
@@ -439,4 +441,48 @@ func CleanTitle(s string) string {
 		s = strings.TrimSpace(string(r[:MaxTitleLength-1])) + "…"
 	}
 	return s
+}
+
+// Access passwords are short codes people read out or type on a phone.
+const (
+	MinPasswordLength = 4
+	MaxPasswordLength = 64
+)
+
+// CleanPassword trims an access password and checks its length and
+// characters. An empty result means no password.
+func CleanPassword(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "", nil
+	}
+	n := utf8.RuneCountInString(s)
+	if !utf8.ValidString(s) || n < MinPasswordLength || n > MaxPasswordLength {
+		return "", ErrPassword
+	}
+	for _, r := range s {
+		if unicode.IsControl(r) {
+			return "", ErrPassword
+		}
+	}
+	return s, nil
+}
+
+// SamePassword compares a visitor's attempt with the stored password in
+// constant time, ignoring ASCII case so generated codes forgive the phone
+// keyboard's capitals.
+func SamePassword(attempt, stored string) bool {
+	a := []byte(asciiLower(strings.TrimSpace(attempt)))
+	b := []byte(asciiLower(stored))
+	return len(b) > 0 && subtle.ConstantTimeCompare(a, b) == 1
+}
+
+func asciiLower(s string) string {
+	b := []byte(s)
+	for i, c := range b {
+		if 'A' <= c && c <= 'Z' {
+			b[i] = c + 'a' - 'A'
+		}
+	}
+	return string(b)
 }

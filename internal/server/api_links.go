@@ -31,6 +31,7 @@ type linkDTO struct {
 	Status      string      `json:"status"`
 	ExpiresAt   *time.Time  `json:"expiresAt"`
 	MaxClicks   *int64      `json:"maxClicks"`
+	Password    *string     `json:"password"`
 	Clicks      int64       `json:"clicks"`
 	LastClickAt *time.Time  `json:"lastClickAt"`
 	CreatedAt   time.Time   `json:"createdAt"`
@@ -78,7 +79,8 @@ func (s *Server) contentDTO(l *store.Link) *contentDTO {
 		return nil
 	}
 	d := &contentDTO{Size: c.Size}
-	if raw := s.rawURL(l); raw != "" {
+	// A protected share's bytes need a token from its unlocked page.
+	if raw := s.rawURL(l); raw != "" && l.Password == "" {
 		d.RawURL = &raw
 	}
 	if l.Kind == store.KindText {
@@ -114,6 +116,9 @@ func (s *Server) toDTO(base string, l *store.Link, now int64) linkDTO {
 	if l.MaxClicks > 0 {
 		d.MaxClicks = &l.MaxClicks
 	}
+	if l.Password != "" {
+		d.Password = &l.Password
+	}
 	switch {
 	case !l.Enabled:
 		d.Status = "disabled"
@@ -137,6 +142,8 @@ type linkInput struct {
 	Enabled   *bool             `json:"enabled"`
 	ExpiresAt nullable[string]  `json:"expiresAt"`
 	MaxClicks nullable[float64] `json:"maxClicks"`
+	// Password guards visits; an empty string removes it.
+	Password *string `json:"password"`
 	// Reuse returns an existing plain link to the same destination instead
 	// of creating another one; "shorten this page" flows set it.
 	Reuse bool `json:"reuse"`
@@ -266,6 +273,13 @@ func (s *Server) resolveInput(r *http.Request, in *linkInput, now int64) (*store
 			n = int64(v)
 		}
 		p.MaxClicks = &n
+	}
+	if in.Password != nil {
+		pw, err := links.CleanPassword(*in.Password)
+		if err != nil {
+			return nil, badInput("password_invalid", err.Error())
+		}
+		p.Password = &pw
 	}
 	if in.Text != nil {
 		if strings.TrimSpace(*in.Text) == "" {
@@ -434,6 +448,7 @@ func (s *Server) createURL(r *http.Request, in *linkInput) (*store.Link, bool, e
 		return nil, false, ierr
 	}
 	plain := (p.Slug == nil || *p.Slug == "") && p.ExpiresAt == nil && p.MaxClicks == nil &&
+		(p.Password == nil || *p.Password == "") &&
 		p.Redirect == nil && p.Tags == nil && (p.Enabled == nil || *p.Enabled)
 	if in.Reuse && plain {
 		existing, err := s.store.FindPlainLink(r.Context(), *p.URL)

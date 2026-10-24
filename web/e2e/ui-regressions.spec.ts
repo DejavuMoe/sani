@@ -90,6 +90,19 @@ async function expiry(page: Page, form: Locator) {
   await page.getByRole('menuitemradio', { name: '1 hour', exact: true }).click();
 }
 
+/** The visit limit lives in a popover beside the expiry; Enter applies it. */
+function limitTrigger(form: Locator) {
+  return form.locator('button[aria-haspopup="dialog"]').first();
+}
+
+async function setLimit(page: Page, form: Locator, value: string) {
+  await limitTrigger(form).click();
+  const field = page.locator('[popover]:popover-open').getByLabel('Visit limit');
+  await field.fill(value);
+  await field.press('Enter');
+  await expect(page.locator('[popover]:popover-open')).toHaveCount(0);
+}
+
 async function fileDraft(page: Page, size = 16) {
   await page.getByRole('tab', { name: 'Files', exact: true }).click();
   const panel = page.locator('#create-panel-file');
@@ -185,18 +198,18 @@ for (const leaveDialog of [false, true]) {
     await page.reload();
     const url = page.locator('#create-panel-url');
     await url.getByLabel('URL', { exact: true }).fill('https://example.com/unsaved-url');
-    await url.getByRole('button', { name: 'More options', exact: true }).click();
+    await url.getByRole('button', { name: 'More', exact: true }).click();
     await url.getByLabel('Title', { exact: true }).fill('Unsaved URL title');
-    await url.getByLabel('Visit limit').fill('17');
+    await setLimit(page, url, '17');
     await expiry(page, url);
     await page.getByRole('tab', { name: 'Text', exact: true }).click();
     const text = page.locator('#create-panel-text');
     await text.getByLabel('Text to share').fill('Unsaved composer text');
     await text.getByRole('radio', { name: 'Code', exact: true }).click();
     const file = await fileDraft(page);
-    await file.getByRole('button', { name: 'More options', exact: true }).click();
+    await file.getByRole('button', { name: 'More', exact: true }).click();
     await file.getByLabel('Title', { exact: true }).fill('Unsaved file title');
-    await file.getByLabel('Visit limit').fill('19');
+    await setLimit(page, file, '19');
     const row = page.locator(`[data-link="${link.id}"]`);
     await row.locator('button.main').click();
     await row.locator('button.main').press('e');
@@ -256,7 +269,7 @@ for (const leaveDialog of [false, true]) {
       await expect(editor.getByLabel('Visit limit')).toHaveValue('23');
       await expect(file.locator('.fname')).toHaveText('ui-retry.bin');
       await expect(file.getByLabel('Title', { exact: true })).toHaveValue('Unsaved file title');
-      await expect(file.getByLabel('Visit limit')).toHaveValue('19');
+      await expect(limitTrigger(file)).toContainText('19 visits');
       await expect(file.getByRole('button', { name: 'Expires', exact: true })).toContainText('1 hour');
       await page.getByRole('tab', { name: 'Text', exact: true }).click();
       await expect(text.getByLabel('Text to share')).toHaveValue('Unsaved composer text');
@@ -264,7 +277,7 @@ for (const leaveDialog of [false, true]) {
       await page.getByRole('tab', { name: 'Links', exact: true }).click();
       await expect(url.getByLabel('URL', { exact: true })).toHaveValue('https://example.com/unsaved-url');
       await expect(url.getByLabel('Title', { exact: true })).toHaveValue('Unsaved URL title');
-      await expect(url.getByLabel('Visit limit')).toHaveValue('17');
+      await expect(limitTrigger(url)).toContainText('17 visits');
       await expect(url.getByRole('button', { name: 'Expires', exact: true })).toContainText('1 hour');
       expect((await (await other.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Saved body');
       expect(writes).toEqual([]);
@@ -282,9 +295,9 @@ test('BUG-14 bookmarklet reauthentication retains the /new route and edited pref
   await page.goto(route);
   await expect(page.locator('#composer-url')).toHaveValue('https://example.com/prefilled');
   await page.locator('#composer-url').fill('https://example.com/unsaved-bookmarklet');
-  await page.getByRole('button', { name: 'More options', exact: true }).click();
+  await page.getByRole('button', { name: 'More', exact: true }).click();
   await page.getByLabel('Title', { exact: true }).fill('Unsaved bookmarklet title');
-  await page.getByLabel('Visit limit').fill('29');
+  await setLimit(page, page.locator('form.composer'), '29');
   const other = await browser.newContext();
   try {
     expect((await other.request.post(`${base}/api/admin/v1/session`, { data: { password } })).ok()).toBe(true);
@@ -300,7 +313,7 @@ test('BUG-14 bookmarklet reauthentication retains the /new route and edited pref
     await expect(page).toHaveURL(route);
     await expect(page.locator('#composer-url')).toHaveValue('https://example.com/unsaved-bookmarklet');
     await expect(page.getByLabel('Title', { exact: true })).toHaveValue('Unsaved bookmarklet title');
-    await expect(page.getByLabel('Visit limit')).toHaveValue('29');
+    await expect(limitTrigger(page.locator('form.composer'))).toContainText('29 visits');
     await expect(page.getByRole('tablist')).toHaveCount(0);
     await captureReauth(page, 'restored');
   } finally { await other.close(); }
@@ -374,7 +387,6 @@ for (const kind of ['url', 'text', 'file', 'chunked file'] as const) {
     if (mode === 'url') await panel.getByLabel('URL', { exact: true }).fill('https://example.com/valid-limit');
     else if (mode === 'text') await panel.getByLabel('Text to share').fill('Visit limit fixture');
     else await panel.locator('input[type=file]').setInputFiles({ name: 'limit.txt', mimeType: 'text/plain', buffer: kind === 'chunked file' ? Buffer.alloc(25_000_001, 37) : Buffer.from('limit fixture') });
-    await panel.getByRole('button', { name: 'More options', exact: true }).click();
     const writes: string[] = [];
     await page.route('**/api/admin/v1/**', route => {
       if (route.request().method() === 'POST') {
@@ -383,11 +395,15 @@ for (const kind of ['url', 'text', 'file', 'chunked file'] as const) {
       }
       return route.continue();
     });
+    // An invalid limit never leaves the popover, so it can't reach a request.
     for (const value of ['9'.repeat(309), '1000000000001', '9007199254740993', '0', '-1', '1.5']) {
-      await panel.getByLabel('Visit limit').fill(value);
-      await panel.locator('button.go').click();
-      await expect(panel.getByLabel('Visit limit')).toHaveAttribute('aria-invalid', 'true');
-      await expect(panel.getByLabel('Visit limit')).toBeEnabled();
+      await limitTrigger(panel).click();
+      const field = page.locator('[popover]:popover-open').getByLabel('Visit limit');
+      await field.fill(value);
+      await field.press('Enter');
+      await expect(field).toHaveAttribute('aria-invalid', 'true');
+      await field.press('Escape');
+      await expect(limitTrigger(panel)).toContainText('No limit');
       expect(writes, `nonempty invalid limit ${value} must not leave the browser`).toEqual([]);
     }
     await page.unroute('**/api/admin/v1/**');
@@ -395,13 +411,13 @@ for (const kind of ['url', 'text', 'file', 'chunked file'] as const) {
     // persistence uses the smaller fixture after covering chunk initialization.
     if (kind === 'chunked file') await panel.locator('input[type=file]').setInputFiles({ name: 'limit.txt', mimeType: 'text/plain', buffer: Buffer.from('limit fixture') });
     for (const value of ['1000000000000', '']) {
-      await panel.getByLabel('Visit limit').fill(value);
+      await setLimit(page, panel, value);
       const saved = page.waitForResponse(r => r.request().method() === 'POST' && /\/api\/admin\/v1\/(links|texts|files)$/.test(r.url()));
       await panel.locator('button.go').click();
       const response = await saved;
       expect(response.ok()).toBe(true);
       expect((await response.json()).maxClicks).toBe(value ? 1_000_000_000_000 : null);
-      await expect(panel.getByLabel('Visit limit')).toHaveValue('');
+      await expect(limitTrigger(panel)).toContainText('No limit');
       await expect(panel.locator('button.go')).toBeEnabled();
       if (value) {
         if (mode === 'url') await panel.getByLabel('URL', { exact: true }).fill('https://example.com/blank-limit');

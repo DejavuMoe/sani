@@ -1129,7 +1129,15 @@
           "internal/server/share.go",
           "internal/store/store.go",
           "internal/store/links.go",
-          "internal/cache/cache.go"
+          "internal/cache/cache.go",
+          "web/src/components/AccessBar.svelte",
+          "web/src/components/AccessPopover.svelte",
+          "web/src/components/LimitPicker.svelte",
+          "web/src/components/PasswordPicker.svelte",
+          "web/src/lib/access.ts",
+          "web/src/lib/tags.ts",
+          "internal/server/unlock.go",
+          "internal/links/links.go"
         ],
         "interfaces": [
           "POST /api/links, /api/texts, /api/files: password",
@@ -1142,11 +1150,14 @@
           "web/e2e/app.spec.ts",
           "internal/server/share_test.go",
           "internal/server/server_test.go",
-          "web/scripts/a11y.mjs"
+          "web/scripts/a11y.mjs",
+          "web/e2e/access.spec.ts",
+          "internal/server/password_test.go",
+          "internal/store/migration_test.go"
         ]
       },
-      "status": "approved",
-      "notes": "R11 approved 2026-10-24: per-link access password for links, texts and files (stored retrievable, compared case-insensitively, follows the share expiry), plus the Radix Slate/Indigo palette, 0.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages. Content inventory: review-r11/content-inventory.json. Evidence: review-r11/verification.json, r11-handoff.md."
+      "status": "implemented",
+      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages. Content inventory: review-r11/content-inventory.json. Evidence: review-r11/verification.json, r11-handoff.md. Production evidence: implementation-r11/verification.json (40 rendered states, 0 failures) and implementation-r11/content-inventory.json (501 strings)."
     },
     {
       "id": "r11-visitor-pages",
@@ -1185,7 +1196,8 @@
           "internal/server/web.go",
           "internal/server/sharepage.go",
           "internal/server/redirect.go",
-          "internal/server/share.go"
+          "internal/server/share.go",
+          "internal/server/unlock.go"
         ],
         "interfaces": [
           "GET/POST /{slug}",
@@ -1195,11 +1207,13 @@
         "tests": [
           "internal/server/share_test.go",
           "internal/server/server_test.go",
-          "web/e2e/app.spec.ts"
+          "web/e2e/app.spec.ts",
+          "internal/server/password_test.go",
+          "web/e2e/access.spec.ts"
         ]
       },
-      "status": "approved",
-      "notes": "R11 approved 2026-10-24: password page and Radix/hairline visitor styles. See r11-handoff.md."
+      "status": "implemented",
+      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented. See r11-handoff.md."
     }
   ]
 }

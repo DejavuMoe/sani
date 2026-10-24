@@ -197,7 +197,7 @@ test('a text is shared at /p/ and served raw from the files origin', async () =>
   const slug = short.split('/').pop()!;
   const row = page.locator('.row', { hasText: `/p/${slug}` });
   await expect(row).toContainText('func main() {');
-  await expect(row).toContainText('Code · 3 lines');
+  await expect(row.locator('.part')).toHaveText(['Code', '3 lines', /B$/]);
 
   const visitor = await page.context().newPage();
   await visitor.goto(short);
@@ -334,7 +334,7 @@ test('tags are created inline, survive refresh and retain the draft after a fail
   const row = page.locator('.row', { hasText: '/review-tags' });
   await expect(row.locator('.tags')).toContainText('Review');
   await page.reload();
-  await expect(row.locator('.tags .tag-badge')).toHaveAttribute('style', /#56877e/);
+  await expect(row.locator('.tags .tag-badge')).toHaveAttribute('style', /#12a594/);
   await expect(page.locator('.age, .h-age')).toHaveCount(0);
   await row.locator('button.main').click();
   await expect(row.locator('.meta')).toContainText('Created');
@@ -472,7 +472,7 @@ test('external shared URLs need confirmation on desktop and phone', async () => 
       await page.getByRole('link', { name: 'Open shared page' }).click();
       await expect(page.getByRole('heading', { name: 'Shorten this page' })).toBeVisible();
       await expect(page.getByLabel('URL', {exact:true})).toHaveValue(destination);
-      await page.getByRole('button', { name: 'More options' }).click();
+      await page.getByRole('button', { name: 'More', exact: true }).click();
       await expect(page.locator('#composer-more input').first()).toHaveValue('Review this shared page');
       await page.waitForLoadState('networkidle');
       expect(posts).toHaveLength(0);

@@ -76,6 +76,7 @@ type Link struct {
 	CreatedAt   int64
 	UpdatedAt   int64
 	HasIcon     bool
+	Password    string // access password; empty means none
 	Tags        []int64
 	ImportTags  []Tag // portable names/colors, resolved inside the import transaction
 }
@@ -90,13 +91,14 @@ type Target struct {
 	ExpiresAt int64
 	MaxClicks int64
 	Clicks    int64
+	Password  string
 }
 
 const linkCols = `l.id, l.slug, l.url, l.host, l.title, l.meta, l.redirect, l.enabled,
 	l.expires_at, l.max_clicks, l.clicks, l.last_click_at, l.created_at, l.updated_at,
 	coalesce(f.type != '', 0), l.kind, coalesce(c.format, 0), coalesce(c.name, ''), coalesce(c.type, ''),
 	coalesce(c.size, 0), coalesce(c.lines, 0), c.sha256, coalesce(c.file, ''), coalesce(c.delete_key, ''),
-	(SELECT json_group_array(tag_id ORDER BY position) FROM link_tags WHERE link_id = l.id)`
+	(SELECT json_group_array(tag_id ORDER BY position) FROM link_tags WHERE link_id = l.id), l.password`
 
 const linkFrom = `links l LEFT JOIN favicons f ON f.host = l.host LEFT JOIN contents c ON c.link_id = l.id`
 
@@ -108,7 +110,7 @@ func scanLink(row scanner) (*Link, error) {
 	var tags string
 	err := row.Scan(&l.ID, &l.Slug, &l.URL, &l.Host, &l.Title, &l.Meta, &l.Redirect, &l.Enabled,
 		&l.ExpiresAt, &l.MaxClicks, &l.Clicks, &l.LastClickAt, &l.CreatedAt, &l.UpdatedAt, &l.HasIcon,
-		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File, &c.DeleteKey, &tags)
+		&l.Kind, &c.Format, &c.Name, &c.Type, &c.Size, &c.Lines, &c.SHA256, &c.File, &c.DeleteKey, &tags, &l.Password)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -161,10 +163,10 @@ func claimSlug(ctx context.Context, tx *sql.Tx, key string, id int64, reclaim bo
 func insertLink(ctx context.Context, tx *sql.Tx, l *Link) error {
 	res, err := tx.ExecContext(ctx, `INSERT INTO links
 		(kind, slug, slug_key, url, host, title, meta, redirect, enabled, expires_at, max_clicks,
-		 clicks, last_click_at, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		 clicks, last_click_at, created_at, updated_at, password)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		l.Kind, l.Slug, links.Key(l.Slug), l.URL, l.Host, l.Title, l.Meta, l.Redirect, l.Enabled,
-		l.ExpiresAt, l.MaxClicks, l.Clicks, l.LastClickAt, l.CreatedAt, l.UpdatedAt)
+		l.ExpiresAt, l.MaxClicks, l.Clicks, l.LastClickAt, l.CreatedAt, l.UpdatedAt, l.Password)
 	if isUniqueViolation(err) {
 		return ErrSlugTaken
 	}
@@ -212,9 +214,9 @@ func (s *Store) GetLink(ctx context.Context, id int64) (*Link, error) {
 // Resolve loads the redirect target for a lookup key.
 func (s *Store) Resolve(ctx context.Context, key string) (*Target, error) {
 	var t Target
-	err := s.r.QueryRowContext(ctx, `SELECT id, kind, url, redirect, enabled, expires_at, max_clicks, clicks
+	err := s.r.QueryRowContext(ctx, `SELECT id, kind, url, redirect, enabled, expires_at, max_clicks, clicks, password
 		FROM links WHERE slug_key = ? AND deleted_at = 0`, key).
-		Scan(&t.ID, &t.Kind, &t.URL, &t.Redirect, &t.Enabled, &t.ExpiresAt, &t.MaxClicks, &t.Clicks)
+		Scan(&t.ID, &t.Kind, &t.URL, &t.Redirect, &t.Enabled, &t.ExpiresAt, &t.MaxClicks, &t.Clicks, &t.Password)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -225,11 +227,11 @@ func (s *Store) Resolve(ctx context.Context, key string) (*Target, error) {
 }
 
 // FindPlainLink returns the newest live link to url that has no expiry, no
-// click limit and a temporary redirect, so it can stand in for a new one.
+// click limit, no password and a temporary redirect, so it can stand in for a new one.
 func (s *Store) FindPlainLink(ctx context.Context, url string) (*Link, error) {
 	return scanLink(s.r.QueryRowContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+`
 		WHERE l.url = ? AND l.kind = 0 AND l.deleted_at = 0 AND l.enabled = 1 AND l.expires_at = 0
-		AND l.max_clicks = 0 AND l.redirect = 302
+		AND l.max_clicks = 0 AND l.password = '' AND l.redirect = 302
 		ORDER BY l.id DESC LIMIT 1`, url))
 }
 
@@ -256,6 +258,7 @@ type Patch struct {
 	Enabled      *bool
 	ExpiresAt    *int64
 	MaxClicks    *int64
+	Password     *string // empty removes it
 	Text         *string // replaces a text's body
 	Format       *Format
 	Tags         *[]int64
@@ -322,6 +325,9 @@ func (s *Store) UpdateLink(ctx context.Context, id int64, p Patch, now int64) (b
 		}
 		if p.MaxClicks != nil {
 			set("max_clicks", *p.MaxClicks)
+		}
+		if p.Password != nil {
+			set("password", *p.Password)
 		}
 		if p.RefreshMeta {
 			set("updated_at", before.UpdatedAt)

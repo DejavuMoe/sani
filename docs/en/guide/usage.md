@@ -12,7 +12,7 @@ There are three ways to hand Sani a link:
 
 Then press <kbd>Enter</kbd>. The new short link is copied to your clipboard and appears at the top of the list.
 
-The page title and icon are fetched in the background and usually show up within seconds; if that fails, the list shows the destination’s domain. To write a title yourself, open “More options”. A title you write is never overwritten.
+The page title and icon are fetched in the background and usually show up within seconds; if that fails, the list shows the destination’s domain. To write a title yourself, open “More”. A title you write is never overwritten.
 
 You can shorten the same URL as often as you like, and each time you get a new link. The bookmarklet and the share menu are the exception: if you shortened the page before, they hand you that link again.
 
@@ -44,12 +44,13 @@ When you pick a slug yourself, the field tells you as you type whether it’s fr
 
 ## Link options
 
-Under “More options”, when creating a link or any time later:
+Expiry, visit limit and access password sit below the input, next to the submit button; title and redirect type are under “More”. Set them when creating a link or any time later:
 
 | Option | What it does |
 |---|---|
 | Expires | Never, or after 1 hour, 1 day, 7 days or 30 days, or at a time you pick. Afterwards visitors see a “no longer available” page. |
 | Visit limit | How many visits the link allows. Only visits that count toward the statistics use it up; see [Statistics](./statistics#visit-limits). |
+| Password | Opens with a fresh six-character code; press Enter to use it, or type 4 to 64 characters of your own. Visitors enter it first, in any letter case. It lasts as long as the link, and you can show or copy it in the details, or change or clear it in the editor. After creating, the clipboard holds the link and its password. |
 | Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani. **Permanent** (301): without expiry or a visit limit, browsers can cache it for a day; repeat visits skip Sani, so they aren’t counted and see changes only later. All redirect types disallow caching when expiry or a visit limit is set. The API also offers 307 and 308. |
 | Turned off | Visitors see a “no longer available” page until you turn the link back on. |
 
@@ -150,9 +151,10 @@ A token has full access and keeps working after a password change. It’s shown 
 - **Query strings.** A visitor’s query string is added to the destination, as in `s.example.com/gh?utm_source=x`. Turn this off with [`SANI_FORWARD_QUERY`](../reference/configuration#sani-forward-query).
 - **Forgiving addresses.** A trailing `/` or different capitalization still redirects.
 - **Texts and files.** They open at `/p/{slug}` on a page in the visitor’s language; `/{slug}` without the `/p/` doesn’t find them.
+- **Access passwords.** A link, text or file with a password first shows a page asking for it, with nothing on it but the short address. Short links ask on every visit; texts and files stay open in that browser for 12 hours. Five wrong passwords from one visitor within a minute make them wait. Details are in the [API reference](../reference/api#access-password).
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.
 
-Creation defaults in Settings control URL, text/code and file slug lengths independently (each 3–32), URL look-alike exclusion and the whole-file size limit. Tags offer 12 muted presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
+Creation defaults in Settings control URL, text/code and file slug lengths independently (each 3–32), URL look-alike exclusion and the whole-file size limit. Tags offer 12 Radix presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
 
 ## Page metadata and proxies
 

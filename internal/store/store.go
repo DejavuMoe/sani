@@ -282,6 +282,9 @@ var migrations = []string{
 	`ALTER TABLE contents ADD COLUMN delete_key TEXT NOT NULL DEFAULT '';
 	UPDATE contents SET delete_key = lower(hex(randomblob(24))) WHERE file != '';
 	CREATE UNIQUE INDEX contents_delete_key ON contents(delete_key) WHERE delete_key != '';`,
+	// 7: an optional access password per link; empty means none. It is kept
+	// readable so the owner can share it again, like the content it guards.
+	`ALTER TABLE links ADD COLUMN password TEXT NOT NULL DEFAULT '';`,
 }
 
 func migrate(ctx context.Context, db *sql.DB) (result error) {

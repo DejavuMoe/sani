@@ -68,20 +68,16 @@
     max-width: min(520px, 100%);
     min-height: 40px;
     padding: 6px 6px 6px 14px;
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     background: var(--toast);
     color: var(--on-toast);
     font-size: 13px;
-    box-shadow:
-      0 1px 2px rgb(0 0 0 / 0.12),
-      0 10px 30px -8px rgb(0 0 0 / 0.35);
+    box-shadow: var(--hair-shadow), var(--shadow-pop);
     pointer-events: auto;
   }
 
   :global([data-theme='dark']) .toast {
-    box-shadow:
-      0 0 0 1px var(--line-2),
-      0 12px 30px -8px rgb(0 0 0 / 0.7);
+    box-shadow: var(--hair-shadow), 0 0 0 0.5px var(--line-2), var(--shadow-pop);
   }
 
   .toast :global(.tone) {
@@ -89,11 +85,11 @@
   }
 
   .success :global(.tone) {
-    color: #6fd39b;
+    color: var(--tone-success);
   }
 
   .error :global(.tone) {
-    color: #ff8a7a;
+    color: var(--tone-error);
   }
 
   .msg {
@@ -110,7 +106,7 @@
     overflow: hidden;
     color: var(--on-toast);
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

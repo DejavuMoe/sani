@@ -2,11 +2,13 @@
   import { tooltip } from '../lib/tooltip';
   import TagList from './TagList.svelte';
   import { untrack } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
+  import { copyShare } from '../lib/access';
   import { api, ApiError, type Link, type LinkStats } from '../lib/api';
   import { clock } from '../lib/clock.svelte';
   import { copyText } from '../lib/clipboard';
-  import { errorText, formatDateTime, formatNumber, formatRelative, t } from '../lib/i18n.svelte';
+  import { errorText, formatDateTime, formatNumber, formatRelative, t, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
   import { download, fileName, qrPNG, qrSVG } from '../lib/qr';
   import { toasts } from '../lib/toast.svelte';
@@ -99,8 +101,16 @@
     if (raw && (await copyText(raw))) toasts.success(t('act.copied'), { detail: stripScheme(raw) });
   }
 
-  async function copy() {
-    if (await copyText(link.shortUrl)) toasts.success(t('act.copied'), { detail: stripScheme(link.shortUrl) });
+  let passwordShown = $state(false);
+  // A new password, or another link, starts hidden again.
+  $effect(() => {
+    void link.password;
+    void id;
+    passwordShown = false;
+  });
+
+  async function copyPassword() {
+    if (link.password && (await copyText(link.password))) toasts.success(t('access.passwordCopied'));
   }
 
   async function refetch() {
@@ -127,7 +137,7 @@
   );
 </script>
 
-<div class="detail" id="detail-{link.id}" transition:slide={{ duration: 200 }}>
+<div class="detail" id="detail-{link.id}" transition:slide={{ duration: 250, easing: cubicOut }}>
   {#if editing}
     <LinkEditor {link} />
   {:else}
@@ -136,7 +146,7 @@
         <div class="short">
           <a class="short-url" href={link.shortUrl} target="_blank" rel="noopener">{stripScheme(link.shortUrl)}</a>
           <div class="short-actions">
-            <Button size="sm" icon="copy" onclick={copy}>{t('act.copy')}</Button>
+            <Button size="sm" icon="copy" onclick={() => copyShare(link)}>{t(link.password ? 'access.copyBoth' : 'act.copy')}</Button>
             <Button size="sm" icon="open" onclick={() => open(link.shortUrl, '_blank', 'noopener')}>
               {t('act.open')}
             </Button>
@@ -147,7 +157,7 @@
           <section class="content" aria-label={t('detail.text')}>
             <div class="content-head">
               <span class="content-meta">
-                {c.format === 'code' ? t('format.code') : t('format.plain')} · {t('share.lines', { n: c.lines ?? 0 })} · {formatSize(c.size)}
+                <span>{c.format === 'code' ? t('format.code') : t('format.plain')}</span><span>{t('share.lines', { n: c.lines ?? 0 })}</span><span>{formatSize(c.size)}</span>
               </span>
               <Button size="sm" variant="ghost" icon="copy" disabled={body === null} onclick={copyBody}>{t('share.copyText')}</Button>
             </div>
@@ -172,7 +182,7 @@
             <span class="ficon"><Icon name="file" size={18} /></span>
             <span class="finfo">
               <span class="fname">{c.name}</span>
-              <span class="fmeta">{mediaType(c.type)} · {formatSize(c.size)}</span>
+              <span class="fmeta"><span>{mediaType(c.type)}</span><span>{formatSize(c.size)}</span></span>
               <span class="sum" use:tooltip={c.sha256}>SHA-256 {c.sha256?.slice(0, 16)}…</span>
             </span>
             {#if c.rawUrl}
@@ -186,6 +196,12 @@
           </p>
         {/if}
 
+        {#if link.status !== 'active'}
+          <div class="unavailable" role="status">
+            <span><strong>{t('access.unavailable')}</strong>{t(`status.${link.status}` as MessageKey)}</span>
+            <Button size="sm" onclick={() => (links.editingId = link.id)}>{t('access.edit')}</Button>
+          </div>
+        {/if}
         {#if link.tags.length}<div class="tag-detail"><span>{t('tags.label')}</span><TagList ids={link.tags} /></div>{/if}
         <div class="stats-head">
           <dl class="figs">
@@ -261,8 +277,20 @@
             <dd class={link.status === 'exhausted' ? 'warn' : ''}>
               {link.maxClicks
                 ? t('detail.used', { n: formatNumber(Math.min(link.clicks, link.maxClicks)), max: formatNumber(link.maxClicks) })
-                : t('composer.noLimit')}
+                : t('access.noLimit')}
             </dd>
+          </div>
+          <div>
+            <dt>{t('access.password')}</dt>
+            {#if link.password}
+              <dd class="password">
+                <span class="code" aria-label={passwordShown ? undefined : t('access.hidden')}>{passwordShown ? link.password : '••••••'}</span>
+                <Button size="sm" variant="ghost" icon={passwordShown ? 'eyeOff' : 'eye'} aria-label={t(passwordShown ? 'access.hide' : 'access.show')} aria-pressed={passwordShown} onclick={() => (passwordShown = !passwordShown)} />
+                <Button size="sm" variant="ghost" icon="copy" aria-label={t('access.copyPassword')} onclick={copyPassword} />
+              </dd>
+            {:else}
+              <dd>{t('access.noPassword')}</dd>
+            {/if}
           </div>
           {#if link.kind === 'url'}
             <div>
@@ -271,7 +299,7 @@
             </div>
           {/if}
         </dl>
-        <div class="access-rules"><p>{t('rules.retained')}</p>{#if link.maxClicks}<p>{t(link.kind === 'url' ? 'rules.url' : link.kind === 'text' ? 'rules.text' : 'rules.file')}</p>{/if}{#if link.kind==='url' && (link.redirect===301 || link.redirect===308)}<p>{t('rules.permanent')}</p>{/if}</div>
+        {#if link.kind === 'url' && (link.redirect === 301 || link.redirect === 308)}<div class="access-rules"><p>{t('rules.permanent')}</p></div>{/if}
       </aside>
     </div>
 
@@ -295,7 +323,7 @@
 
 <style>
   .detail {
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
     background: var(--surface);
   }
 
@@ -373,7 +401,32 @@
 
   .content-meta {
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
+  }
+
+  /* Metadata runs are spaced, not dotted. */
+  .content-meta > span + span,
+  .fmeta > span + span {
+    margin-left: 12px;
+  }
+
+  .unavailable {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 8px 8px 8px 14px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: 13px;
+  }
+
+  .unavailable strong {
+    margin-right: 8px;
+    color: var(--text);
+    font-weight: 600;
   }
 
   .preview {
@@ -382,12 +435,12 @@
     padding: 12px 14px;
     overflow: auto;
     scrollbar-gutter: stable;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
     background: var(--surface-2);
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: 13.5px;
+    font-size: 13px;
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -396,7 +449,7 @@
   .preview-state {
     min-height: 92px;
     padding: 18px 14px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
     background: var(--surface-2);
   }
@@ -418,7 +471,7 @@
 
   .preview.code {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 12px;
     white-space: pre;
     overflow-wrap: normal;
     tab-size: 4;
@@ -429,7 +482,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 12px 12px 14px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
   }
 
@@ -453,7 +506,7 @@
 
   .fname {
     overflow: hidden;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -461,13 +514,13 @@
 
   .fmeta {
     color: var(--text-2);
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .sum {
     color: var(--text-3);
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
   }
 
   .stats-head {
@@ -492,7 +545,7 @@
 
   .figs dd {
     margin: 2px 0 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.015em;
     line-height: 1.2;
@@ -502,7 +555,7 @@
     /* Puts the 14px text on the 22px figures' baseline. */
     padding-top: 8px;
     color: var(--text-2);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 0;
   }
@@ -586,7 +639,7 @@
     align-items: center;
     gap: 6px;
     padding: 14px 12px 8px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
   }
 
@@ -606,13 +659,28 @@
     display: grid;
     gap: 9px;
     margin: 0;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .meta div {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
+  }
+
+  /* Masked until shown; the two square actions sit on the row's end. */
+  .meta .password {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin: -6px -6px -6px 0;
+  }
+
+  .meta .password .code {
+    margin-right: 4px;
+    color: var(--text);
+    letter-spacing: 0.04em;
   }
 
   .meta dt {
@@ -635,7 +703,7 @@
   .meta .code {
     color: var(--text-3);
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
   }
 
   .actions {
@@ -644,14 +712,14 @@
     align-items: center;
     gap: 4px;
     padding: 10px 12px 12px 16px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .actions kbd {
     margin-left: 2px;
     min-width: 16px;
     height: 16px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .spacer {
@@ -690,7 +758,7 @@
     }
 
     .figs dd {
-      font-size: 19px;
+      font-size: 20px;
     }
 
     .figs dd.soft {

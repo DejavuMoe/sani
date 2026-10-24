@@ -357,7 +357,7 @@ test('reduced motion also suppresses Svelte transitions', async ({page}) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   expect((await page.request.post(`${base}/api/admin/v1/links`, {data:{url:'https://example.org/motion'}})).ok()).toBe(true);
   await page.goto(`${base}/admin/`);
-  await page.getByRole('button', {name:'More options', exact:true}).click();
+  await page.getByRole('button', {name:'More', exact:true}).click();
   await expect(page.locator('#composer-more')).toBeVisible();
   await page.locator('.row .copy').first().click();
   await expect(page.locator('.toast').first()).toBeVisible();

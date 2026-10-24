@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
-  import { prefersReducedMotion } from 'svelte/motion';
+  import { shareText, shareToast } from '../lib/access';
   import { ApiError, type Link } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
@@ -10,7 +9,7 @@
   import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { hostOf, stripScheme } from '../lib/url';
-  import ExpiryPicker from './ExpiryPicker.svelte';
+  import AccessBar from './AccessBar.svelte';
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
@@ -35,6 +34,7 @@
   let tagBusy = $state(false);
   let expiry = $state<Expiry>({ preset: 'never' });
   let maxClicks = $state('');
+  let password = $state('');
   let redirect = $state(302);
   let more = $state(false);
   let busy = $state(false);
@@ -69,6 +69,7 @@
     title = '';
     tags = [];
     maxClicks = '';
+    password = '';
     note = '';
     expiry = { preset: 'never' };
     redirect = 302;
@@ -84,7 +85,8 @@
     slug_reserved: 'slug',
     slug_invalid: 'slug',
     slug_too_long: 'slug',
-    max_clicks_invalid: 'more',
+    max_clicks_invalid: 'other',
+    password_invalid: 'other',
     expires_past: 'other',
     expires_invalid: 'other',
   };
@@ -103,8 +105,7 @@
     }
     const limit = maxClicks.trim();
     if (!validMaxClicks(limit)) {
-      more = true;
-      error = { field: 'more', text: t('err.max_clicks_invalid') };
+      error = { field: 'other', text: t('err.max_clicks_invalid') };
       return;
     }
 
@@ -125,15 +126,15 @@
         title: title.trim() || undefined,
         expiresAt: toISO(expiry) ?? undefined,
         maxClicks: limit ? Number(limit) : undefined,
+        password: password || undefined,
         redirect: redirect === 302 ? undefined : redirect,
         reuse: reuse || undefined,
         tags: tags.length ? tags : undefined,
       });
-      deliver(link.shortUrl);
+      deliver(shareText(link));
       const ok = await copied;
-      toasts.success(t(link.reused ? 'created.existing' : ok ? 'created.copied' : 'created.ready'), {
-        detail: stripScheme(link.shortUrl),
-      });
+      if (link.reused) toasts.success(t('created.existing'), { detail: stripScheme(link.shortUrl) });
+      else shareToast(link, ok, true);
       reset();
       oncreated?.(link, ok);
     } catch (err) {
@@ -199,29 +200,19 @@
       onenter={() => submit()}
     />
     <span class="gap"></span>
-    <ExpiryPicker bind:value={expiry} triggerClass="opt" />
-    <button type="button" class="opt" aria-expanded={more} aria-controls="composer-more" onclick={() => (more = !more)}>
-      {more ? t('composer.less') : t('composer.more')}{#if title.trim() || maxClicks.trim() || redirect !== 302}<span class="more-count">{Number(!!title.trim()) + Number(!!maxClicks.trim()) + Number(redirect !== 302)}</span>{/if}
+    <AccessBar id="composer" bind:expiry bind:maxClicks bind:password />
+    <button type="button" class={['opt', (title.trim() || redirect !== 302) && 'set']} aria-expanded={more} aria-controls="composer-more" onclick={() => (more = !more)}>
+      {t('composer.more')}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
   </div>
 
   <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy} />
   {#if more}
-    <div class="more" id="composer-more" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}>
+    <div class="more" id="composer-more">
       <label class="cell grow">
         <span class="k">{t('composer.title')}</span>
         <input class="inline" bind:value={title} placeholder={t('composer.titleAuto')} maxlength="300" />
-      </label>
-      <label class="cell">
-        <span class="k">{t('composer.maxClicks')}</span>
-        <input
-          class="inline num"
-          bind:value={maxClicks}
-          inputmode="numeric"
-          placeholder={t('composer.noLimit')}
-          aria-invalid={error?.field === 'more' || undefined}
-        />
       </label>
       <span class="cell">
         <span class="k" id="composer-redirect">{t('composer.redirect')}</span>
@@ -238,12 +229,8 @@
       </span>
     </div>
   {/if}
-  {#if maxClicks.trim() || ('at' in expiry || expiry.preset !== 'never') || redirect === 301}
-  <div class="access-rules">
-    {#if maxClicks.trim()}<p>{t('rules.url')}</p>{/if}
-    {#if ('at' in expiry || expiry.preset !== 'never')}<p>{t('rules.expiry')}</p>{/if}
-    {#if redirect === 301}<p>{t('rules.permanent')}</p>{/if}
-  </div>
+  {#if redirect === 301}
+  <div class="access-rules"><p>{t('rules.permanent')}</p></div>
   {/if}
   </fieldset>
 </form>
@@ -256,22 +243,21 @@
 
 <style>
   .composer {
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius-lg);
     background: var(--surface);
-    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
+    box-shadow: var(--hair-shadow), 0 1px 2px rgb(28 27 25 / 0.04);
     transition:
       border-color var(--normal) var(--ease),
       box-shadow var(--normal) var(--ease);
   }
 
   .composer:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
   }
 
   .composer.invalid {
-    border-color: var(--danger);
+    --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
   }
 
   .pulse {
@@ -295,10 +281,10 @@
     flex: 1;
     min-width: 0;
     height: 100%;
-    border: 0;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     background: transparent;
     color: var(--text);
-    font-size: max(15px, var(--input-font-size));
+    font-size: 16px;
   }
 
   .url:focus {
@@ -309,20 +295,18 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 38px;
+    /* 52px row, 6px inset under a 12px card: a concentric 6px corner. */
+    height: 40px;
     padding: 0 8px 0 14px;
-    border-radius: var(--radius);
-    background: var(--ink);
-    color: var(--on-ink);
-    font-size: 13.5px;
+    border-radius: var(--radius-sm);
+    background: var(--solid);
+    color: var(--on-solid);
+    font-size: 13px;
     font-weight: 550;
-    transition:
-      background-color var(--fast) var(--ease),
-      transform 80ms var(--ease);
   }
 
   .go:hover:not(:disabled) {
-    background: var(--ink-hover);
+    background: var(--solid-hover);
   }
 
   .go:active:not(:disabled) {
@@ -332,16 +316,15 @@
   .go-kbd {
     min-width: 20px;
     height: 20px;
-    border: 0;
-    background: color-mix(in oklab, var(--on-ink) 16%, transparent);
-    color: var(--on-ink);
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
+    background: var(--solid-key);
+    color: var(--on-solid);
   }
 
   .spinner {
     width: 13px;
     height: 13px;
-    border: 1.5px solid currentColor;
-    border-right-color: transparent;
+    border: 1.5px solid currentColor; border-right-color: transparent;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }
@@ -356,10 +339,10 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px 6px;
-    min-height: 42px;
-    padding: 6px 10px 6px 16px;
-    border-top: 1px solid var(--line);
+    gap: 4px;
+    min-height: 40px;
+    padding: 6px 6px 6px 16px;
+    border-top: 0; --hbt: var(--line);
     font-size: 13px;
   }
 
@@ -373,13 +356,14 @@
     gap: 6px;
     height: var(--control-compact);
     padding: 0 8px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     color: var(--text-2);
     font-size: 13px;
     white-space: nowrap;
-    transition:
-      background-color var(--fast) var(--ease),
-      color var(--fast) var(--ease);
+  }
+
+  .options :global(.opt.set) {
+    color: var(--text);
   }
 
   .options :global(.opt:hover),
@@ -394,7 +378,6 @@
 
   .options :global(.chev) {
     color: var(--text-3);
-    transition: transform var(--normal) var(--ease);
   }
 
   .options :global(.chev.up) {
@@ -407,7 +390,7 @@
     align-items: center;
     gap: 8px 20px;
     padding: 10px 16px 12px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
     font-size: 13px;
   }
 
@@ -432,7 +415,7 @@
     min-width: 0;
     height: var(--control-compact);
     padding: 0 8px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
     font-size: 13px;
@@ -444,16 +427,7 @@
 
   .inline:focus {
     outline: none;
-    border-color: var(--accent);
-  }
-
-  .inline[aria-invalid='true'] {
-    border-color: var(--danger);
-  }
-
-  .num {
-    width: 88px;
-    font-variant-numeric: tabular-nums;
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
   }
 
   .problem,

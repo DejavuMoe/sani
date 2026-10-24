@@ -146,7 +146,7 @@
 
   input {
     min-width: 0;
-    border: 0;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     background: transparent;
     color: var(--text);
     font-family: var(--font-mono);
@@ -177,7 +177,7 @@
 
   .inline .box:focus-within {
     background: var(--surface-2);
-    box-shadow: inset 0 0 0 1px var(--line-2);
+    box-shadow: var(--hair-shadow), inset 0 0 0 0.5px var(--line-2);
   }
 
   .inline input {
@@ -194,24 +194,24 @@
     flex: none;
     height: var(--control-field);
     padding: 0 11px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
-    font-size: 13.5px;
+    font-size: 13px;
     transition:
       border-color var(--fast) var(--ease),
       box-shadow var(--fast) var(--ease);
   }
 
   .boxed .box:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
   }
 
   .boxed input {
     flex: 1;
     height: 100%;
-    font-size: var(--input-font-size, 13.5px);
+    font-size: var(--input-font-size, 13px);
   }
 
   .boxed {
@@ -225,15 +225,15 @@
   .reserved .box,
   .invalid .box,
   .tooLong .box {
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--danger) 55%, transparent);
+    box-shadow: var(--hair-shadow), inset 0 0 0 0.5px color-mix(in oklab, var(--danger) 55%, transparent);
   }
 
   .boxed.taken .box,
   .boxed.reserved .box,
   .boxed.invalid .box,
   .boxed.tooLong .box {
-    border-color: var(--danger);
-    box-shadow: none;
+    --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
+    box-shadow: var(--hair-shadow);
   }
 
   .status {

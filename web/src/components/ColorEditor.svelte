@@ -4,7 +4,7 @@
   import { t } from '../lib/i18n.svelte';
   import { TAG_COLORS, normalizeTagColor, tagHex } from '../lib/tags';
 
-  let { value = $bindable<TagColor>('#5872a5'), valid = $bindable(true), disabled = false }: { value?: TagColor; valid?: boolean; disabled?: boolean } = $props();
+  let { value = $bindable<TagColor>('#0090ff'), valid = $bindable(true), disabled = false }: { value?: TagColor; valid?: boolean; disabled?: boolean } = $props();
   const id = $props.id();
   let draft = $state(untrack(() => tagHex(value)));
   const channels = $derived([1, 3, 5].map(i => parseInt(tagHex(value).slice(i, i + 2), 16)));
@@ -32,7 +32,7 @@
   </div>
   <div class="color-sliders">
     {#each ['color.red', 'color.green', 'color.blue'] as label, i}
-      <label>{t(label as 'color.red')}<input type="range" min="0" max="255" value={channels[i]} {disabled} aria-label={t(label as 'color.red')} style:--range-color={['#a96f72', '#56877e', '#5872a5'][i]} oninput={e => channel(i, +e.currentTarget.value)} /><output>{channels[i]}</output></label>
+      <label>{t(label as 'color.red')}<input type="range" min="0" max="255" value={channels[i]} {disabled} aria-label={t(label as 'color.red')} style:--range-color={['#e5484d', '#30a46c', '#0090ff'][i]} oninput={e => channel(i, +e.currentTarget.value)} /><output>{channels[i]}</output></label>
     {/each}
   </div>
   <p id="{id}-hint" class="hint" class:error-text={!valid}>{t(valid ? 'tags.colorHint' : 'tags.colorInvalid')}</p>

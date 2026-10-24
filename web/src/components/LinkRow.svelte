@@ -1,12 +1,11 @@
 <script lang="ts">
   import { tooltip } from '../lib/tooltip';
   import type { Link } from '../lib/api';
-  import { copyText } from '../lib/clipboard';
+  import { copyShare } from '../lib/access';
   import { formatCompact, formatNumber, t, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
-  import { toasts } from '../lib/toast.svelte';
   import { formatSize, mediaType } from '../lib/size';
-  import { displayParts, stripScheme } from '../lib/url';
+  import { displayParts } from '../lib/url';
   import Favicon from './Favicon.svelte';
   import Icon, { type IconName } from './Icon.svelte';
   import LinkDetail from './LinkDetail.svelte';
@@ -29,15 +28,15 @@
   const sparkTotal = $derived(spark.reduce((a, b) => a + b, 0));
   const shared = $derived(link.kind !== 'url' && link.content ? link.content : null);
   const sharedTitle = $derived(link.title || shared?.preview || shared?.name || link.slug);
-  /** What a text or file is, in place of a destination. */
+  /** What a text or file is, in place of a destination; shown as spaced parts. */
   const sharedInfo = $derived.by(() => {
     const c = shared;
-    if (!c) return '';
+    if (!c) return [];
     if (link.kind === 'text') {
       const kind = c.format === 'code' ? t('format.code') : t('format.plain');
-      return [kind, t('share.lines', { n: c.lines ?? 0 }), formatSize(c.size)].join(' · ');
+      return [kind, t('share.lines', { n: c.lines ?? 0 }), formatSize(c.size)];
     }
-    return [link.title ? c.name : mediaType(c.type), formatSize(c.size)].filter(Boolean).join(' · ');
+    return [link.title ? c.name : mediaType(c.type), formatSize(c.size)].filter(Boolean);
   });
 
   const statusIcon: Record<string, IconName> = { disabled: 'pause', expired: 'clock', exhausted: 'gauge' };
@@ -62,11 +61,10 @@
   }
 
   async function copy() {
-    if (await copyText(link.shortUrl)) {
+    if (await copyShare(link)) {
       copied = true;
       clearTimeout(copyTimer);
       copyTimer = setTimeout(() => (copied = false), 1600);
-      toasts.success(t('act.copied'), { detail: stripScheme(link.shortUrl) });
     }
   }
 </script>
@@ -117,13 +115,16 @@
               <span class="title untitled">{parts.host || link.url}</span>
             {/if}
           {/if}
+          {#if link.password}
+            <span class="lock" role="img" aria-label={t('access.protected')}><Icon name="lock" size={12} /></span>
+          {/if}
           {#if link.status !== 'active'}
             <span class="badge"><Icon name={statusIcon[link.status]} size={12} />{t(`status.${link.status}` as MessageKey)}</span>
           {/if}
         </span>
         <span class="dest">
           {#if shared}
-            {sharedInfo}
+            {#each sharedInfo as part, i (i)}<span class="part">{part}</span>{/each}
           {:else if link.title || link.meta === 'pending'}
             <span class="host">{parts.host}</span><span class="rest">{parts.rest}</span>
           {:else if parts.host}
@@ -139,8 +140,8 @@
     <span class="clicks" use:tooltip={formatNumber(link.clicks)}>{formatCompact(link.clicks)}</span>
     <button
       class={['copy', copied && 'done']}
-      aria-label={t('list.copyShort')}
-      use:tooltip={t('list.copyShort')}
+      aria-label={t(link.password ? 'access.copyBoth' : 'list.copyShort')}
+      use:tooltip={t(link.password ? 'access.copyBoth' : 'list.copyShort')}
       onclick={(e) => {
         e.stopPropagation();
         copy();
@@ -175,15 +176,9 @@
     background: color-mix(in oklab, var(--surface), var(--surface-2) 55%);
   }
 
-  .selected .line::before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 0;
-    width: 2px;
-    border-radius: 0 2px 2px 0;
-    background: var(--accent);
+  /* Selection is a fill, never a coloured edge. */
+  .selected .line {
+    background: var(--surface-2);
   }
 
   /* Half-strength, so the row's dimmest text keeps AA contrast on it. */
@@ -199,7 +194,7 @@
     height: 16px;
     place-items: center;
     /* The box is the control: its edge keeps 3:1 against the row. */
-    border: 1.5px solid var(--text-3);
+    border: 0; --hbt: var(--text-2); --hbr: var(--text-2); --hbb: var(--text-2); --hbl: var(--text-2);
     border-radius: var(--radius-xs);
     background: var(--surface);
     color: #fff;
@@ -209,31 +204,19 @@
   }
 
   .line:hover .box {
-    border-color: var(--text-2);
+    --hbt: var(--text-2); --hbr: var(--text-2); --hbb: var(--text-2); --hbl: var(--text-2);
   }
 
   .box.on,
   .line:hover .box.on {
-    border-color: var(--accent);
-    background: var(--accent);
+    --hbt: var(--solid); --hbr: var(--solid); --hbb: var(--solid); --hbl: var(--solid);
+    background: var(--solid);
   }
 
-  :global([data-theme='dark']) .box.on {
-    color: #0d0f1c;
-  }
 
+  /* A new row stays tinted while it is marked fresh; no animation. */
   .fresh .line {
-    animation: fresh 2.4s var(--ease);
-  }
-
-  @keyframes fresh {
-    0%,
-    25% {
-      background: var(--accent-soft);
-    }
-    100% {
-      background: transparent;
-    }
+    background: var(--accent-soft);
   }
 
   .main {
@@ -257,7 +240,7 @@
     overflow: hidden;
     color: var(--text);
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -291,7 +274,7 @@
   .title {
     overflow: hidden;
     color: var(--text);
-    font-size: 14px;
+    font-size: 13px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -319,16 +302,17 @@
     height: 12px;
     border-radius: 3px;
     background: var(--surface-3);
-    animation: breathe 1.2s ease-in-out infinite alternate;
   }
 
-  @keyframes breathe {
-    from {
-      opacity: 0.45;
-    }
-    to {
-      opacity: 1;
-    }
+  .lock {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    color: var(--text-2);
+  }
+
+  .part + .part {
+    margin-left: 12px;
   }
 
   .badge {
@@ -338,10 +322,10 @@
     gap: 3px;
     height: 18px;
     padding: 0 6px 0 4px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: 4px;
     color: var(--text-2);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -350,7 +334,7 @@
     overflow: hidden;
     padding-left: 21px;
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -385,7 +369,7 @@
     flex: none;
     width: var(--col-clicks);
     color: var(--text);
-    font-size: 14px;
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
     text-align: right;
   }

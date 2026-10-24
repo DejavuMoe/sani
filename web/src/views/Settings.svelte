@@ -371,8 +371,7 @@
               <div class="tok-main">
                 <span class="tok-name">{tok.name}</span>
                 <span class="tok-meta">
-                  <code>{tok.hint}…</code> · {formatDate(tok.createdAt, clock.now)} ·
-                  {tok.usedAt ? t('settings.tokenUsed', { time: formatRelative(tok.usedAt, clock.now) }) : t('settings.tokenUnused')}
+                  <code>{tok.hint}…</code><span>{formatDate(tok.createdAt, clock.now)}</span><span>{tok.usedAt ? t('settings.tokenUsed', { time: formatRelative(tok.usedAt, clock.now) }) : t('settings.tokenUnused')}</span>
                 </span>
               </div>
               <Button size="sm" variant={confirming === tok.id ? 'danger' : 'ghost'} onclick={() => revoke(tok)}>
@@ -560,7 +559,7 @@
 
   h1 {
     margin: 12px 0 24px;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.015em;
   }
@@ -570,18 +569,18 @@
     grid-template-columns: 200px minmax(0, 1fr);
     gap: 28px;
     padding: 24px 0;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   section header h2 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
   }
 
   section header p {
     margin-top: 6px;
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -611,7 +610,7 @@
 
   .text {
     color: var(--text-2);
-    font-size: 13.5px;
+    font-size: 13px;
     line-height: 1.6;
   }
 
@@ -634,7 +633,7 @@
   }
 
   h3 {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 500;
   }
 
@@ -658,7 +657,7 @@
 
   .tool + .tool {
     padding-top: 16px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .bookmarklet {
@@ -668,14 +667,14 @@
     gap: 6px;
     min-height: var(--control-compact);
     padding: 0 12px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
     color: var(--text);
     font-size: 13px;
     font-weight: 500;
     cursor: grab;
-    box-shadow: 0 1px 0 rgb(28 27 25 / 0.04);
+    box-shadow: var(--hair-shadow), 0 1px 0 rgb(28 27 25 / 0.04);
   }
 
   .bookmarklet:active {
@@ -693,7 +692,7 @@
     align-items: center;
     min-height: var(--control-compact);
     padding: 0 12px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
     color: var(--text);
@@ -712,7 +711,7 @@
     justify-content: center;
     gap: 10px;
     height: 76px;
-    border: 1px dashed var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius-lg);
     color: var(--text-3);
     font-size: 13px;
@@ -725,7 +724,7 @@
 
   .drop:hover,
   .drop.over {
-    border-color: var(--text-3);
+    --hbt: var(--text-3); --hbr: var(--text-3); --hbb: var(--text-3); --hbl: var(--text-3);
     background: var(--surface-2);
     color: var(--text);
   }
@@ -764,7 +763,7 @@
     padding: 0;
     list-style: none;
     color: var(--text-2);
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .import-result li {
@@ -774,7 +773,7 @@
 
   code {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .reveal {
@@ -782,7 +781,7 @@
     flex-direction: column;
     gap: 8px;
     padding: 14px;
-    border: 1px solid var(--accent-line);
+    border: 0; --hbt: var(--accent-line); --hbr: var(--accent-line); --hbb: var(--accent-line); --hbl: var(--accent-line);
     border-radius: var(--radius-lg);
     background: var(--accent-soft);
   }
@@ -801,7 +800,7 @@
     align-items: center;
     gap: 8px;
     padding: 6px 6px 6px 12px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
     background: var(--surface);
   }
@@ -822,7 +821,7 @@
     margin: 0;
     padding: 12px 40px 12px 12px;
     overflow-x: auto;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
     background: var(--surface);
     color: var(--text-2);
@@ -851,7 +850,7 @@
   .tokens {
     margin: 0;
     padding: 0;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     list-style: none;
   }
@@ -864,7 +863,7 @@
   }
 
   .tokens li + li {
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .tokens :global(.tok-icon) {
@@ -879,7 +878,7 @@
   }
 
   .tok-name {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 500;
   }
 
@@ -892,7 +891,11 @@
   }
 
   .tok-meta code {
-    font-size: 11.5px;
+    font-size: 12px;
+  }
+
+  .tok-meta > span {
+    margin-left: 12px;
   }
 
   .empty {
@@ -972,10 +975,10 @@
     .row { flex-wrap: wrap; gap: 8px 16px; }
   }
   .defaults-form { gap: 18px; }
-  .lengths { min-width: 0; padding: 0; border: 0; margin: 0; }
+  .lengths { min-width: 0; padding: 0; border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; margin: 0; }
   .lengths legend { padding: 0; font-size: 13px; font-weight: 500; }
   .length-help { margin: 6px 0 12px; line-height: 1.65; }
-  .length-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .length-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 16px; padding: 10px 0; border-top: 0; --hbt: var(--line); }
   .length-label label { font-size: 13px; font-weight: 500; }
   .length-label .hint { margin: 2px 0 0; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
   .env-lock { display: inline-flex; align-items: center; gap: 4px; }
@@ -983,7 +986,7 @@
   .length-label { min-width: 0; }
   .length-example { grid-column: 1; display: flex; align-items: baseline; gap: 7px; min-height: 18px; font-size: 12px; color: var(--text-3); }
   .length-example > span { flex: none; }
-  .length-example code { font-size: 11.5px; min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
+  .length-example code { font-size: 12px; min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
   .length-example .error-text { margin: 0; flex: 1; min-width: 0; }
   .setting { --unit-width: 64px; --unit-mobile-width: 62px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
   .setting > div { min-width: 0; }

@@ -4,3 +4,5 @@ screenshots/compare/*.png
 screenshots/review/
 review-r11/content/
 review-r11/rendered-content.json
+implementation-r11/content/
+implementation-r11/rendered-content.json

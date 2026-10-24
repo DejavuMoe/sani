@@ -98,7 +98,7 @@
 
   .field {
     height: var(--control-field);
-    font-size: var(--input-font-size, 15px);
+    font-size: var(--input-font-size, 16px);
   }
 
   .form :global(.btn) {

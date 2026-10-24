@@ -65,7 +65,7 @@
     padding: 2px;
     border-radius: var(--radius);
     background: var(--surface-2);
-    box-shadow: inset 0 0 0 1px var(--line);
+    box-shadow: var(--hair-shadow), inset 0 0 0 0.5px var(--line);
   }
 
   button {
@@ -102,9 +102,7 @@
   button[aria-checked='true'] {
     background: var(--surface);
     color: var(--text);
-    box-shadow:
-      0 0 0 1px var(--line-2),
-      0 1px 2px rgb(28 27 25 / 0.06);
+    box-shadow: var(--hair-shadow), 0 0 0 0.5px var(--line-2);
   }
 
   :global([data-theme='dark']) button[aria-checked='true'] {

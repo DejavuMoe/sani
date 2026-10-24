@@ -148,8 +148,10 @@ for (const lang of ['en', 'zh'] as const) for (const theme of ['light', 'dark'] 
       const side = row.locator('.side');
       await side.scrollIntoViewIfNeeded();
       await expect(side.locator('.qr-actions button')).toHaveCount(2);
-      await expect(side.locator('.meta dd')).toHaveCount(link.kind === 'url' ? 4 : 3);
-      await expect(side.locator('.access-rules p')).toHaveCount(link.kind === 'url' ? 3 : 2);
+      // Created, expiry, limit and password; links add the redirect.
+      await expect(side.locator('.meta dd')).toHaveCount(link.kind === 'url' ? 5 : 4);
+      // Only a permanent redirect keeps its one line of caching advice.
+      await expect(side.locator('.access-rules p')).toHaveCount(link.kind === 'url' ? 1 : 0);
       const overflow = await side.evaluate(element => {
         const card = element.closest('.card')!.getBoundingClientRect();
         const side = element.getBoundingClientRect();

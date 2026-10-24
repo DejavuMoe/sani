@@ -214,6 +214,7 @@ Permanently removes the tag and all its associations, including associations on 
   "status": "active",
   "expiresAt": null,
   "maxClicks": null,
+  "password": null,
   "clicks": 2507,
   "lastClickAt": "2026-09-28T16:02:11.402Z",
   "createdAt": "2026-08-01T14:19:03.118Z",
@@ -236,6 +237,7 @@ Permanently removes the tag and all its associations, including associations on 
 | `redirect` | The redirect status: 301, 302, 307 or 308. |
 | `status` | `active`, `disabled`, `expired`, or `exhausted` when the visit limit is used up. |
 | `expiresAt`, `maxClicks` | Expiry and visit limit, `null` when not set. |
+| `password` | The access password, `null` when not set. Only the admin API returns it; see [Access passwords](#access-password). |
 | `clicks` | Total clicks, including those still in memory and not yet written. |
 | `lastClickAt` | The last counted visit, or `null`. |
 
@@ -254,9 +256,10 @@ Only `url` is required.
 | `title` | The title. Runs of whitespace are collapsed, and titles over 300 characters are cut. Fetched in the background when missing. |
 | `expiresAt` | A future RFC 3339 expiry whose UTC year is within 0000–9999, stored with millisecond precision. `null` means never. |
 | `maxClicks` | The visit limit, a whole number; `0` or `null` means none. |
+| `password` | An [access password](#access-password): 4 to 64 characters after trimming, no control characters. Omitted or an empty string means none. |
 | `redirect` | `302` (default), `301`, `307` or `308`. |
 | `enabled` | Defaults to `true`. |
-| `reuse` | With `true`, and no slug, expiry, visit limit, redirect or tags given, an existing plain link to the same URL (enabled, no expiry, no limit, 302) is returned instead of a new one, with status `200` and `"reused": true`. The bookmarklet and the share menu use it. |
+| `reuse` | With `true`, and no slug, expiry, visit limit, access password, redirect or tags given, an existing plain link to the same URL (enabled, no expiry, no limit, no password, 302) is returned instead of a new one, with status `200` and `"reused": true`. The bookmarklet and the share menu use it. |
 
 Returns `201` with the new [link](#link-object).
 
@@ -298,6 +301,7 @@ Omitted `tags` preserves the assignments; `[]` clears them; an ID array replaces
 Takes every field of *Create* except `reuse`, and changes only the fields present:
 
 - `null` for `expiresAt` or `maxClicks` clears it;
+- an empty `password` removes the access password; after a new one, visitors enter it again;
 - an empty `title` fetches a new one;
 - a new `url` fetches a new title if the old one was fetched automatically;
 - after a `slug` change, the old slug stops working immediately;
@@ -406,7 +410,7 @@ A share’s `content`:
 | `name`, `type` | Files: the file name and its media type, from the extension or, without one, the first bytes. |
 | `sha256` | Files: the SHA-256 of the bytes, in hex. |
 | `size` | The size in bytes. |
-| `rawUrl` | The bytes on the files domain, or `null` when there is none. Opening it counts as a visit. |
+| `rawUrl` | The bytes on the files domain, or `null` when there is none or the share has an access password. Opening it counts as a visit. |
 
 ### Share a text {#create-text}
 
@@ -416,7 +420,7 @@ A share’s `content`:
 { "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
 ```
 
-`text` is required: at most 1 MiB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
+`text` is required: at most 1 MiB of UTF-8, and not only whitespace. It is stored as sent, line breaks and all. `format` defaults to `plain`. `slug`, `title`, `expiresAt`, `maxClicks`, `password` and `enabled` work as for [a link](#create). Returns `201` with the new [link](#link-object).
 
 ### Share a file {#create-file}
 
@@ -424,7 +428,7 @@ The optional multipart `tags` field is a JSON array string such as `[1,2]`. It u
 
 `POST /api/admin/v1/files`
 
-The body is `multipart/form-data` with one `file` part and, optionally, the fields `slug`, `title`, `expiresAt`, `maxClicks` and `enabled`, as text and with the same meaning as for [a link](#create):
+The body is `multipart/form-data` with one `file` part and, optionally, the fields `slug`, `title`, `expiresAt`, `maxClicks`, `password` and `enabled`, as text and with the same meaning as for [a link](#create):
 
 ```sh
 curl https://s.example.com/api/admin/v1/files \
@@ -496,6 +500,8 @@ curl https://s.example.com/api/admin/v1/import \
 
 Expiry accepts supported date strings or Unix timestamps in seconds/milliseconds and is stored in milliseconds. A nonempty value that is malformed, predates the Unix epoch, exceeds UTC years 0000–9999 or overflows during unit conversion skips the row with `expires_invalid`. Empty values and `0` mean never; valid past expiry dates are preserved.
 
+The `password` field of Sani JSON and CSV carries the access password, with the same rules as [creating a link](#create); an invalid one skips the row with `password_invalid`.
+
 Click counts and visit limits accept integers from `0` to `9223372036854775807`, including exact decimal/exponent JSON numbers. Invalid or out-of-range values skip the entire row with `clicks_invalid` or `max_clicks_invalid`. Empty values and `0` mean zero clicks or unlimited visits. These reasons appear in `skipped` within a successful import response, rather than as HTTP errors.
 
 ### Chunked uploads {#chunk-upload}
@@ -504,7 +510,7 @@ All four endpoints require authentication and the same origin checks as the othe
 
 `POST /api/admin/v1/uploads`
 
-Send JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`; link options `title`, `tags`, `expiresAt`, `maxClicks` and `enabled` are optional. Body limit: 16 KiB. Returns `201` with `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`. The complete size must fit the effective `maxFileSize`. Sessions belong to the exact authenticated session/token credential, not a reusable token ID.
+Send JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`; link options `title`, `tags`, `expiresAt`, `maxClicks`, `password` and `enabled` are optional. Body limit: 16 KiB. Returns `201` with `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`. The complete size must fit the effective `maxFileSize`. Sessions belong to the exact authenticated session/token credential, not a reusable token ID.
 
 `url`, `redirect`, `text` and `format` do not apply to files; initialization rejects these fields for other resource types with `400 kind_mismatch`. Completion revalidates the fields saved at initialization and does not read new link options from its request body.
 
@@ -667,7 +673,7 @@ These paths are outside `/api/` and need no authentication.
 - Redirects with the link’s status code and the destination in `Location`. Non-ASCII hosts are converted to Punycode, and other non-ASCII characters are percent-encoded.
 - Redirects with expiry or a visit limit (301, 302, 307, 308) send `Cache-Control: no-store`. Without either limit, temporary redirects (302, 307) send `Cache-Control: private, max-age=0`; permanent ones (301, 308) send `Cache-Control: public, max-age=86400`, allowing one day of browser caching. Counting and edits cannot affect requests that do not reach Sani. See [CDN caching](../guide/deploy#cdn-cache).
 - Unknown slugs get `404`, and turned off, expired or used-up links `410`, both as small HTML pages in the visitor’s language.
-- Only `GET` and `HEAD` are accepted; other methods get `405`.
+- Only `GET` and `HEAD` are accepted; other methods get `405`. Links with an access password also accept `POST`, below.
 - A text or file at this path gets `404`: shares live under `/p/`.
 
 `GET /p/{slug}`
@@ -675,6 +681,15 @@ These paths are outside `/api/` and need no authentication.
 - A page that shows a text, escaped and in the visitor’s language, or describes a file with a download button. `404` and `410` work as for redirects.
 - Opening a text’s page counts as a visit; a file’s page doesn’t, its download does.
 - The page’s only script is its copy button, allowed by hash in the Content Security Policy.
+
+### Access passwords {#access-password}
+
+A link, text or file with a `password` first shows a page asking for it. The page shows only the short address, never the title, destination or content. The form needs no script: it `POST`s a `password` field to the same path, compared ignoring ASCII case and surrounding whitespace.
+
+- Short links: a correct password returns `303` with the destination in `Location` and counts one visit. Nothing is remembered; the next visit asks again.
+- Texts and files: a correct password sets an `HttpOnly`, `SameSite=Lax` cookie for that share’s path only, valid for 12 hours, then returns `303` to the share page. Opening the page counts the visit. Its raw and download links carry a `t` parameter valid for an hour; the files domain answers `403` without a valid one.
+- A wrong password returns `403` and an empty one `400`, both with the same form and a message, and neither counts. Five wrong passwords from one client for one link within a minute return `429` with `Retry-After`.
+- Changing or removing the password, or restarting the server, voids earlier cookies and `t` parameters. A disabled, expired or used-up link returns `410` without the form.
 
 On the files domain:
 
@@ -709,6 +724,7 @@ Returns `200` with `ok`, for health checks.
 | `expires_invalid` | 400 | Malformed `expiresAt` or a value outside the supported UTC range; imports return it as a skip reason |
 | `expires_past` | 400 | `expiresAt` is in the past |
 | `max_clicks_invalid` | 400 | `maxClicks` in an ordinary write request is not an integer from 0 to 10¹²; imports allow a larger range and return skip reasons in a successful response, as described under [Import](#import) |
+| `password_invalid` | 400 | The access password isn’t 4 to 64 characters or contains control characters; a skip reason in imports |
 | `redirect_invalid` | 400 | `redirect` isn’t 301, 302, 307 or 308 |
 | `text_required` | 400 | A text is missing or only whitespace |
 | `format_invalid` | 400 | `format` isn’t `plain` or `code` |

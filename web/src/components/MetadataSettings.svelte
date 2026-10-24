@@ -119,7 +119,7 @@
   .setting label { font-size: 13px; font-weight: 500; }
   .setting .hint { margin-top: 6px; }
   .setting :global(.switch) { flex: none; margin-top: 0; }
-  .connection { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; padding: 0; margin: 0; min-width: 0; border: 0; }
+  .connection { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; padding: 0; margin: 0; min-width: 0; border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .k { font-size: 13px; color: var(--text-2); }
   .input label { font-size: 12px; color: var(--text-2); }

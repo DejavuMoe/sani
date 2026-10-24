@@ -56,18 +56,18 @@
   .dialog {
     max-height: calc(100dvh - 48px);
     padding: 0;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--hair-shadow), var(--shadow-pop);
     opacity: 1;
     transform: none;
     transition:
-      opacity 120ms var(--ease),
-      transform 120ms var(--ease),
-      overlay 120ms allow-discrete,
-      display 120ms allow-discrete;
+      opacity 250ms var(--ease),
+      transform 250ms var(--ease),
+      overlay 250ms allow-discrete,
+      display 250ms allow-discrete;
   }
 
   .dialog:not([open]) {
@@ -86,9 +86,9 @@
     background: var(--scrim);
     opacity: 1;
     transition:
-      opacity 120ms var(--ease),
-      overlay 120ms allow-discrete,
-      display 120ms allow-discrete;
+      opacity 250ms var(--ease),
+      overlay 250ms allow-discrete,
+      display 250ms allow-discrete;
   }
 
   .dialog:not([open])::backdrop {
@@ -117,7 +117,7 @@
   }
 
   h2 {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
   }
 

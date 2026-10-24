@@ -48,7 +48,7 @@
     justify-content: space-between;
     gap: 16px;
     padding: 8px 0;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   .keys div:first-child {
@@ -70,7 +70,7 @@
   kbd {
     min-width: 22px;
     height: 22px;
-    font-size: 11.5px;
+    font-size: 12px;
   }
 
   .or {

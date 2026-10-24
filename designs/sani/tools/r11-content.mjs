@@ -17,13 +17,15 @@ import { fileURLToPath } from 'node:url';
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const step = process.argv[2];
+// Production verification reuses the same steps on its own capture and inventory.
+const dir = process.env.R11_CONTENT_DIR ?? 'review-r11';
 
 if (step === 'merge') {
-  const reports = JSON.parse(readFileSync(join(project, 'review-r11/rendered-content.json'), 'utf8'));
+  const reports = JSON.parse(readFileSync(join(project, dir, 'rendered-content.json'), 'utf8'));
   const items = [];
   for (const r of reports) for (const item of r.items) items.push({ ...item, location: `[${r.page?.url?.split('/').pop() ?? ''}] ${item.location}` });
-  mkdirSync(join(project, 'review-r11/content'), { recursive: true });
-  writeFileSync(join(project, 'review-r11/content/dom-r11.json'), JSON.stringify({
+  mkdirSync(join(project, dir, 'content'), { recursive: true });
+  writeFileSync(join(project, dir, 'content/dom-r11.json'), JSON.stringify({
     schemaVersion: 1,
     generator: 'prototype-first-ui/collect_dom_content.js via tools/r11-check.mjs',
     capturedAt: new Date().toISOString(),
@@ -57,6 +59,15 @@ if (step === 'merge') {
     for (const [k, value] of Object.entries(V.shareCopy[lang])) entries.push({ key: `shareCopy.${lang}.${k}`, value, tier: 'shipped', re: value.includes('%s') ? new RegExp(`^${value.split('%s').map(esc).join('.+?')}$`) : null });
   }
   for (const value of proposedVisitor) entries.push({ key: 'visitor-r11 password page', value, tier: 'r11' });
+  // Production captures render the shipped dictionary, R11 copy included.
+  if (dir !== 'review-r11') {
+    const source = readFileSync(join(project, '../../web/src/lib/i18n.svelte.ts'), 'utf8');
+    for (const m of source.matchAll(/^\s+['"]([\w.]+)['"]:\s*(['"])((?:\\.|(?!\2).)*)\2,?$/gm)) {
+      const value = m[3].replace(/\\(['"\\])/g, '$1');
+      const parts = value.split(/\{\w+\}/);
+      entries.push({ key: m[1], value, tier: 'shipped', re: parts.length > 1 ? new RegExp(`^${parts.map(esc).join('.+?')}$`, 's') : null });
+    }
+  }
 
   const purposeOf = (key) => {
     if (/^err\.|wrong|rate|empty$|pageCopy\.\w+\.(notfound|gone|error|share-)/.test(key)) return key.startsWith('err.') ? 'validation' : 'error';
@@ -86,10 +97,12 @@ if (step === 'merge') {
     'Visit limit reached': kept('availability', 'src/r7/states (R7 AccessRules)'), '访问次数已用尽': kept('availability', 'src/r7/states (R7 AccessRules)'),
     'HEX、RGB、HSL': proposal('task-help', 'src/r11/controls.jsx (was HEX · RGB · HSL)'),
     'Remove tag aff': kept('user-action', 'src/r8/tags.jsx'), '移除标签 aff': kept('user-action', 'src/r8/tags.jsx'),
+    // sharepage.go shareCopy.CopyFailed, newer than the synced visitor copy.
+    'Copy failed. Select text manually.': kept('error', 'internal/server/sharepage.go'), '无法复制，请手动选择文本': kept('error', 'internal/server/sharepage.go'),
   };
   for (const [, cn, en] of window.SANI_COLOR_PRESETS) manual[cn] = manual[en] = proposal('domain-value', 'src/r11/copy.js (Radix tag presets)');
 
-  const file = join(project, 'review-r11/content-inventory.json');
+  const file = join(project, dir, 'content-inventory.json');
   const inv = JSON.parse(readFileSync(file, 'utf8'));
   const unplaced = [];
   for (const item of inv.items) {
@@ -97,6 +110,8 @@ if (step === 'merge') {
     const t = item.text;
     const hit = entries.find((e) => e.value === t) ?? entries.filter((e) => e.re?.test(t)).sort((a, b) => b.value.length - a.value.length)[0];
     if (manual[t]) Object.assign(item, manual[t]);
+    else if (dir !== 'review-r11' && (/^127\.0\.0\.1:\d+\//.test(t) || /^[a-z0-9]{5,10}$/.test(t) || t.startsWith('Deploy checklist') || t === 'Ctrl↵'))
+      Object.assign(item, { purpose: 'domain-value', origin: 'production-domain', decision: 'allow', evidence: { source: 'designs/sani/tools/r11-impl.mjs', reference: 'local verification instance, generated slugs and its fixture text' }, notes: null });
     else if (/^[0-9a-f]{16}$/.test(t) || t === R11_TEXT_FLAT) Object.assign(item, { purpose: 'domain-value', origin: 'production-domain', decision: 'allow', evidence: { source: 'src/fixtures.js, src/r11/scenes.jsx', reference: 'SHA-256 prefix or sample text' }, notes: null });
     else if (hit) {
       Object.assign(item, {

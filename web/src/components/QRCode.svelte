@@ -24,6 +24,6 @@
   }
 
   path {
-    fill: #1c1b19;
+    fill: #1c2024;
   }
 </style>

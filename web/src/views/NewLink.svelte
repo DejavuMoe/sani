@@ -98,7 +98,7 @@
     align-items: center;
     gap: 10px;
     padding: 26px 20px 22px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface);
     text-align: center;
@@ -115,7 +115,7 @@
     margin-top: 8px;
     color: var(--text);
     font-family: var(--font-mono);
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
     overflow-wrap: anywhere;
   }

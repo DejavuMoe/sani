@@ -6,6 +6,7 @@
   import { errorText, t } from '../lib/i18n.svelte';
   import { mod, modEnter } from '../lib/keys';
   import { links } from '../lib/links.svelte';
+  import { generatePassword, validPassword } from '../lib/access';
   import { validMaxClicks } from '../lib/max-clicks';
   import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
@@ -31,6 +32,7 @@
       title: link.meta === 'manual' || link.meta === 'ok' ? link.title : '',
       expiry: fromISO(link.expiresAt) as Expiry,
       maxClicks: link.maxClicks ? String(link.maxClicks) : '',
+      password: link.password ?? '',
       redirect: link.redirect,
       enabled: link.enabled,
       tags: [...link.tags],
@@ -42,7 +44,7 @@
   let slugStatus = $state<SlugStatus>('idle');
   let saving = $state(false);
   let tagBusy = $state(false);
-  let errors = $state<{ url?: string; text?: string; slug?: string; maxClicks?: string; other?: string }>({});
+  let errors = $state<{ url?: string; text?: string; slug?: string; maxClicks?: string; password?: string; other?: string }>({});
   let urlField = $state<HTMLTextAreaElement>();
   /** A text's body as saved; it can't be edited before it arrives. */
   let saved = $state<string | null>(null);
@@ -62,6 +64,7 @@
     if (!sameExpiry(form.expiry, start.expiry)) p.expiresAt = toISO(form.expiry);
     const limit = form.maxClicks.trim();
     if (limit !== start.maxClicks) p.maxClicks = limit ? Number(limit) : null;
+    if (form.password.trim() !== start.password) p.password = form.password.trim();
     if (isURL && form.redirect !== start.redirect) p.redirect = form.redirect;
     if (form.enabled !== start.enabled) p.enabled = form.enabled;
     if (form.tags.join(',') !== start.tags.join(',')) p.tags = form.tags;
@@ -137,6 +140,7 @@
     if (!form.slug.trim()) { errors = { slug: t('err.slug_invalid') }; return false; }
     if (blocking.includes(slugStatus)) { errors = { slug: t(`slug.${slugStatus}` as 'slug.taken') }; return false; }
     if (form.maxClicks.trim() !== start.maxClicks && !validMaxClicks(form.maxClicks)) { errors = { maxClicks: t('err.max_clicks_invalid') }; return false; }
+    if (!validPassword(form.password)) { errors = { password: t('err.password_invalid') }; return false; }
     const p = patch();
     if (!Object.keys(p).length) { editor.check = null; editor.saving = false; links.editingId = null; return true; }
     saving = true;
@@ -153,6 +157,7 @@
       else if (code.startsWith('text_')) errors = { text };
       else if (code.startsWith('slug_')) errors = { slug: text };
       else if (code === 'max_clicks_invalid') errors = { maxClicks: text };
+      else if (code === 'password_invalid') errors = { password: text };
       else errors = { other: text };
       return false;
     } finally {
@@ -278,6 +283,26 @@
     {#if errors.maxClicks}<p class="error-text">{errors.maxClicks}</p>{/if}
   </div>
 
+  <div class="cell">
+    <label class="label" for="edit-password-{link.id}">{t('access.password')}</label>
+    <!-- Empty means no password; the button fills in a fresh code. -->
+    <div class="pair">
+      <input
+        id="edit-password-{link.id}"
+        class="field mono"
+        bind:value={form.password}
+        maxlength="64"
+        spellcheck="false"
+        autocomplete="off"
+        autocapitalize="off"
+        placeholder={t('access.noPassword')}
+        aria-invalid={!!errors.password || undefined}
+      />
+      <Button icon="refresh" onclick={() => (form.password = generatePassword())}>{t('access.generate')}</Button>
+    </div>
+    {#if errors.password}<p class="error-text">{errors.password}</p>{/if}
+  </div>
+
   {#if isURL}
     <div class="cell">
       <span class="label">{t('composer.redirect')}</span>
@@ -300,7 +325,6 @@
       <Switch id="edit-enabled-{link.id}" checked={form.enabled} onchange={(v) => (form.enabled = v)} label={t('detail.enabled')} />
       <label class="switch-label" for="edit-enabled-{link.id}">{t('detail.enabled')}</label>
     </div>
-    <p class="hint">{t('detail.enabledHint')}</p>
   </div>
 
   <footer class="wide">
@@ -348,7 +372,7 @@
 
   .body {
     min-height: 120px;
-    font-size: var(--input-font-size, 14.5px);
+    font-size: var(--input-font-size, 13px);
     line-height: 1.6;
   }
 
@@ -385,8 +409,8 @@
     color: var(--warning);
   }
 
-  /* The switch sits in the same 36px control row as its neighbor, under a
-     label-height gap, with its hint below like every other field. */
+  /* The switch sits in the same control row as its neighbor, under a
+     label-height gap. */
   .switch-row {
     padding-top: calc(13px * 1.5 + 6px);
   }
@@ -395,7 +419,22 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 36px;
+    height: var(--control-field);
+  }
+
+  /* Input and action share one height and top edge. */
+  .pair {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pair .field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pair :global(.btn) {
+    min-height: var(--control-field);
   }
 
   .switch-label {
@@ -412,7 +451,7 @@
     align-items: center;
     gap: 6px;
     padding-top: 12px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
   }
 
   footer .error-text {

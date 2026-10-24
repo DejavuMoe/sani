@@ -237,7 +237,7 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       for (const width of [641, 640, 320]) {
         await page.setViewportSize({ width, height: 900 });
         await expect(urlPanel.locator('.tag-add')).toHaveCSS('min-height', (touch || width <= 640) ? '36px' : '28px');
-        await expect(urlPanel.locator('.url')).toHaveCSS('font-size', (touch || width <= 640) ? '16px' : '15px');
+        await expect(urlPanel.locator('.url')).toHaveCSS('font-size', '16px');
       }
       await urlPanel.locator('.tag-add').press('Enter');
       const pop = page.locator('.tag-pop:popover-open');

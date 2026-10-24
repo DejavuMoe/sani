@@ -1,10 +1,18 @@
 /*
- * Sani design tokens.
+ * Sani design tokens (R11).
  *
- * Warm neutrals with one accent. Surfaces are separated by hairlines, not
- * shadows; only floating layers (menus, dialogs, toasts) cast one. Text
- * colors are checked against the canvas: --text-3 still clears 4.5:1, so it
- * is safe for small metadata; --text-4 is for disabled states and marks.
+ * Colours are Radix Colors, used by step role: 1–2 backgrounds, 3–5
+ * component states, 6–8 lines, 9–10 solid fills, 11–12 text. Slate is the
+ * neutral, Indigo the one accent, Red/Green/Amber the states. Slate 11 is the
+ * only secondary text step that clears 4.5:1, so --text-2 and --text-3 share
+ * it; hierarchy below that comes from weight and spacing. --text-4 marks
+ * disabled states only.
+ *
+ * Lines are 0.5px. Browsers round a border under one device pixel up to a
+ * full pixel, so lines are inset shadows: each side's colour is a
+ * non-inherited property (--hbt/--hbr/--hbb/--hbl) and every element draws
+ * --hair-shadow. Rules with their own shadow list --hair-shadow first.
+ * Surfaces carry no shadow; only floating layers do.
  */
 
 :root {
@@ -20,80 +28,107 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
     "PingFang SC", "Microsoft YaHei", monospace;
 
+  /* One radius per nesting level: 12 outside with 4 inside gives 8. */
   --radius-xs: 4px;
-  --radius-sm: 5px;
-  --radius: 7px;
+  --radius-sm: 6px;
+  --radius: 8px;
   --radius-lg: 12px;
 
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-io: cubic-bezier(0.6, 0, 0.3, 1);
-  --fast: 120ms;
-  --normal: 180ms;
+  /* Colour changes are instant; layers that enter or leave take 250ms. */
+  --ease: cubic-bezier(0, 0, 0.2, 1);
+  --ease-io: cubic-bezier(0, 0, 0.2, 1);
+  --fast: 0ms;
+  --normal: 250ms;
 
   --page: 920px;
   --gutter: 24px;
 
-  --bg: #f7f7f5;
+  --bg: #f9f9fb;            /* slate 2 */
   --surface: #ffffff;
-  --surface-2: #f2f1ee;
-  --surface-3: #e9e8e4;
-  --line: #e7e5e0;
-  --line-2: #d9d6cf;
-  --text: #1c1b19;
-  --text-2: #56544e;
-  --text-3: #716e67;
-  --text-4: #b3b0a8;
-  --accent: #2d4be0;
-  --accent-hover: #2340c8;
-  --accent-soft: #edf0fd;
-  --accent-line: #c3ccf7;
-  --ink: #1c1b19;
-  --ink-hover: #34332f;
-  --on-ink: #fafaf8;
-  --danger: #c23a2c;
-  --danger-soft: #fbefed;
-  --success: #167640;
-  --warning: #a86200;
-  --toast: #1f1e1c;
-  --on-toast: #f3f2ee;
-  --shadow-pop: 0 1px 2px rgb(28 27 25 / 0.05), 0 8px 28px -6px rgb(28 27 25 / 0.16);
-  --scrim: rgb(24 23 21 / 0.28);
-  --selection: #d7ddfb;
+  --surface-2: #f0f0f3;     /* slate 3 */
+  --surface-3: #e8e8ec;     /* slate 4 */
+  --line: #d9d9e0;          /* slate 6 */
+  --line-2: #cdced6;        /* slate 7 */
+  --line-3: #b9bbc6;        /* slate 8 */
+  --text: #1c2024;          /* slate 12 */
+  --text-2: #60646c;        /* slate 11 */
+  --text-3: #60646c;        /* slate 11 */
+  --text-4: #b9bbc6;        /* slate 8 */
+  --accent: #3e63dd;        /* indigo 9; 5.1:1 as text */
+  --accent-hover: #3358d4;  /* indigo 10 */
+  --accent-soft: #edf2fe;   /* indigo 3 */
+  --accent-line: #c1d0ff;   /* indigo 6 */
+  --solid: #3e63dd;         /* indigo 9 */
+  --solid-hover: #3358d4;   /* indigo 10 */
+  --solid-key: #3a5bc7;     /* indigo 11, a key cap on the solid fill */
+  --on-solid: #ffffff;
+  --ink: #1c2024;
+  --ink-hover: #1c2024;
+  --on-ink: #ffffff;
+  --danger: #ce2c31;        /* red 11 */
+  --danger-line: #eb8e90;   /* red 8 */
+  --danger-soft: #feebec;   /* red 3 */
+  --success: #2a7e3b;       /* grass 11: green 11 is 4.48:1 on slate 2 */
+  --warning: #ab6400;       /* amber 11 */
+  --toast: #1c2024;         /* slate 12 */
+  --on-toast: #fcfcfd;      /* slate 1 */
+  --on-toast-2: #b9bbc6;    /* slate 8 */
+  --tone-success: #3dd68c;  /* green 11 (dark) on the dark toast */
+  --tone-error: #ff9592;    /* red 11 (dark) */
+  --shadow-pop: 0 8px 24px -8px rgb(28 32 36 / 0.18);
+  --scrim: rgb(28 32 36 / 0.32);
+  --selection: #d2deff;     /* indigo 5 */
 
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #111110;
-  --surface: #191918;
-  --surface-2: #20201e;
-  --surface-3: #292927;
-  --line: #292826;
-  --line-2: #3a3936;
-  --text: #edece7;
-  --text-2: #b3b1a9;
-  --text-3: #8a887f;
-  --text-4: #5b5954;
-  --accent: #7189ff;
-  --accent-hover: #8b9dff;
-  --accent-soft: #1b2140;
-  --accent-line: #34407a;
-  --ink: #edece7;
-  --ink-hover: #d9d8d2;
-  --on-ink: #141413;
-  --danger: #ff7462;
-  --danger-soft: #36201c;
-  --success: #4cc584;
-  --warning: #e9a94a;
-  --toast: #2a2a27;
-  --on-toast: #f0efea;
-  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -8px rgb(0 0 0 / 0.7);
-  --scrim: rgb(0 0 0 / 0.55);
-  --selection: #2f3a73;
+  --bg: #111113;            /* slate 1 */
+  --surface: #18191b;       /* slate 2 */
+  --surface-2: #212225;     /* slate 3 */
+  --surface-3: #272a2d;     /* slate 4 */
+  --line: #363a3f;          /* slate 6 */
+  --line-2: #43484e;        /* slate 7 */
+  --line-3: #5a6169;        /* slate 8 */
+  --text: #edeef0;          /* slate 12 */
+  --text-2: #b0b4ba;        /* slate 11 */
+  --text-3: #b0b4ba;        /* slate 11 */
+  --text-4: #5a6169;        /* slate 8 */
+  --accent: #9eb1ff;        /* indigo 11: indigo 9 is 3.4:1 as text here */
+  --accent-hover: #d6e1ff;  /* indigo 12 */
+  --accent-soft: #182449;   /* indigo 3 */
+  --accent-line: #304384;   /* indigo 6 */
+  --solid: #3e63dd;
+  --solid-hover: #5472e4;   /* indigo 10 */
+  --solid-key: #3a5bc7;
+  --on-solid: #ffffff;
+  --ink: #edeef0;
+  --ink-hover: #edeef0;
+  --on-ink: #111113;
+  --danger: #ff9592;        /* red 11 */
+  --danger-line: #b54548;   /* red 8 */
+  --danger-soft: #3b1219;   /* red 3 */
+  --success: #71d083;       /* grass 11 */
+  --warning: #ffca16;       /* amber 11 */
+  --toast: #212225;         /* slate 3 */
+  --on-toast: #edeef0;
+  --on-toast-2: #b0b4ba;
+  --shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.6);
+  --scrim: rgb(0 0 0 / 0.6);
+  --selection: #253974;     /* indigo 5 */
 
   color-scheme: dark;
 }
 
+@property --hbt { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbr { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbb { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --hbl { syntax: "<color>"; inherits: false; initial-value: transparent; }
+
+* {
+  --hair-shadow: inset 0 0.5px 0 var(--hbt), inset -0.5px 0 0 var(--hbr), inset 0 -0.5px 0 var(--hbb), inset 0.5px 0 0 var(--hbl);
+  box-shadow: var(--hair-shadow);
+}
 *,
 *::before,
 *::after {
@@ -113,7 +148,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -141,7 +176,7 @@ textarea {
 button {
   cursor: pointer;
   background: none;
-  border: 0;
+  border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
   padding: 0;
   margin: 0;
   -webkit-tap-highlight-color: transparent;
@@ -201,7 +236,7 @@ textarea::placeholder {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-  border: 0;
+  border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
 }
 
 .truncate {
@@ -217,7 +252,7 @@ textarea::placeholder {
   height: var(--control-field);
   min-height: max(var(--control-field), calc(1lh + 8px));
   padding: 0 10px;
-  border: 1px solid var(--line-2);
+  border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
@@ -229,7 +264,7 @@ textarea::placeholder {
 }
 
 .field:hover {
-  border-color: color-mix(in oklab, var(--line-2), var(--text-3) 30%);
+  --hbt: color-mix(in oklab, var(--line-2), var(--text-3) 30%); --hbr: color-mix(in oklab, var(--line-2), var(--text-3) 30%); --hbb: color-mix(in oklab, var(--line-2), var(--text-3) 30%); --hbl: color-mix(in oklab, var(--line-2), var(--text-3) 30%);
 }
 
 .field:disabled { color: var(--text-3); background: var(--surface-2); cursor: default; opacity: 1; }
@@ -238,16 +273,16 @@ textarea::placeholder {
 .field:focus,
 .field:focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+  --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+  box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 .field[aria-invalid="true"] {
-  border-color: var(--danger);
+  --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
 }
 
 .field[aria-invalid="true"]:focus {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--danger) 16%, transparent);
+  box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--danger) 16%, transparent);
 }
 
 textarea.field {
@@ -275,7 +310,7 @@ textarea.field {
 .error-text {
   margin-top: 6px;
   color: var(--danger);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -285,12 +320,12 @@ kbd {
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  border: 1px solid var(--line-2);
-  border-bottom-width: 1.5px;
+  border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
+
   border-radius: var(--radius-xs);
   background: var(--surface);
   color: var(--text-2);
-  font: 500 11px/1 var(--font-sans);
+  font: 500 12px/1 var(--font-sans);
 }
 
 @media (max-width: 640px) {
@@ -340,4 +375,4 @@ input, textarea { appearance: none; }
 input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
 input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 
-.sani-tooltip { position: fixed; inset: auto; margin: 0; padding: 6px 9px; max-width: min(360px, calc(100vw - 32px)); width: max-content; overflow-wrap: anywhere; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-pop); font-family: var(--font-sans); font-size: 12px; line-height: 1.5; }
+.sani-tooltip { position: fixed; inset: auto; margin: 0; padding: 6px 9px; max-width: min(360px, calc(100vw - 32px)); width: max-content; overflow-wrap: anywhere; color: var(--text-2); background: var(--surface); border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line); border-radius: var(--radius-sm); box-shadow: var(--hair-shadow), var(--shadow-pop); font-family: var(--font-sans); font-size: 12px; line-height: 1.5; }

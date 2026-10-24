@@ -29,15 +29,12 @@
       </div>
     {/if}
   </dl>
-  <details class="scope"><summary>{t('summary.scope')}</summary><p>{t('summary.scopeHint')}</p></details>
+
   {#if links.overviewFailed}<div class="state-notice error" role="alert"><span>{t('summary.failed')}</span><Button size="sm" onclick={()=>links.refreshOverview()}>{t('act.retry')}</Button></div>{/if}
 </section>
 {/if}
 
 <style>
-  .scope { margin-top:12px; color:var(--text-3); font-size:11px; }
-  .scope summary { cursor:pointer; width:fit-content; }
-  .scope p { max-width:560px; margin-top:6px; line-height:1.7; }
   .summary {
     padding: 0 4px;
   }
@@ -86,7 +83,7 @@
     }
 
     dd {
-      font-size: 18px;
+      font-size: 20px;
     }
 
     .trend {

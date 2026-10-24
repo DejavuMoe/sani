@@ -44,7 +44,7 @@
     width: 100%;
     min-height: var(--control-option);
     padding: 6px 10px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     color: var(--text);
     font-size: 13px;
     text-align: left;

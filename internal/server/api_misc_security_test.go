@@ -50,7 +50,7 @@ func TestCSVFormulaExportAndJSONRoundTrip(t *testing.T) {
 	if err != nil || len(rows) != len(cases)+1 {
 		t.Fatalf("CSV rows: %d, %v", len(rows), err)
 	}
-	if got := strings.Join(rows[0], ","); got != "slug,url,title,redirect,enabled,expires_at,max_clicks,clicks,created_at,tags" {
+	if got := strings.Join(rows[0], ","); got != "slug,url,title,redirect,enabled,expires_at,max_clicks,clicks,created_at,tags,password" {
 		t.Fatalf("CSV header changed: %s", got)
 	}
 	records, err := parseCSVRecords(exported.body)

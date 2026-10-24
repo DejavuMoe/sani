@@ -83,6 +83,9 @@ func applyOptions(l *store.Link, p *store.Patch) {
 	if p.MaxClicks != nil {
 		l.MaxClicks = *p.MaxClicks
 	}
+	if p.Password != nil {
+		l.Password = *p.Password
+	}
 }
 
 // save inserts a new link under the requested slug, or a generated one, and
@@ -187,7 +190,7 @@ type upload struct {
 }
 
 // uploadFields are the multipart fields createFile reads besides the file.
-var uploadFields = map[string]bool{"slug": true, "title": true, "expiresAt": true, "maxClicks": true, "enabled": true, "tags": true}
+var uploadFields = map[string]bool{"slug": true, "title": true, "expiresAt": true, "maxClicks": true, "enabled": true, "tags": true, "password": true}
 
 // createFile stores one uploaded file as a new link. The body is
 // multipart/form-data with a "file" part and optional fields named like the
@@ -324,6 +327,9 @@ func formInput(f map[string]string) (*linkInput, *inputError) {
 			return nil, badInput("max_clicks_invalid", "maxClicks must be a positive whole number")
 		}
 		in.MaxClicks = nullable[float64]{Set: true, Value: n}
+	}
+	if v, ok := f["password"]; ok {
+		in.Password = &v
 	}
 	if v := strings.TrimSpace(f["enabled"]); v != "" {
 		b, err := strconv.ParseBool(v)
@@ -565,6 +571,10 @@ func (s *Server) serveFiles(w http.ResponseWriter, r *http.Request) {
 	}
 	if e == nil {
 		plainStatus(w, http.StatusNotFound, "not found")
+		return
+	}
+	if e.Password != "" && !s.validProof("raw", r.URL.Query().Get("t"), e, time.Now()) {
+		plainStatus(w, http.StatusForbidden, "this share needs its password; open the share page")
 		return
 	}
 	// Wait for a slot before counting, so a busy server never uses up a

@@ -188,7 +188,7 @@
 
   .tick {
     fill: var(--text-3);
-    font-size: 11px;
+    font-size: 12px;
     font-variant-numeric: tabular-nums;
   }
 
@@ -208,10 +208,10 @@
     flex-direction: column;
     gap: 1px;
     padding: 6px 10px;
-    border: 1px solid var(--line);
+    border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
     border-radius: var(--radius);
     background: var(--surface);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--hair-shadow), var(--shadow-pop);
     white-space: nowrap;
     transform: translate(-50%, calc(-100% - 8px));
     pointer-events: none;
@@ -219,7 +219,7 @@
 
   :global([data-theme='dark']) .tip {
     background: var(--surface-2);
-    border-color: var(--line-2);
+    --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
   }
 
   .tip strong {

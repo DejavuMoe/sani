@@ -215,6 +215,7 @@ curl https://s.example.com/api/admin/v1/links \
   "status": "active",
   "expiresAt": null,
   "maxClicks": null,
+  "password": null,
   "clicks": 2507,
   "lastClickAt": "2026-09-28T16:02:11.402Z",
   "createdAt": "2026-08-01T14:19:03.118Z",
@@ -237,6 +238,7 @@ curl https://s.example.com/api/admin/v1/links \
 | `redirect` | 跳转使用的状态码：301、302、307 或 308。 |
 | `status` | `active` 正常，`disabled` 已停用，`expired` 已过期，`exhausted` 访问次数已用完。 |
 | `expiresAt`、`maxClicks` | 过期时间和访问上限，没有设置时为 `null`。 |
+| `password` | 访问密码，没有设置时为 `null`。只在管理接口返回，见[访问密码](#access-password)。 |
 | `clicks` | 总点击数，包含还在内存里、尚未写入数据库的点击。 |
 | `lastClickAt` | 最近一次计入统计的访问，没有时为 `null`。 |
 
@@ -255,9 +257,10 @@ curl https://s.example.com/api/admin/v1/links \
 | `title` | 标题，连续的空白会合并，超过 300 个字符会被截断。不填时在后台自动获取。 |
 | `expiresAt` | RFC 3339 过期时间，必须晚于现在，转换到 UTC 后年份在 0000–9999 内，按毫秒保存。`null` 表示永久有效。 |
 | `maxClicks` | 访问上限，非负整数，`0` 或 `null` 表示不限。 |
+| `password` | [访问密码](#access-password)，去掉首尾空白后 4–64 个字符，不能含控制字符。省略或空字符串表示不设密码。 |
 | `redirect` | `302`（默认）、`301`、`307` 或 `308`。 |
 | `enabled` | 默认 `true`。 |
-| `reuse` | 设为 `true`，并且没有指定短码、过期时间、访问上限、跳转方式和标签时，如果已经有一条指向同一网址的普通链接（启用、没有过期时间、没有访问上限、302 跳转），就直接返回它，状态码为 `200`，并带上 `"reused": true`。书签小工具和手机分享用的就是它。 |
+| `reuse` | 设为 `true`，并且没有指定短码、过期时间、访问上限、访问密码、跳转方式和标签时，如果已经有一条指向同一网址的普通链接（启用、没有过期时间、没有访问上限、没有访问密码、302 跳转），就直接返回它，状态码为 `200`，并带上 `"reused": true`。书签小工具和手机分享用的就是它。 |
 
 成功时返回 `201` 和新建的[链接对象](#link-object)。
 
@@ -299,6 +302,7 @@ curl https://s.example.com/api/admin/v1/links \
 接受创建时除 `reuse` 以外的全部字段，只修改请求里出现的字段：
 
 - `expiresAt` 或 `maxClicks` 传 `null`，表示清除；
+- `password` 传空字符串，表示移除访问密码；改成新密码后，访问者需要重新输入；
 - `title` 传空字符串，表示重新自动获取标题；
 - 修改 `url` 时，如果原来的标题是自动获取的，会重新获取；
 - 修改 `slug` 后，旧短码立即失效；
@@ -407,7 +411,7 @@ curl https://s.example.com/api/admin/v1/links \
 | `name`、`type` | 文件：文件名和媒体类型。类型按扩展名判断，没有扩展名时看文件开头的内容。 |
 | `sha256` | 文件：内容的 SHA-256，十六进制。 |
 | `size` | 大小，单位是字节。 |
-| `rawUrl` | 文件域名上的原始内容，没有文件域名时为 `null`。打开它计为一次访问。 |
+| `rawUrl` | 文件域名上的原始内容，没有文件域名或设置了访问密码时为 `null`。打开它计为一次访问。 |
 
 ### 分享文本 {#create-text}
 
@@ -417,7 +421,7 @@ curl https://s.example.com/api/admin/v1/links \
 { "text": "server {\n    listen 443 ssl;\n}\n", "format": "code", "slug": "nginx-conf" }
 ```
 
-`text` 必填，最多 1 MiB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
+`text` 必填，最多 1 MiB 的 UTF-8 文本，不能只有空白，换行等内容按原样保存。`format` 默认 `plain`。`slug`、`title`、`expiresAt`、`maxClicks`、`password` 和 `enabled` 与[创建链接](#create)相同。成功时返回 `201` 和新建的[链接对象](#link-object)。
 
 ### 分享文件 {#create-file}
 
@@ -425,7 +429,7 @@ curl https://s.example.com/api/admin/v1/links \
 
 `POST /api/admin/v1/files`
 
-请求体是 `multipart/form-data`：一个 `file` 部分，以及可选的 `slug`、`title`、`expiresAt`、`maxClicks` 和 `enabled` 字段，值是文本，含义与[创建链接](#create)相同：
+请求体是 `multipart/form-data`：一个 `file` 部分，以及可选的 `slug`、`title`、`expiresAt`、`maxClicks`、`password` 和 `enabled` 字段，值是文本，含义与[创建链接](#create)相同：
 
 ```sh
 curl https://s.example.com/api/admin/v1/files \
@@ -497,6 +501,8 @@ curl https://s.example.com/api/admin/v1/import \
 
 过期时间可以是受支持的日期字符串或 Unix 秒/毫秒时间戳，按毫秒保存。非空值若格式非法、早于 Unix 纪元、超出 UTC 年份 0000–9999 或在单位换算时溢出，该行以 `expires_invalid` 跳过。空值和 `0` 表示永久有效；合法的历史过期时间会保留。
 
+Sani JSON 和 CSV 的 `password` 字段带上访问密码，规则与[创建链接](#create)相同，不合法时以 `password_invalid` 跳过该行。
+
 点击量和访问上限接受 `0`–`9223372036854775807` 的整数，JSON 数字的小数／指数形式也精确解析。非法或越界值分别以 `clicks_invalid` 或 `max_clicks_invalid` 作为跳过原因返回，整行不导入；空值和 `0` 表示零次点击／不限访问。导入原因位于成功响应的 `skipped` 中，不是 HTTP 错误响应。
 
 ### 分片上传 {#chunk-upload}
@@ -505,7 +511,7 @@ curl https://s.example.com/api/admin/v1/import \
 
 `POST /api/admin/v1/uploads`
 
-发送 JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`，可选链接字段 `title`、`tags`、`expiresAt`、`maxClicks`、`enabled`。请求体限制 16 KiB。返回 `201` 和 `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`。完整文件大小不得超过当前 `maxFileSize`。会话绑定具体登录会话或令牌凭据，不使用可复用的令牌数字 ID。
+发送 JSON `{ "name":"archive.zip", "size":72000000, "slug":"archive" }`，可选链接字段 `title`、`tags`、`expiresAt`、`maxClicks`、`password`、`enabled`。请求体限制 16 KiB。返回 `201` 和 `{ "id":"…", "offset":0, "chunkSize":25000000, "expiresAt":"…" }`。完整文件大小不得超过当前 `maxFileSize`。会话绑定具体登录会话或令牌凭据，不使用可复用的令牌数字 ID。
 
 `url`、`redirect`、`text` 和 `format` 不适用于文件；初始化时拒绝这些其他类型的字段，返回 `400 kind_mismatch`。完成阶段再次校验初始化时保存的字段，不从完成请求体读取新的链接选项。
 
@@ -668,7 +674,7 @@ curl https://s.example.com/api/admin/v1/import \
 - 按链接设置的状态码跳转，`Location` 响应头是目标网址。非 ASCII 的域名会转换为 Punycode，其他非 ASCII 字符按百分号编码。
 - 设置有效期或访问上限的跳转（301、302、307、308）带 `Cache-Control: no-store`。未设置这两项限制时，临时跳转（302、307）带 `Cache-Control: private, max-age=0`；永久跳转（301、308）带 `Cache-Control: public, max-age=86400`，允许浏览器缓存一天，期间计数和修改无法影响未回源的请求。参见 [CDN 缓存配置](../guide/deploy#cdn-cache)。
 - 短码不存在时返回 `404`，链接停用、过期或访问次数用完时返回 `410`，都是按访问者语言显示的简单 HTML 页面。
-- 只接受 `GET` 和 `HEAD`，其他方法返回 `405`。
+- 只接受 `GET` 和 `HEAD`，其他方法返回 `405`；设置了访问密码的链接另外接受 `POST`，见下文。
 - 文本和文件在这个路径下返回 `404`，它们在 `/p/` 下。
 
 `GET /p/{slug}`
@@ -676,6 +682,15 @@ curl https://s.example.com/api/admin/v1/import \
 - 显示文本（经过转义，按访问者语言显示界面）的页面，或者介绍文件、带下载按钮的页面。`404` 和 `410` 与跳转相同。
 - 打开文本页面计为一次访问；文件页面不计，下载才计。
 - 页面里唯一的脚本是复制按钮，内容安全策略按哈希放行它。
+
+### 访问密码 {#access-password}
+
+设置了 `password` 的链接、文本和文件，先显示一个输入密码的页面，页面上只有短链接地址，不透露标题、目标或内容。表单不依赖脚本，`POST` 到同一路径，字段名是 `password`，比较时忽略 ASCII 大小写和首尾空白：
+
+- 短链接：密码正确时返回 `303`，`Location` 是目标网址，并计一次访问；不记住解锁状态，下次访问需要重新输入。
+- 文本和文件：密码正确时设置一个只对这个分享路径有效、`HttpOnly`、`SameSite=Lax` 的 Cookie，有效 12 小时，然后 `303` 回到分享页；打开分享页才计访问。页面上的原始内容和下载链接带一个 1 小时内有效的 `t` 参数，文件域名上没有有效 `t` 的请求返回 `403`。
+- 密码错误返回 `403`，没有填写返回 `400`，都显示同一个表单和错误提示，不计访问。同一客户端对同一链接 1 分钟内错 5 次后返回 `429` 和 `Retry-After`。
+- 修改或移除密码、或者服务重启后，之前的 Cookie 和 `t` 参数失效。停用、过期或次数用完的链接直接返回 `410`，不显示密码页面。
 
 文件域名上：
 
@@ -710,6 +725,7 @@ curl https://s.example.com/api/admin/v1/import \
 | `expires_invalid` | 400 | `expiresAt` 格式非法或超出 UTC 支持范围；导入时作为跳过原因返回 |
 | `expires_past` | 400 | `expiresAt` 早于当前时间 |
 | `max_clicks_invalid` | 400 | 普通写接口的 `maxClicks` 不是 0 到 10¹² 之间的整数；导入允许更大范围，并在成功响应中返回跳过原因，见[导入](#import) |
+| `password_invalid` | 400 | 访问密码不是 4 到 64 个字符，或含控制字符；导入时作为跳过原因返回 |
 | `redirect_invalid` | 400 | `redirect` 不是 301、302、307 或 308 |
 | `text_required` | 400 | 缺少文本，或者文本只有空白 |
 | `format_invalid` | 400 | `format` 不是 `plain` 或 `code` |

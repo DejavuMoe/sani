@@ -59,6 +59,11 @@ func legacyFixture(t *testing.T, version int) (string, string) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if version >= 6 {
+			if _, err := db.Exec(`UPDATE contents SET delete_key = lower(hex(randomblob(24))) WHERE link_id = 103`); err != nil {
+				t.Fatal(err)
+			}
+		}
 	}
 	if version >= 4 {
 		if _, err := db.Exec(`INSERT INTO tags VALUES(42,'old','old','blue');INSERT INTO link_tags VALUES(101,42,0)`); err != nil {
@@ -69,7 +74,7 @@ func legacyFixture(t *testing.T, version int) (string, string) {
 }
 
 func TestCompatibilityUpgradePreservesAllLegacySchemas(t *testing.T) {
-	for version := 1; version <= 5; version++ {
+	for version := 1; version <= 6; version++ {
 		t.Run(fmt.Sprint(version), func(t *testing.T) {
 			path, files := legacyFixture(t, version)
 			ctx := context.Background()
@@ -78,7 +83,7 @@ func TestCompatibilityUpgradePreservesAllLegacySchemas(t *testing.T) {
 				t.Fatal(err)
 			}
 			report, err := Preflight(ctx, path, files)
-			if err != nil || report.Schema != version || report.Target != 6 {
+			if err != nil || report.Schema != version || report.Target != 7 {
 				t.Fatalf("preflight: %+v %v", report, err)
 			}
 			after, _ := os.ReadFile(path)
@@ -92,7 +97,7 @@ func TestCompatibilityUpgradePreservesAllLegacySchemas(t *testing.T) {
 					t.Fatal(err)
 				}
 				l, err := s.GetLink(ctx, 101)
-				if err != nil || l.Slug != "KeepCase" || len(l.URL) <= 3000 || l.Clicks != 27 || l.Redirect != 307 || l.ExpiresAt != 1234 || l.MaxClicks != 500 {
+				if err != nil || l.Slug != "KeepCase" || len(l.URL) <= 3000 || l.Clicks != 27 || l.Redirect != 307 || l.ExpiresAt != 1234 || l.MaxClicks != 500 || l.Password != "" {
 					t.Fatalf("changed legacy link: %+v %v", l, err)
 				}
 				var password string

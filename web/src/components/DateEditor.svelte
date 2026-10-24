@@ -49,18 +49,18 @@
 </div>
 
 <style>
-  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 280px; max-width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); flex-basis: auto; }
+  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 280px; max-width: 100%; padding: 14px; border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line); border-radius: var(--radius); background: var(--surface); flex-basis: auto; }
   .date-fields { display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 8px; }
   .input { display: grid; gap: 7px; min-width: 0; }
   label { font-size: 13px; color: var(--text-2); }
   .field { width: 100%; min-width: 0; }
-  .hint, .error-text { font-size: 11px; }
+  .hint, .error-text { font-size: 12px; }
   .calendar-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
   .calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-  .calendar > span { text-align: center; font-size: 10px; color: var(--text-3); padding: 5px 0; }
+  .calendar > span { text-align: center; font-size: 12px; color: var(--text-3); padding: 5px 0; }
   .calendar button { min-height: 32px; border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
   .calendar button:hover { background: var(--surface-2); }
-  .calendar button[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-line); }
+  .calendar button[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent); box-shadow: var(--hair-shadow), inset 0 0 0 0.5px var(--accent-line); }
   @media (max-width: 640px), (pointer: coarse) {
     .date-editor { padding: 10px; }
     .date-fields { grid-template-columns: minmax(0,1fr) 80px; }

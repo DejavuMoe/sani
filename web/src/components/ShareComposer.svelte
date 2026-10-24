@@ -1,9 +1,8 @@
 <script lang="ts">
   import { tooltip } from '../lib/tooltip';
   import { onDestroy, tick } from 'svelte';
-  import { slide } from 'svelte/transition';
-  import { prefersReducedMotion } from 'svelte/motion';
-  import { ApiError, UPLOAD_CHUNK_SIZE, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
+  import { shareText, shareToast } from '../lib/access';
+  import { ApiError, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
   import { copyLater } from '../lib/clipboard';
   import { toISO, type Expiry } from '../lib/expiry';
   import { errorText, i18n, t } from '../lib/i18n.svelte';
@@ -13,8 +12,8 @@
   import { session } from '../lib/session.svelte';
   import { byteLength, formatSize } from '../lib/size';
   import { toasts } from '../lib/toast.svelte';
-  import { hostOf, stripScheme } from '../lib/url';
-  import ExpiryPicker from './ExpiryPicker.svelte';
+  import { hostOf } from '../lib/url';
+  import AccessBar from './AccessBar.svelte';
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
@@ -34,6 +33,7 @@
   let tagBusy = $state(false);
   let expiry = $state<Expiry>({ preset: 'never' });
   let maxClicks = $state('');
+  let password = $state('');
   let more = $state(false);
   let busy = $state(false);
   /** Share of the file sent so far, while uploading. */
@@ -101,6 +101,7 @@
     title = '';
     tags = [];
     maxClicks = '';
+    password = '';
     note = '';
     expiry = { preset: 'never' };
     tick().then(autosize);
@@ -117,7 +118,8 @@
     slug_reserved: 'slug',
     slug_invalid: 'slug',
     slug_too_long: 'slug',
-    max_clicks_invalid: 'more',
+    max_clicks_invalid: 'other',
+    password_invalid: 'other',
   };
 
   function fail(code: string) {
@@ -166,6 +168,7 @@
       title: title.trim() || undefined,
       expiresAt: toISO(expiry) ?? undefined,
       maxClicks: maxClicks.trim() ? Number(maxClicks.trim()) : undefined,
+      password: password || undefined,
     };
     try {
       let link: Link;
@@ -174,14 +177,14 @@
       } else {
         upload = new AbortController();
         progress = resume.offset / file!.size;
-        const draft = JSON.stringify({ tags, slug, title, expiry, maxClicks });
+        const draft = JSON.stringify({ tags, slug, title, expiry, maxClicks, password });
         // Only a continuing chunk session is bound to the earlier deadline.
         if (!resume.id || draft !== lastFileDraft) { savedFileOptions = options; lastFileDraft = draft; }
         link = await links.createFile(file!, savedFileOptions ?? options, (sent, total) => (progress = sent / total), upload.signal, resume);
       }
-      deliver(link.shortUrl);
+      deliver(shareText(link));
       const ok = await copied;
-      toasts.success(t(ok ? 'created.copied' : 'created.ready'), { detail: stripScheme(link.shortUrl) });
+      shareToast(link, ok, true);
       reset();
     } catch (err) {
       reject(err);
@@ -265,7 +268,7 @@
           <span class="ficon"><Icon name="file" size={18} /></span>
           <span class="finfo">
             <span class="fname">{file.name}</span>
-            <span class="fmeta">{formatSize(file.size)}{file.type ? ` · ${file.type}` : ''}</span>
+            <span class="fmeta"><span>{formatSize(file.size)}</span>{#if file.type}<span>{file.type}</span>{/if}</span>
           </span>
           {#if !(busy && progress !== null)}
             <button
@@ -347,9 +350,9 @@
     {#if mode === 'text' && text}
       <span class={['count', bytes > maxText && 'over']}>{formatSize(bytes)} / {formatSize(maxText)}</span>
     {/if}
-    <ExpiryPicker bind:value={expiry} triggerClass="opt" />
-    <button type="button" class="opt" aria-expanded={more} aria-controls="{id}-more" onclick={() => (more = !more)}>
-      {more ? t('composer.less') : t('composer.more')}{#if title.trim() || maxClicks.trim()}<span class="more-count">{Number(!!title.trim()) + Number(!!maxClicks.trim())}</span>{/if}
+    <AccessBar {id} bind:expiry bind:maxClicks bind:password />
+    <button type="button" class={['opt', title.trim() && 'set']} aria-expanded={more} aria-controls="{id}-more" onclick={() => (more = !more)}>
+      {t('composer.more')}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
     <button class="go" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
@@ -361,34 +364,17 @@
 
   <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy || (mode === 'file' && !filesOn)} />
   {#if more}
-    <div class="more" id="{id}-more" transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}>
+    <div class="more" id="{id}-more">
       <label class="cell grow">
         <span class="k">{t('composer.title')}</span>
         <input class="inline" bind:value={title} placeholder={t('share.optional')} maxlength="300" />
       </label>
-      <label class="cell">
-        <span class="k">{t('composer.maxClicks')}</span>
-        <input
-          class="inline num"
-          bind:value={maxClicks}
-          inputmode="numeric"
-          placeholder={t('composer.noLimit')}
-          aria-invalid={error?.field === 'more' || undefined}
-        />
-      </label>
     </div>
-  {/if}
-  {#if maxClicks.trim() || ('at' in expiry || expiry.preset !== 'never')}
-  <div class="access-rules">
-    {#if maxClicks.trim()}<p>{t(mode === 'text' ? 'rules.text' : 'rules.file')}</p>{/if}
-    {#if ('at' in expiry || expiry.preset !== 'never')}<p>{t('rules.expiry')}</p>{/if}
-  </div>
   {/if}
   </fieldset>
   {#if busy && progress !== null}<button type="button" class="cancel-upload" onclick={() => upload?.abort()}>{t('share.cancel')}</button>{/if}
 </form>
 
-{#if mode === 'file' && file && file.size > UPLOAD_CHUNK_SIZE}<p class="chunk-hint">{t('share.chunked')}</p>{/if}
 {#if error}
   <p class="problem" id="{id}-error" role="alert"><Icon name="alert" size={14} />{error.text}</p>
 {:else if note}
@@ -399,23 +385,19 @@
   .cancel-upload { display:block; margin:10px 16px; color:var(--danger); font-size:13px; }
   .off a { color:var(--accent); }
   .composer {
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius-lg);
     background: var(--surface);
-    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
-    transition:
-      border-color var(--normal) var(--ease),
-      box-shadow var(--normal) var(--ease);
+    box-shadow: var(--hair-shadow);
   }
 
   .composer:focus-within,
   .composer.dragging {
-    border-color: var(--accent);
-    box-shadow: 0 1px 2px rgb(28 27 25 / 0.04);
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
   }
 
   .composer.invalid {
-    border-color: var(--danger);
+    --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
   }
 
   .body {
@@ -423,11 +405,11 @@
     width: 100%;
     min-height: 128px;
     padding: 14px 16px;
-    border: 0;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     background: transparent;
     color: var(--text);
-    font-size: var(--input-font-size, 14.5px);
+    font-size: var(--input-font-size, 13px);
     line-height: 1.6;
     resize: none;
   }
@@ -463,7 +445,7 @@
     align-items: center;
     gap: 6px;
     color: var(--text-2);
-    font-size: 13.5px;
+    font-size: 13px;
     text-align: center;
   }
 
@@ -529,16 +511,20 @@
   .fname {
     overflow: hidden;
     color: var(--text);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
+  .fmeta > span + span {
+    margin-left: 12px;
+  }
+
   .fmeta {
     overflow: hidden;
     color: var(--text-3);
-    font-size: 12.5px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -571,17 +557,17 @@
     height: 100%;
     border-radius: 2px;
     background: var(--accent);
-    transition: width 160ms linear;
+    transition: width 250ms linear;
   }
 
   .options {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 10px;
-    min-height: 48px;
-    padding: 7px 8px 7px 16px;
-    border-top: 1px solid var(--line);
+    gap: 4px;
+    min-height: 40px;
+    padding: 6px 6px 6px 16px;
+    border-top: 0; --hbt: var(--line);
     font-size: 13px;
   }
 
@@ -606,13 +592,14 @@
     gap: 6px;
     height: var(--control-compact);
     padding: 0 8px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     color: var(--text-2);
     font-size: 13px;
     white-space: nowrap;
-    transition:
-      background-color var(--fast) var(--ease),
-      color var(--fast) var(--ease);
+  }
+
+  .options :global(.opt.set) {
+    color: var(--text);
   }
 
   .options :global(.opt:hover),
@@ -627,7 +614,6 @@
 
   .options :global(.chev) {
     color: var(--text-3);
-    transition: transform var(--normal) var(--ease);
   }
 
   .options :global(.chev.up) {
@@ -640,16 +626,19 @@
     gap: 8px;
     height: var(--control-compact);
     padding: 0 8px 0 14px;
-    border-radius: var(--radius);
-    background: var(--ink);
-    color: var(--on-ink);
+    /* 6px inset under the 12px card: a concentric 6px corner. */
+    border-radius: var(--radius-sm);
+    background: var(--solid);
+    color: var(--on-solid);
     font-size: 13px;
     font-weight: 550;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    transition:
-      background-color var(--fast) var(--ease),
-      transform 80ms var(--ease);
+  }
+
+  /* When the row wraps, the action stays at the row's end. */
+  .go {
+    margin-left: auto;
   }
 
   .go:not(:has(.go-kbd)) {
@@ -657,7 +646,7 @@
   }
 
   .go:hover:not(:disabled) {
-    background: var(--ink-hover);
+    background: var(--solid-hover);
   }
 
   .go:active:not(:disabled) {
@@ -671,17 +660,16 @@
   .go-kbd {
     min-width: 20px;
     height: 20px;
-    border: 0;
-    background: color-mix(in oklab, var(--on-ink) 16%, transparent);
-    color: var(--on-ink);
-    font-size: 11px;
+    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
+    background: var(--solid-key);
+    color: var(--on-solid);
+    font-size: 12px;
   }
 
   .spinner {
     width: 13px;
     height: 13px;
-    border: 1.5px solid currentColor;
-    border-right-color: transparent;
+    border: 1.5px solid currentColor; border-right-color: transparent;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }
@@ -698,7 +686,7 @@
     align-items: center;
     gap: 8px 20px;
     padding: 10px 16px 12px;
-    border-top: 1px solid var(--line);
+    border-top: 0; --hbt: var(--line);
     font-size: 13px;
   }
 
@@ -722,7 +710,7 @@
     min-width: 0;
     height: var(--control-compact);
     padding: 0 8px;
-    border: 1px solid var(--line-2);
+    border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
     font-size: var(--input-font-size, 13px);
@@ -734,16 +722,7 @@
 
   .inline:focus {
     outline: none;
-    border-color: var(--accent);
-  }
-
-  .inline[aria-invalid='true'] {
-    border-color: var(--danger);
-  }
-
-  .num {
-    width: 88px;
-    font-variant-numeric: tabular-nums;
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
   }
 
   .problem,
@@ -781,6 +760,5 @@
       display: none;
     }
   }
-  .chunk-hint { margin-top: 8px; color: var(--text-3); font-size: 12px; line-height: 1.6; }
   .options:has(:global(.date-editor)) { align-items: flex-start; }
 </style>

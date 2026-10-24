@@ -30,19 +30,22 @@ export function normalizeTagColor(input: string): TagColor | null {
   return ('#' + channels.map(n => Math.round(n).toString(16).padStart(2, '0')).join('')) as TagColor;
 }
 
-const legacyColors: Record<string, string> = { blue: '#5872a5', green: '#56877e', amber: '#b18b54', rose: '#a96f89', neutral: '#808481' };
-export const tagHex = (color: string) => legacyColors[color] ?? normalizeTagColor(color) ?? '#808481';
+// The five named colors from before custom colors map to Radix step 9;
+// saved hex values show as saved.
+const legacyColors: Record<string, string> = { blue: '#0090ff', green: '#12a594', amber: '#ffc53d', rose: '#d6409f', neutral: '#8b8d98' };
+export const tagHex = (color: string) => legacyColors[color] ?? normalizeTagColor(color) ?? '#8b8d98';
+/** Presets are Radix Colors step 9, the scale's solid swatch. */
 export const TAG_COLORS = [
-  ['#5872a5', 'tags.presetBlue'],
-  ['#588c98', 'tags.presetCyan'],
-  ['#56877e', 'tags.presetTeal'],
-  ['#74896a', 'tags.presetSage'],
-  ['#91885d', 'tags.presetOlive'],
-  ['#b18b54', 'tags.presetOchre'],
-  ['#b17c5e', 'tags.presetTerracotta'],
-  ['#ad7070', 'tags.presetBrick'],
-  ['#a96f89', 'tags.presetRose'],
-  ['#9679a5', 'tags.presetMauve'],
-  ['#797ba1', 'tags.presetIris'],
-  ['#808481', 'tags.presetStone'],
+  ['#0090ff', 'tags.presetBlue'],
+  ['#00a2c7', 'tags.presetCyan'],
+  ['#12a594', 'tags.presetTeal'],
+  ['#46a758', 'tags.presetGrass'],
+  ['#ffc53d', 'tags.presetAmber'],
+  ['#f76b15', 'tags.presetOrange'],
+  ['#e54d2e', 'tags.presetTomato'],
+  ['#e5484d', 'tags.presetRed'],
+  ['#d6409f', 'tags.presetPink'],
+  ['#8e4ec6', 'tags.presetPurple'],
+  ['#3e63dd', 'tags.presetIndigo'],
+  ['#8b8d98', 'tags.presetSlate'],
 ] as const;

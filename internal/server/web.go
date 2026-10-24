@@ -312,21 +312,13 @@ const pageTemplate = `<!doctype html>
 <meta name="robots" content="noindex">
 <title>{{.Title}}</title>
 <style>
-:root{color-scheme:light dark;--bg:#f6f6f3;--fg:#1c1c1a;--muted:#6f6e68;--line:#e3e1db}
-@media (prefers-color-scheme:dark){:root{--bg:#111110;--fg:#ecebe6;--muted:#9b9991;--line:#2b2a27}}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{display:grid;place-items:center;padding:24px;background:var(--bg);color:var(--fg);
-font:15px/1.65 system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
--webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-main{width:min(100%,400px);margin-top:-8vh}
-.code{display:flex;align-items:center;gap:12px;color:var(--muted);
-font:500 12px/1 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;letter-spacing:.06em}
-.code:after{content:"";flex:1;height:1px;background:var(--line)}
-h1{margin:22px 0 6px;font-size:19px;font-weight:600;line-height:1.4;letter-spacing:-.005em}
-p{margin:0;color:var(--muted)}
-.link{margin-top:28px;color:var(--muted);font:13px/1.5 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
-overflow-wrap:anywhere}
+` + visitorTokens + `
+body{display:grid;min-height:100vh;min-height:100dvh;place-items:center;padding:24px 16px}
+main{width:min(100%,400px);text-align:center}
+.code{margin-bottom:12px;color:var(--fg2);font:12px/1.5 var(--mono)}
+h1{margin:0;font-size:16px;font-weight:600;line-height:1.5}
+p{margin:8px 0 0;color:var(--fg2)}
+.link{margin-top:8px;color:var(--fg2);font:12px/1.5 var(--mono);overflow-wrap:anywhere}
 </style>
 </head>
 <body>

@@ -48,6 +48,24 @@ var shareCSP = func() string {
 		base64.StdEncoding.EncodeToString(sum[:]) + "'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
 }()
 
+// visitorTokens is the head of every visitor page's style: Radix Slate,
+// Indigo and Red steps, a system font stack and the base rules. Lines are
+// 0.5px inset shadows, since browsers round thinner borders up to 1px.
+const visitorTokens = `:root{color-scheme:light dark;--bg:#f9f9fb;--surface:#fff;--soft:#f0f0f3;--fg:#1c2024;--fg2:#60646c;
+--line:#d9d9e0;--line2:#cdced6;--solid:#3e63dd;--solid-hover:#3358d4;--focus:#8da4ef;--ring:#c1d0ff;
+--danger:#ce2c31;--danger-line:#eb8e90;--danger-ring:#fdbdbe;
+--mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--surface:#18191b;--soft:#212225;--fg:#edeef0;--fg2:#b0b4ba;
+--line:#363a3f;--line2:#43484e;--solid:#3e63dd;--solid-hover:#5472e4;--focus:#435db1;--ring:#304384;
+--danger:#ff9592;--danger-line:#b54548;--danger-ring:#72232d}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:13px/1.6 system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.mono{font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--solid);outline-offset:2px}`
+
 // The page leaves a newline after each <pre>: the parser drops the first one,
 // so a text that starts with a blank line keeps it.
 const sharePage = `<!doctype html>
@@ -59,42 +77,34 @@ const sharePage = `<!doctype html>
 <meta name="referrer" content="no-referrer">
 <title>{{.Heading}}</title>
 <style>
-:root{color-scheme:light dark;--bg:#f7f7f5;--surface:#fff;--soft:#f2f1ee;--fg:#1c1b19;--fg2:#56544e;--muted:#716e67;
---line:#e7e5e0;--line2:#d9d6cf;--accent:#2d4be0;--on-accent:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#191918;--soft:#20201e;--fg:#edece7;--fg2:#b3b1a9;
---muted:#8a887f;--line:#292826;--line2:#3a3936;--accent:#7189ff;--on-accent:#0d0f1c}}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--fg);
-font:15px/1.65 system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
--webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-main{width:min(100%,{{if .Code}}1080px{{else}}760px{{end}});margin:0 auto;padding:48px 20px 72px}
-h1{margin:0;font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-.01em;overflow-wrap:anywhere}
-.meta{margin:6px 0 0;color:var(--muted);font-size:13px}
-.bar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
-.actions{display:flex;flex-wrap:wrap;gap:6px}
-.btn{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid var(--line2);border-radius:8px;
-background:var(--surface);color:var(--fg);font-family:inherit;font-size:13px;font-weight:500;line-height:1;
-text-decoration:none;cursor:pointer}
-.btn:hover{border-color:var(--muted)}
-.btn.primary{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
-.btn:focus-visible,.sheet:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+` + visitorTokens + `
+main{width:min(100%,{{if .Code}}1080px{{else}}760px{{end}});margin:0 auto;padding:48px 24px 72px}
+h1{margin:0;font-size:16px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:0 12px;margin:2px 0 0;color:var(--fg2);font-size:12px}
+.bar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
+.actions{display:flex;flex-wrap:wrap;gap:4px}
+.btn{display:inline-flex;align-items:center;height:28px;padding:0 10px;border:0;border-radius:6px;box-shadow:inset 0 0 0 .5px var(--line2);
+background:var(--surface);color:var(--fg);font:inherit;font-weight:500;line-height:1;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.primary{box-shadow:none;background:var(--solid);color:#fff}
+.btn.primary:hover{background:var(--solid-hover)}
 .btn[hidden]{display:none}
-.sheet{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-pre{margin:0;font:13px/1.65 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;tab-size:4}
-.plain pre{padding:20px 22px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:15px;line-height:1.7}
+.sheet{position:relative;overflow:hidden;border-radius:12px;background:var(--surface)}
+.sheet::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .5px var(--line);pointer-events:none}
+pre{margin:0;font:13px/1.7 var(--mono);tab-size:4}
+.plain pre{padding:20px 24px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:16px;line-height:1.75}
 .code{display:flex;overflow-x:auto}
-.code .ln{position:sticky;left:0;flex:none;padding:16px 12px 16px 16px;border-right:1px solid var(--line);
-background:var(--soft);color:var(--muted);text-align:right;user-select:none;-webkit-user-select:none}
+.code .ln{position:sticky;left:0;flex:none;padding:16px 12px 16px 16px;box-shadow:inset -.5px 0 0 var(--line);
+background:var(--soft);color:var(--fg2);text-align:right;user-select:none;-webkit-user-select:none}
 .code .src{flex:1;padding:16px 20px}
-.file{display:flex;flex-direction:column;align-items:center;gap:6px;padding:40px 24px;text-align:center}
-.file svg{color:var(--muted)}
-.file .name{margin-top:8px;font-size:16px;font-weight:600;overflow-wrap:anywhere}
-.file .type{color:var(--muted);font-size:13px}
-.file .btn{margin-top:16px;height:38px;padding:0 18px;font-size:14px}
-.file .sum{margin-top:18px;color:var(--muted);font:12px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;overflow-wrap:anywhere}
-.note{margin-top:16px;color:var(--fg2);font-size:13.5px}
-@media (max-width:640px){main{padding:28px 16px 56px}.plain pre{padding:16px}}
+.file{display:flex;flex-direction:column;align-items:center;gap:4px;padding:40px 24px;text-align:center}
+.file svg{color:var(--fg2)}
+.file .name{margin-top:8px;font-weight:600;overflow-wrap:anywhere}
+.file .type{display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px;color:var(--fg2);font-size:12px}
+.file .btn{margin-top:16px;height:36px;padding:0 16px;border-radius:8px}
+.file .sum{margin-top:16px;color:var(--fg2);font:12px/1.5 var(--mono);overflow-wrap:anywhere}
+.note{margin-top:16px;color:var(--fg2);font-size:12px}
+@media (max-width:640px){main{padding:24px 16px 56px}.plain pre{padding:16px}}
 </style>
 </head>
 <body>
@@ -102,7 +112,7 @@ background:var(--soft);color:var(--muted);text-align:right;user-select:none;-web
 <div class="bar">
 <div>
 <h1>{{.Heading}}</h1>
-<p class="meta">{{.Meta}}</p>
+<p class="meta">{{range .Meta}}<span>{{.}}</span>{{end}}</p>
 </div>
 {{if .Text}}<div class="actions">
 <button class="btn" type="button" data-copy data-label="{{.L.Copy}}" data-done="{{.L.Copied}}" data-failed="{{.L.CopyFailed}}" aria-live="polite" hidden>{{.L.Copy}}</button>
@@ -117,7 +127,7 @@ background:var(--soft);color:var(--muted);text-align:right;user-select:none;-web
 {{else}}<div class="sheet file">
 <svg width="40" height="40" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 1.75H4.75A2 2 0 0 0 2.75 3.75v8.5a2 2 0 0 0 2 2h6.5a2 2 0 0 0 2-2V6z"/><path d="M9 1.75V6h4.25"/></svg>
 <div class="name">{{.FileName}}</div>
-<div class="type">{{.FileInfo}}</div>
+<div class="type"><span>{{.FileType}}</span><span>{{.FileSize}}</span></div>
 {{if .RawURL}}<a class="btn primary" href="{{.RawURL}}">{{.L.DownloadFile}}</a>{{else}}<p class="note">{{.L.Unavailable}}</p>{{end}}
 <div class="sum">SHA-256 {{.SHA256}}</div>
 </div>{{end}}
@@ -157,7 +167,7 @@ const maxNumbered = 50_000
 // serveShare shows a text or describes a file at /p/{slug}. Opening a text
 // counts as a visit; a file counts when it is downloaded.
 func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead && r.Method != http.MethodPost {
 		w.Header().Set("Allow", "GET, HEAD")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -177,6 +187,17 @@ func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	if !s.admit(e, false, r, now) {
 		s.pages.render(w, r, pageShareGone, shown)
+		return
+	}
+	if !s.unlocked(r, e) {
+		// guard answers every request here: the form, an error or the
+		// redirect back after a correct password.
+		s.guard(w, r, e, shown)
+		return
+	}
+	if r.Method == http.MethodPost {
+		w.Header().Set("Allow", "GET, HEAD")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	l, err := s.sharedLink(r, e)
@@ -207,12 +228,16 @@ func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
 		"Code": l.Kind == store.KindText && c.Format == store.FormatCode,
 	}
 	raw := s.rawURL(l)
-	d["RawURL"] = raw
+	query := ""
+	if raw != "" && e.Password != "" {
+		query = "?t=" + s.rawToken(e)
+	}
+	d["RawURL"] = raw + query
 	meta := []string{}
 	if l.Kind == store.KindText {
 		d["Heading"] = firstOf(l.Title, c.Name, l.Slug)
 		d["Body"] = body
-		d["DownloadURL"] = raw + "/" + url.PathEscape(l.Slug) + ".txt"
+		d["DownloadURL"] = raw + "/" + url.PathEscape(l.Slug) + ".txt" + query
 		kind := lb.Text
 		if c.Format == store.FormatCode {
 			kind = lb.Code
@@ -229,11 +254,11 @@ func (s *Server) serveShare(w http.ResponseWriter, r *http.Request) {
 		d["Heading"] = firstOf(l.Title, c.Name)
 		d["FileName"] = c.Name
 		mediaType, _, _ := strings.Cut(c.Type, ";")
-		d["FileInfo"] = mediaType + " · " + formatSize(c.Size)
+		d["FileType"], d["FileSize"] = mediaType, formatSize(c.Size)
 		d["SHA256"] = fmt.Sprintf("%x", c.SHA256)
 		meta = append(meta, lb.File, formatSize(c.Size))
 	}
-	d["Meta"] = strings.Join(meta, " · ")
+	d["Meta"] = meta
 	if l.ExpiresAt != 0 {
 		d["Until"] = fmt.Sprintf(lb.Until, formatWhen(time.UnixMilli(l.ExpiresAt).In(s.clicks.Location()), lang))
 	}
