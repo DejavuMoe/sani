@@ -26,7 +26,7 @@ It’s probably not for you if you need:
 - **Rule-based routing.** Sending visitors to different destinations by device, region or percentage.
 - **Multiple active replicas.** Caches and pending clicks live in one process. Several processes serving the same database are not supported; use one instance and measure capacity with your data and traffic.
 
-Sani is still in 0.x. Before serving public traffic, read [Versioning](../project/versioning), configure HTTPS and persistent storage, and rehearse backups and restores using [Operations](./operations).
+From v1.0.0, Sani provides compatibility guarantees throughout 1.x. Before serving public traffic, read [Versioning](../project/versioning), configure HTTPS and persistent storage, and rehearse backups and restores using [Operations](./operations).
 
 ## Design choices
 

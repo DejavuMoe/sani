@@ -132,6 +132,8 @@ for (const [locale, theme] of ['zh-CN', 'en-US'].flatMap((locale) => ['light', '
     const path = typeof s.path === 'function' ? await s.path(ctx.request) : s.path;
     await page.goto((s.origin ?? base) + path, { waitUntil: 'networkidle' });
     if (s.run) await s.run(page);
+    // Measure final colors, not the partially transparent opening dialog.
+    await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
     if (screenshots && (s.name.startsWith('r3-') || s.name === 'settings-narrow' || s.name === 'settings' || s.name === 'dashboard')) {
       const artifact = `${screenshots}/${locale}-${theme}-${s.name}`;
       await page.screenshot({path:artifact+'.png',fullPage:false});

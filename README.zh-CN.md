@@ -27,7 +27,7 @@
 
 ## 文档
 
-Sani 面向单实例、单管理员使用，不提供多用户托管或多实例同时写入能力。目前仍处于 0.x 阶段，升级前请阅读[兼容规则](docs/project/versioning.md)和更新日志。对外服务前应配置 HTTPS、持久化存储，按需设置独立文件域名，并演练[完整备份与恢复](docs/guide/operations.md)。仓库测试和公开基准不代表具体部署的容量或可用性保证。
+Sani 面向单实例、单管理员使用，不提供多用户托管或多实例同时写入能力。1.x 系列遵循[兼容规则](docs/project/versioning.md)，升级前请阅读更新日志。对外服务前应配置 HTTPS、持久化存储，按需设置独立文件域名，并演练[完整备份与恢复](docs/guide/operations.md)。仓库测试和公开基准不代表具体部署的容量或可用性保证。
 
 完整的中英文文档位于 [docs/](docs/) 目录：包含[部署](docs/guide/deploy.md)与[运维](docs/guide/operations.md)指南，[配置项](docs/reference/configuration.md)、[HTTP API](docs/reference/api.md) 与[命令行](docs/reference/cli.md)参考，以及系统内部架构说明。文档站点基于 VitePress 构建，运行 `make install docs-dev` 即可在 `127.0.0.1:5174` 本地预览；部署页面内置配置生成器，输入域名即可生成完整部署文件。文档在构建时会与源码进行自动化一致性校验，确保文档记录的配置项、接口、错误码及命令均与程序实际实现保持一致。
 
@@ -47,14 +47,14 @@ docker compose up -d
 
 镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
 
-模板固定使用 `v0.9.11`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v1.0.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
 每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS、Windows 和 FreeBSD 的压缩包，附校验和与构建来源证明：
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.11/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -96,7 +96,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 **移动端支持**：在 Android 系统上使用支持 Web Share Target 的浏览器将 Sani 安装为 PWA 后，可直接从其他系统的分享菜单接收网址并预填；核对无误后点击“缩短”即可。具体支持情况取决于浏览器与操作系统。
 
-**API（v0.9.11）**：API 路由自 v0.9.5 起调整；从 v0.9.4 或更早版本升级时，须按[当前 API](docs/reference/api.md)更新调用脚本。旧版本契约请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建 API 令牌，然后：
+**API（v1.0.0）**：API 路由自 v0.9.5 起调整；从 v0.9.4 或更早版本升级时，须按[当前 API](docs/reference/api.md)更新调用脚本。旧版本契约请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建 API 令牌，然后：
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \

@@ -14,8 +14,8 @@ published with credit to you, unless you’d rather stay anonymous.
 
 ## Supported versions
 
-Fixes go into the newest release. Before 1.0 there are no backports: upgrade
-to the latest version to get them.
+Security fixes go into the newest release. Older releases are not maintained
+as separate branches: upgrade to the latest release to receive fixes.
 
 ## Scope
 
@@ -30,5 +30,5 @@ provenance for every archive and image. To check a download:
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz --repo DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v0.9.11 --repo DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v1.0.0 --repo DejavuMoe/sani
 ```

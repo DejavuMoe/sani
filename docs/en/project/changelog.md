@@ -1,10 +1,10 @@
 # Changelog
 
-<p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; before 1.0, a minor version may include breaking changes, and when it does, this page says how to upgrade.</p>
+<p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## v0.9.11
+## v1.0.0
 
-2026-10-24 · Access passwords, and a new visual system for the admin app and visitor pages. The database moves to schema 7.
+2026-10-24 · First stable release, establishing compatibility guarantees for public contracts throughout 1.x. Access passwords, and a new visual system for the admin app and visitor pages. The database moves to schema 7.
 
 - Links, texts and files can have an access password. When creating, expiry, visit limit and password sit side by side next to the submit button; the password opens with a readable six-character code, so Enter accepts it. The clipboard and the toast then carry the link and its password. The list marks protected links with a lock, the details show or copy the password, and the editor changes or clears it.
 - Visitors first see a password page with only the short address on it, which works without script. Short links ask every time; texts and files stay open in that browser for 12 hours, and their raw and download links carry a parameter valid for an hour. Wrong passwords don’t count as visits, and five within a minute from one visitor for one link make them wait. A new password, or a restart, asks again.
@@ -13,7 +13,7 @@
 
 ### Upgrade and rollback
 
-These new features are an [explicit exception to the patch version rule](./versioning#v0911-exception). Upgrading migrates the database to schema 7. Back up first as in [Backup and restore](../guide/operations#backup-files); rolling back means restoring the full pre-upgrade snapshot, since older versions refuse schema 7.
+v1.0.0 begins the [1.x compatibility promise](./versioning#stable), preserving existing public addresses and access without passwords. Upgrading migrates the database to schema 7. Back up first as in [Backup and restore](../guide/operations#backup-files); rolling back means restoring the full pre-upgrade snapshot, since older versions refuse schema 7.
 
 ## v0.9.10
 

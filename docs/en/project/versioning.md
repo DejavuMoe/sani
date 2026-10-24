@@ -4,7 +4,7 @@
 
 ## Version numbers {#semver}
 
-Sani uses [semantic versioning](https://semver.org), with the v0.9.5 and v0.9.11 exceptions documented below. A version looks like `major.minor.patch`:
+From v1.0.0, Sani follows [semantic versioning](https://semver.org) and the compatibility promises below. A version looks like `major.minor.patch`; the historical v0.9.5 exception is documented below:
 
 - **Patch releases** (0.1.0 → 0.1.1) only fix things; still back up and read the changelog before upgrading.
 - **Minor releases** (1.1 → 1.2) add things without breaking what exists.
@@ -18,9 +18,9 @@ Sani uses [semantic versioning](https://semver.org), with the v0.9.5 and v0.9.11
 
 Export JSON in the old admin app, stop cleanly and back up the database, files and configuration. Run preflight before the in-place migration; rollback requires the complete pre-upgrade snapshot and old version. See the [v0.9.5 changelog](./changelog#v0-9-5) and [upgrade steps](../guide/operations#upgrade). This exception does not relax compatibility requirements for later patches.
 
-### v0.9.11 feature-release exception {#v0911-exception}
+### v1.0.0 stable release {#v100}
 
-**v0.9.11 adds access passwords and migrates to schema 7; it is not a bug-fix-only patch.** This release retains the requested v0.9.11 version number as another explicit exception to the patch rule. Existing public addresses and access without passwords are preserved. Back up the database, files and configuration before upgrading; older versions cannot read schema 7, so rollback requires the complete pre-upgrade snapshot. See the [v0.9.11 changelog](./changelog#v0-9-11). This exception does not relax compatibility requirements for later releases.
+**v1.0.0 is the first stable release, adding access passwords and migrating to schema 7.** The 1.x series preserves the documented public contracts below; incompatible changes require the next major version. Existing public addresses and access without passwords are preserved. Back up the database, files and configuration before upgrading; older versions cannot read schema 7, so rollback requires the complete pre-upgrade snapshot. See the [v1.0.0 changelog](./changelog#v1-0-0).
 
 ## What stays the same {#stable}
 
@@ -73,12 +73,12 @@ Something that is going away is first marked deprecated in the changelog and the
 
 ## Acceptance before 1.0 {#before-1}
 
-These gates precede the formal compatibility promise; Sani is still in 0.x:
+v1.0.0 must pass these release gates; applicable checks continue for later releases:
 
 - Settle the public API, configuration defaults, CLI, reserved paths, export formats and release filenames, with bilingual references checked against the source.
 - Exercise incremental database upgrades, preserving URLs, texts, files, statistics and credentials. Roll back failed migrations, reject newer schemas in older binaries, and rehearse a complete restore.
 - Complete tests on Linux, Windows and macOS, build every release platform, and pass E2E, accessibility and dependency checks. Release decisions use remote CI for the exact commit.
 - Record reproducible capacity measurements for latency, memory, SQLite waits and count consistency. Those measurements are not an SLA.
-- List incompatible changes to documented behavior under “Breaking changes” with migration steps. During 0.x, ship them in a minor release; the explicitly documented one-time v0.9.5 exception is not a precedent for breaking later patches.
+- List incompatible changes to documented behavior under “Breaking changes” with migration steps. During 0.x they required a minor release; from 1.0 they require the next major release. The historical v0.9.5 exception is not a precedent for later incompatible changes.
 
 Database tables remain internal implementation details after 1.0.

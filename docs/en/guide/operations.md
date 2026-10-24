@@ -100,7 +100,7 @@ In an isolated local instance, check `/healthz`, login, URL redirects, text bodi
 
 ## Upgrading {#upgrade}
 
-**v0.9.11 adds access passwords and migrates to schema 7**, an [explicit exception to the patch rule](../project/versioning#v0911-exception). Upgrades from schema 6 also require a clean stop and complete backup. Older versions cannot read schema 7; rollback requires the pre-upgrade snapshot. Existing links have no access password by default.
+**v1.0.0 adds access passwords and migrates to schema 7**, beginning the [1.x compatibility promise](../project/versioning#stable). Upgrades from schema 6 also require a clean stop and complete backup. Older versions cannot read schema 7; rollback requires the pre-upgrade snapshot. Existing links have no access password by default.
 
 **v0.9.5 includes breaking API changes and migration to schema 6**, a [one-time exception to the patch rule](../project/versioning#v095-exception). Follow this procedure when upgrading from v0.9.4 or earlier.
 

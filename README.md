@@ -27,7 +27,7 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 
 ## Documentation
 
-Sani is designed for a single running instance and one administrator, not multi-user hosting or active-active replicas. It is still in 0.x: read the [compatibility policy](docs/en/project/versioning.md) and release notes before upgrading. For public service, configure HTTPS, persistent storage and a separate files domain when needed, then rehearse a complete [backup and restore](docs/en/guide/operations.md). Repository tests and published benchmarks do not certify your deployment’s capacity or availability.
+Sani is designed for a single running instance and one administrator, not multi-user hosting or active-active replicas. The 1.x series follows the [compatibility policy](docs/en/project/versioning.md). Read the release notes before upgrading. For public service, configure HTTPS, persistent storage and a separate files domain when needed, then rehearse a complete [backup and restore](docs/en/guide/operations.md). Repository tests and published benchmarks do not certify your deployment’s capacity or availability.
 
 The documentation, in English and Chinese, lives in [docs/](docs/): guides for [deployment](docs/en/guide/deploy.md) and [operations](docs/en/guide/operations.md), the [configuration](docs/en/reference/configuration.md), [HTTP API](docs/en/reference/api.md) and [command line](docs/en/reference/cli.md) references, and how Sani works inside. It's a VitePress site; `make install docs-dev` serves it on `127.0.0.1:5174`, and its deploy page has a config builder that writes the deployment files for your domain. Every build checks the docs against the source, so the settings, endpoints, error codes and commands they list are the ones the code has.
 
@@ -47,14 +47,14 @@ Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first vis
 
 The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
 
-The template pins `v0.9.11`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
+The template pins `v1.0.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v0.9.11/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -96,7 +96,7 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 
 **Phone.** Install Sani on Android using a browser that supports Web Share Target. Sharing a URL from another app prefills it for review; click “Shorten” to submit. Support depends on the browser and operating system.
 
-**API (v0.9.11).** API routes changed in v0.9.5; when upgrading from v0.9.4 or earlier, update scripts using the [current API reference](docs/en/reference/api.md). The [API archive](docs/en/reference/api-archive.md) documents those older versions. Save a fixed sharing domain and create a token in Settings, then:
+**API (v1.0.0).** API routes changed in v0.9.5; when upgrading from v0.9.4 or earlier, update scripts using the [current API reference](docs/en/reference/api.md). The [API archive](docs/en/reference/api-archive.md) documents those older versions. Save a fixed sharing domain and create a token in Settings, then:
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \

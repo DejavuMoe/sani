@@ -101,7 +101,7 @@ systemd 的 `DynamicUser` 可能让 `/var/lib/sani` 成为指向私有状态目�
 
 ## 版本升级 {#upgrade}
 
-**v0.9.11 新增访问密码并迁移至 schema 7**，是[修订版本规则的明确例外](../project/versioning#v0911-exception)。从 schema 6 升级也须先正常停机并完整备份；旧版本不能读取 schema 7，回滚必须恢复升级前快照。已有链接默认不设访问密码。
+**v1.0.0 新增访问密码并迁移至 schema 7**，并开始履行 [1.x 兼容承诺](../project/versioning#stable)。从 schema 6 升级也须先正常停机并完整备份；旧版本不能读取 schema 7，回滚必须恢复升级前快照。已有链接默认不设访问密码。
 
 **v0.9.5 含不兼容的 API 变更与 schema 6 迁移**，是[修订版本规则的一次性例外](../project/versioning#v095-exception)。从 v0.9.4 或更早版本升级须完成以下流程。
 
