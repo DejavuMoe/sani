@@ -10,6 +10,7 @@
   import { toasts } from '../lib/toast.svelte';
   import { hostOf, stripScheme } from '../lib/url';
   import AccessBar from './AccessBar.svelte';
+  import Button from './Button.svelte';
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
@@ -183,11 +184,7 @@
         }
       }}
     />
-    <button class="go" type="submit" disabled={busy || tagBusy} aria-busy={busy || undefined}>
-      {#if busy}<span class="spinner" aria-hidden="true"></span>{/if}
-      <span class="go-label">{t('composer.submit')}</span>
-      <kbd class="go-kbd" aria-hidden="true"><Icon name="enter" size={12} /></kbd>
-    </button>
+    <Button class="go creation-action" variant="primary" type="submit" disabled={tagBusy} loading={busy}>{t('composer.submit')}</Button>
   </div>
 
   <div class="options">
@@ -289,50 +286,6 @@
 
   .url:focus {
     outline: none;
-  }
-
-  .go {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    /* 52px row, 6px inset under a 12px card: a concentric 6px corner. */
-    height: 40px;
-    padding: 0 8px 0 14px;
-    border-radius: var(--radius-sm);
-    background: var(--solid);
-    color: var(--on-solid);
-    font-size: 13px;
-    font-weight: 550;
-  }
-
-  .go:hover:not(:disabled) {
-    background: var(--solid-hover);
-  }
-
-  .go:active:not(:disabled) {
-    transform: translateY(0.5px);
-  }
-
-  .go-kbd {
-    min-width: 20px;
-    height: 20px;
-    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
-    background: var(--solid-key);
-    color: var(--on-solid);
-  }
-
-  .spinner {
-    width: 13px;
-    height: 13px;
-    border: 1.5px solid currentColor; border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 
   .options {
@@ -456,14 +409,6 @@
       display: none;
     }
 
-    .go {
-      padding: 0 12px;
-    }
-
-    .go-kbd {
-      display: none;
-    }
-
     .options {
       padding-left: 14px;
     }
@@ -473,5 +418,4 @@
       height: 0;
     }
   }
-  .options:has(:global(.date-editor)) { align-items: flex-start; }
 </style>

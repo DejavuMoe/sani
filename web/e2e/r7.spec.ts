@@ -286,7 +286,8 @@ for (const [lang,theme,width] of [['zh','light',1280],['en','dark',390],['zh','d
     await manager.getByRole('button',{name:lang==='zh'?'关闭':'Close',exact:true}).click();
     for (const [kind,label] of [['text',lang==='zh'?'文本':'Text'],['file',lang==='zh'?'文件':'Files']]) {
       await page.getByRole('tab',{name:label,exact:true}).click();
-      await heights(`#create-panel-${kind} .opt,#create-panel-${kind} .slug .box,#create-panel-${kind} .go`,compact);
+      await heights(`#create-panel-${kind} .opt,#create-panel-${kind} .slug .box`,compact);
+      await heights(`#create-panel-${kind} .go`,field);
     }
     await page.goto(`${base}/admin/settings`);
     await heights('.inline-form .field,.inline-form .btn',field);

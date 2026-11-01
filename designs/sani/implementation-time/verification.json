@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-01",
+  "approvedAsset": "prototype-time.html",
+  "designCommit": "606a3c8",
+  "runtime": "Production Svelte app embedded in a freshly built Sani binary; disposable SQLite fixture",
+  "validation": {
+    "contentAudit": {
+      "warnings": 0,
+      "strings": 140
+    },
+    "check": "passed: gofmt, go vet, svelte-check with zero warnings, bilingual docs sync and vue-tsc",
+    "test": "passed: Go race tests, 99 Vitest tests, existing script tests",
+    "e2e": {
+      "passed": 192,
+      "browser": "Chromium",
+      "failed": 0,
+      "duration": "6.1m",
+      "command": "make e2e"
+    }
+  },
+  "focusedCoverage": [
+    "Eight zh/en x light/dark x 1280/390 states",
+    "No composer height changes when opening custom expiry",
+    "Apply/Cancel/Escape/outside dismissal preserve draft semantics",
+    "Hours/minutes pointer and keyboard selection, wrap, Home/End, focus return",
+    "Invalid date and time, typed Enter, exact minute precision",
+    "Real link/text/file creation and edit-save persistence, existing shortcuts",
+    "Shared action dimensions: 88px minimum width, 32px desktop / 40px mobile, 8px radius, weight 600",
+    "320x700 touch viewport hour/minute selection",
+    "Expanded expiry and time menu axe audit in all eight matrix states"
+  ],
+  "visualReview": [
+    "zh-light-1280.png",
+    "en-light-1280.png",
+    "en-dark-390.png",
+    "url-action.png",
+    "text-action.png",
+    "file-action.png"
+  ],
+  "limitations": [
+    "No deployment or remote push",
+    "Chromium and simulated touch; no physical iOS device or Safari run"
+  ]
+}

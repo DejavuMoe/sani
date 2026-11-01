@@ -1357,13 +1357,15 @@
           "Existing local datetime draft; no API change"
         ],
         "tests": [
+          "web/e2e/expiry.spec.ts",
           "web/e2e/metadata.spec.ts",
+          "web/e2e/r7.spec.ts",
           "web/e2e/access.spec.ts",
           "web/e2e/app.spec.ts"
         ]
       },
-      "status": "approved",
-      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md."
+      "status": "implemented",
+      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md. Implemented in Svelte on 2026-11-01. Evidence: implementation-time/verification.json, content-inventory.json and screenshots. Final full E2E run: 192 passed."
     }
   ]
 }

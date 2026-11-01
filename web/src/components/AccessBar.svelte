@@ -30,7 +30,4 @@
     min-width: 0;
   }
 
-  .access :global(.expiry:has(.date-editor)) {
-    flex-basis: 100%;
-  }
 </style>

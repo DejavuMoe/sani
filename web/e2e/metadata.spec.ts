@@ -26,6 +26,8 @@ async function login(page: Page, lang = 'en', theme = 'light') {
 }
 
 async function audit(page: Page) {
+  // Measure final colors, not a popover's opening/closing opacity transition.
+  await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
   await page.evaluate(axe);
   const violations = await page.evaluate(async () => {
     const root = document.querySelector('.tag-pop:popover-open') ?? document;
@@ -157,7 +159,11 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await expect(calendar.getByRole('button').last()).toBeDisabled();
     await date.fill('2032-02-29'); await time.fill('12:30');
     await time.press('Enter');
-    await expect(calendar.getByRole('button').last()).toBeDisabled();
+    await expect(calendar).toHaveCount(0);
+    await panel.getByRole('button', { name: lang === 'zh' ? '有效期' : 'Expires', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
+    await expect(time).toHaveValue('12:30');
+    await expect(calendar.getByRole('button').last()).toBeEnabled();
     await expect(calendar.getByRole('button', { name: '2032-02-29', exact: true })).toHaveAttribute('aria-pressed', 'true');
     expect((await (await page.request.get(`${base}/api/admin/v1/links`)).json()).items).toEqual([]);
     await audit(page);

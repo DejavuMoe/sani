@@ -14,6 +14,7 @@
   import { toasts } from '../lib/toast.svelte';
   import { hostOf } from '../lib/url';
   import AccessBar from './AccessBar.svelte';
+  import Button from './Button.svelte';
   import Icon from './Icon.svelte';
   import Segmented from './Segmented.svelte';
   import SlugField, { blocking, type SlugStatus } from './SlugField.svelte';
@@ -355,11 +356,9 @@
       {t('composer.more')}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
-    <button class="go" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} aria-busy={busy || undefined}>
-      {#if busy}<span class="spinner" aria-hidden="true"></span>{/if}
+    <Button class="go creation-action" variant="primary" type="submit" disabled={tagBusy || (mode === 'file' && !filesOn)} loading={busy}>
       {busy && progress !== null ? t('share.uploading', { pct }) : t(uploadFailed ? 'share.retry' : 'share.submit')}
-      {#if mode === 'text' && !busy}<kbd class="go-kbd" aria-hidden="true">{mod}↵</kbd>{/if}
-    </button>
+    </Button>
   </div>
 
   <TagPicker bind:value={tags} bind:creating={tagBusy} disabled={busy || (mode === 'file' && !filesOn)} />
@@ -620,66 +619,6 @@
     transform: rotate(180deg);
   }
 
-  .go {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: var(--control-compact);
-    padding: 0 8px 0 14px;
-    /* 6px inset under the 12px card: a concentric 6px corner. */
-    border-radius: var(--radius-sm);
-    background: var(--solid);
-    color: var(--on-solid);
-    font-size: 13px;
-    font-weight: 550;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  /* When the row wraps, the action stays at the row's end. */
-  .go {
-    margin-left: auto;
-  }
-
-  .go:not(:has(.go-kbd)) {
-    padding-right: 14px;
-  }
-
-  .go:hover:not(:disabled) {
-    background: var(--solid-hover);
-  }
-
-  .go:active:not(:disabled) {
-    transform: translateY(0.5px);
-  }
-
-  .go:disabled:not([aria-busy]) {
-    opacity: 0.45;
-  }
-
-  .go-kbd {
-    min-width: 20px;
-    height: 20px;
-    border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
-    background: var(--solid-key);
-    color: var(--on-solid);
-    font-size: 12px;
-  }
-
-  .spinner {
-    width: 13px;
-    height: 13px;
-    border: 1.5px solid currentColor; border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .more {
     display: flex;
     flex-wrap: wrap;
@@ -752,13 +691,6 @@
       height: 0;
     }
 
-    .go {
-      margin-left: auto;
-    }
-
-    .go-kbd {
-      display: none;
-    }
   }
-  .options:has(:global(.date-editor)) { align-items: flex-start; }
+  .options :global(.creation-action) { margin-left: auto; }
 </style>

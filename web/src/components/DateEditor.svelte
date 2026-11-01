@@ -4,11 +4,60 @@
   import { i18n, t } from '../lib/i18n.svelte';
   import { toLocalInput, validLocalExpiry } from '../lib/expiry';
   import Button from './Button.svelte';
+  import Icon from './Icon.svelte';
+  import Menu from './Menu.svelte';
+  import MenuItem from './MenuItem.svelte';
 
   const generatedId = $props.id();
-  let { value, onchange, id = generatedId }: { value: string; onchange: (value: string) => void; id?: string } = $props();
+  let { value, onchange, oncancel, id = generatedId }: { value: string; onchange: (value: string) => void; oncancel: () => void; id?: string } = $props();
   let date = $state(untrack(() => value.slice(0, 10)));
   let time = $state(untrack(() => value.slice(11, 16)));
+  let timeEntry: HTMLDivElement;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const selected = $derived([24, 60].map((limit, i) => {
+    const part = time.split(':')[i] ?? '';
+    return /^\d{2}$/.test(part) && Number(part) < limit ? Number(part) : null;
+  }));
+
+  function chooseTime(column: number, n: number) {
+    const next = selected.map(value => value ?? 0);
+    next[column] = n;
+    time = next.map(pad).join(':');
+  }
+
+  $effect(() => {
+    const menu = timeEntry.querySelector('[popover]')!;
+    let frame: number;
+    const reveal = (e: Event) => {
+      if ((e as ToggleEvent).newState !== 'open') return;
+      frame = requestAnimationFrame(() => {
+        for (const list of menu.querySelectorAll<HTMLElement>('.time-options')) {
+          const checked = list.querySelector<HTMLElement>('[aria-checked="true"]');
+          if (checked) list.scrollTop += checked.getBoundingClientRect().top - list.getBoundingClientRect().top - (list.clientHeight - checked.offsetHeight) / 2;
+        }
+      });
+    };
+    menu.addEventListener('toggle', reveal);
+    return () => { menu.removeEventListener('toggle', reveal); cancelAnimationFrame(frame); };
+  });
+
+  function timeKeys(e: KeyboardEvent) {
+    const column = (e.target as HTMLElement).closest('[data-time-column]');
+    if (!column) return;
+    const options = [...column.querySelectorAll<HTMLElement>('[role="menuitemradio"]')];
+    const current = options.indexOf(document.activeElement as HTMLElement);
+    let target: HTMLElement | null | undefined;
+    if (e.key === 'ArrowDown') target = options[(current + 1) % options.length];
+    if (e.key === 'ArrowUp') target = options[(current - 1 + options.length) % options.length];
+    if (e.key === 'Home') target = options[0];
+    if (e.key === 'End') target = options[options.length - 1];
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const sibling = column.parentElement!.querySelector(`[data-time-column="${e.key === 'ArrowLeft' ? 0 : 1}"]`)!;
+      target = sibling.querySelector<HTMLElement>('[aria-checked="true"]') ?? sibling.querySelector<HTMLElement>('[role="menuitemradio"]');
+    }
+    if (current < 0 && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) target = column.querySelector<HTMLElement>('[aria-checked="true"]') ?? options[0];
+    if (target) { e.preventDefault(); e.stopPropagation(); target.focus(); }
+  }
   let month = $state(untrack(() => {
     const d = new Date(value);
     return Number.isNaN(+d) ? new Date(new Date().getFullYear(), new Date().getMonth(), 1) : new Date(d.getFullYear(), d.getMonth(), 1);
@@ -41,16 +90,37 @@
   </div>
   <div class="date-fields">
     <div class="input"><label for="{id}-date">{t('calendar.date')}</label><input id="{id}-date" class="field" placeholder="YYYY-MM-DD" bind:value={date} onkeydown={applyOnEnter} aria-invalid={!valid || undefined} aria-describedby={!valid ? `${id}-error` : undefined} /></div>
-    <div class="input"><label for="{id}-time">{t('calendar.time')}</label><input id="{id}-time" class="field" placeholder="HH:mm" bind:value={time} onkeydown={applyOnEnter} aria-invalid={!valid || undefined} aria-describedby={!valid ? `${id}-error` : undefined} /></div>
+    <div class="input"><label for="{id}-time">{t('calendar.time')}</label><div class="time-entry" bind:this={timeEntry}>
+      <input id="{id}-time" class="field" placeholder="HH:mm" bind:value={time} onkeydown={applyOnEnter} aria-invalid={!valid || undefined} aria-describedby={!valid ? `${id}-error` : undefined} />
+      <Menu triggerClass="time-trigger" label={t('calendar.chooseTime')} minWidth={224} align="end">
+        {#snippet button()}<Icon name="clock" size={14} />{/snippet}
+        {#snippet children(close)}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div class="time-columns" onkeydown={timeKeys}>
+            {#each [24, 60] as count, column}
+              <div data-time-column={column}>
+                <div class="time-column-label" aria-hidden="true">{t(column === 0 ? 'calendar.hours' : 'calendar.minutes')}</div>
+                <!-- Scroll regions remain keyboard reachable even when their menu items have tabindex=-1. -->
+                <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                <div class="time-options" role="group" aria-label={t(column === 0 ? 'calendar.hours' : 'calendar.minutes')} tabindex="0">
+                  {#each Array(count) as _, n}<MenuItem checked={selected[column] === n} onclick={() => chooseTime(column, n)}>{pad(n)}</MenuItem>{/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+          <div class="time-done"><MenuItem onclick={close}>{t('calendar.done')}</MenuItem></div>
+        {/snippet}
+      </Menu>
+    </div></div>
   </div>
   {#if !valid}<p id="{id}-error" class="error-text" role="alert">{t('calendar.invalid')}</p>{/if}
   <p class="hint">{t('calendar.zone')}</p>
-  <Button size="sm" disabled={!valid || candidate === value} onclick={apply}>{t('calendar.apply')}</Button>
+  <div class="expiry-actions"><Button size="sm" variant="ghost" onclick={oncancel}>{t('act.cancel')}</Button><Button size="sm" variant="primary" disabled={!valid} onclick={apply}>{t('calendar.apply')}</Button></div>
 </div>
 
 <style>
-  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 280px; max-width: 100%; padding: 14px; border: 0; --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line); border-radius: var(--radius); background: var(--surface); flex-basis: auto; }
-  .date-fields { display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 8px; }
+  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 100%; padding: 14px; }
+  .date-fields { display: grid; grid-template-columns: minmax(0,1fr) 112px; gap: 8px; }
   .input { display: grid; gap: 7px; min-width: 0; }
   label { font-size: 13px; color: var(--text-2); }
   .field { width: 100%; min-width: 0; }
@@ -63,6 +133,21 @@
   .calendar button[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent); box-shadow: var(--hair-shadow), inset 0 0 0 0.5px var(--accent-line); }
   @media (max-width: 640px), (pointer: coarse) {
     .date-editor { padding: 10px; }
-    .date-fields { grid-template-columns: minmax(0,1fr) 80px; }
   }
+  .expiry-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .time-entry { position: relative; min-width: 0; }
+  .time-entry > input { padding-right: 34px; font-variant-numeric: tabular-nums; }
+  .time-entry :global(.time-trigger) { position: absolute; right: 2px; top: 2px; bottom: 2px; width: 28px; display: grid; place-items: center; color: var(--text-2); border-radius: var(--radius-sm); }
+  .time-entry :global(.time-trigger:hover), .time-entry :global(.time-trigger[aria-expanded='true']) { background: var(--surface-2); color: var(--text); }
+  .time-entry :global(.time-trigger:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .time-entry :global(.menu) { width: 224px; }
+  .time-entry :global(.menu .label) { color: inherit; }
+  .time-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px; }
+  .time-column-label { padding: 4px 8px 8px; color: var(--text-2); font-size: 12px; }
+  .time-options { height: 180px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-3) transparent; }
+  .time-options :global(.item) { font-variant-numeric: tabular-nums; }
+  .time-options :global(.item[aria-checked='true']) { color: var(--accent); background: var(--accent-soft); }
+  .time-done { margin: 4px; padding-top: 4px; --hbt: var(--line); }
+  .time-done :global(.item) { justify-content: center; color: var(--accent); }
+  .time-done :global(.label) { text-align: center; }
 </style>

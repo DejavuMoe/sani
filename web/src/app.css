@@ -82,6 +82,22 @@
   color-scheme: light;
 }
 
+/* Shared creation action in link, text and file composers. */
+.composer .btn.creation-action {
+  height: var(--control-field);
+  min-height: max(var(--control-field), calc(1lh + 8px));
+  min-width: 88px;
+  padding: 0 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.composer .btn.creation-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.composer .btn.creation-action:disabled:not([aria-busy]) { background: var(--surface-3); color: var(--text-3); cursor: not-allowed; }
+.composer .btn.creation-action[aria-busy] { background: var(--solid); color: var(--on-solid); }
+.composer .btn.creation-action:disabled { --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; }
+
 :root[data-theme="dark"] {
   --bg: #111113;            /* slate 1 */
   --surface: #18191b;       /* slate 2 */

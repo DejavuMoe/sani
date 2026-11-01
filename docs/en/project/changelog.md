@@ -2,6 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Show custom expiry in a popover without stretching the creation form. Apply commits the date and time; Cancel, Escape and outside dismissal preserve the previous value.
+- Add an hour and minute chooser alongside typed time entry, with keyboard controls. Unify the size and state styling of link, text and file creation buttons.
+
 ## v1.0.1
 
 2026-10-24 · Correct the random distribution of generated access passwords and align stable-release documentation. Database schema remains 7 with no new migration.
