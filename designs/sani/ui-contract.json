@@ -1214,6 +1214,156 @@
       },
       "status": "implemented",
       "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented. See r11-handoff.md."
+    },
+    {
+      "id": "custom-expiry-popover",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-expiry.html",
+        "assetPath": "prototype-expiry.html",
+        "files": [
+          "src/time/controls.jsx",
+          "src/time/time.css",
+          "src/expiry/access.jsx",
+          "src/expiry/actions.css",
+          "src/expiry/expiry.css"
+        ],
+        "states": [
+          "presets",
+          "custom-open",
+          "invalid-date",
+          "cancel",
+          "escape",
+          "outside-dismiss",
+          "apply",
+          "reopen",
+          "zh-en-light-dark-1280-390"
+        ],
+        "stableIds": [
+          "composer-expiry-date",
+          "composer-expiry-time"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/",
+        "files": [
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/components/DateEditor.svelte",
+          "web/src/components/AccessBar.svelte"
+        ],
+        "interfaces": [
+          "Expiry binding; apply local date/time; no API changes"
+        ],
+        "tests": [
+          "web/e2e/metadata.spec.ts",
+          "web/e2e/access.spec.ts"
+        ]
+      },
+      "status": "needs-review",
+      "notes": "Popover must not change composer height. Opening edits a draft; Apply commits and closes. Cancel, Escape and outside click discard the draft. Show committed expiry in the trigger. Existing preset selection remains. Content: review-expiry/content-inventory.json. QA: tools/expiry-check.mjs and review-expiry/results.json."
+    },
+    {
+      "id": "unified-creation-actions",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-actions.html",
+        "assetPath": "prototype-actions.html",
+        "files": [
+          "src/time/controls.jsx",
+          "src/time/time.css",
+          "src/expiry/access.jsx",
+          "src/expiry/actions.css",
+          "src/expiry/expiry.css"
+        ],
+        "states": [
+          "url",
+          "text",
+          "file",
+          "hover",
+          "focus-visible",
+          "pressed",
+          "busy",
+          "disabled",
+          "zh-en-light-dark-1280-390"
+        ],
+        "stableIds": [
+          "create-panel-url",
+          "create-panel-text",
+          "create-panel-file"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/",
+        "files": [
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/app.css"
+        ],
+        "interfaces": [
+          "Existing submit handlers and keyboard shortcuts; no API changes"
+        ],
+        "tests": [
+          "web/e2e/app.spec.ts",
+          "web/e2e/ui-regressions.spec.ts"
+        ]
+      },
+      "status": "needs-review",
+      "notes": "Extends the pending expiry preview. All three creation actions share 88px minimum width, existing 32px desktop/40px mobile field height, 8px radius, 13px semibold text, solid primary tokens and disabled/busy states. Embedded shortcut badges are hidden; existing keyboard submission and help remain. CSS-only design revision; labels and layouts remain task-specific. QA: tools/actions-check.mjs; review-actions/results.json."
+    },
+    {
+      "id": "custom-time-selection",
+      "contentProfile": "operational-strict",
+      "prototype": {
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
+        "files": [
+          "src/time/controls.jsx",
+          "src/time/time.css",
+          "src/expiry/access.jsx",
+          "src/expiry/actions.css",
+          "src/expiry/expiry.css"
+        ],
+        "states": [
+          "typed-time",
+          "hour-minute-open",
+          "selected-values-visible",
+          "pointer",
+          "keyboard",
+          "midnight",
+          "23:59",
+          "invalid",
+          "nested-escape",
+          "outside-dismiss",
+          "cancel",
+          "apply",
+          "zh-en-light-dark-1280-390"
+        ],
+        "stableIds": [
+          "composer-expiry-time"
+        ]
+      },
+      "production": {
+        "routeOrWindow": "/admin/",
+        "files": [
+          "web/src/components/DateEditor.svelte",
+          "web/src/components/ExpiryPicker.svelte",
+          "web/src/components/AccessBar.svelte",
+          "web/src/components/Composer.svelte",
+          "web/src/components/ShareComposer.svelte",
+          "web/src/app.css",
+          "web/src/lib/i18n.svelte.ts"
+        ],
+        "interfaces": [
+          "Existing local datetime draft; no API change"
+        ],
+        "tests": [
+          "web/e2e/metadata.spec.ts",
+          "web/e2e/access.spec.ts",
+          "web/e2e/app.spec.ts"
+        ]
+      },
+      "status": "approved",
+      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md."
     }
   ]
 }

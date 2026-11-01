@@ -245,8 +245,50 @@
           }
         }
       ]
+    },
+    "Expiry picker": {
+      "versions": [
+        {
+          "path": "prototype-expiry.html",
+          "createdAt": "2026-11-01T11:22:55.790Z",
+          "status": "needs-review",
+          "subtitle": "Custom expiry popover with explicit apply and cancellation",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
+        }
+      ]
+    },
+    "Creation actions": {
+      "versions": [
+        {
+          "path": "prototype-actions.html",
+          "createdAt": "2026-11-01T11:34:58.464Z",
+          "status": "needs-review",
+          "subtitle": "Unified link, text and file primary actions; includes custom expiry popover",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
+        }
+      ]
+    },
+    "Custom time selection": {
+      "versions": [
+        {
+          "path": "prototype-time.html",
+          "createdAt": "2026-11-01T11:42:10.697Z",
+          "status": "approved",
+          "subtitle": "Editable time with hour and minute chooser; includes expiry and action revisions",
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          }
+        }
+      ]
     }
   },
   "createdAt": "2026-10-03T19:40:00.705Z",
-  "updatedAt": "2026-10-24T03:15:46.282Z"
+  "updatedAt": "2026-11-01T12:01:23.559Z"
 }

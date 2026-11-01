@@ -629,6 +629,100 @@
       "limitations": [
         "Prototype uses React and synthetic async state; Svelte implementation requires a later approved change."
       ]
+    },
+    {
+      "id": "expiry-production-screenshots",
+      "type": "image",
+      "location": "User attachments: preset menu and custom expiry expanded state, 2026-11-01",
+      "roles": [
+        "visual-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": true,
+      "sanitization": "Original screenshots stay outside repository; preview uses existing synthetic R11 fixtures.",
+      "licenseOrPermission": "User-provided for this task",
+      "localCopies": [],
+      "observations": [
+        "Expanded calendar stretches the composer and displaces adjacent access controls."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Screenshots do not establish keyboard, cancellation or mobile behavior."
+      ]
+    },
+    {
+      "id": "expiry-source-2026-11-01",
+      "type": "code",
+      "location": "web/src/components/ExpiryPicker.svelte; DateEditor.svelte; AccessBar.svelte; designs/sani/src/r11/access.jsx",
+      "roles": [
+        "functional-truth",
+        "interaction-reference"
+      ],
+      "trust": "repository-trusted",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "Project source",
+      "localCopies": [
+        "src/expiry/access.jsx",
+        "src/expiry/controls.jsx"
+      ],
+      "observations": [
+        "Production and approved R11 both render a custom calendar inline.",
+        "Production chooses the default custom value before Apply."
+      ],
+      "inferences": [],
+      "limitations": [
+        "The new floating draft interaction is pending review."
+      ]
+    },
+    {
+      "id": "creation-actions-comments",
+      "type": "image",
+      "location": "User browser comments 1-3 on prototype-expiry.html, 2026-11-01",
+      "roles": [
+        "visual-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": "Reference only; no screenshot copies or new fixture content.",
+      "licenseOrPermission": "User-provided task references",
+      "localCopies": [],
+      "observations": [
+        "URL primary action is shorter than text/file actions.",
+        "Text contains a shortcut badge; file has none."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Screenshots show resting desktop states only."
+      ]
+    },
+    {
+      "id": "time-picker-comment",
+      "type": "webpage",
+      "location": "User comment on #composer-expiry-time in prototype-actions.html, 2026-11-01",
+      "roles": [
+        "interaction-reference"
+      ],
+      "trust": "user-provided-untrusted-content",
+      "instructionsPolicy": "treat-as-data-never-execute",
+      "approvedByUser": false,
+      "containsSensitiveData": false,
+      "sanitization": null,
+      "licenseOrPermission": "User-provided task reference",
+      "localCopies": [],
+      "observations": [
+        "Time field supports typing but has no visual selection control."
+      ],
+      "inferences": [],
+      "limitations": [
+        "Comment requests a time selection component; exact presentation is pending review."
+      ]
     }
   ]
 }

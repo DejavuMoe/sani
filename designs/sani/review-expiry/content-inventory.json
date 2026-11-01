@@ -1,0 +1,2333 @@
+{
+  "schemaVersion": 1,
+  "profile": "operational-strict",
+  "capture": {
+    "method": "rendered-dom",
+    "sources": [
+      "review-expiry/content.json"
+    ],
+    "capturedAt": "2026-11-01T11:28:00.607Z",
+    "surfaces": [
+      {
+        "source": "review-expiry/content.json",
+        "url": "http://127.0.0.1:4313/sani/prototype-expiry.html",
+        "title": "Sani"
+      }
+    ],
+    "limitations": [
+      "Limited to changed expiry popover; surrounding R11 content is unchanged."
+    ]
+  },
+  "briefSources": [],
+  "approvedCopySources": [
+    "web/src/lib/i18n.svelte.ts"
+  ],
+  "items": [
+    {
+      "id": "expiry-0",
+      "text": "自定义时间",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)",
+        "div#create-panel-text > form.cmp.cmp-share > fieldset.r7-lock > div.cmp-options:nth-of-type(1) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)",
+        "div#create-panel-file > form.cmp.cmp-share > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-1",
+      "text": "上个月",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-2",
+      "text": "2026年11月",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > span"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-3",
+      "text": "下个月",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-4",
+      "text": "选择日期",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-5",
+      "text": "一",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-6",
+      "text": "二",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-7",
+      "text": "三",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(3)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-8",
+      "text": "四",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(4)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-9",
+      "text": "五",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(5)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-10",
+      "text": "六",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(6)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-11",
+      "text": "日",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(7)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-12",
+      "text": "2026-11-01",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-13",
+      "text": "1",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-14",
+      "text": "2026-11-02",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-15",
+      "text": "2",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-16",
+      "text": "2026-11-03",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(3)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-17",
+      "text": "3",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(3)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-18",
+      "text": "2026-11-04",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(4)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-19",
+      "text": "4",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(4)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-20",
+      "text": "2026-11-05",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(5)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-21",
+      "text": "5",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(5)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-22",
+      "text": "2026-11-06",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(6)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-23",
+      "text": "6",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(6)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-24",
+      "text": "2026-11-07",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(7)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-25",
+      "text": "7",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(7)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-26",
+      "text": "2026-11-08",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(8)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-27",
+      "text": "8",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(8)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-28",
+      "text": "2026-11-09",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(9)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-29",
+      "text": "9",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(9)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-30",
+      "text": "2026-11-10",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(10)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-31",
+      "text": "10",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(10)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-32",
+      "text": "2026-11-11",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(11)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-33",
+      "text": "11",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(11)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-34",
+      "text": "2026-11-12",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(12)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-35",
+      "text": "12",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(12)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-36",
+      "text": "2026-11-13",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(13)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-37",
+      "text": "13",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(13)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-38",
+      "text": "2026-11-14",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(14)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-39",
+      "text": "14",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(14)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-40",
+      "text": "2026-11-15",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(15)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-41",
+      "text": "15",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(15)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-42",
+      "text": "2026-11-16",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(16)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-43",
+      "text": "16",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(16)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-44",
+      "text": "2026-11-17",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(17)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-45",
+      "text": "17",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(17)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-46",
+      "text": "2026-11-18",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(18)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-47",
+      "text": "18",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(18)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-48",
+      "text": "2026-11-19",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(19)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-49",
+      "text": "19",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(19)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-50",
+      "text": "2026-11-20",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(20)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-51",
+      "text": "20",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(20)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-52",
+      "text": "2026-11-21",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(21)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-53",
+      "text": "21",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(21)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-54",
+      "text": "2026-11-22",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(22)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-55",
+      "text": "22",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(22)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-56",
+      "text": "2026-11-23",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(23)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-57",
+      "text": "23",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(23)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-58",
+      "text": "2026-11-24",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(24)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-59",
+      "text": "24",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(24)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-60",
+      "text": "2026-11-25",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-61",
+      "text": "25",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(25)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-62",
+      "text": "2026-11-26",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-63",
+      "text": "26",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(26)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-64",
+      "text": "2026-11-27",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-65",
+      "text": "27",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(27)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-66",
+      "text": "2026-11-28",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-67",
+      "text": "28",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(28)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-68",
+      "text": "2026-11-29",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(29)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-69",
+      "text": "29",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(29)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-70",
+      "text": "2026-11-30",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(30)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-71",
+      "text": "30",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > button:nth-of-type(30)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-72",
+      "text": "日期",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(1) > label"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-73",
+      "text": "时间",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > label"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-74",
+      "text": "使用当前设备的时区。",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > p.hint"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "task-help",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-75",
+      "text": "取消",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.expiry-actions:nth-of-type(4) > button.btn.btn-ghost:nth-of-type(1) > span.btn-text"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-76",
+      "text": "应用时间",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.expiry-actions:nth-of-type(4) > button.btn.btn-primary:nth-of-type(2) > span.btn-text"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-77",
+      "text": "Pick a time",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)",
+        "div#create-panel-text > form.cmp.cmp-share > fieldset.r7-lock > div.cmp-options:nth-of-type(1) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)",
+        "div#create-panel-file > form.cmp.cmp-share > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-78",
+      "text": "Previous month",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-79",
+      "text": "November 2026",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > span"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-80",
+      "text": "Next month",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar-head:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-81",
+      "text": "Choose date",
+      "channels": [
+        "aria-label"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-82",
+      "text": "M",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(1)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-83",
+      "text": "T",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(2)",
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(4)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-84",
+      "text": "W",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(3)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-85",
+      "text": "F",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(5)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-86",
+      "text": "S",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(6)",
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-calendar:nth-of-type(2) > span:nth-of-type(7)"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-value",
+      "origin": "production-behavior",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-87",
+      "text": "Date",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(1) > label"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-88",
+      "text": "Time",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.r4-date-fields:nth-of-type(3) > div.r4-input:nth-of-type(2) > label"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "domain-field",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-89",
+      "text": "Uses this device’s time zone.",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "div#create-panel-url > form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > p.hint"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "task-help",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-90",
+      "text": "Cancel",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.expiry-actions:nth-of-type(4) > button.btn.btn-ghost:nth-of-type(1) > span.btn-text"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    },
+    {
+      "id": "expiry-91",
+      "text": "Apply date and time",
+      "channels": [
+        "text"
+      ],
+      "locations": [
+        "form.cmp > fieldset.r7-lock > div.cmp-options:nth-of-type(2) > span.r11-access:nth-of-type(3) > span.expiry.expiry-floating > div.r11-pop.expiry-pop:nth-of-type(2) > div.r4-date > div.expiry-actions:nth-of-type(4) > button.btn.btn-primary:nth-of-type(2) > span.btn-text"
+      ],
+      "visibility": [
+        "visible"
+      ],
+      "captures": [
+        "review-expiry/content.json"
+      ],
+      "purpose": "user-action",
+      "origin": "existing-approved-ui-copy",
+      "decision": "allow",
+      "evidence": {
+        "source": "web/src/lib/i18n.svelte.ts; web/src/components/DateEditor.svelte",
+        "reference": "calendar.*, expiry.custom, act.cancel; localized calendar date values"
+      },
+      "flags": [],
+      "notes": null
+    }
+  ]
+}

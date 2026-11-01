@@ -1,0 +1,36 @@
+/* All three creation actions use the existing field size and primary tokens. */
+.cmp .cmp-go {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--control-field);
+  min-height: max(var(--control-field), calc(1lh + 8px));
+  min-width: 88px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  background: var(--solid);
+  color: var(--on-solid);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  opacity: 1;
+}
+.cmp .cmp-go:not(:has(.cmp-go-kbd)) { padding-inline: 12px; }
+.cmp .cmp-go:hover:not(:disabled) { background: var(--solid-hover); }
+.cmp .cmp-go:active:not(:disabled) { transform: translateY(1px); }
+.cmp .cmp-go:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cmp .cmp-go:disabled:not([aria-busy]) {
+  background: var(--surface-3);
+  color: var(--text-3);
+  opacity: 1;
+  cursor: not-allowed;
+}
+.cmp .cmp-go[aria-busy] { cursor: progress; }
+.cmp .cmp-go-kbd { display: none; }
+.cmp .cmp-spinner { flex: none; }
+.cmp-main { min-height: 52px; }
+.cmp-share .cmp-options { align-items: center; }
