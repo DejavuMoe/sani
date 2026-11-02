@@ -1,0 +1,93 @@
+{
+  "results": [
+    {
+      "name": "zh-light-1280",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "zh-dark-1280",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "en-light-1280",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "en-dark-1280",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "zh-light-390",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "zh-dark-390",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "en-light-390",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    },
+    {
+      "name": "en-dark-390",
+      "pointer": true,
+      "keyboard": true,
+      "minutePrecision": true,
+      "nestedEscape": true,
+      "cancel": true,
+      "apply": true,
+      "manualEntry": true,
+      "axe": []
+    }
+  ],
+  "errors": []
+}

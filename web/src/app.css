@@ -83,20 +83,38 @@
 }
 
 /*
- * Shared creation action in link, text and file composers. Only size and
- * shape differ from Button; states (disabled, busy, focus) stay Button's.
- * It sits 6px inside the 12px card, so its corner is a concentric 6px.
+ * Shared creation action in link, text and file composers: one size in
+ * every composer; states (disabled, busy, focus) stay Button's. Link and
+ * text carry their Enter shortcut as a key badge; files have no shortcut.
  */
 .composer .btn.creation-action {
   height: var(--control-field);
   min-height: max(var(--control-field), calc(1lh + 8px));
   min-width: 88px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
   font-weight: 600;
   line-height: 1.25;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+/* The badge sits 6px from the end, the same as from top and bottom. */
+.composer .btn.creation-action:has(.go-kbd) { padding-right: 6px; }
+.composer .creation-action .go-kbd {
+  display: inline-flex;
+  gap: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
+  background: var(--solid-key);
+  color: var(--on-solid);
+  font: 500 12px/1 var(--font-sans);
+}
+.composer .creation-action:disabled .go-kbd { background: var(--surface-3); color: var(--text-3); }
+/* No hardware keyboard to press it with: drop the badge, keep the size. */
+@media (max-width: 640px), (pointer: coarse) {
+  .composer .creation-action .go-kbd { display: none; }
+  .composer .btn.creation-action:has(.go-kbd) { padding-right: 12px; }
 }
 
 :root[data-theme="dark"] {

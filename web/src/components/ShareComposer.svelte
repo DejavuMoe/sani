@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { shortcutTip, tooltip } from '../lib/tooltip';
+  import { tooltip } from '../lib/tooltip';
   import { onDestroy, tick } from 'svelte';
   import { shareText, shareToast } from '../lib/access';
   import { ApiError, cancelFileUpload, type UploadResume, type FileFields, type Link, type TextFormat } from '../lib/api';
@@ -45,9 +45,6 @@
   let area = $state<HTMLTextAreaElement>();
   let picker = $state<HTMLInputElement>();
   let chooser = $state<HTMLButtonElement>();
-  let go = $state<HTMLButtonElement>();
-  // Text has a shortcut, files don't; the hint lives in a tooltip so all actions look alike.
-  $effect(() => shortcutTip(go, mode === 'text' ? `${t('share.submit')} (${mod} ↵)` : undefined));
   let upload: AbortController | null = null;
   let resume: UploadResume = { offset: 0 };
   let lastFileDraft = '';
@@ -359,8 +356,9 @@
       {t('composer.more')}
       <Icon name="chevronDown" size={14} class={['chev', more && 'up']} />
     </button>
-    <Button bind:el={go} class="go creation-action" variant="primary" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} loading={busy && progress === null} aria-busy={busy || undefined}>
+    <Button class="go creation-action" variant="primary" type="submit" disabled={busy || tagBusy || (mode === 'file' && !filesOn)} loading={busy && progress === null} aria-busy={busy || undefined}>
       {busy && progress !== null ? t('share.uploading', { pct }) : t(uploadFailed ? 'share.retry' : 'share.submit')}
+      {#if mode === 'text'}<kbd class="go-kbd" aria-hidden="true">{mod}<Icon name="enter" size={12} /></kbd>{/if}
     </Button>
   </div>
 

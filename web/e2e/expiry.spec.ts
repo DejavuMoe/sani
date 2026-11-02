@@ -114,18 +114,26 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
       await page.getByRole('tab', { name: label, exact: true }).click();
       const current = page.locator(`#create-panel-${mode}`), button = current.locator('.creation-action');
       await button.focus(); await expect(button).toBeFocused();
-      sizes.push(await button.evaluate(el => { const r = el.getBoundingClientRect(), s = getComputedStyle(el); return [r.width, r.height, s.borderRadius, s.fontWeight]; }));
-      // No key badge on the buttons; the shortcut is announced as a tooltip on focus.
-      const tip = page.locator('.sani-tooltip');
-      if (mode === 'file') await expect(tip).toHaveCount(0);
-      else await expect(tip).toHaveText(mode === 'url' ? `${zh ? '缩短' : 'Shorten'} (↵)` : new RegExp(`\\((Ctrl|⌘) ↵\\)$`));
+      sizes.push(await button.evaluate(el => { const r = el.getBoundingClientRect(), s = getComputedStyle(el); return [r.height, s.borderRadius, s.fontWeight, r.width >= 88]; }));
+      // Link and text show their Enter shortcut as a key badge on desktop; files have none.
+      const kbd = button.locator('.go-kbd');
+      if (mode === 'file') await expect(kbd).toHaveCount(0);
+      else if (width <= 640) await expect(kbd).toBeHidden();
+      else {
+        await expect(kbd).toBeVisible();
+        if (mode === 'text') await expect(kbd).toHaveText(/^(Ctrl|⌘)$/);
+        const [b, k] = [(await button.boundingBox())!, (await kbd.boundingBox())!];
+        // Label and badge stay together; short labels center the pair within the 88px minimum.
+        expect(k.height).toBe(20);
+        expect(Math.round(k.y - b.y)).toBe(Math.round(b.y + b.height - (k.y + k.height)));
+        expect(Math.round(b.x + b.width - (k.x + k.width))).toBeGreaterThanOrEqual(6);
+      }
       if (mode !== 'url') { await openExpiry(current, zh); await page.keyboard.press('Escape'); }
       await page.screenshot({ path: info.outputPath(`${mode}-action.png`), animations: 'disabled' });
     }
-    // Same width, corner and weight; the link action fills its 52px row with a 6px inset.
-    expect(sizes[2]).toEqual(sizes[1]);
-    expect(sizes[0]).toEqual([88, 40, '6px', '600']);
-    expect(sizes[1]).toEqual([88, width <= 640 ? 40 : 32, '6px', '600']);
+    // One height, corner and weight in every composer.
+    expect(sizes[1]).toEqual(sizes[0]); expect(sizes[2]).toEqual(sizes[0]);
+    expect(sizes[0]).toEqual([width <= 640 ? 40 : 32, '8px', '600', true]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });

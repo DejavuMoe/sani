@@ -28,3 +28,17 @@ A review against the rest of the app aligned the prototype and production:
 - A file upload's busy action shows its percentage instead of a spinner.
 
 Evidence: `review-unify/` (from `tools/time-check.mjs` and `tools/actions-check.mjs`).
+
+## Key badge revision, 2026-11-02
+
+At the user's request after v1.0.2, the creation actions take back their
+Enter key badges instead of tooltips, with one shape for all three:
+
+- Link: `↵` icon badge; text: `Ctrl`/`⌘` plus the `↵` icon; files have no
+  shortcut and no badge. Badges are 20px, 6px from the button end, and
+  hidden on touch and narrow screens.
+- All three actions are 32px (40px on touch/narrow) with Button's 8px
+  corner; the link row keeps a 10px inset around its action.
+- The tooltip shim (`src/time/shortcut-tips.js`, `shortcutTip()`) is removed.
+
+Evidence: `review-badges/`.

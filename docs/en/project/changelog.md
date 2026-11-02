@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Bring back the Enter key badges on the Shorten and Share buttons in place of tooltips; the link, text and file creation buttons now share one height, corner and badge style.
+
 ## v1.0.2
 
 2026-11-02 · Improve expiry selection and the creation buttons, and align admin controls on shared styles and states. Database schema remains 7 with no new migration.

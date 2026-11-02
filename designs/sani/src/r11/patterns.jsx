@@ -512,7 +512,7 @@ const ShareComposer = forwardRef(function ShareComposer({ mode, store, toasts, c
             {busy && progress !== null ? t('share.uploading', { pct }) : mode === 'file' && error?.text === errorText('network') ? (lang === 'zh' ? '重试上传' : 'Retry upload') : t('share.submit')}
             {mode === 'text' && !busy && (
               <kbd className="cmp-go-kbd" aria-hidden="true">
-                {mod}↵
+                {mod}<Icon name="enter" size={12} />
               </kbd>
             )}
           </button>

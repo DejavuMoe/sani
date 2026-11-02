@@ -1,8 +1,7 @@
 /*
- * All three creation actions share width, corner and weight and keep the
- * shared Button states (disabled, busy, focus). Each sits 6px inside the
- * 12px card, so its corner is a concentric 6px; the link action fills its
- * 52px row (40px), text and file actions use the field height.
+ * All three creation actions share one size, corner and weight in every
+ * composer and keep the shared Button states (disabled, busy, focus).
+ * Link and text carry their Enter shortcut as a key badge; files have none.
  */
 .cmp .cmp-go {
   position: relative;
@@ -15,7 +14,7 @@
   min-height: max(var(--control-field), calc(1lh + 8px));
   min-width: 88px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--solid);
   color: var(--on-solid);
   font-size: 13px;
@@ -25,7 +24,21 @@
   font-variant-numeric: tabular-nums;
   opacity: 1;
 }
+/* The badge sits 6px from the end, the same as from top and bottom. */
+.cmp .cmp-go:has(.cmp-go-kbd) { padding-right: 6px; }
 .cmp .cmp-go:not(:has(.cmp-go-kbd)) { padding-inline: 12px; }
+.cmp .cmp-go-kbd {
+  display: inline-flex;
+  gap: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
+  border-radius: var(--radius-xs);
+  background: var(--solid-key, #3a5bc7);
+  color: var(--on-solid);
+  font: 500 12px/1 var(--font-sans);
+}
 .cmp .cmp-go:hover:not(:disabled) { background: var(--solid-hover); }
 .cmp .cmp-go:active:not(:disabled) { transform: translateY(1px); }
 /* Button's disabled look; busy is disabled too. */
@@ -35,14 +48,18 @@
   --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
   opacity: 1;
 }
+.cmp .cmp-go:disabled .cmp-go-kbd { background: var(--surface-3); color: var(--text-3); }
 .cmp .cmp-go[aria-busy] { cursor: progress; }
 /* Link and text: the spinner replaces the label. File: the upload percentage stays, without a spinner. */
 .cmp:not(.cmp-share) .cmp-go[aria-busy], .cmp-share.text .cmp-go[aria-busy] { color: transparent; }
+.cmp:not(.cmp-share) .cmp-go[aria-busy] .cmp-go-kbd { visibility: hidden; }
 .cmp:not(.cmp-share) .cmp-go[aria-busy] .cmp-spinner, .cmp-share.text .cmp-go[aria-busy] .cmp-spinner { position: absolute; inset: 0; margin: auto; color: var(--text-3); }
 .cmp-share.file .cmp-go[aria-busy] .cmp-spinner { display: none; }
-/* No key badges: the shortcut shows in a tooltip (shortcut-tips.js). */
-.cmp .cmp-go-kbd { display: none; }
 .cmp .cmp-spinner { flex: none; }
-.cmp-main { min-height: 52px; padding-right: 6px; }
-.cmp-main .cmp-go { height: 40px; min-height: 40px; }
+.cmp-main { min-height: 52px; padding-right: 10px; }
 .cmp-share .cmp-options { align-items: center; }
+/* No hardware keyboard to press it with: drop the badge, keep the size. */
+@media (max-width: 640px), (pointer: coarse) {
+  .cmp .cmp-go-kbd { display: none; }
+  .cmp .cmp-go:has(.cmp-go-kbd) { padding-right: 12px; }
+}

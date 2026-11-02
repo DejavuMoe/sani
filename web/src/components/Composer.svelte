@@ -8,7 +8,6 @@
   import { validMaxClicks } from '../lib/max-clicks';
   import { session } from '../lib/session.svelte';
   import { toasts } from '../lib/toast.svelte';
-  import { shortcutTip } from '../lib/tooltip';
   import { hostOf, stripScheme } from '../lib/url';
   import AccessBar from './AccessBar.svelte';
   import Button from './Button.svelte';
@@ -44,9 +43,6 @@
   let note = $state('');
   let pulse = $state(false);
   let input = $state<HTMLInputElement>();
-  let go = $state<HTMLButtonElement>();
-  // The action carries no key badge (all three match); its shortcut shows on hover and focus.
-  $effect(() => shortcutTip(go, `${t('composer.submit')} (↵)`));
 
   const prefix = $derived(hostOf(session.origin));
 
@@ -188,7 +184,9 @@
         }
       }}
     />
-    <Button bind:el={go} class="go creation-action" variant="primary" type="submit" disabled={tagBusy} loading={busy}>{t('composer.submit')}</Button>
+    <Button class="go creation-action" variant="primary" type="submit" disabled={tagBusy} loading={busy}>
+      {t('composer.submit')}<kbd class="go-kbd" aria-hidden="true"><Icon name="enter" size={12} /></kbd>
+    </Button>
   </div>
 
   <div class="options">
@@ -271,13 +269,8 @@
     align-items: center;
     gap: 10px;
     height: 52px;
-    padding: 0 6px 0 16px;
-  }
-
-  /* 52px row, 6px inset on every side: the action fills it. */
-  .main :global(.btn.creation-action) {
-    height: 40px;
-    min-height: 40px;
+    /* The 32px action sits 10px from the end, as from top and bottom. */
+    padding: 0 10px 0 16px;
   }
 
   .main :global(.lead) {

@@ -1,14 +1,3 @@
-/**
- * A tooltip for an element held by reference (a component's button), only
- * where a keyboard shortcut is useful: with a fine pointer. Returns the
- * cleanup for an $effect.
- */
-export function shortcutTip(el: HTMLElement | undefined, text: string | undefined) {
-  if (!el || !text || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  const tip = tooltip(el, text);
-  return () => tip.destroy();
-}
-
 // An action keeps the original trigger's layout and semantics intact.
 let dismissCurrent: (() => void) | undefined;
 let nextId = 0;

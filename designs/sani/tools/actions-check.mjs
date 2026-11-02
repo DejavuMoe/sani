@@ -21,10 +21,10 @@ try {
       const panel = page.locator(`#create-panel-${mode}`), button = panel.locator('.cmp-go');
       await expect(button).toBeVisible();
       const normal = await button.evaluate(el => { const s = getComputedStyle(el), r = el.getBoundingClientRect(); return { width:r.width, height:r.height, radius:s.borderRadius, fontSize:s.fontSize, fontWeight:s.fontWeight, background:s.backgroundColor, color:s.color }; });
-      // The link action fills its 52px row; text and file use the field height. All 6px concentric corners.
-      expect(normal.height).toBe(mode === 'url' || width !== 1280 ? 40 : 32);
-      expect(normal.width).toBe(88);
-      expect(normal.radius).toBe('6px');
+      // One size and corner in every composer; badges widen link and text on desktop.
+      expect(normal.height).toBe(width === 1280 ? 32 : 40);
+      expect(normal.width).toBeGreaterThanOrEqual(88);
+      expect(normal.radius).toBe('8px');
       sizes.push(normal);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await button.hover();
@@ -32,10 +32,17 @@ try {
       await button.focus(); await button.press('Tab'); await page.keyboard.press('Shift+Tab');
       await expect(button).toBeFocused();
       expect(await button.evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid');
-      // No key badge; link and text announce their shortcut in a tooltip, files have none.
-      const tip = page.locator('#cmp-go-tip');
-      if (mode === 'file') await expect(tip).toHaveCount(0);
-      else await expect(tip).toHaveText(mode === 'url' ? /\(↵\)$/ : /\((Ctrl|⌘) ↵\)$/);
+      // Link and text show an Enter key badge on desktop, 6px from the end; files have none.
+      const kbd = button.locator('.cmp-go-kbd');
+      if (mode === 'file') await expect(kbd).toHaveCount(0);
+      else if (width !== 1280) await expect(kbd).toBeHidden();
+      else {
+        const [b, k] = [await button.boundingBox(), await kbd.boundingBox()];
+        // Label and badge stay together; short labels center the pair within the 88px minimum.
+        expect(k.height).toBe(20); expect(Math.round(k.y - b.y)).toBe(Math.round(b.y + b.height - (k.y + k.height)));
+        expect(Math.round(b.x + b.width - (k.x + k.width))).toBeGreaterThanOrEqual(6);
+        if (mode === 'text') await expect(kbd).toHaveText(/^(Ctrl|⌘)$/);
+      }
       await page.mouse.move(0, 0); await button.blur();
       await page.evaluate(() => document.fonts.ready);
       await page.evaluate(() => Promise.all(document.getAnimations().filter(a => a.effect?.getTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))));
@@ -62,8 +69,8 @@ try {
       await expect(page.locator('.toast').first()).toBeVisible();
       results.push({ name, ...normal, hover:true, keyboardFocus:true, submission:true, busy:true, axe:violations });
     }
-    expect(sizes[2]).toEqual(sizes[1]);
-    expect([sizes[0].width, sizes[0].radius, sizes[0].fontWeight]).toEqual([sizes[1].width, sizes[1].radius, sizes[1].fontWeight]);
+    const shape = s => [s.height, s.radius, s.fontSize, s.fontWeight];
+    expect(shape(sizes[1])).toEqual(shape(sizes[0])); expect(shape(sizes[2])).toEqual(shape(sizes[0]));
     console.log(`PASS ${lang}/${theme}/${width}: all three actions`);
     await page.close();
   }
