@@ -2,7 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.3
+
+2026-11-02 · Restore the Enter key badges on the creation buttons and give all three one size and style. Database schema remains 7 with no new migration.
+
+Upgrading from v1.0.2 needs no data migration; the API, public contracts and existing links are unchanged. Take a complete snapshot as described in [backup and restore](../guide/operations#backup-files) before upgrading.
 
 - Bring back the Enter key badges on the Shorten and Share buttons in place of tooltips; the link, text and file creation buttons now share one height, corner and badge style.
 

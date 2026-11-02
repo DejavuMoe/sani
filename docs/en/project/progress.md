@@ -42,6 +42,12 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0; publishing a release does not replace acceptance of a target deployment.
 
+## v1.0.3 patch release {#v103-release}
+
+v1.0.3 restores the Enter key badges on the Shorten and Share buttons in place of the v1.0.2 tooltips. The link, text and file creation buttons share one height, corner and badge style, with badges hidden on touch and narrow screens. The prototype and both usage guides match the implementation. Database schema remains 7 with no new migration and no API change, under the existing 1.x compatibility promises.
+
+See the [v1.0.3 changelog](./changelog#v1-0-3) for changes and upgrade guidance, and the [v1.0.3 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.3) for published artifacts.
+
 ## v1.0.2 patch release {#v102-release}
 
 v1.0.2 improves expiry selection and the creation buttons in the admin app. Custom times are edited in a popover with an hour and minute chooser; the expiry, visit limit and password popovers share one layout and placement; link, text and file creation buttons share size and states, show their shortcuts as tooltips, and show upload progress. The prototype and both usage guides match the implementation. Database schema remains 7 with no new migration and no API change, under the existing 1.x compatibility promises.
