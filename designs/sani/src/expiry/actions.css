@@ -1,4 +1,9 @@
-/* All three creation actions use the existing field size and primary tokens. */
+/*
+ * All three creation actions share width, corner and weight and keep the
+ * shared Button states (disabled, busy, focus). Each sits 6px inside the
+ * 12px card, so its corner is a concentric 6px; the link action fills its
+ * 52px row (40px), text and file actions use the field height.
+ */
 .cmp .cmp-go {
   position: relative;
   display: inline-flex;
@@ -10,27 +15,34 @@
   min-height: max(var(--control-field), calc(1lh + 8px));
   min-width: 88px;
   padding: 0 12px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background: var(--solid);
   color: var(--on-solid);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.25;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
   opacity: 1;
 }
 .cmp .cmp-go:not(:has(.cmp-go-kbd)) { padding-inline: 12px; }
 .cmp .cmp-go:hover:not(:disabled) { background: var(--solid-hover); }
 .cmp .cmp-go:active:not(:disabled) { transform: translateY(1px); }
-.cmp .cmp-go:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.cmp .cmp-go:disabled:not([aria-busy]) {
-  background: var(--surface-3);
+/* Button's disabled look; busy is disabled too. */
+.cmp .cmp-go:disabled, .cmp-share .cmp-go:disabled:not([aria-busy]) {
+  background: var(--surface-2);
   color: var(--text-3);
+  --hbt: var(--line); --hbr: var(--line); --hbb: var(--line); --hbl: var(--line);
   opacity: 1;
-  cursor: not-allowed;
 }
 .cmp .cmp-go[aria-busy] { cursor: progress; }
+/* Link and text: the spinner replaces the label. File: the upload percentage stays, without a spinner. */
+.cmp:not(.cmp-share) .cmp-go[aria-busy], .cmp-share.text .cmp-go[aria-busy] { color: transparent; }
+.cmp:not(.cmp-share) .cmp-go[aria-busy] .cmp-spinner, .cmp-share.text .cmp-go[aria-busy] .cmp-spinner { position: absolute; inset: 0; margin: auto; color: var(--text-3); }
+.cmp-share.file .cmp-go[aria-busy] .cmp-spinner { display: none; }
+/* No key badges: the shortcut shows in a tooltip (shortcut-tips.js). */
 .cmp .cmp-go-kbd { display: none; }
 .cmp .cmp-spinner { flex: none; }
-.cmp-main { min-height: 52px; }
+.cmp-main { min-height: 52px; padding-right: 6px; }
+.cmp-main .cmp-go { height: 40px; min-height: 40px; }
 .cmp-share .cmp-options { align-items: center; }

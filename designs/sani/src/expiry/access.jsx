@@ -200,9 +200,12 @@ function R11ExpiryPicker({ value, onChange, triggerClass = 'picker', showLabel =
     if (!draft) return;
     const el = pop.current, trigger = host.current.querySelector('button');
     const place = () => {
+      // Same placement as AccessPop: end-aligned, flipped above when it does not fit below.
       const r = trigger.getBoundingClientRect(), w = el.offsetWidth, h = el.offsetHeight;
-      el.style.left = `${Math.max(8, Math.min(r.left, innerWidth - w - 8))}px`;
-      el.style.top = `${Math.max(8, Math.min(r.bottom + 6, innerHeight - h - 8))}px`;
+      let top = r.bottom + 6;
+      if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;
+      el.style.left = `${Math.max(8, Math.min(r.right - w, innerWidth - w - 8))}px`;
+      el.style.top = `${Math.max(8, top)}px`;
     };
     const toggle = e => {
       if (e.newState === 'closed') {

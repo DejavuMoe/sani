@@ -1351,7 +1351,10 @@
           "web/src/components/Composer.svelte",
           "web/src/components/ShareComposer.svelte",
           "web/src/app.css",
-          "web/src/lib/i18n.svelte.ts"
+          "web/src/lib/i18n.svelte.ts",
+          "web/src/components/AccessPopover.svelte",
+          "web/src/components/Button.svelte",
+          "web/src/lib/tooltip.ts"
         ],
         "interfaces": [
           "Existing local datetime draft; no API change"
@@ -1365,7 +1368,7 @@
         ]
       },
       "status": "implemented",
-      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md. Implemented in Svelte on 2026-11-01. Evidence: implementation-time/verification.json, content-inventory.json and screenshots. Final full E2E run: 192 passed."
+      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md. Implemented in Svelte on 2026-11-01. Evidence: implementation-time/verification.json, content-inventory.json and screenshots. Final full E2E run: 192 passed. Consistency revision 2026-11-02 (user-requested review; prototype and production aligned): the custom expiry popover reuses AccessPopover (8px insets, hairline footer with 4px gaps, end-aligned and flipped like the limit/password popovers); time menu selection is the check alone and Done is a plain menu item after a separator; the time menu uses a line-3 edge in dark; creation actions keep Button's disabled/busy/focus states, use 6px concentric corners, and the link action is 40px in its 52px row; shortcuts show as tooltips ('Shorten (↵)', 'Share (Ctrl/⌘ ↵)') with a fine pointer instead of key badges; a file upload's busy action shows its percentage instead of a spinner. QA: tools/time-check.mjs and tools/actions-check.mjs; review-unify/ results and screenshots."
     }
   ]
 }

@@ -29,6 +29,12 @@ try {
     await time.fill('13:07'); await choose.click();
     await expect(option(hours,'13')).toBeFocused(); await expect(option(minutes,'07')).toHaveAttribute('aria-checked','true');
     expect((await panel.boundingBox()).height).toBe(height);
+    // Selection is the check alone; the popover matches the limit and password popovers.
+    expect(await option(hours,'13').evaluate(el => getComputedStyle(el).color)).toBe(await option(hours,'12').evaluate(el => getComputedStyle(el).color));
+    await expect(pop.locator('.r11-pop-foot')).toHaveCSS('gap', '4px');
+    await expect(pop.locator('.r4-date')).toHaveCSS('padding', '8px 8px 4px');
+    const t = await trigger.boundingBox(), p = await pop.boundingBox();
+    expect(Math.round(p.x + p.width)).toBe(Math.round(Math.max(8 + p.width, Math.min(t.x + t.width, width - 8))));
     const rect = await menu.boundingBox();
     expect(rect.x).toBeGreaterThanOrEqual(0); expect(rect.x+rect.width).toBeLessThanOrEqual(width); expect(rect.y+rect.height).toBeLessThanOrEqual(804);
     await page.evaluate(() => document.fonts.ready);

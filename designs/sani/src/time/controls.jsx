@@ -92,12 +92,12 @@ function R4DateEditor({ value, onChange, id, onCancel }) {
             <div className="time-column-label" aria-hidden="true">{column === 0 ? (zh ? '小时' : 'Hours') : (zh ? '分钟' : 'Minutes')}</div>
             <div className="time-options" role="group" aria-label={column === 0 ? (zh ? '小时' : 'Hours') : (zh ? '分钟' : 'Minutes')} tabIndex={0}>{Array.from({ length: count }, (_, n) => <MenuItem key={n} checked={selected[column] === n} onClick={() => chooseTime(column, n)}>{pad(n)}</MenuItem>)}</div>
           </div>)}
-        </div><div className="time-done"><MenuItem onClick={close}>{zh ? '完成' : 'Done'}</MenuItem></div></>}
+        </div><div className="expiry-sep" role="separator" /><div className="time-done"><MenuItem onClick={close}>{zh ? '完成' : 'Done'}</MenuItem></div></>}
       </Menu>
     </div></div></div>
     {!valid && <p className="error-text" role="alert">{zh ? '请选择有效的未来日期与时间。' : 'Choose a valid future date and time.'}</p>}
     <p className="hint">{zh ? '使用当前设备的时区。' : 'Uses this device’s time zone.'}</p>
-    <div className="expiry-actions"><Button size="sm" variant="ghost" onClick={onCancel}>{zh ? '取消' : 'Cancel'}</Button><Button size="sm" variant="primary" disabled={!valid} onClick={() => onChange({ at: candidate })}>{zh ? '应用时间' : 'Apply date and time'}</Button></div>
+    <div className="r11-pop-foot expiry-actions"><Button size="sm" variant="ghost" onClick={onCancel}>{zh ? '取消' : 'Cancel'}</Button><Button size="sm" variant="primary" disabled={!valid} onClick={() => onChange({ at: candidate })}>{zh ? '应用时间' : 'Apply date and time'}</Button></div>
   </div>;
 }
 
