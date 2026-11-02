@@ -42,6 +42,12 @@ Run the following checks for each release candidate commit. A previous release's
 
 Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0; publishing a release does not replace acceptance of a target deployment.
 
+## v1.0.2 patch release {#v102-release}
+
+v1.0.2 improves expiry selection and the creation buttons in the admin app. Custom times are edited in a popover with an hour and minute chooser; the expiry, visit limit and password popovers share one layout and placement; link, text and file creation buttons share size and states, show their shortcuts as tooltips, and show upload progress. The prototype and both usage guides match the implementation. Database schema remains 7 with no new migration and no API change, under the existing 1.x compatibility promises.
+
+See the [v1.0.2 changelog](./changelog#v1-0-2) for changes and upgrade guidance, and the [v1.0.2 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.2) for published artifacts.
+
 ## v1.0.1 patch release {#v101-release}
 
 v1.0.1 fixes modulo bias in generated access passwords using rejection sampling in both the admin app and R11 prototype. The alphabet, default six-character length and existing passwords are unchanged. Regression tests cover generation and unlock-cookie transport attributes, and bilingual documentation now aligns stable-release status and access-password boundaries. Database schema remains 7 with no new migration, under the existing 1.x compatibility promises.

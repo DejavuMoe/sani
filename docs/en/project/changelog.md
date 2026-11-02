@@ -2,7 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.2
+
+2026-11-02 · Improve expiry selection and the creation buttons, and align admin controls on shared styles and states. Database schema remains 7 with no new migration.
+
+Upgrading from v1.0.1 needs no data migration; the API, public contracts and existing links are unchanged. Take a complete snapshot as described in [backup and restore](../guide/operations#backup-files) before upgrading.
 
 - Show custom expiry in a popover without stretching the creation form. Apply commits the date and time; Cancel, Escape and outside dismissal preserve the previous value.
 - Add an hour and minute chooser alongside typed time entry, with keyboard controls. Unify the size and state styling of link, text and file creation buttons; their keyboard shortcuts now show in a tooltip.
