@@ -88,7 +88,8 @@
   }
   .ghost:disabled, .danger:disabled { background: transparent; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent; }
   .btn[aria-busy='true'] > .spinner { position: absolute; inset: 0; margin: auto; }
-  .btn[aria-busy='true'] > .text, .btn[aria-busy='true'] :global(.icon) { opacity: 0; }
+  /* The spinner replaces the label; a busy button without one (an upload's percentage) keeps its label. */
+  .btn:has(> .spinner) > .text, .btn:has(> .spinner) :global(.icon) { opacity: 0; }
   .btn[aria-busy='true'] > .text { white-space: nowrap; }
 
   .text {

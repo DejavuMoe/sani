@@ -108,6 +108,7 @@
               </div>
             {/each}
           </div>
+          <div class="sep" role="separator"></div>
           <div class="time-done"><MenuItem onclick={close}>{t('calendar.done')}</MenuItem></div>
         {/snippet}
       </Menu>
@@ -115,11 +116,12 @@
   </div>
   {#if !valid}<p id="{id}-error" class="error-text" role="alert">{t('calendar.invalid')}</p>{/if}
   <p class="hint">{t('calendar.zone')}</p>
-  <div class="expiry-actions"><Button size="sm" variant="ghost" onclick={oncancel}>{t('act.cancel')}</Button><Button size="sm" variant="primary" disabled={!valid} onclick={apply}>{t('calendar.apply')}</Button></div>
+  <div class="foot"><Button size="sm" variant="ghost" onclick={oncancel}>{t('act.cancel')}</Button><Button size="sm" variant="primary" disabled={!valid} onclick={apply}>{t('calendar.apply')}</Button></div>
 </div>
 
 <style>
-  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-width: 0; width: 100%; padding: 14px; }
+  /* Same insets and footer as the limit and password popovers beside it. */
+  .date-editor { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; min-width: 0; width: 100%; padding: 8px 8px 4px; }
   .date-fields { display: grid; grid-template-columns: minmax(0,1fr) 112px; gap: 8px; }
   .input { display: grid; gap: 7px; min-width: 0; }
   label { font-size: 13px; color: var(--text-2); }
@@ -131,23 +133,18 @@
   .calendar button { min-height: 32px; border-radius: var(--radius-xs); aspect-ratio: 1; font-size: 12px; }
   .calendar button:hover { background: var(--surface-2); }
   .calendar button[aria-pressed='true'] { background: var(--accent-soft); color: var(--accent); box-shadow: var(--hair-shadow), inset 0 0 0 0.5px var(--accent-line); }
-  @media (max-width: 640px), (pointer: coarse) {
-    .date-editor { padding: 10px; }
-  }
-  .expiry-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .foot { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin: 4px -4px 0; padding-top: 8px; --hbt: var(--line); }
   .time-entry { position: relative; min-width: 0; }
   .time-entry > input { padding-right: 34px; font-variant-numeric: tabular-nums; }
   .time-entry :global(.time-trigger) { position: absolute; right: 2px; top: 2px; bottom: 2px; width: 28px; display: grid; place-items: center; color: var(--text-2); border-radius: var(--radius-sm); }
   .time-entry :global(.time-trigger:hover), .time-entry :global(.time-trigger[aria-expanded='true']) { background: var(--surface-2); color: var(--text); }
   .time-entry :global(.time-trigger:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
   .time-entry :global(.menu) { width: 224px; }
-  .time-entry :global(.menu .label) { color: inherit; }
+  /* In dark both layers are surface-2; a stronger edge keeps the menu apart from the popover under it. */
+  :global([data-theme='dark']) .time-entry :global([popover].menu) { --hbt: var(--line-3); --hbr: var(--line-3); --hbb: var(--line-3); --hbl: var(--line-3); }
   .time-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px; }
   .time-column-label { padding: 4px 8px 8px; color: var(--text-2); font-size: 12px; }
   .time-options { height: 180px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-3) transparent; }
   .time-options :global(.item) { font-variant-numeric: tabular-nums; }
-  .time-options :global(.item[aria-checked='true']) { color: var(--accent); background: var(--accent-soft); }
-  .time-done { margin: 4px; padding-top: 4px; --hbt: var(--line); }
-  .time-done :global(.item) { justify-content: center; color: var(--accent); }
-  .time-done :global(.label) { text-align: center; }
+  .sep { height: 0.5px; margin: 4px 6px; background: var(--line); }
 </style>

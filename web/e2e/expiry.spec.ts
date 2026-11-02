@@ -61,6 +61,9 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
     await expect(hour('13')).toBeFocused();
     await expect(minute('07')).toHaveAttribute('aria-checked', 'true');
     await expect(hour('13')).toBeInViewport(); await expect(minute('07')).toBeInViewport();
+    // Selection is the check alone, like every other menu; the popover uses the access popovers' surface.
+    expect(await hour('13').evaluate(el => getComputedStyle(el).color)).toBe(await hour('12').evaluate(el => getComputedStyle(el).color));
+    await expect(pop).toHaveClass(/\bpop\b/);
     await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
     for (const layer of [pop, menu]) {
       const r = (await layer.boundingBox())!;
@@ -112,11 +115,17 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
       const current = page.locator(`#create-panel-${mode}`), button = current.locator('.creation-action');
       await button.focus(); await expect(button).toBeFocused();
       sizes.push(await button.evaluate(el => { const r = el.getBoundingClientRect(), s = getComputedStyle(el); return [r.width, r.height, s.borderRadius, s.fontWeight]; }));
+      // No key badge on the buttons; the shortcut is announced as a tooltip on focus.
+      const tip = page.locator('.sani-tooltip');
+      if (mode === 'file') await expect(tip).toHaveCount(0);
+      else await expect(tip).toHaveText(mode === 'url' ? `${zh ? '缩短' : 'Shorten'} (↵)` : new RegExp(`\\((Ctrl|⌘) ↵\\)$`));
       if (mode !== 'url') { await openExpiry(current, zh); await page.keyboard.press('Escape'); }
       await page.screenshot({ path: info.outputPath(`${mode}-action.png`), animations: 'disabled' });
     }
-    expect(sizes[1]).toEqual(sizes[0]); expect(sizes[2]).toEqual(sizes[0]);
-    expect(sizes[0]).toEqual([88, width <= 640 ? 40 : 32, '8px', '600']);
+    // Same width, corner and weight; the link action fills its 52px row with a 6px inset.
+    expect(sizes[2]).toEqual(sizes[1]);
+    expect(sizes[0]).toEqual([88, 40, '6px', '600']);
+    expect(sizes[1]).toEqual([88, width <= 640 ? 40 : 32, '6px', '600']);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });

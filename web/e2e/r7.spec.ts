@@ -238,6 +238,11 @@ test('an uploading file stays locked but can be canceled without losing its draf
   try {
     await panel.locator('.go').click();
     await expect(panel.locator('.slug input')).toBeDisabled();
+    // The busy action shows the upload percentage in place of a spinner.
+    const go = panel.locator('.go');
+    await expect(go).toHaveAttribute('aria-busy','true');await expect(go).toBeDisabled();await expect(go.locator('.spinner')).toHaveCount(0);
+    await expect(go).toHaveText(/Uploading… \d+%/);
+    expect(await go.locator('.text').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
     await capture(page,'upload-busy');
     await panel.locator('.cancel-upload').click();
     await expect(panel.locator('.slug input')).toBeEnabled();

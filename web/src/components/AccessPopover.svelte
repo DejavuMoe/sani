@@ -3,22 +3,29 @@
    * A small form in the browser's top layer, like Menu but with
    * role="dialog": it holds a field, so focus goes to the field, Enter
    * confirms and Escape or an outside click closes it.
+   *
+   * Without `trigger`, the caller opens it with `show()` and `anchor`
+   * names the control it hangs from (the expiry menu's custom time).
    */
   import type { Snippet } from 'svelte';
   import { onDestroy, tick } from 'svelte';
 
   let {
     trigger,
+    anchor,
     children,
     label,
     triggerClass = '',
+    popClass = '',
     width = 288,
     onopen,
   }: {
-    trigger: Snippet;
+    trigger?: Snippet;
+    anchor?: () => HTMLElement | null | undefined;
     children: Snippet<[() => void]>;
     label: string;
     triggerClass?: string;
+    popClass?: string;
     width?: number;
     onopen?: () => void;
   } = $props();
@@ -27,10 +34,16 @@
   let button = $state<HTMLButtonElement>();
   let pop = $state<HTMLDivElement>();
   let open = $state(false);
+  const anchorEl = () => button ?? anchor?.() ?? undefined;
+
+  export function show() {
+    pop?.showPopover();
+  }
 
   function place() {
-    if (!button || !pop) return;
-    const r = button.getBoundingClientRect();
+    const target = anchorEl();
+    if (!target || !pop) return;
+    const r = target.getBoundingClientRect();
     const w = pop.offsetWidth;
     const h = pop.offsetHeight;
     const left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8));
@@ -45,9 +58,13 @@
   }
 
   const reposition = () => place();
+  // Content can grow while open (an error line), so keep it inside the viewport.
+  let resize: ResizeObserver | undefined;
   const stopReposition = () => {
     removeEventListener('resize', reposition);
     removeEventListener('scroll', reposition, true);
+    resize?.disconnect();
+    resize = undefined;
   };
   onDestroy(stopReposition);
 
@@ -57,6 +74,8 @@
       onopen?.();
       addEventListener('resize', reposition);
       addEventListener('scroll', reposition, true);
+      resize = new ResizeObserver(reposition);
+      if (pop) resize.observe(pop);
       // The content mounts with `open`; measure and focus after it renders.
       await tick();
       if (!open || !pop?.isConnected) return;
@@ -64,16 +83,18 @@
       pop.querySelector('input')?.select();
     } else {
       stopReposition();
-      if (pop?.contains(document.activeElement) || document.activeElement === document.body) button?.focus();
+      if (pop?.contains(document.activeElement) || document.activeElement === document.body) anchorEl()?.focus();
     }
   }
 </script>
 
-<button bind:this={button} type="button" class={triggerClass} popovertarget={id} aria-haspopup="dialog" aria-expanded={open}>
-  {@render trigger()}
-</button>
+{#if trigger}
+  <button bind:this={button} type="button" class={triggerClass} popovertarget={id} aria-haspopup="dialog" aria-expanded={open}>
+    {@render trigger()}
+  </button>
+{/if}
 
-<div bind:this={pop} {id} popover="auto" role="dialog" aria-label={label} class="pop" style:width="{width}px" {ontoggle}>
+<div bind:this={pop} {id} popover="auto" role="dialog" aria-label={label} class={['pop', popClass]} style:width="{width}px" {ontoggle}>
   {#if open}{@render children(close)}{/if}
 </div>
 
@@ -85,6 +106,9 @@
     margin: 0;
     padding: 4px;
     max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    overflow: auto;
+    overscroll-behavior: contain;
     border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius-lg);
     background: var(--surface);

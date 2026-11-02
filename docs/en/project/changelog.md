@@ -5,7 +5,8 @@
 ## Unreleased
 
 - Show custom expiry in a popover without stretching the creation form. Apply commits the date and time; Cancel, Escape and outside dismissal preserve the previous value.
-- Add an hour and minute chooser alongside typed time entry, with keyboard controls. Unify the size and state styling of link, text and file creation buttons.
+- Add an hour and minute chooser alongside typed time entry, with keyboard controls. Unify the size and state styling of link, text and file creation buttons; their keyboard shortcuts now show in a tooltip.
+- While a file uploads, the Share button shows the percentage again.
 
 ## v1.0.1
 
