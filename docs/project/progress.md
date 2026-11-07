@@ -2,9 +2,9 @@
 import { data as status } from '../.vitepress/data/status.data'
 </script>
 
-# 研发进度
+# 项目状态
 
-<p class="lead">最近发布版本为 {{ status.latestVersion }}。Sani 已进入 1.x 稳定维护阶段，本页记录已交付能力、验收入口与后续计划；各版本变更见<a href="./changelog">更新日志</a>。</p>
+<p class="lead">最近发布版本为 {{ status.latestVersion }}。Sani 已进入 1.x 稳定维护阶段，本页说明已有能力、适用范围与后续计划；各版本变更见<a href="./changelog">更新日志</a>。</p>
 
 ## 功能现状 {#current}
 
@@ -21,108 +21,18 @@ import { data as status } from '../.vitepress/data/status.data'
 | 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
 | 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期核对配置、接口等已纳入检查的源码规则 |
 | 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |
-| 持续集成（CI） | <span class="sn-status done">已完成</span> | Linux/macOS/Windows Go 测试、全部发布平台交叉编译、E2E、axe 无障碍核查和已知漏洞扫描；结果以具体提交的流水线为准 |
+| 持续集成（CI） | <span class="sn-status done">已完成</span> | Linux/macOS/Windows Go 测试、全部发布平台交叉编译、E2E、axe 无障碍核查和已知漏洞扫描 |
 | 线上文档站点 | <span class="sn-status done">已完成</span> | 官方中英双语文档已部署：[sani.zsh.moe](https://sani.zsh.moe) |
 
-## 生产验收范围 {#production}
+## 适用范围 {#production}
 
 Sani 面向**单管理员、单个服务进程、本地持久化数据目录**的自托管部署。前置代理负责 HTTPS，文件分享使用独立主机名；备份、磁盘余量、日志监控和升级恢复由部署者负责。多个进程共享数据库时，内存缓存与访问额度不会同步，因此不支持通过多副本实现高可用。短码是分享地址，不是访客身份认证；点击统计也不承诺断电时零丢失。
 
-每个准备发布的候选提交都应通过以下检查。历史版本的绿灯不能替代当前提交的结果。
-
-| 验收层 | 检查入口 | 通过条件 |
-|---|---|---|
-| 代码与功能 | `make check test e2e` | 静态检查、Go 竞态、前端单测及实际浏览器操作通过 |
-| 真实进程与恢复 | `make smoke` | 构建产物启动、正常停机、CLI 数据库备份与配套文件恢复通过；计数、凭据、标签、文本与文件哈希保留 |
-| 存储演进与故障 | `internal/store/*_test.go`、`cmd/sani/main_test.go` | 历史 schema 迁移、失败回滚、锁等待、停机超时与刷盘失败有回归验证 |
-| 容量与计数 | `make bench load capacity` | 记录测量环境；负载请求和点击一致，无未解释的性能退化 |
-| 页面可用性 | `pnpm --dir web a11y`、`pnpm --dir docs a11y` | 管理端主要页面及全部文档页面的中英双语、深浅主题 axe 检查通过 |
-| 文档与 SEO | `make docs`、文档输出与发布脚本检查 | 源码与双语说明对齐，页面描述、canonical、语言替代链接及站点地图对应实际页面 |
-| 分发与供应链 | 当前提交的 CI、CodeQL 及 Release 工作流 | 跨平台测试、归档、容器、依赖扫描通过；正式制品另核对版本、校验和与来源证明 |
-
-上述检查完成后，还需在目标部署上按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。v1.0.0 起执行[1.x 兼容承诺](./versioning#stable)；版本发布不替代目标部署的验收。
-
-## v1.0.3 修订版 {#v103-release}
-
-v1.0.3 恢复“缩短”和“分享”按钮上的回车快捷键徽标，取代 v1.0.2 的悬停提示；链接、文本、文件三个创建按钮统一为同一高度、圆角和徽标样式，触屏与窄屏隐藏徽标。原型、双语使用说明与实现同步。数据库 schema 仍为 7，无新增迁移，API 不变，继续履行 1.x 兼容承诺。
-
-变更与升级说明见 [v1.0.3 更新日志](./changelog#v1-0-3)，正式制品见 [v1.0.3 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.3)。
-
-## v1.0.2 修订版 {#v102-release}
-
-v1.0.2 改进管理端的有效期选择与创建按钮：自定义时间在浮层中编辑，新增小时和分钟选择；过期、次数、密码三个浮层的版式和定位保持一致；链接、文本、文件的创建按钮统一尺寸与状态，快捷键改为悬停提示，上传时按钮显示进度百分比。原型、双语使用说明与实现同步。数据库 schema 仍为 7，无新增迁移，API 不变，继续履行 1.x 兼容承诺。
-
-变更与升级说明见 [v1.0.2 更新日志](./changelog#v1-0-2)，正式制品见 [v1.0.2 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.2)。
-
-## v1.0.1 修订版 {#v101-release}
-
-v1.0.1 修复访问密码生成的随机取模偏差，管理端与 R11 原型均使用拒绝采样；字符集、默认 6 位长度与已有密码保持不变。新增生成算法及解锁 Cookie 传输属性的回归测试，并对齐双语文档的稳定版状态与访问密码边界。数据库 schema 仍为 7，无新增迁移，继续履行 1.x 兼容承诺。
-
-变更与升级说明见 [v1.0.1 更新日志](./changelog#v1-0-1)，正式制品见 [v1.0.1 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.1)。
-
-## v1.0.0 稳定版交付 {#v100-release}
-
-v1.0.0 于 2026-10-24 发布，确立 1.x 对已文档化公开契约的兼容承诺。链接、文本和文件均支持访问密码，后台与访客页面采用 R11 视觉规范。数据库迁移至 schema 7；升级前备份，回滚时恢复升级前的完整快照，详见[更新日志](./changelog#v1-0-0)。
-
-正式制品见 [v1.0.0 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.0)。发布提交 `52fbd8a` 的 [CI](https://github.com/DejavuMoe/sani/actions/runs/40078432630)、[CodeQL](https://github.com/DejavuMoe/sani/actions/runs/40078432553) 与[发布流水线](https://github.com/DejavuMoe/sani/actions/runs/40079106305)均已通过。以下版本章节保留历史交付与验收记录，其中的 schema 和界面规则对应各自版本。
-
-## v0.9.7 缺陷修复回归 {#v097-fixes}
-
-v0.9.7 修复 23 项已复现问题，涵盖草稿与选择保护、搜索结果一致性、上传重试、精确整数导入、元数据任务取消与竞态、编码协商、公开文本复制，以及设置、健康检查和备份工具。该版本数据库 schema 仍为 6，无新增迁移。
-
-浏览器回归入口为 `web/e2e/audit-regressions.spec.ts`、`web/e2e/ui-regressions.spec.ts`；列表状态与访问上限单测位于 `web/src/lib/links.test.ts`、`web/src/lib/max-clicks.test.ts`。Go 回归分布在 `cmd/sani`、`internal/config`、`internal/meta`、`internal/store` 与 `internal/server`。`make check test` 还会检查 Compose 美元符号保留和负载脚本的隔离场景；这些隔离测试不代替真实部署或容量验收。
-
-## v0.9.6 后台资源鉴权回归 {#v096-auth}
-
-后台导入示例通过受保护的管理 API 下载，旧静态路径不再提供文件；登录页所需的公开资源与公开分享地址保持原有用途。回归入口：`internal/server/api_auth_boundary_test.go`、`internal/server/api_examples_test.go` 与 `web/e2e/app.spec.ts`，覆盖管理路由匿名访问、会话与令牌失效、GET／HEAD、条件请求、遗留构建文件及实际下载。数据库 schema 仍为 6，无新增迁移。
-
-## v0.9.5 紧凑界面与 API 升级验收入口 {#r10-acceptance}
-
-已实施批准的 R10，取代 R9 的控件尺寸规则。桌面按钮、字段、菜单项分别使用 28、32、36px 基准；窄屏与触屏按钮、字段采用 36、40px，菜单项为 44px，并保留扩展的点击区域。数字与单位输入复用 `UnitInput`，常规字重、起始侧对齐，窄屏可见输入高度为 36px。长文案可增高，忙碌按钮保留宽度，分段选项支持 Home/End，Svelte 过渡尊重减少动态效果偏好。
-
-交互与尺寸回归：`web/e2e/r7.spec.ts`、`web/e2e/metadata.spec.ts`；实际界面、文案与验证记录：`designs/sani/implementation-r10/`。文档和 README 首页使用最新英文界面截图；使用指南保留中英文、明暗主题截图。
-
-API 契约与迁移入口：`make contract`、`OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`、`scripts/test-docker-storage.sh`。本地使用已校验的 v0.9.4 发布二进制完成升级与完整快照回滚，WSL Docker 验证非 root 存储、只读数据库和真实磁盘写满。Docker Desktop 会创建缺失的绑定目录，该拒绝场景由原生 Linux CI 覆盖。真机、Firefox/WebKit 与生产部署仍需独立验收。
-
-## v0.9.4 管理与视觉一致性验收入口 {#r9-acceptance}
-
-已实施批准的 R7、R9。标签搜索／范围筛选按外框同高，工具栏、表单和菜单采用共享尺寸；窄屏或触屏控件为 44px。分类、分享地址、访问统计和关于信息字体统一。R9 的尺寸规则取代 R6 的窄屏紧凑规则。
-
-标签原子删除与内容保留：`internal/store/tags_test.go`、`internal/server/tags_test.go`；草稿保护、筛选刷新、错误重试和成组控件尺寸：`web/e2e/r7.spec.ts`；响应式边界、中英文、明暗、鼠标与模拟触屏：`web/e2e/metadata.spec.ts`。实际截图与文案证据：`designs/sani/implementation-r9/`。真机与 Firefox/WebKit 未验收。
-
-## v0.9.3 短码与界面修复验收入口 {#r6-acceptance}
-
-已实施批准的 R6，原型与产品同步修复。以下回归覆盖独立短码配置、稳定预览和响应式控件；触屏检查使用浏览器模拟，尚不代表 iOS/Android 真机及 Firefox/WebKit 验收。
-
-| 能力 | 验收入口 |
-|---|---|
-| 三类长度、3–32 边界、环境锁定、旧设置初始化与重启持久化 | `internal/config/slug_lengths_test.go`、`internal/server/slug_lengths_test.go`、`cmd/sani/slug_lengths_test.go` |
-| 实际生成、统计刷新保留正文与滚动位置、失败重试及编辑后刷新 | `web/e2e/r6.spec.ts` |
-| 721/720、641/640、502/390/320px 控件尺寸，中英文、明暗、鼠标/触屏、展开状态与无障碍 | `web/e2e/metadata.spec.ts` |
-
-## v0.5.0 标签管理验收入口 {#tags-acceptance}
-
-| 能力 | 验收入口 |
-|---|---|
-| schema 4 迁移、关联事务、备份恢复与筛选分页 | `internal/store/tags_test.go` |
-| 鉴权、文件上传清理、跨实例标签导入导出 | `internal/server/tags_test.go` |
-| 创建与编辑、筛选、失败重试、移动端弹层、迟到响应保护 | `web/e2e/app.spec.ts` |
-
-## v0.4.0 关键实施与验收入口 {#acceptance}
-
-以下五批次特性均已纳入 v0.4.0 并落地，验收入口如下；远端流水线状态可查阅 [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) 与 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml)。
-
-| 实施批次 | 交付内容 | 验收入口 |
-|---|---|---|
-| 1 · 计数正确性 | Range 与条件响应、共享额度、不可复用 ID、刷盘一致性 | `counting_test.go`、表结构迁移与并发测试 |
-| 2 · 备份与文档 | 配套停机备份、恢复与哈希校验、统计和持久性口径、统一版本 | `TestStoppedBackup`、文档语义自动化核对 |
-| 3 · 故障恢复 | 重试来源上限、外部锁等待上限 1 秒、停机与最终刷盘失败 | Go 竞态测试、锁与停机回归测试 |
-| 4 · 容量与自动检查 | 三档容量数据、列表查询精简、依赖审计、CI 容量检查 | `make capacity`、`make bench load`、依赖审计 |
-| 5 · 文档与兼容收尾 | 双语更新日志与升级步骤、1.0 验收边界、文档构建和无障碍 | `make check test e2e docs`、axe 全站无障碍核验 |
+部署后请按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。v1.0.0 起执行[1.x 兼容承诺](./versioning#stable)。
 
 ## 构建期一致性校验 {#checks}
 
-每次编译文档站点前，脚本会核对已纳入规则的配置、接口、错误码及参数；这些检查发现偏差时会阻断构建。研发状态、规划及其他说明文字仍需人工核对，检查通过不代表所有文案都已与当前版本对齐。
+每次编译文档站点前，脚本会核对已纳入规则的配置、接口、错误码及参数；发现偏差时会阻断构建。其余说明文字仍需人工核对。
 
 <SyncStatus part="checks" />
 
@@ -139,7 +49,7 @@ API 契约与迁移入口：`make contract`、`OLD_BIN=/absolute/path/to/old-san
 ## 后续演进规划 {#next}
 
 1. **收集社区反馈**：Sani 已完成核心能力建设，后续重点进行稳定维护与体验打磨。欢迎在 [GitHub Issues](https://github.com/DejavuMoe/sani/issues) 提交建议。
-2. **维护 1.x 兼容性**：后续发布保持已文档化的 HTTP API、环境变量与升级契约兼容；数据库内部表结构可通过迁移演进。每次发布继续执行兼容检查与备份恢复验证；不兼容变更按[版本与兼容](./versioning)安排主版本升级。
+2. **维护 1.x 兼容性**：后续发布保持已文档化的 HTTP API、环境变量与升级契约兼容；数据库内部表结构可通过迁移演进。不兼容变更按[版本与兼容](./versioning)安排主版本升级。
 
 待评估功能（视复杂度而定）：
 

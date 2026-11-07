@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestRegressionBUG02DocumentedBackupDereferencesStateRoot(t *testing.T) {
+func TestDocumentedBackupDereferencesStateRoot(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("the systemd backup command requires Linux cp; run through the Linux runner")
 	}
@@ -70,7 +70,7 @@ func TestRegressionBUG02DocumentedBackupDereferencesStateRoot(t *testing.T) {
 					}
 					info, err := os.Lstat(backup)
 					if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
-						t.Fatalf("BUG-02: backup must be an independent real directory: %v, %v", info, err)
+						t.Fatalf("backup must be an independent real directory: %v, %v", info, err)
 					}
 					if err := os.RemoveAll(private); err != nil {
 						t.Fatal(err)

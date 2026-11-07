@@ -608,7 +608,7 @@ test('custom tag colors validate, edit existing references and keep Enter inside
   const panel = page.getByRole('tabpanel', { name: 'Links', exact: true });
   await panel.getByRole('button', { name: 'Choose or create tags' }).click();
   const pop = page.locator('.tag-pop:popover-open');
-  await pop.getByLabel('Search or create a tag').fill('Custom R3');
+  await pop.getByLabel('Search or create a tag').fill('Custom tag');
   const color = pop.getByLabel('Custom color', { exact: true });
   await color.fill('rgb(300, 0, 0)');
   await expect(color).toHaveAttribute('aria-invalid', 'true');
@@ -619,7 +619,7 @@ test('custom tag colors validate, edit existing references and keep Enter inside
   await pop.locator('.tag-create').click();
   await pop.getByRole('button', { name: 'Manage tags', exact: true }).click();
   const manager = page.getByRole('dialog', {name:'Manage tags',exact:true});
-  await manager.getByRole('button',{name:'Edit tag Custom R3'}).click();
+  await manager.getByRole('button',{name:'Edit tag Custom tag'}).click();
   const edit = page.getByRole('dialog',{name:'Edit tag',exact:true});
   await edit.getByLabel('Name', { exact: true }).fill('Custom renamed');
   await edit.getByLabel('Custom color', { exact: true }).fill('hsl(120, 20%, 40%)');
@@ -641,7 +641,7 @@ test('creation defaults persist and environment metadata stays locked', async ()
   await expect(page.getByLabel('Links', { exact: true })).toHaveValue('7');
   await expect(page.getByLabel('Maximum file size', { exact: true })).toHaveValue('200');
   await expect(page.locator('#metadata-enabled')).toBeDisabled();
-  const created = await page.request.post('/api/admin/v1/links', {data:{url:'https://example.com/r3-settings'}});
+  const created = await page.request.post('/api/admin/v1/links', {data:{url:'https://example.com/settings-defaults'}});
   expect((await created.json()).slug).toHaveLength(7);
 });
 
@@ -688,7 +688,7 @@ test('large file retries the failed chunk without resending confirmed bytes', as
     return route.continue();
   });
   try {
-    await panel.locator('input[type=file]').setInputFiles({name:'large-r3.bin',mimeType:'application/octet-stream',buffer:bytes});
+    await panel.locator('input[type=file]').setInputFiles({name:'large-upload.bin',mimeType:'application/octet-stream',buffer:bytes});
     await panel.getByRole('button', {name:'Share',exact:true}).click();
     await expect(panel.getByRole('button', {name:'Retry upload'})).toBeVisible();
     const completed = page.waitForResponse(r => r.url().endsWith('/complete') && r.request().method() === 'POST');
@@ -697,7 +697,7 @@ test('large file retries the failed chunk without resending confirmed bytes', as
     expect(offsets).toEqual([0,25_000_000,25_000_000]);
     const link = await (await completed).json();
     expect(link).toBeTruthy();
-    const file = await page.request.get(`http://localhost:${new URL(page.url()).port}/${link.slug}/large-r3.bin`, {headers:{'User-Agent':'Mozilla/5.0'}});
+    const file = await page.request.get(`http://localhost:${new URL(page.url()).port}/${link.slug}/large-upload.bin`, {headers:{'User-Agent':'Mozilla/5.0'}});
     expect(file.status()).toBe(200);
     const downloaded = await file.body();
     expect(downloaded.length).toBe(bytes.length);

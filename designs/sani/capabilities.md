@@ -43,7 +43,7 @@ no plans, no design rationale. Paths are relative to the repository root.
 | Flow | Ready | Loading | Empty | Error | Disabled | Permission/offline | Progress/cancel/retry | Platform |
 |---|---|---|---|---|---|---|---|---|
 | Session | dashboard | blank until `/api/session` answers (not modeled) | — | wrong password (`auth.wrong`); rate limited with a wait (`auth.rateLimited`); setup code wrong; passwords short or mismatched | — | session expired → login with `auth.expired`; server down → offline + retry | — | — |
-| Link list | rows | ghost rows; stale (dimmed) while reloading | first run (`list.emptyTitle`); no search results; no items of a kind | load failed + retry | — | — | more pages load at the end of the list (`ll-sentinel`) | phone layout under 640px drops columns |
+| Link list | rows | ghost rows with the real header and the rows' geometry, shown only when the first page is slow; stale (dimmed) while reloading | first run (`list.emptyTitle`); no search results; no items of a kind | load failed + retry | — | — | more pages load at the end of the list (`ll-sentinel`) | phone layout under 640px drops columns |
 | Composer (link) | idle | submit busy | — | field errors from the API (`err.url_*`, `err.slug_*`, `err.expires_*`) | submit disabled while empty | — | — | paste anywhere fills it (`composer.pasted`) |
 | Composer (text) | idle | busy | — | `err.text_required`, `err.text_too_large` | — | — | — | `Ctrl/⌘ ↵` submits |
 | Composer (file) | drop zone | — | — | `err.file_too_large`, `err.upload_invalid` | turned off when `filesUrl` is null (`share.fileDisabled`) | — | upload progress, cancel (`share.uploading`, `share.canceled`) | drag and drop anywhere on the page |

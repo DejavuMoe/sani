@@ -7,7 +7,6 @@
   },
   "content": {
     "defaultProfile": "operational-strict",
-    "inventory": "review-r10/content-inventory.json",
     "approvedCopySources": [
       "web/src/lib/i18n.svelte.ts",
       "internal/server/web.go#pageCopy",
@@ -383,13 +382,9 @@
       "id": "link-tags",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r2.html",
-        "assetPath": "prototype-r2.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "src/r2/tags.jsx",
-          "src/r2/tags.css",
-          "src/r2/store.jsx",
-          "src/r2/patterns.jsx",
           "src/r2/scenes.jsx"
         ],
         "states": [
@@ -465,19 +460,12 @@
       "id": "admin-refinements-r3",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r3.html",
-        "assetPath": "prototype-r3.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "src/r3/app.jsx",
           "src/r3/colors.js",
           "src/r3/overrides.js",
-          "src/r3/patterns.jsx",
-          "src/r3/refinements.css",
-          "src/r3/scenes.jsx",
-          "src/r3/screens.jsx",
-          "src/r3/settings.jsx",
-          "src/r3/store.jsx",
-          "src/r3/tags.jsx"
+          "src/r3/scenes.jsx"
         ],
         "states": [
           "colors-create-edit-invalid",
@@ -551,79 +539,14 @@
       "notes": "Implemented from approved R3 design commit 81e5609929cc8f9674b20c89cce64e5d438f5c8f for v0.9.0. Local check/test/e2e/smoke/docs/bench passed; 27 Chromium flows include 26 MB chunk retry and 1280/390/320 horizontal geometry. Real HTTP/HTTPS/SOCKS5 fixtures cover authentication, Host/SNI, NO_PROXY, mixed DNS and rebinding. Original private Shlink CSV verified only in a temporary database: 82 links, 10 tags, 38234 clicks, repeat import 0. Bilingual light/dark axe checks cover desktop and narrow tag create/edit and settings. Cloudflare live transfer and VPS upgrade require instance validation; not performed here."
     },
     {
-      "id": "r4-metadata-controls",
-      "contentProfile": "operational-strict",
-      "prototype": {
-        "entry": "prototype-r4.html",
-        "assetPath": "prototype-r4.html",
-        "files": [
-          "src/r4/settings.jsx",
-          "src/r4/controls.jsx",
-          "src/r4/controls.css",
-          "src/r4/scenes.jsx",
-          "src/r4/app.jsx"
-        ],
-        "states": [
-          "relay",
-          "http-https",
-          "socks5",
-          "direct",
-          "off",
-          "credentials-empty-saved-replace-remove",
-          "invalid",
-          "testing-success-failure-retry",
-          "environment-locked",
-          "menu-keyboard",
-          "color-rgb-hex-hsl",
-          "calendar",
-          "zh-en-light-dark-1280-390-320"
-        ],
-        "stableIds": [
-          "r4-meta"
-        ]
-      },
-      "production": {
-        "routeOrWindow": "/admin/settings, /admin/",
-        "files": [
-          "web/src/views/Settings.svelte",
-          "web/src/components/Menu.svelte",
-          "web/src/components/Segmented.svelte",
-          "web/src/components/ColorEditor.svelte",
-          "web/src/components/ExpiryPicker.svelte",
-          "web/src/lib/i18n.svelte.ts",
-          "web/src/lib/api.ts",
-          "internal/server/settings.go",
-          "internal/meta/proxy.go",
-          "internal/meta/meta.go"
-        ],
-        "interfaces": [
-          "GET /api/config",
-          "PATCH /api/config",
-          "metadata connection test API (proposed; exact route decided after approval)"
-        ],
-        "tests": [
-          "web/e2e/app.spec.ts",
-          "web/scripts/a11y.mjs",
-          "internal/server/r3_test.go",
-          "internal/meta/proxy_test.go"
-        ]
-      },
-      "status": "prototype",
-      "notes": "Historical R4, changes requested by user: misaligned controls, redundant connection selector/card, unwanted Jina integration. Superseded by R5. See _d_meta.json for review status; do not implement R4."
-    },
-    {
       "id": "r5-compact-settings",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r5.html",
-        "assetPath": "prototype-r5.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
           "src/r5/settings.jsx",
-          "src/r5/settings.css",
-          "src/r5/controls.css",
-          "src/r5/scenes.jsx",
-          "src/r5/app.jsx",
-          "src/r4/controls.jsx"
+          "src/r5/scenes.jsx"
         ],
         "states": [
           "http-https",
@@ -674,7 +597,7 @@
           "web/scripts/a11y.mjs",
           "internal/server/r3_test.go",
           "internal/meta/proxy_test.go",
-          "web/e2e/metadata.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
           "web/src/lib/i18n.test.ts",
           "internal/server/metadata_settings_test.go"
         ]
@@ -686,16 +609,10 @@
       "id": "r6-independent-lengths-and-preview",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r6.html",
-        "assetPath": "prototype-r6.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "src/r6/settings.jsx",
-          "src/r6/refinements.css",
-          "src/r6/responsive.css",
-          "src/r6/detail.jsx",
-          "src/r6/store.jsx",
-          "src/r6/scenes.jsx",
-          "src/r6/app.jsx"
+          "src/r6/scenes.jsx"
         ],
         "states": [
           "independent-url-text-file-lengths",
@@ -755,34 +672,26 @@
           "web/e2e/app.spec.ts",
           "internal/server/r3_test.go",
           "internal/server/share_test.go",
-          "web/e2e/r6.spec.ts",
-          "web/e2e/metadata.spec.ts",
+          "web/e2e/settings-defaults.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
           "cmd/sani/slug_lengths_test.go",
           "internal/config/slug_lengths_test.go",
           "internal/server/slug_lengths_test.go"
         ]
       },
       "status": "implemented",
-      "notes": "Approved R6 implemented with user-authorized responsive sizing corrections: independent lengths, legacy migration and stable previews; width-independent controls, consistent create/edit typography and separate touch input sizing. WSL make check test e2e passed (69 Chromium tests); docs build passed. Prototype verified across 28 language/theme/width combinations. See r6-handoff.md."
+      "notes": "Approved R6 implemented with user-authorized responsive sizing corrections: independent lengths, legacy migration and stable previews; width-independent controls, consistent create/edit typography and separate touch input sizing. WSL make check test e2e passed (69 Chromium tests); docs build passed. Prototype verified across 28 language/theme/width combinations."
     },
     {
       "id": "admin-r7",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r7.html",
-        "assetPath": "prototype-r7.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "src/r7/app.jsx",
           "src/r7/copy.js",
-          "src/r7/detail.jsx",
-          "src/r7/management.jsx",
-          "src/r7/patterns.jsx",
-          "src/r7/refinements.css",
           "src/r7/scenes.jsx",
-          "src/r7/screens.jsx",
-          "src/r7/states.jsx",
-          "src/r7/store.jsx",
-          "src/r7/tags.jsx"
+          "src/r7/store.jsx"
         ],
         "states": [
           "tag-manager",
@@ -849,26 +758,22 @@
           "web/e2e/app.spec.ts",
           "web/src/lib/tags.test.ts",
           "web/src/lib/links.test.ts",
-          "web/e2e/r7.spec.ts",
+          "web/e2e/admin-behavior.spec.ts",
           "internal/store/tags_test.go",
           "internal/server/tags_test.go"
         ]
       },
       "status": "implemented",
-      "notes": "Approved design 2cce5c1 implemented in Svelte/Go. WSL make check test e2e passed: 57 Vitest and 79 Chromium cases. Final R7 visual/content captures passed after dialog spacing alignment; docs build and SEO passed. Evidence and limits: r7-handoff.md, implementation-r7/."
+      "notes": "Approved design 2cce5c1 implemented in Svelte/Go. WSL make check test e2e passed: 57 Vitest and 79 Chromium cases. Final R7 visual/content captures passed after dialog spacing alignment; docs build and SEO passed."
     },
     {
       "id": "r8-consistency",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r8.html",
-        "assetPath": "prototype-r8.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "src/r8/app.jsx",
           "src/r8/copy.js",
-          "src/r8/defaults.jsx",
-          "src/r8/management.jsx",
-          "src/r8/refinements.css",
           "src/r8/scenes.jsx",
           "src/r8/tags.jsx"
         ],
@@ -915,22 +820,19 @@
         ],
         "tests": [
           "web/e2e/app.spec.ts",
-          "web/e2e/r7.spec.ts"
+          "web/e2e/admin-behavior.spec.ts"
         ]
       },
       "status": "needs-review",
-      "notes": "R8 changes action styling, vocabulary and technical-value typography only. See r8-handoff.md for evidence, preserved semantics and verification boundaries. Superseded by R9 after height feedback; changes-requested asset status is recorded in _d_meta.json."
+      "notes": "R8 changes action styling, vocabulary and technical-value typography only. Superseded by R9 after height feedback; changes-requested asset status is recorded in _d_meta.json."
     },
     {
       "id": "r9-control-geometry",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r9.html",
-        "assetPath": "prototype-r9.html",
-        "files": [
-          "src/r9/controls.css",
-          "src/r9/app.jsx"
-        ],
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
+        "files": [],
         "states": [
           "grouped-control-alignment",
           "tag-manager-filter",
@@ -986,32 +888,29 @@
         ],
         "tests": [
           "web/e2e/app.spec.ts",
-          "web/e2e/r7.spec.ts",
-          "web/e2e/metadata.spec.ts",
-          "web/e2e/r6.spec.ts",
+          "web/e2e/admin-behavior.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
+          "web/e2e/settings-defaults.spec.ts",
           "web/src/lib/i18n.test.ts",
           "web/scripts/a11y.mjs"
         ]
       },
       "status": "implemented",
-      "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. See r9-handoff.md. Implemented after approval 5958500; see r9-handoff.md and implementation-r9/ for measured production evidence."
+      "notes": "R9 inherits R8 copy and behavior; shared outer sizing and group alignment. Implemented after approval 5958500;"
     },
     {
       "id": "r10-shared-controls",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r10.html",
-        "assetPath": "prototype-r10.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
           "src/r10/app.css",
-          "src/r10/app.jsx",
           "src/r10/components.jsx",
           "src/r10/controls.css",
           "src/r10/copy.js",
           "src/r10/data.jsx",
-          "src/r10/defaults.jsx",
-          "src/r10/screens.jsx",
-          "src/r10/states.jsx"
+          "src/r10/defaults.jsx"
         ],
         "states": [
           "defaults-ready-invalid-saving-error-retry-saved-locked",
@@ -1056,33 +955,30 @@
           "Existing Sani admin API; no backend contract change proposed"
         ],
         "tests": [
-          "web/e2e/r7.spec.ts",
-          "web/e2e/r6.spec.ts",
-          "web/e2e/metadata.spec.ts",
+          "web/e2e/admin-behavior.spec.ts",
+          "web/e2e/settings-defaults.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
           "web/e2e/app.spec.ts",
           "web/scripts/a11y.mjs"
         ]
       },
       "status": "implemented",
-      "notes": "Approved in ead108e; Svelte implementation and verification recorded in implementation-r10/verification.json and r10-handoff.md."
+      "notes": "Approved in ead108e;"
     },
     {
       "id": "r11-access-and-visual",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-r11.html",
-        "assetPath": "prototype-r11.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
-          "prototype-r11.html",
           "src/r11/app.css",
           "src/r11/theme.css",
           "src/r11/access.css",
-          "src/r11/access.jsx",
           "src/r11/patterns.jsx",
           "src/r11/detail.jsx",
           "src/r11/states.jsx",
           "src/r11/screens.jsx",
-          "src/r11/controls.jsx",
           "src/r11/tags.jsx",
           "src/r11/management.jsx",
           "src/r11/copy.js",
@@ -1157,7 +1053,7 @@
         ]
       },
       "status": "implemented",
-      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages. Content inventory: review-r11/content-inventory.json. Evidence: review-r11/verification.json, r11-handoff.md. Production evidence: implementation-r11/verification.json (40 rendered states, 0 failures) and implementation-r11/content-inventory.json (501 strings)."
+      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented.5px shadow hairlines, 12/13/16/20 type steps and 250ms ease-out motion across the admin app and visitor pages."
     },
     {
       "id": "r11-visitor-pages",
@@ -1213,14 +1109,14 @@
         ]
       },
       "status": "implemented",
-      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented. See r11-handoff.md."
+      "notes": "R11 approved 2026-10-24 in 5cad78e/bf8600a and implemented."
     },
     {
       "id": "custom-expiry-popover",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-expiry.html",
-        "assetPath": "prototype-expiry.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
           "src/time/controls.jsx",
           "src/time/time.css",
@@ -1255,19 +1151,19 @@
           "Expiry binding; apply local date/time; no API changes"
         ],
         "tests": [
-          "web/e2e/metadata.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
           "web/e2e/access.spec.ts"
         ]
       },
       "status": "needs-review",
-      "notes": "Popover must not change composer height. Opening edits a draft; Apply commits and closes. Cancel, Escape and outside click discard the draft. Show committed expiry in the trigger. Existing preset selection remains. Content: review-expiry/content-inventory.json. QA: tools/expiry-check.mjs and review-expiry/results.json."
+      "notes": "Popover must not change composer height. Opening edits a draft; Apply commits and closes. Cancel, Escape and outside click discard the draft. Show committed expiry in the trigger. Existing preset selection remains."
     },
     {
       "id": "unified-creation-actions",
       "contentProfile": "operational-strict",
       "prototype": {
-        "entry": "prototype-actions.html",
-        "assetPath": "prototype-actions.html",
+        "entry": "prototype-time.html",
+        "assetPath": "prototype-time.html",
         "files": [
           "src/time/controls.jsx",
           "src/time/time.css",
@@ -1304,11 +1200,11 @@
         ],
         "tests": [
           "web/e2e/app.spec.ts",
-          "web/e2e/ui-regressions.spec.ts"
+          "web/e2e/session-and-limits.spec.ts"
         ]
       },
       "status": "needs-review",
-      "notes": "Extends the pending expiry preview. All three creation actions share 88px minimum width, existing 32px desktop/40px mobile field height, 8px radius, 13px semibold text, solid primary tokens and disabled/busy states. Embedded shortcut badges are hidden; existing keyboard submission and help remain. CSS-only design revision; labels and layouts remain task-specific. QA: tools/actions-check.mjs; review-actions/results.json."
+      "notes": "Extends the pending expiry preview. All three creation actions share 88px minimum width, existing 32px desktop/40px mobile field height, 8px radius, 13px semibold text, solid primary tokens and disabled/busy states. Embedded shortcut badges are hidden; existing keyboard submission and help remain. CSS-only design revision; labels and layouts remain task-specific."
     },
     {
       "id": "custom-time-selection",
@@ -1361,14 +1257,14 @@
         ],
         "tests": [
           "web/e2e/expiry.spec.ts",
-          "web/e2e/metadata.spec.ts",
-          "web/e2e/r7.spec.ts",
+          "web/e2e/settings-controls.spec.ts",
+          "web/e2e/admin-behavior.spec.ts",
           "web/e2e/access.spec.ts",
           "web/e2e/app.spec.ts"
         ]
       },
       "status": "implemented",
-      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; review-time/results.json and content-inventory.json. Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; see time-handoff.md. Implemented in Svelte on 2026-11-01. Evidence: implementation-time/verification.json, content-inventory.json and screenshots. Final full E2E run: 192 passed. Consistency revision 2026-11-02 (user-requested review; prototype and production aligned): the custom expiry popover reuses AccessPopover (8px insets, hairline footer with 4px gaps, end-aligned and flipped like the limit/password popovers); time menu selection is the check alone and Done is a plain menu item after a separator; the time menu uses a line-3 edge in dark; creation actions keep Button's disabled/busy/focus states, use 6px concentric corners, and the link action is 40px in its 52px row; shortcuts show as tooltips ('Shorten (↵)', 'Share (Ctrl/⌘ ↵)') with a fine pointer instead of key badges; a file upload's busy action shows its percentage instead of a spinner. QA: tools/time-check.mjs and tools/actions-check.mjs; review-unify/ results and screenshots. Badge revision 2026-11-02 (user request after v1.0.2): Enter key badges return on the link (↵ icon) and text (Ctrl/⌘ + ↵ icon) actions, 20px high and 6px from the button end, hidden on touch and narrow screens; tooltips removed; all three actions are 32px (40px on touch/narrow) with the 8px Button corner, the link row keeping a 10px inset. Evidence: review-badges/."
+      "notes": "Preserves the pending expiry popover and unified creation actions. Time input has a clock trigger opening the existing custom Menu with Hours (00-23) and Minutes (00-59). Selecting updates only the local draft. Done/Escape close only the inner menu; outer Apply commits. Arrow keys move within/across columns; Home/End reach boundaries. Both selected values scroll into view on open. New zh/en copy: Choose time, Hours, Minutes, Done. QA: tools/time-check.mjs; Approved final surface includes and supersedes custom-expiry-popover and unified-creation-actions; Implemented in Svelte on 2026-11-01. Final full E2E run: 192 passed. Consistency revision 2026-11-02 (user-requested review; prototype and production aligned): the custom expiry popover reuses AccessPopover (8px insets, hairline footer with 4px gaps, end-aligned and flipped like the limit/password popovers); time menu selection is the check alone and Done is a plain menu item after a separator; the time menu uses a line-3 edge in dark; creation actions keep Button's disabled/busy/focus states, use 6px concentric corners, and the link action is 40px in its 52px row; shortcuts show as tooltips ('Shorten (↵)', 'Share (Ctrl/⌘ ↵)') with a fine pointer instead of key badges; a file upload's busy action shows its percentage instead of a spinner. Badge revision 2026-11-02 (user request after v1.0.2): Enter key badges return on the link (↵ icon) and text (Ctrl/⌘ + ↵ icon) actions, 20px high and 6px from the button end, hidden on touch and narrow screens; tooltips removed; all three actions are 32px (40px on touch/narrow) with the 8px Button corner, the link row keeping a 10px inset."
     }
   ]
 }

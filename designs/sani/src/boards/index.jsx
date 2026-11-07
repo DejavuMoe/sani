@@ -76,7 +76,7 @@ function Index() {
           <code>src/revisions.js</code>
         </div>
         <div className="bd-cards">
-          <a className="bd-card" href={`prototype-r2.html${keep}&scene=tags-create`}>
+          <a className="bd-card" href={`prototype-time.html${keep}&scene=tags-create`}>
             <span className="tag">R2 · needs-review</span>
             <h3>Link tags</h3>
             <p>Create, assign and filter tags. Desktop columns and mobile cards.</p>

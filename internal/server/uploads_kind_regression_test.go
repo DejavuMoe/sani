@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestBUG20UploadRejectsIncompatibleFieldsBeforeReservation(t *testing.T) {
+func TestUploadRejectsIncompatibleFieldsBeforeReservation(t *testing.T) {
 	for _, field := range []string{`"text":"copy-fixture"`, `"format":"code"`, `"url":"https://example.invalid/path"`, `"redirect":301`} {
 		t.Run(field, func(t *testing.T) {
 			e := newShareEnv(t, Options{})
@@ -46,7 +46,7 @@ func TestBUG20UploadRejectsIncompatibleFieldsBeforeReservation(t *testing.T) {
 	})
 }
 
-func TestBUG20UploadCompletionRechecksKind(t *testing.T) {
+func TestUploadCompletionRechecksKind(t *testing.T) {
 	e := newShareEnv(t, Options{})
 	r := e.req("POST", "/api/admin/v1/uploads", `{"name":"fixture.bin","size":1}`)
 	if r.status != http.StatusCreated {

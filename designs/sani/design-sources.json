@@ -263,7 +263,7 @@
     {
       "id": "r3-requirements",
       "type": "copy-brief",
-      "location": "2026-10-08 user request; r3-handoff.md",
+      "location": "2026-10-08 user request",
       "roles": [
         "interaction-reference"
       ],

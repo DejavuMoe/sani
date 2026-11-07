@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const script = fileURLToPath(new URL('./load.sh', import.meta.url));
 
 for (const mode of ['occupied-port', 'child-exit', 'readiness-timeout', 'foreign-ready-after-launch', 'owned-ready']) {
-  test(`BUG-12 load helper handles ${mode}`, { skip: process.platform !== 'linux' }, () => {
+  test(`load helper handles ${mode}`, { skip: process.platform !== 'linux' }, () => {
     const dir = mkdtempSync(join(tmpdir(), 'sani-load-regression-'));
     const tools = join(dir, 'tools');
     mkdirSync(tools);

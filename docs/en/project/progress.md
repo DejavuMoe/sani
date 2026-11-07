@@ -4,7 +4,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 # Status
 
-<p class="lead">The latest release is {{ status.latestVersion }}. Sani is now maintained as a stable 1.x series. This page records delivered capabilities, acceptance checks and future plans; see the <a href="./changelog">changelog</a> for individual releases.</p>
+<p class="lead">The latest release is {{ status.latestVersion }}. Sani is now maintained as a stable 1.x series. This page describes what it does today, what it is meant for and what comes next; see the <a href="./changelog">changelog</a> for individual releases.</p>
 
 ## Where things stand {#current}
 
@@ -21,108 +21,18 @@ import { data as status } from '../../.vitepress/data/status.data'
 | Operations | <span class="sn-status done">Done</span> | Online database snapshots, stopped-service database and file backups, password reset, health checks |
 | Documentation | <span class="sn-status done">Done</span> | English and Chinese, with build-time source checks for covered configuration, API and other rules |
 | Releases | <span class="sn-status done">Done</span> | A tag publishes everything: multi-platform images on GHCR, binaries for Linux, macOS, Windows and FreeBSD, with checksums and build provenance |
-| Continuous integration | <span class="sn-status done">Done</span> | Go tests on Linux, macOS and Windows, cross-compilation for every release target, E2E, axe and known-vulnerability scans; results belong to the specific commit |
+| Continuous integration | <span class="sn-status done">Done</span> | Go tests on Linux, macOS and Windows, cross-compilation for every release target, E2E, axe and known-vulnerability scans |
 | Hosted docs | <span class="sn-status done">Done</span> | Chinese and English documentation is live at [sani.zsh.moe](https://sani.zsh.moe) |
 
-## Production acceptance scope {#production}
+## Intended use {#production}
 
 Sani is intended for **one administrator, one server process and a local persistent data directory**. A reverse proxy provides HTTPS, and file sharing uses a separate hostname. The operator owns backups, disk capacity, log monitoring and upgrade recovery. Multiple processes sharing a database do not synchronize their in-memory caches or visit allowances, so replicas are not a supported high-availability setup. A share URL is not visitor authentication, and click statistics do not promise zero loss after a power failure.
 
-Run the following checks for each release candidate commit. A previous release's green checks do not validate a new candidate.
-
-| Layer | Entry point | Acceptance condition |
-|---|---|---|
-| Code and features | `make check test e2e` | Static checks, Go race tests, frontend unit tests and real browser interactions pass |
-| Process and recovery | `make smoke` | The built binary starts and stops cleanly; CLI database backup and paired file restore preserve counts, credentials, tags, texts and file hashes |
-| Storage and failure handling | `internal/store/*_test.go`, `cmd/sani/main_test.go` | Regressions cover historical schema migration, rollback, lock waits, shutdown deadlines and failed flushes |
-| Capacity and counting | `make bench load capacity` | Record the environment; request counts agree with clicks, with no unexplained performance regression |
-| Accessibility | `pnpm --dir web a11y`, `pnpm --dir docs a11y` | Main admin screens and every documentation page pass axe in both languages and themes |
-| Documentation and SEO | `make docs`, docs output and publishing checks | Bilingual descriptions match the code; page summaries, canonical URLs, language alternates and sitemap match the actual pages |
-| Distribution and supply chain | CI, CodeQL and Release workflows for the candidate | Platform tests, archives, containers and dependency scans pass; verify the version, checksums and provenance of published artifacts separately |
-
-Before accepting a target deployment, also verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0; publishing a release does not replace acceptance of a target deployment.
-
-## v1.0.3 patch release {#v103-release}
-
-v1.0.3 restores the Enter key badges on the Shorten and Share buttons in place of the v1.0.2 tooltips. The link, text and file creation buttons share one height, corner and badge style, with badges hidden on touch and narrow screens. The prototype and both usage guides match the implementation. Database schema remains 7 with no new migration and no API change, under the existing 1.x compatibility promises.
-
-See the [v1.0.3 changelog](./changelog#v1-0-3) for changes and upgrade guidance, and the [v1.0.3 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.3) for published artifacts.
-
-## v1.0.2 patch release {#v102-release}
-
-v1.0.2 improves expiry selection and the creation buttons in the admin app. Custom times are edited in a popover with an hour and minute chooser; the expiry, visit limit and password popovers share one layout and placement; link, text and file creation buttons share size and states, show their shortcuts as tooltips, and show upload progress. The prototype and both usage guides match the implementation. Database schema remains 7 with no new migration and no API change, under the existing 1.x compatibility promises.
-
-See the [v1.0.2 changelog](./changelog#v1-0-2) for changes and upgrade guidance, and the [v1.0.2 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.2) for published artifacts.
-
-## v1.0.1 patch release {#v101-release}
-
-v1.0.1 fixes modulo bias in generated access passwords using rejection sampling in both the admin app and R11 prototype. The alphabet, default six-character length and existing passwords are unchanged. Regression tests cover generation and unlock-cookie transport attributes, and bilingual documentation now aligns stable-release status and access-password boundaries. Database schema remains 7 with no new migration, under the existing 1.x compatibility promises.
-
-See the [v1.0.1 changelog](./changelog#v1-0-1) for changes and upgrade guidance, and the [v1.0.1 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.1) for published artifacts.
-
-## v1.0.0 stable release {#v100-release}
-
-Released on 2026-10-24, v1.0.0 establishes compatibility promises for documented public contracts throughout 1.x. Links, texts and files support access passwords, and the admin app and visitor pages use the R11 visual rules. The database migrates to schema 7. Back up before upgrading; rollback requires the complete pre-upgrade snapshot. See the [changelog](./changelog#v1-0-0).
-
-Published artifacts are available in the [v1.0.0 Release](https://github.com/DejavuMoe/sani/releases/tag/v1.0.0). [CI](https://github.com/DejavuMoe/sani/actions/runs/40078432630), [CodeQL](https://github.com/DejavuMoe/sani/actions/runs/40078432553) and the [release workflow](https://github.com/DejavuMoe/sani/actions/runs/40079106305) passed for release commit `52fbd8a`. The following version sections retain historical delivery and acceptance records; their schemas and interface rules describe those versions.
-
-## v0.9.7 bug-fix regressions {#v097-fixes}
-
-v0.9.7 fixed 23 reproduced issues covering draft and selection guards, search membership, upload retries, exact integer imports, metadata cancellation and races, encoding negotiation, public text copying, and setup, healthcheck and backup tools. That version kept database schema 6 with no new migration.
-
-Browser regression entry points are `web/e2e/audit-regressions.spec.ts` and `web/e2e/ui-regressions.spec.ts`; list-state and visit-limit unit tests live in `web/src/lib/links.test.ts` and `web/src/lib/max-clicks.test.ts`. Go regressions span `cmd/sani`, `internal/config`, `internal/meta`, `internal/store` and `internal/server`. `make check test` also checks literal dollars in Compose and isolated load-helper scenarios; these isolated tests do not replace deployment or capacity acceptance.
-
-## v0.9.6 admin resource authentication regressions {#v096-auth}
-
-Admin import examples download through the protected management API; old static paths no longer serve files. Public sign-in assets and public share URLs retain their intended roles. Regression entry points: `internal/server/api_auth_boundary_test.go`, `internal/server/api_examples_test.go` and `web/e2e/app.spec.ts`, covering anonymous management requests, expired or revoked credentials, GET/HEAD, conditional requests, stale frontend files and actual downloads. Database schema remains 6 with no new migration.
-
-## v0.9.5 compact interface and API upgrade acceptance {#r10-acceptance}
-
-Approved R10 supersedes R9 control sizing. Desktop buttons, fields and menu items use 28, 32 and 36px baselines. Narrow or touch screens use 36px buttons, 40px fields and 44px menu items, with extended hit areas. Numeric/unit inputs share `UnitInput`, regular weight and start alignment, with a 36px visible input on narrow screens. Long labels can grow, busy buttons retain width, segmented controls support Home/End, and Svelte transitions respect reduced motion.
-
-Interaction and sizing regressions: `web/e2e/r7.spec.ts` and `web/e2e/metadata.spec.ts`. Actual interface, content and verification records: `designs/sani/implementation-r10/`. Documentation and README landing images use the latest English interface; guides retain both languages and themes.
-
-API and migration entry points: `make contract`, `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill` and `scripts/test-docker-storage.sh`. Local checks used the verified published v0.9.4 binary for upgrade and full-snapshot rollback. WSL Docker checks cover non-root storage, read-only databases and real disk exhaustion. Docker Desktop creates missing bind directories; native Linux CI covers their rejection. Physical devices, Firefox/WebKit and production deployments require separate acceptance.
-
-## v0.9.4 management and visual consistency acceptance {#r9-acceptance}
-
-Approved R7 and R9 are implemented. Tag search and scope filters share an outer height; toolbars, fields and menus use shared sizes, with 44px controls on narrow or touch screens. Categories, share URLs, visit statistics and About typography are consistent. R9 sizing supersedes the R6 narrow-screen compact rule.
-
-Atomic tag deletion and retained content: `internal/store/tags_test.go`, `internal/server/tags_test.go`. Draft guards, filtered refresh, retries and grouped dimensions: `web/e2e/r7.spec.ts`. Breakpoints, both languages/themes, mouse and emulated touch: `web/e2e/metadata.spec.ts`. Rendered evidence: `designs/sani/implementation-r9/`. Physical devices and Firefox/WebKit remain unverified.
-
-## v0.9.3 slug and interface fix acceptance {#r6-acceptance}
-
-Approved R6 is implemented, with matching prototype and production fixes. These regressions cover independent slug settings, stable previews and responsive controls. Touch checks use browser emulation; they do not establish acceptance on physical iOS/Android devices or Firefox/WebKit.
-
-| Capability | Acceptance entry point |
-|---|---|
-| Three lengths, 3–32 bounds, environment locks, legacy settings initialization and persistence across restarts | `internal/config/slug_lengths_test.go`, `internal/server/slug_lengths_test.go`, `cmd/sani/slug_lengths_test.go` |
-| Generated lengths, body and scroll retention during statistics refreshes, failure retry and refresh after editing | `web/e2e/r6.spec.ts` |
-| Control sizing at 721/720, 641/640, 502/390/320px; both languages and themes, mouse/touch, expanded controls and accessibility | `web/e2e/metadata.spec.ts` |
-
-## v0.5.0 tag verification {#tags-acceptance}
-
-| Capability | Acceptance entry point |
-|---|---|
-| Schema 4 migration, assignment transactions, backup/restore and filtered pagination | `internal/store/tags_test.go` |
-| Authentication, rejected upload cleanup and cross-instance tag imports/exports | `internal/server/tags_test.go` |
-| Creation and editing, filters, failed-save retry, mobile popovers and delayed-response protection | `web/e2e/app.spec.ts` |
-
-## v0.4.0 implementation and verification {#acceptance}
-
-These five batches are included in v0.4.0. Verification entry points are listed below; remote results are available in [CI](https://github.com/DejavuMoe/sani/actions/workflows/ci.yml) and [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml).
-
-| Batch | Implementation | Acceptance entry point |
-|---|---|---|
-| 1 · Counting | Ranges and conditionals, shared allowances, non-reused IDs, flush consistency | `counting_test.go`, migration and concurrency tests |
-| 2 · Backups and docs | Stopped-service paired backups, restore/hash drill, statistics and durability wording, shared version | `TestStoppedBackup`, semantic docs checks |
-| 3 · Recovery | Bounded retry referrers, one-second external lock waits, shutdown and final-flush failures | Go race tests, lock and shutdown regressions |
-| 4 · Capacity and automation | Three dataset sizes, simpler list counts, dependency audits, CI capacity checks | `make capacity`, `make bench load`, dependency audits |
-| 5 · Docs and compatibility | Bilingual release notes and upgrade steps, 1.0 gates, docs builds and accessibility | `make check test e2e docs`, axe on both sites |
+After deploying, verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0.
 
 ## Build-time checks {#checks}
 
-Before every docs build, scripts compare covered configuration, API, error-code and parameter rules with the source; mismatches in those checks fail the build. Project status, plans and other prose still need manual review. Passing these checks does not establish that every description matches the current release.
+Before every docs build, scripts compare covered configuration, API, error-code and parameter rules with the source; a mismatch fails the build. The rest of the prose is reviewed by hand.
 
 <SyncStatus part="checks" />
 
@@ -139,7 +49,7 @@ Pinned in `mise.toml`, `go.mod` and `pnpm-workspace.yaml`:
 ## Next {#next}
 
 1. **Listening.** Sani is out in public; what comes next is mostly fixes and polish. Problems and questions are welcome on [GitHub](https://github.com/DejavuMoe/sani/issues).
-2. **Maintaining 1.x compatibility.** Preserve documented HTTP API, environment-variable and upgrade contracts in subsequent releases; internal schemas may evolve through migrations. Continue compatibility and backup/restore checks for each release. Schedule incompatible changes for a major release under [Versioning](./versioning).
+2. **Maintaining 1.x compatibility.** Preserve documented HTTP API, environment-variable and upgrade contracts in subsequent releases; internal schemas may evolve through migrations. Schedule incompatible changes for a major release under [Versioning](./versioning).
 
 Under consideration, not decided:
 

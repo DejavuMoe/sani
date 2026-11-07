@@ -1,26 +1,16 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import type { ChildProcess } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { startSani, stopSani } from './fixture';
 
 const base = 'http://127.0.0.1:18776';
 const password = 'local-expiry-fixture';
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 let server: ChildProcess;
 
-test.beforeAll(async () => {
-  const env = { ...process.env };
-  for (const key of Object.keys(env)) if (key.startsWith('SANI_')) delete env[key];
-  server = spawn('../bin/sani', [], {
-    env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-expiry-e2e-')), SANI_LISTEN: '127.0.0.1:18776', SANI_FILES_URL: 'http://localhost:18776', SANI_PASSWORD: password, SANI_FETCH_META: 'false', SANI_LOG_LEVEL: 'error' }, stdio: 'ignore',
-  });
-  await expect.poll(async () => { try { return (await fetch(`${base}/healthz`)).status; } catch { return 0; } }).toBe(200);
-});
-test.afterAll(async () => {
-  if (server?.exitCode === null) await new Promise<void>(resolve => { server.once('exit', () => resolve()); server.kill('SIGTERM'); });
-});
+test.beforeAll(async () => { server = await startSani(base, password); });
+test.afterAll(() => stopSani(server));
 
 async function login(page: Page, lang = 'en', theme = 'light') {
   await page.addInitScript(({ lang, theme }) => { localStorage.setItem('sani.lang', lang); localStorage.setItem('sani.theme', theme); }, { lang, theme });
@@ -73,15 +63,6 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
     await page.screenshot({ path: info.outputPath('time-open.png') });
     await page.evaluate(axe);
     expect(await page.evaluate(async () => (await (window as any).axe.run(document, { resultTypes: ['violations'] })).violations.map((v: any) => ({ id: v.id, nodes: v.nodes.map((n: any) => n.target) })))).toEqual([]);
-    // Captures are synthetic and limited to the changed controls for content review.
-    const collector = readFileSync('../designs/sani/tools/collect-dom-content.js', 'utf8');
-    await page.evaluate(collector);
-    const content = await page.evaluate(() => {
-      const capture = (window as any).__prototypeFirstUICollectDOMContent();
-      capture.items = capture.items.filter((i: any) => /expiry-pop|date-editor|time-entry|time-columns|time-options|time-done|creation-action/.test(i.location));
-      return capture;
-    });
-    writeFileSync(info.outputPath('content.json'), JSON.stringify(content, null, 2));
     await hour('23').click(); await minute('59').click(); await expect(time).toHaveValue('23:59');
     await expect(trigger).toHaveText(original);
     await page.keyboard.press('Escape'); await expect(menu).toHaveCount(0); await expect(pop).toBeVisible(); await expect(choose).toBeFocused();

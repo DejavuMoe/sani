@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAUD006EncodedShortURLSearch(t *testing.T) {
+func TestEncodedShortURLSearch(t *testing.T) {
 	const base = "https://short.example"
 	e := newShareEnv(t, Options{BaseURL: base})
 	for _, kind := range []string{"url", "text", "file"} {
@@ -48,7 +48,7 @@ func TestAUD006EncodedShortURLSearch(t *testing.T) {
 	}
 }
 
-func TestAUD006SearchPreservesLiteralQueries(t *testing.T) {
+func TestSearchPreservesLiteralQueries(t *testing.T) {
 	const base = "https://short.example"
 	e := newEnv(t, Options{BaseURL: base})
 	e.signIn()

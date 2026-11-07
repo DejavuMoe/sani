@@ -56,7 +56,7 @@ They do not replace those files.
 - **不得出现浏览器默认控件样式，包括展开后的浮层。** 所有应用自有控件必须使用 Sani 的字体、色彩、边框、圆角、间距和状态样式；覆盖默认、hover、focus-visible、按下、展开、选中、错误、忙碌和禁用状态，明暗主题一致。
 - 禁止以原生 `<select>` 的系统选项弹层、`input[type=color/date/time/datetime-local]` 的系统取色/日期面板、数字输入箭头、浏览器校验气泡或 `title` 提示作为产品界面。下拉复用 Menu，互斥选择复用 Segmented，颜色/日期用应用内编辑器。保留语义 HTML、键盘操作、可见焦点与辅助技术信息；`appearance: none` 不能替代展开状态验收。
 - 系统文件选择窗口及权限对话框不属于应用可绘制界面，不仿制；应用内入口仍需统一样式。以上规则同样用于新原型的评审工具条。
-- 视觉验收必须实际打开每个受影响控件，检查鼠标与键盘操作、中英文明暗主题、桌面及窄屏。只有收起截图、构建通过或 axe 通过均不足以证明符合设计；历史原型保留作为记录，新实现必须遵守当前约束。
+- 视觉验收必须实际打开每个受影响控件，检查鼠标与键盘操作、中英文明暗主题、桌面及窄屏。只有收起截图、构建通过或 axe 通过均不足以证明符合设计；旧版原型留在 git 历史中，新实现必须遵守当前约束。
 
 - Typography: Inter Variable for text, IBM Plex Mono for slugs, URLs and code. Chinese uses the system CJK fonts in `--font-sans`. Since R11 a page uses at most four sizes: 12 (meta), 13 (body and controls), 16 (headings, phone inputs) and 20 (figures); nothing below 12px. Hierarchy comes from weight, colour step and spacing.
 - Density and layout: one 920px column with hairline-separated surfaces. Shadows only on floating layers (menus, popovers, dialogs, toasts). Since R11, colours come only from Radix Colors (Slate neutrals, Indigo accent, Red/Green/Amber states) used by their step roles; lines are 0.5px, drawn as inset shadows because browsers round thinner borders up to 1px; nested corners are concentric; no coloured edge on cards or rows; no "·" separators.

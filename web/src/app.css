@@ -1,5 +1,5 @@
 /*
- * Sani design tokens (R11).
+ * Sani design tokens.
  *
  * Colours are Radix Colors, used by step role: 1–2 backgrounds, 3–5
  * component states, 6–8 lines, 9–10 solid fills, 11–12 text. Slate is the
@@ -272,12 +272,6 @@ textarea::placeholder {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0; --hbt: transparent; --hbr: transparent; --hbb: transparent; --hbl: transparent;
-}
-
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Text fields share one look across the app. */

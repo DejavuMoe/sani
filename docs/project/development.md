@@ -113,11 +113,23 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 - 构建文档站，对每一页做 axe 检查；
 - 为每个发布平台试构建镜像，启动它，等健康检查通过；
 - 构建全部二进制文件的压缩包；
-- 用 `govulncheck`、工作区 `pnpm audit --audit-level=moderate` 和两个受跟踪设计工具的 npm audit 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
+- 用 `govulncheck`、工作区 `pnpm audit --audit-level=moderate` 和受跟踪原型工具的 npm audit 检查已知漏洞。每周一还会自动运行一次，不用等到有新提交。
 
 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) 在推送、拉取请求和每周定时任务中扫描 Go、JavaScript/TypeScript、Python 与 GitHub Actions。Go 使用项目固定的工具链构建，其余语言直接分析源码。
 
-`master` 上的 CI 使用 pnpm/npm 从锁文件导出 SPDX，并向 GitHub 提交管理界面、文档站及两个开发工具的依赖快照，不安装这些包。快照对应原始清单路径，补齐 pnpm 双文档锁文件、`catalog:` 与静态图谱旧版本造成的遗漏。写权限仅用于默认分支的依赖提交，不向拉取请求开放；Dependabot 自动更新设置不变。
+`master` 上的 CI 使用 pnpm/npm 从锁文件导出 SPDX，并向 GitHub 提交管理界面、文档站及原型工具的依赖快照，不安装这些包。快照对应原始清单路径，补齐 pnpm 双文档锁文件、`catalog:` 与静态图谱旧版本造成的遗漏。写权限仅用于默认分支的依赖提交，不向拉取请求开放；Dependabot 自动更新设置不变。
+
+每个准备发布的候选提交都应通过以下检查。历史版本的绿灯不能替代当前提交的结果。
+
+| 验收层 | 检查入口 | 通过条件 |
+|---|---|---|
+| 代码与功能 | `make check test e2e` | 静态检查、Go 竞态、前端单测及实际浏览器操作通过 |
+| 真实进程与恢复 | `make smoke` | 构建产物启动、正常停机、CLI 数据库备份与配套文件恢复通过；计数、凭据、标签、文本与文件哈希保留 |
+| 存储演进与故障 | `internal/store/*_test.go`、`cmd/sani/main_test.go` | 历史 schema 迁移、失败回滚、锁等待、停机超时与刷盘失败有回归验证 |
+| 容量与计数 | `make bench load capacity` | 记录测量环境；负载请求和点击一致，无未解释的性能退化 |
+| 页面可用性 | `pnpm --dir web a11y`、`pnpm --dir docs a11y` | 管理端主要页面及全部文档页面的中英双语、深浅主题 axe 检查通过 |
+| 文档与 SEO | `make docs`、文档输出与发布脚本检查 | 源码与双语说明对齐，页面描述、canonical、语言替代链接及站点地图对应实际页面 |
+| 分发与供应链 | 当前提交的 CI、CodeQL 及 Release 工作流 | 跨平台测试、归档、容器、依赖扫描通过；正式制品另核对版本、校验和与来源证明 |
 
 发布一个新版本：
 
@@ -151,8 +163,8 @@ Docker 存储演练：先构建本地镜像，再执行 `bash scripts/test-docke
 
 `make ablation` 对缓存与点击聚合逐项消融并断言计数守恒，[实验记录](../internals/performance#ablation)保留条件、三次结果及限制。协议测试使用 Node 内置 fetch/FormData，无外部 SDK 或新增运行依赖。
 
-2026-10-10 的引用检查覆盖 `web/src/components` 的 37 个 Svelte 组件（包括 R10 的 `UnitInput`），均有调用，保留现有共用组件。五个直接 Go 模块分别负责 Argon2、HTML/IDNA/代理、终端密码输入、Unicode 规范化和纯 Go SQLite；`go mod tidy -diff` 与 `go mod verify` 用于验证图与校验和。前端运行依赖是本地字体和二维码编码；文档运行依赖还包括 Vue、VitePress 和评论组件 Ecoku。测试/类型检查工具归入开发依赖。删除这些依赖会改变已有能力，因此没有仅为减少数量而移除它们；`go.mod`、`go.sum` 未改变。工作区锁文件记录 VitePress 1.6.4 的本地预览监听补丁，依赖版本不变。补丁位于 `patches/`，Docker 依赖安装同样复制此目录；升级 VitePress 时须重新验证 `--host`，上游修复后移除补丁。文档构建中的 `preview.test.mjs` 验证默认和带 base 路径的监听地址、首页及 404。
+五个直接 Go 模块分别负责 Argon2、HTML/IDNA/代理、终端密码输入、Unicode 规范化和纯 Go SQLite；`go mod tidy -diff` 与 `go mod verify` 用于验证图与校验和。前端运行依赖是本地字体和二维码编码；文档运行依赖还包括 Vue、VitePress 和评论组件 Ecoku。测试/类型检查工具归入开发依赖。工作区锁文件记录 VitePress 1.6.4 的本地预览监听补丁，依赖版本不变。补丁位于 `patches/`，Docker 依赖安装同样复制此目录；升级 VitePress 时须重新验证 `--host`，上游修复后移除补丁。文档构建中的 `preview.test.mjs` 验证默认和带 base 路径的监听地址、首页及 404。
 
-脚本按实际用途保留：`screenshots.mjs` 生成文档所需固定文件名，`shots.mjs` 覆盖更多交互场景，`fresh-shots.mjs` 验证初始化和空状态，`icons.mjs` 生成图标。截图登录/初始化失败必须退出，不能把登录页误当业务截图。`smoke` 验证正常停机与备份；`upgrade-drill` 验证旧版升级/回滚；Docker 脚本验证权限、绑定目录、重启和磁盘满，三者各有边界。发布脚本通过 `test-release-notes.sh`、`test-publish-docs.sh` 的隔离夹具验证，不会部署站点。
+脚本按实际用途保留：`screenshots.mjs` 生成文档所需固定文件名（含全新实例的初始化页面），`icons.mjs` 生成图标。截图登录/初始化失败必须退出，不能把登录页误当业务截图。`smoke` 验证正常停机与备份；`upgrade-drill` 验证旧版升级/回滚；Docker 脚本验证权限、绑定目录、重启和磁盘满，三者各有边界。发布脚本通过 `test-release-notes.sh`、`test-publish-docs.sh` 的隔离夹具验证，不会部署站点。
 
-文档检查从源码提取路由、错误码、环境变量、CLI、保留短码、输入长度和发布平台，并用负例测试防止旧事实重新混入。历史 API 归档不参加当前路由集合比较。自然语言和交互仍需结合源码、HTTP 契约与浏览器检查，自动检查不是所有行为的形式化证明。
+文档检查从源码提取路由、错误码、环境变量、CLI、保留短码、输入长度和发布平台，并用负例测试防止旧事实重新混入。历史 API 归档不参加当前路由集合比较。自然语言和交互仍需结合源码、HTTP 契约与浏览器检查。

@@ -2,7 +2,7 @@
 //   SANI_URL=http://127.0.0.1:8080 node scripts/a11y.mjs
 // SANI_FRESH_URL may point at an instance without a password to include setup.
 import { chromium } from '@playwright/test';
-import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
@@ -51,7 +51,7 @@ const screens = [
   { name: 'settings', path: '/admin/settings' },
   { name: 'settings-narrow', path: '/admin/settings', viewport: {width:320,height:860} },
   ...[1280,390,320].flatMap(width => ['create','edit'].map(mode => ({
-    name: `r3-tag-${mode}-${width}`, path:'/admin/', viewport:{width,height:860},
+    name: `tags-${mode}-${width}`, path:'/admin/', viewport:{width,height:860},
     run:async page => {
       if (mode === 'edit') {
         await page.request.post(`${base}/api/admin/v1/tags`, {data:{name:'QA color',color:'#5872a5'}});
@@ -60,7 +60,7 @@ const screens = [
       await page.locator('#create-panel-url .tag-add').click();
       const pop = page.locator('.tag-pop:popover-open');
       let editor = pop;
-      if (mode === 'create') await pop.locator('.tag-search input').fill('R3 custom');
+      if (mode === 'create') await pop.locator('.tag-search input').fill('Custom tag');
       else {
         await pop.getByRole('button', {name: /^(管理标签|Manage tags)$/}).click();
         await page.getByRole('button', {name: /^(编辑标签|Edit tag) QA color$/}).click();
@@ -134,11 +134,9 @@ for (const [locale, theme] of ['zh-CN', 'en-US'].flatMap((locale) => ['light', '
     if (s.run) await s.run(page);
     // Measure final colors, not the partially transparent opening dialog.
     await page.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'));
-    if (screenshots && (s.name.startsWith('r3-') || s.name === 'settings-narrow' || s.name === 'settings' || s.name === 'dashboard')) {
+    if (screenshots && (s.name.startsWith('tags-') || s.name === 'settings-narrow' || s.name === 'settings' || s.name === 'dashboard')) {
       const artifact = `${screenshots}/${locale}-${theme}-${s.name}`;
       await page.screenshot({path:artifact+'.png',fullPage:false});
-      await page.addScriptTag({content:readFileSync('../.agents/skills/prototype-first-ui/scripts/collect_dom_content.js','utf8')});
-      writeFileSync(artifact+'.json', JSON.stringify(await page.evaluate(() => window.__prototypeFirstUICollectDOMContent()),null,2));
     }
     await page.addScriptTag({ content: axe });
     const result = await page.evaluate(async () => {

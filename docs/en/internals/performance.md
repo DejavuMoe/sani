@@ -86,7 +86,7 @@ There were no reader-pool waits. The 100k mixed workload queued on the single wr
 
 ## 2026-10-10 ablation comparison {#ablation}
 
-The baseline is `2817cdc`; the experiment uses the subsequent local Sani API changes, Go 1.27.2, WSL2 Linux amd64, an Intel Core Ultra 7 255H and eight Go scheduler cores. `make ablation` runs each case three times. `internal/server/ablation_test.go` gives every case its own temporary SQLite database and the same target, User-Agent and Referer. Only one condition changes; there are no production switches.
+The experiment ran on Go 1.27.2, WSL2 Linux amd64, an Intel Core Ultra 7 255H and eight Go scheduler cores. `make ablation` runs each case three times. `internal/server/ablation_test.go` gives every case its own temporary SQLite database and the same target, User-Agent and Referer. Only one condition changes; there are no production switches.
 
 | Condition | Three runs, ns/op | B/op | allocs/op | Database loads/request | Click write transactions/request |
 |---|---|---|---|---|---|

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestRegressionBUG16SetupCodeMustRemainNonempty(t *testing.T) {
+func TestSetupCodeMustRemainNonempty(t *testing.T) {
 	for _, entry := range os.Environ() {
 		key, _, _ := strings.Cut(entry, "=")
 		if strings.HasPrefix(key, "SANI_") {
@@ -17,7 +17,7 @@ func TestRegressionBUG16SetupCodeMustRemainNonempty(t *testing.T) {
 		t.Run(code, func(t *testing.T) {
 			t.Setenv("SANI_SETUP_CODE", code)
 			if _, err := Load(); err == nil || !strings.Contains(err.Error(), "SANI_SETUP_CODE") {
-				t.Fatalf("BUG-16: separator-only code %q must be rejected with its setting name; got %v", code, err)
+				t.Fatalf("separator-only code %q must be rejected with its setting name; got %v", code, err)
 			}
 		})
 	}

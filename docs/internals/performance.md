@@ -84,7 +84,7 @@ make bench                          # 运行 Go 微基准
 
 ## 2026-10-10 消融对照 {#ablation}
 
-基线为 `2817cdc`，实验使用其后本地的 Sani 自有 API 改动、Go 1.27.2、WSL2 Linux amd64、Intel Core Ultra 7 255H、8 个 Go 调度核心。执行 `make ablation`，每组运行三次。实现位于 `internal/server/ablation_test.go`，每组使用独立临时 SQLite、相同目标、相同 User-Agent 和 Referer，只改变一个条件；无生产开关。
+实验环境为 Go 1.27.2、WSL2 Linux amd64、Intel Core Ultra 7 255H、8 个 Go 调度核心。执行 `make ablation`，每组运行三次。实现位于 `internal/server/ablation_test.go`，每组使用独立临时 SQLite、相同目标、相同 User-Agent 和 Referer，只改变一个条件；无生产开关。
 
 | 条件 | 三次 ns/op | B/op | allocs/op | 每请求数据库加载 | 每请求点击写事务 |
 |---|---|---|---|---|---|

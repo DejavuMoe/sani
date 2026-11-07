@@ -113,11 +113,23 @@ Every push and pull request runs [CI](https://github.com/DejavuMoe/sani/actions/
 - a docs build, with axe over every page;
 - a build of the image for every release platform, which is then started and has to pass its health check;
 - the release archives for every platform;
-- `govulncheck`, workspace `pnpm audit --audit-level=moderate`, and npm audit for both tracked design tools. It also runs every Monday, so a new advisory doesn’t wait for a commit.
+- `govulncheck`, workspace `pnpm audit --audit-level=moderate`, and npm audit for the tracked prototype tooling. It also runs every Monday, so a new advisory doesn’t wait for a commit.
 
 [CodeQL](https://github.com/DejavuMoe/sani/actions/workflows/codeql.yml) scans Go, JavaScript/TypeScript, Python and GitHub Actions on pushes, pull requests and a weekly schedule. Go is built with the pinned project toolchain; the other languages are analyzed directly from source.
 
-On `master`, CI uses pnpm/npm to export SPDX from lockfiles and submits dependency snapshots for the admin app, docs and both development tools without installing those packages. Snapshots use the original manifest paths to cover pnpm's two-document lockfile, `catalog:` references and stale static graph versions. Write access is limited to dependency submission on the default branch, never pull requests. Dependabot automatic update settings remain unchanged.
+On `master`, CI uses pnpm/npm to export SPDX from lockfiles and submits dependency snapshots for the admin app, docs and the prototype tooling without installing those packages. Snapshots use the original manifest paths to cover pnpm's two-document lockfile, `catalog:` references and stale static graph versions. Write access is limited to dependency submission on the default branch, never pull requests. Dependabot automatic update settings remain unchanged.
+
+Run the following checks for each release candidate commit. A previous release's green checks do not validate a new candidate.
+
+| Layer | Entry point | Acceptance condition |
+|---|---|---|
+| Code and features | `make check test e2e` | Static checks, Go race tests, frontend unit tests and real browser interactions pass |
+| Process and recovery | `make smoke` | The built binary starts and stops cleanly; CLI database backup and paired file restore preserve counts, credentials, tags, texts and file hashes |
+| Storage and failure handling | `internal/store/*_test.go`, `cmd/sani/main_test.go` | Regressions cover historical schema migration, rollback, lock waits, shutdown deadlines and failed flushes |
+| Capacity and counting | `make bench load capacity` | Record the environment; request counts agree with clicks, with no unexplained performance regression |
+| Accessibility | `pnpm --dir web a11y`, `pnpm --dir docs a11y` | Main admin screens and every documentation page pass axe in both languages and themes |
+| Documentation and SEO | `make docs`, docs output and publishing checks | Bilingual descriptions match the code; page summaries, canonical URLs, language alternates and sitemap match the actual pages |
+| Distribution and supply chain | CI, CodeQL and Release workflows for the candidate | Platform tests, archives, containers and dependency scans pass; verify the version, checksums and provenance of published artifacts separately |
 
 To release a new version:
 
@@ -151,8 +163,8 @@ Docker storage drill: build the local image, then run `bash scripts/test-docker-
 
 `make ablation` removes caching and click batching one at a time and asserts conserved counts. The [experiment record](../internals/performance#ablation) keeps conditions, three runs and limits. Protocol tests use Node's built-in fetch/FormData, with no external SDK or new runtime dependency.
 
-The 2026-10-10 reference check covered all 37 components under `web/src/components` (including R10’s `UnitInput`): each has callers, so shared components remain. The five direct Go modules provide Argon2, HTML/IDNA/proxy support, terminal password input, Unicode normalization and pure-Go SQLite. `go mod tidy -diff` and `go mod verify` check the module graph and checksums. App runtime dependencies provide local fonts and QR encoding; docs also use Vue, VitePress and Ecoku comments. Testing and type-checking tools are development dependencies. Removing these would remove existing capabilities; `go.mod` and `go.sum` remain unchanged. The workspace lockfile records a VitePress 1.6.4 loopback-preview patch without changing dependency versions. The patch lives in `patches/`, also copied for Docker dependency installation. Recheck `--host` when upgrading VitePress and remove the patch once upstream fixes it. Documentation builds run `preview.test.mjs` to check default and base-path listeners, homepages and 404 responses.
+The five direct Go modules provide Argon2, HTML/IDNA/proxy support, terminal password input, Unicode normalization and pure-Go SQLite. `go mod tidy -diff` and `go mod verify` check the module graph and checksums. App runtime dependencies provide local fonts and QR encoding; docs also use Vue, VitePress and Ecoku comments. Testing and type-checking tools are development dependencies. The workspace lockfile records a VitePress 1.6.4 loopback-preview patch without changing dependency versions. The patch lives in `patches/`, also copied for Docker dependency installation. Recheck `--host` when upgrading VitePress and remove the patch once upstream fixes it. Documentation builds run `preview.test.mjs` to check default and base-path listeners, homepages and 404 responses.
 
-Scripts retain distinct jobs: `screenshots.mjs` produces the fixed docs filenames, `shots.mjs` covers more interactions, `fresh-shots.mjs` exercises setup/empty states, and `icons.mjs` generates icons. Screenshot authentication/setup failures must exit rather than capture a login page as the requested screen. `smoke` checks shutdown/backup, `upgrade-drill` checks old-version upgrade/rollback, and the Docker harness checks permissions, bind storage, restarts and a full disk. Release scripts use isolated fixtures in `test-release-notes.sh` and `test-publish-docs.sh`; these do not deploy a site.
+Scripts retain distinct jobs: `screenshots.mjs` produces the fixed docs filenames, including the setup screen of a fresh instance, and `icons.mjs` generates icons. Screenshot authentication/setup failures must exit rather than capture a login page as the requested screen. `smoke` checks shutdown/backup, `upgrade-drill` checks old-version upgrade/rollback, and the Docker harness checks permissions, bind storage, restarts and a full disk. Release scripts use isolated fixtures in `test-release-notes.sh` and `test-publish-docs.sh`; these do not deploy a site.
 
-Docs checks extract routes, errors, environment variables, CLI commands, reserved slugs, input lengths and release platforms from source, with negative tests against known false claims. The historical API archive is excluded from the current route comparison. Prose and interactions still need source, HTTP and browser review; automated checks are not a formal proof of every behavior.
+Docs checks extract routes, errors, environment variables, CLI commands, reserved slugs, input lengths and release platforms from source, with negative tests against known false claims. The historical API archive is excluded from the current route comparison. Prose and interactions still need source, HTTP and browser review.

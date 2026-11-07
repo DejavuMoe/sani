@@ -13,6 +13,15 @@
   import MenuItem from './MenuItem.svelte';
   import TagFilters from './TagFilters.svelte';
 
+  /** Bar lengths (px) for a short code, a title and a destination: varied, as real rows are. */
+  const GHOSTS = [
+    { slug: 56, title: 190, dest: 250 },
+    { slug: 72, title: 130, dest: 210 },
+    { slug: 48, title: 240, dest: 170 },
+    { slug: 64, title: 160, dest: 280 },
+    { slug: 80, title: 110, dest: 200 },
+  ];
+
   let search = $state<HTMLInputElement>();
   let sentinel = $state<HTMLElement>();
   let searchFocused = $state(false);
@@ -61,6 +70,21 @@
     });
   }
 </script>
+
+{#snippet head(locked: boolean)}
+  <div class="head" aria-hidden="true" inert={locked}>
+    {#if links.picking}<span class="h-pick"></span>{/if}
+    <span class="h-slug">{t('list.col.link')}</span>
+    <span class="h-target">{t('list.col.target')}</span>
+    <span class="h-tags">{t('tags.label')}</span>
+    <span class="h-spark">{t('list.col.activity')}</span>
+    <button class={['h-clicks', links.sort === 'clicks' && 'on']} tabindex="-1" onclick={() => links.setSort('clicks')}>
+      {t('list.col.clicks')}
+      {#if links.sort === 'clicks'}<Icon name="chevronDown" size={12} />{/if}
+    </button>
+    <span class="h-copy"></span>
+  </div>
+{/snippet}
 
 <section class="list-section" aria-label={t('list.label')}>
   <TagFilters />
@@ -224,28 +248,31 @@
     </div>
   {:else if !links.loaded}
     {#if slowLoad}
+      <!-- Same header, row geometry and breakpoints as the list that replaces it, so nothing moves. -->
       <div class="card" role="status" aria-busy="true" aria-label={t('list.loading')}>
-        {#each [0, 1, 2, 3] as i (i)}
-          <div class="ghost-row" style:--d="{i * 90}ms">
-            <span class="g g1"></span><span class="g g2"></span><span class="g g3"></span>
-          </div>
-        {/each}
+        {@render head(true)}
+        <ul aria-hidden="true">
+          {#each GHOSTS as ghost, i (i)}
+            <li class="ghost" style:--d="{i * 90}ms">
+              <span class="g-main">
+                <span class="g-slug bar" style:--w="{ghost.slug}px"></span>
+                <span class="g-target">
+                  <span class="g-title"><span class="g-icon"></span><span class="bar" style:--w="{ghost.title}px"></span></span>
+                  <span class="g-dest bar" style:--w="{ghost.dest}px"></span>
+                </span>
+                <span class="g-tags"></span>
+              </span>
+              <span class="g-spark"></span>
+              <span class="g-clicks bar" style:--w="22px"></span>
+              <span class="g-copy"></span>
+            </li>
+          {/each}
+        </ul>
       </div>
     {/if}
   {:else}
     <div class={['card', links.stale && 'stale']} inert={links.stale} aria-busy={links.loading}>
-      <div class="head" aria-hidden="true">
-        {#if links.picking}<span class="h-pick"></span>{/if}
-        <span class="h-slug">{t('list.col.link')}</span>
-        <span class="h-target">{t('list.col.target')}</span>
-        <span class="h-tags">{t('tags.label')}</span>
-        <span class="h-spark">{t('list.col.activity')}</span>
-        <button class={['h-clicks', links.sort === 'clicks' && 'on']} tabindex="-1" onclick={() => links.setSort('clicks')}>
-          {t('list.col.clicks')}
-          {#if links.sort === 'clicks'}<Icon name="chevronDown" size={12} />{/if}
-        </button>
-        <span class="h-copy"></span>
-      </div>
+      {@render head(false)}
       <ul>
         {#each links.items as link (link.id)}
           <li
@@ -708,38 +735,112 @@
     text-underline-offset: 3px;
   }
 
-  .ghost-row {
+  /*
+   * The placeholder row follows LinkRow's .line and .main: the same padding, gaps, column widths
+   * and breakpoints. Each line of text is an empty line in the real font with a bar drawn inside
+   * it, so line heights come from the font and cannot drift from the row it stands in for.
+   * Change LinkRow's layout, change this too (web/e2e/placeholder.spec.ts compares them).
+   */
+  .ghost {
     display: flex;
     align-items: center;
-    gap: 16px;
-    height: 60px;
-    padding: 0 16px;
-    border-top: 0; --hbt: var(--line);
+    gap: 14px;
+    min-height: 66px;
+    padding: 8px 10px 8px 16px;
     animation: breathe 1.1s ease-in-out var(--d) infinite alternate;
   }
 
-  .ghost-row:first-child {
-    border-top: 0;
-  }
-
-  .g {
+  .bar::before {
+    content: '';
+    display: inline-block;
+    width: var(--w);
+    max-width: 100%;
     height: 10px;
     border-radius: 3px;
-    background: var(--surface-2);
+    background: var(--surface-3);
+    vertical-align: middle;
   }
 
-  .g1 {
-    width: 90px;
-  }
-
-  .g2 {
+  .g-main {
+    display: flex;
     flex: 1;
-    max-width: 320px;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    padding: 2px 0;
   }
 
-  .g3 {
-    width: 40px;
-    margin-left: auto;
+  .g-slug {
+    flex: none;
+    width: var(--col-slug);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .g-target {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .g-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .g-icon {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--surface-3);
+  }
+
+  .g-dest {
+    padding-left: 21px;
+    font-size: 12px;
+  }
+
+  .g-tags {
+    flex: none;
+    width: 110px;
+  }
+
+  .g-spark {
+    flex: none;
+    width: var(--col-spark);
+    height: 16px;
+    border-radius: 3px;
+    background: var(--surface-3);
+  }
+
+  .g-clicks {
+    flex: none;
+    width: var(--col-clicks);
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .g-copy {
+    display: grid;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+  }
+
+  .g-copy::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-3);
   }
 
   @keyframes breathe {
@@ -763,7 +864,8 @@
   }
 
   @media (max-width: 900px) {
-    .h-spark {
+    .h-spark,
+    .g-spark {
       display: none;
     }
   }
@@ -771,6 +873,41 @@
   @media (max-width: 640px) {
     .head {
       display: none;
+    }
+
+    .ghost {
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 8px 12px 14px;
+    }
+
+    .g-main {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+    }
+
+    .g-slug {
+      width: auto;
+    }
+
+    .g-dest {
+      padding-left: 0;
+    }
+
+    .g-tags {
+      width: auto;
+      margin-top: 4px;
+    }
+
+    .g-clicks {
+      width: auto;
+      min-width: 28px;
+      padding-top: 3px;
+    }
+
+    .g-copy {
+      margin-top: -3px;
     }
 
     .search {

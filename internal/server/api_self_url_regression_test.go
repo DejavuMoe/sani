@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBUG09DefaultPortSelfOrigins(t *testing.T) {
+func TestDefaultPortSelfOrigins(t *testing.T) {
 	e := newEnv(t, Options{BaseURL: "https://short.example"})
 	for _, tc := range []struct {
 		origin, dest string
@@ -37,7 +37,7 @@ func TestBUG09DefaultPortSelfOrigins(t *testing.T) {
 	}
 }
 
-func TestBUG09SelfURLMutationAndImport(t *testing.T) {
+func TestSelfURLMutationAndImport(t *testing.T) {
 	e, key := publicEnv(t)
 	l := e.create(map[string]any{"slug": "existing", "url": "https://example.invalid/original"})
 	for _, tc := range []struct{ method, path, body string }{

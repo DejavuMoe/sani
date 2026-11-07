@@ -47,7 +47,7 @@ func opsRegressionCLI(t *testing.T, command string, extra ...string) ([]byte, er
 	return out, err
 }
 
-func TestRegressionBUG05SetupURLRoundTrip(t *testing.T) {
+func TestSetupURLRoundTrip(t *testing.T) {
 	root := t.TempDir()
 	for _, code := range []string{"AbCd-EfGh-1234", "alpha+beta123", "alpha&beta123", "alpha%2Bbeta123"} {
 		t.Run(code, func(t *testing.T) {
@@ -82,7 +82,7 @@ func TestRegressionBUG05SetupURLRoundTrip(t *testing.T) {
 				// Parse the raw fragment once, like Setup.svelte's URLSearchParams.
 				values, err := url.ParseQuery(fragment)
 				if err != nil || len(values) != 1 || values.Get("setup") != code {
-					t.Fatalf("BUG-05: setup link changed %q to %q: %v", code, values.Get("setup"), err)
+					t.Fatalf("setup link changed %q to %q: %v", code, values.Get("setup"), err)
 				}
 				return
 			}
@@ -91,7 +91,7 @@ func TestRegressionBUG05SetupURLRoundTrip(t *testing.T) {
 	}
 }
 
-func TestRegressionBUG15HealthcheckPaddedListenerCLI(t *testing.T) {
+func TestHealthcheckPaddedListenerCLI(t *testing.T) {
 	for _, status := range []int{http.StatusOK, http.StatusServiceUnavailable} {
 		t.Run(http.StatusText(status), func(t *testing.T) {
 			requests := make(chan string, 1)
@@ -104,7 +104,7 @@ func TestRegressionBUG15HealthcheckPaddedListenerCLI(t *testing.T) {
 				"SANI_LISTEN= \t"+strings.TrimPrefix(srv.URL, "http://")+" \t",
 				"SANI_BASE_URL=invalid-unrelated-config")
 			if status == http.StatusOK && err != nil {
-				t.Errorf("BUG-15: healthy padded listener rejected: %v\n%s", err, out)
+				t.Errorf("healthy padded listener rejected: %v\n%s", err, out)
 			}
 			if status != http.StatusOK && (err == nil || !strings.Contains(string(out), "healthz returned 503")) {
 				t.Errorf("unhealthy HTTP status must fail CLI: %v\n%s", err, out)
@@ -115,7 +115,7 @@ func TestRegressionBUG15HealthcheckPaddedListenerCLI(t *testing.T) {
 					t.Errorf("unexpected probe: %s", request)
 				}
 			default:
-				t.Error("BUG-15: CLI did not probe the normalized listener")
+				t.Error("CLI did not probe the normalized listener")
 			}
 		})
 	}
@@ -125,7 +125,7 @@ type opsRegressionTransport func(*http.Request) (*http.Response, error)
 
 func (f opsRegressionTransport) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
 
-func TestRegressionBUG15HealthcheckWhitespaceDefault(t *testing.T) {
+func TestHealthcheckWhitespaceDefault(t *testing.T) {
 	// Intercept the request so the default-port case cannot contact a real service.
 	old := http.DefaultTransport
 	t.Cleanup(func() { http.DefaultTransport = old })
@@ -139,6 +139,6 @@ func TestRegressionBUG15HealthcheckWhitespaceDefault(t *testing.T) {
 	})
 	t.Setenv("SANI_LISTEN", " \t\n ")
 	if err := healthcheck(); err != nil || !called {
-		t.Fatalf("BUG-15: whitespace must select the default listener: called=%v, err=%v", called, err)
+		t.Fatalf("whitespace must select the default listener: called=%v, err=%v", called, err)
 	}
 }

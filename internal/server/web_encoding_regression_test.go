@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBUG10AssetEncodingNegotiation(t *testing.T) {
+func TestAssetEncodingNegotiation(t *testing.T) {
 	// Distinct bytes identify the chosen representation without a decompressor.
 	f := &asset{body: []byte("identity"), gz: []byte("gz"), br: []byte("b"), ctype: "text/javascript", etag: `"fixture"`}
 	for _, tc := range []struct {

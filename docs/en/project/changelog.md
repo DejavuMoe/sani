@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- The placeholder shown while the first page of links is slow to load now lines up with the list: it shows the real header, and its row height, columns and the phone’s stacked layout match the list, so nothing moves when the links arrive. Its bars use a clearer interface colour.
+
 ## v1.0.3
 
 2026-11-02 · Restore the Enter key badges on the creation buttons and give all three one size and style. Database schema remains 7 with no new migration.
@@ -22,11 +26,9 @@ Upgrading from v1.0.1 needs no data migration; the API, public contracts and exi
 
 ## v1.0.1
 
-2026-10-24 · Correct the random distribution of generated access passwords and align stable-release documentation. Database schema remains 7 with no new migration.
+2026-10-24 · Correct the random distribution of generated access passwords. Database schema remains 7 with no new migration.
 
-- Remove modulo bias from generated access passwords with rejection sampling, giving each allowed character equal probability. The admin app and R11 prototype use the corrected algorithm; existing passwords are unchanged.
-- Add regression coverage for password generation and unlock-cookie transport attributes, and verify that query parameters cannot replace a short link's saved destination.
-- Align Chinese and English project status, version plans and access-password guidance, correcting outdated statements in configuration, API and security pages that shares have no access passwords.
+- Remove modulo bias from generated access passwords with rejection sampling, giving each allowed character equal probability. Existing passwords are unchanged.
 
 Upgrading from v1.0.0 needs no data migration and preserves public interfaces and existing links. The fix applies to newly generated passwords; it does not rotate existing passwords. Use the link editor to generate a replacement if needed. Take a complete snapshot before upgrading as described in [Backup and restore](../guide/operations#backup-files).
 
@@ -45,22 +47,19 @@ v1.0.0 begins the [1.x compatibility promise](./versioning#stable), preserving e
 
 ## v0.9.10
 
-2026-10-24 · Fix draft protection, chart range changes, encoded short-URL searches and narrow detail layouts, and remove an unused legacy helper. Database schema remains 6 with no new migration.
+2026-10-24 · Fix draft protection, chart range changes, encoded short-URL searches and narrow detail layouts. Database schema remains 6 with no new migration.
 
 - Fix discarded drafts remaining in the editor and disabling subsequent leave warnings after changing sort order, search or content type. Reopened editors retain full draft protection.
 - Fix chart rendering errors when shortening a date range with the keyboard while hovering. Track the hovered day by date so the chart stays consistent with the selected range.
 - Fix clipped detail content on narrow screens when QR codes, metadata and access rules competed for one row. Wrap the sidebar to the available width and give access rules a full row in both languages and themes.
 - Find Unicode short URLs encoded by the browser, including text and file share URLs. Apply the same matching rules after saving, statistics refreshes and failed-operation rollbacks; preserve literal percent characters in ordinary searches and destination URLs.
-- Remove an unused legacy hostname helper and its dedicated assertions while retaining coverage for the metadata hostname handling still used in production.
 
 ## v0.9.9
 
-2026-10-23 · Fix database paths, Unicode identity comparison and browser test cleanup, and update build dependencies. Database schema stays at 6 with no new migration.
+2026-10-23 · Fix database paths and Unicode identity comparison, and update the Go toolchain. Database schema stays at 6 with no new migration.
 
 - Fix database paths containing `%`, `#` and other URI characters being interpreted as URIs. Database opening, password changes, backups, upgrade snapshots and read-only preflight now consistently use literal filenames, with relative and absolute path coverage on Windows and Linux. Database schema stays at 6 with no new migration.
 - Align Unicode case comparison in tag and slug editors with the server and list search: Greek final sigma stays distinct, while dotted capital `İ` correctly matches plain `i`.
-- Preserve the original browser startup error in end-to-end tests without an additional teardown exception when no page was created. Add fault-injection regression coverage.
-- Update the app's Vite build tool to 8.3.3 and the docs dependency to 6.4.5 to fix development-server issues reported by dependency auditing, keeping the existing CI audit threshold.
 - Align the Go toolchain and container builder on 1.27.3 to fix the GO-2026-6809 certificate-trust issue in `crypto/x509`.
 
 If an older version used a data directory containing `%` or `#`, stop the service before upgrading, check the actual database location, and back up the database and shared files. This fix does not automatically locate or move data previously written to the wrong path; verify which instance owns the data before restoring it to the configured directory.
@@ -69,12 +68,9 @@ When upgrading from v0.9.5–v0.9.8, follow [backup and restore](../guide/operat
 
 ## v0.9.8
 
-2026-10-18 · Fix development collectors and dependency graph accuracy, enforce checks for the exact release commit, and verify session cookie boundaries behind reverse proxies. Database schema stays at 6 with no new migration.
+2026-10-18 · Clarify session cookie boundaries behind reverse proxies. Database schema stays at 6 with no new migration.
 
-- Fix DOM content collectors used by prototype and accessibility checks: escape backslashes in identifiers and handle emoji, leading digits and a lone hyphen when `CSS.escape` is unavailable. Add browser regression coverage.
-- Submit GitHub dependency snapshots generated from the actual lockfiles to correct stale versions and unresolved pnpm catalogs in the static dependency graph, including development tools.
-- Require successful CI, known-vulnerability checks and every CodeQL job for the exact release commit before building archives or publishing images. Preserve the Forgejo → GitHub synchronization flow.
-- Add cookie attribute regressions for setup, sign-in, renewal and sign-out, and document the TLS, trusted-proxy and local HTTP boundaries. Isolated tests with the repository's Nginx and Caddy templates did not reproduce an HTTPS session missing `Secure`. Preserve local HTTP support without suppressing CodeQL rules.
+- Document the TLS, trusted-proxy and local HTTP boundaries: with the repository's Nginx and Caddy templates, HTTPS sessions carry `Secure`; local HTTP stays supported.
 
 When upgrading from v0.9.5–v0.9.7, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.8`, then reload the admin app to continue using the existing schema 6 data. Upgrades from v0.9.4 or earlier still require the API adjustments and migration steps under [upgrade and rollback](../guide/operations#upgrade).
 
@@ -89,23 +85,22 @@ When upgrading from v0.9.5–v0.9.7, follow [backup and restore](../guide/operat
 - Commit metadata only for its current task, cancel or replace superseded tasks on metadata-affecting edits or refreshes, and settle canceled queued work during orderly shutdown. Decode file titles once, retain stale icons after failed refresh with a one-day retry delay, and use the full hostname for `www` favicon lookup.
 - Honor `Accept-Encoding` quality values and exclusions. Public text pages try a compatible copy method when the clipboard API is absent or rejects, then show success or manual-copy feedback.
 - Encode special characters in setup links, reject setup codes made only of ignored separators, and trim healthcheck listen addresses consistently with startup.
-- Correct systemd symlink-directory backup instructions and literal dollar escaping in generated Compose root URLs. Load checks require their own child to become ready, use a fresh password and stop on an occupied port.
-- Add per-issue failure regressions, concurrency/cancellation tests, CLI and Compose checks, and browser coverage across both languages, themes and desktop/mobile sizes.
+- Correct systemd symlink-directory backup instructions and literal dollar escaping in generated Compose root URLs.
 
 When upgrading from v0.9.5 or v0.9.6, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.7`, then reload the admin app to continue using the existing schema 6 data. Upgrades from v0.9.4 or earlier still require the API adjustments and migration steps under [upgrade and rollback](../guide/operations#upgrade).
 
 ## v0.9.6
 
-2026-10-11 · Fix missing authentication on admin import example downloads and add management resource access regressions. Database schema stays at 6 with no new migration.
+2026-10-11 · Fix missing authentication on admin import example downloads . Database schema stays at 6 with no new migration.
 
 - Require management API authentication for admin CSV/JSON import example downloads; old `/admin/examples/...` static URLs return 404. Downloads disable caching and session cookies remain scoped to `/api/`. Examples contain fixed demonstration data, never instance content.
-- Block static downloads even when an older frontend build still contains example files. Regressions cover anonymous access to every existing protected management route, plus example GET/HEAD requests, expired sessions, revoked credentials, conditional requests and pointer/keyboard downloads.
+- Block static downloads even when an older frontend build still contains example files.
 
 When upgrading from v0.9.5, follow [backup and restore](../guide/operations#backup-files), replace the binary or pin `ghcr.io/dejavumoe/sani:v0.9.6`, then reload the admin app to download examples. Replace bookmarked old example URLs with the new admin links. Upgrades from v0.9.4 or earlier still require the API and schema-6 migration steps under [upgrade and rollback](../guide/operations#upgrade). Existing public share URLs and instance data remain unchanged.
 
 ## v0.9.5
 
-2026-10-10 · Release the approved R10 compact interface and new Sani HTTP API, with migration to database schema 6. **This release includes breaking changes as a one-time exception to the patch rule**; read the steps below and the [versioning note](./versioning#v095-exception) before upgrading.
+2026-10-10 · Release the compact interface and new Sani HTTP API, with migration to database schema 6. **This release includes breaking changes as a one-time exception to the patch rule**; read the steps below and the [versioning note](./versioning#v095-exception) before upgrading.
 
 ### Breaking changes
 
@@ -114,27 +109,22 @@ When upgrading from v0.9.5, follow [backup and restore](../guide/operations#back
 - Admin JSON and multipart uploads also reject unknown fields; JSON rejects trailing data so unsupported protection inputs cannot appear to succeed.
 - Schema 6 adds stable opaque file deletion keys. Pending migrations run in one transaction, with preflight and a database safety copy before upgrading. Resource deletion is permanent; management deletion stays restorable.
 - **Upgrade steps:** export JSON from the old admin app; stop cleanly; snapshot database, shared files and deployment configuration; run new-binary preflight; start and verify old addresses. Normal upgrades migrate in place, without reimport. Roll back only with the old binary/image and the complete pre-upgrade snapshot. See [operations](../guide/operations#upgrade).
-- Add direct HTTP contract checks without external SDK dependencies, schema 1–5 preservation/failure tests and the old-binary full-snapshot recovery drill to CI.
-- Independent review adds atomic identity checks between rename and updates/permanent deletion, raw JSON UTF-8 validation, database/WAL/SHM write-access preflight and failed-migration copy cleanup. Docker verifies full-snapshot rollback, read-only databases and real ENOSPC as UID 65532.
+- Add atomic identity checks between rename and updates/permanent deletion, raw JSON UTF-8 validation, database/WAL/SHM write-access preflight and failed-migration copy cleanup.
 
-- Record cache/batching ablations and dependency/component references; correct documented day storage, cache capacity, referrers and units.
-- Keep menus inside short viewports and clean up listeners on unmount; make scrolling docs tables keyboard reachable with visible focus. Update token examples and fail screenshot scripts on authentication errors.
+- Correct documented day storage, cache capacity, referrers and units.
+- Keep menus inside short viewports and clean up listeners on unmount; make scrolling docs tables keyboard reachable with visible focus. Update token examples.
 
 ### Interface refinements
 
 - Size empty slug fields for their placeholder and shorten the English hint to avoid clipping. Refresh actual documentation and README screenshots, using English for landing images.
-- Implement approved R10: share compact sizing across buttons, fields and segmented controls; reuse numeric/unit inputs with regular weight and start alignment. Refine settings and tag spacing, bilingual typography, stable busy-button width, Home/End navigation and reduced motion.
-
-### Development tooling
-
-- Patch VitePress 1.6.4 preview to honor `--host` and default to `127.0.0.1`. Documentation builds verify the listener address, homepage and 404 responses.
+- Share compact sizing across buttons, fields and segmented controls; reuse numeric/unit inputs with regular weight and start alignment. Refine settings and tag spacing, bilingual typography, stable busy-button width, Home/End navigation and reduced motion.
 
 ## v0.9.4
 
-2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Implements approved R7 and R9. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.
+2026-10-10 · Fix missing tag management, lost draft/refresh state and inconsistent interface controls. Database schema remains 5 with no new migration; existing share URLs, configuration defaults and file contents stay unchanged.
 
 - Restore readable button text immediately when enabled; version documentation screenshots by content so updated pages do not reuse stale images.
-- Apply approved R9 control sizes: 32px desktop toolbars, 36px fields and 38px menu rows, with 44px controls on narrow or touch screens. Align tag search and filters, management entry styling and About typography.
+- Unify control sizes: 32px desktop toolbars, 36px fields and 38px menu rows, with 44px controls on narrow or touch screens. Align tag search and filters, management entry styling and About typography.
 - Complete tag management with search, unused tags, global editing and atomic deletion that retains content.
 - Protect submitted drafts and unsaved item edits; preserve loaded pages and selection during refresh.
 - Distinguish query, pagination, statistics and token errors from empty data, with retry actions.
@@ -144,7 +134,7 @@ Before upgrading from v0.9.3, back up the database, files and configuration usin
 
 ## v0.9.3
 
-2026-10-09 · Fix share slug lengths not matching their settings, detail preview jitter and controls abruptly growing on narrow screens. Implements approved R6. Database schema stays at 5; the first startup only initializes missing independent share-length settings, with no new schema migration.
+2026-10-09 · Fix share slug lengths not matching their settings, detail preview jitter and controls abruptly growing on narrow screens. Database schema stays at 5; the first startup only initializes missing independent share-length settings, with no new schema migration.
 
 - Fix admin inputs, save buttons and tag controls abruptly growing at the 640px breakpoint. Keep text/code creation and editing typography consistent, with separate touch-input font sizing and switch hit areas that preserve the compact layout.
 
@@ -160,22 +150,20 @@ Before upgrading from v0.9.2, stop the service cleanly and back up the database,
 
 - Fix direct requests borrowing the environment proxy's address exemption. Requests matching `NO_PROXY` use a separate connection pool and always check the public IP at dial time, blocking DNS rebinding to the configured private proxy address and port. Only requests actually routed through a proxy may delegate failed local DNS lookups. Dedicated metadata proxy IP pinning is unchanged.
 - Create `sani backup FILE` with `0600` permissions from the start, atomically reject existing files and symlinks, and remove incomplete output on failure. The host shell still controls stdout backup permissions; bilingual examples now use `umask 077` and prevent overwrites. Existing backup permissions are unchanged and should be reviewed after upgrading.
-- Add regression tests for proxy/direct DNS rebinding, backup permissions and failure cleanup, plus 308 HTTP checks that forwarded queries cannot replace the saved redirect scheme or authority. CodeQL #7 is dismissed as a false positive; the raw scan still reports this data flow and is not claimed to be clean.
 
 ## v0.9.1
 
-2026-10-09 · Fix admin proxy configuration and control styling with approved R5. Database schema stays at 5 with no new migration.
+2026-10-09 · Fix admin proxy configuration and control styling. Database schema stays at 5 with no new migration.
 
-- Implement approved R5: restore compact Settings rows with one centered Direct/HTTP(S)/SOCKS5 segmented control. Align paired domain, token and password actions, retaining touch sizes on narrow screens.
+- Restore compact Settings rows with one centered Direct/HTTP(S)/SOCKS5 segmented control. Align paired domain, token and password actions, retaining touch sizes on narrow screens.
 - Configure proxy hosts, ports and optional authentication directly in Settings, effective for new requests after saving. Never return saved passwords; changing a proxy or account requires re-entry. Add real connection testing without saving or direct fallback, preserving environment overrides.
-- Replace native controls with app-styled RGB sliders, a calendar with date/time text fields, and hover/focus tooltips. Keep HEX/RGB/HSL entry, keyboard access and both themes. Record the no-browser-default-visuals rule in design and development constraints.
+- Replace native controls with app-styled RGB sliders, a calendar with date/time text fields, and hover/focus tooltips. Keep HEX/RGB/HSL entry, keyboard access and both themes.
 - Align bilingual settings, API and credential-storage documentation. Saved proxy passwords are included in the database and backups without encryption; this change does not alter the database schema.
-- Document Forgejo as the push destination for branches and tags, mirrored to GitHub for builds. Forgejo master pushes trigger Woodpecker documentation deployment; verify both remotes and the live site after publishing.
 - Update the Go toolchain and Docker builder to 1.27.2 and `golang.org/x/net` to 0.60.0 to fix known security vulnerabilities found by release checks.
 
 ## v0.9.0
 
-2026-10-09 · Implement approved R3: editable tag colors, creation defaults, a dedicated metadata proxy and chunked file uploads, with consistent admin interactions. First startup migrates to schema 5; read the upgrade notes below.
+2026-10-09 · Editable tag colors, creation defaults, a dedicated metadata proxy and chunked file uploads, with consistent admin interactions. First startup migrates to schema 5; read the upgrade notes below.
 
 - Add 12 muted tag presets, the system color picker and HEX/RGB/HSL input, stored as six-digit HEX. Edit existing tag names and colors in place across all references; legacy named colors remain supported.
 - Add persisted settings for generated slug length, look-alike character exclusion, file size and off/direct/proxy metadata fetching. Explicit environment values take priority and lock their corresponding controls. Generated share IDs remain at least 10 characters.
@@ -183,7 +171,6 @@ Before upgrading from v0.9.2, stop the service cleanly and back up the database,
 - Add optional `SANI_META_PROXY` for HTTP, HTTPS or SOCKS5 with optional authentication. Dedicated mode pins verified public target IPs while retaining Host/TLS SNI, ignores NO_PROXY and never falls back to direct connections. Proxy credentials stay on the server; refreshing with fetching disabled preserves existing metadata.
 - Limit imports to native Sani CSV/JSON and explicit Shlink formats, with downloadable Sani examples. Remove other products’ aliases and arbitrary wrappers; reject unrecognized formats before writing. Verify an unmodified Shlink CSV against an isolated database and repeated imports without duplicate links or counts.
 - Soften composer focus halos and upload hover; unify keyboard, copy, open and Enter icons and action buttons. Keep hidden creation panels out of focus order and prevent long domains from widening narrow Settings pages.
-- Align bilingual API, configuration, import, deployment and security documentation; add proxy protocol/DNS, schema migration, settings precedence, chunk retry and browser regression coverage.
 
 ### Incompatible changes and upgrade
 
@@ -237,8 +224,6 @@ Redirects with expiry or a visit limit now disallow caching, so cache-dependent 
 - Protect temporary and renamed files for the full upload request until database ownership or failure cleanup, preventing the file sweeper from removing active uploads.
 - Decide whether to refetch a title from the latest row inside the write transaction, preserving concurrently saved manual titles during URL updates and metadata refreshes.
 - Ignore late list and text responses to preserve saved or deleted data. Retry stale pagination and refresh counts after deletion. Failed sign-out keeps the authenticated interface and shows an error that can be retried.
-- Add CI smoke coverage using real processes for authentication, shares, CLI password reset and stopped-service backup/restore. Run admin axe checks in Chinese/English and light/dark themes.
-- Align bilingual product scope, cache/statistics limits, proxy trust and stopped-service backup/upgrade instructions. Add page descriptions, canonical URLs, language alternates, social metadata and JSON-LD, with post-build checks of HTML, sitemap, robots and 404 indexing rules.
 - Reject session issuance from a password verification that predates a password change. Admin changes, environment synchronization and CLI resets update the password and revoke sessions atomically; a failed revocation rolls back the password.
 - Prevent requests after cache invalidation from joining an older load, so disabling or renaming links and shares takes effect for new requests.
 - Limit HTML icon candidates to 32 and base and HTTP(S) icon URLs to 8192 bytes to bound relative-URL expansion.
@@ -292,17 +277,12 @@ Upgrading from v0.5.0 keeps the database at schema 4 with no new migration. This
 - API totals do not double-count a committing batch; concurrent requests and replaced cache entries share the same allowance.
 - Failed-batch merges keep referrers bounded while preserving accumulated clicks.
 - Shutdown waits for requests and background work, gives the final flush its own deadline, and exits nonzero on failure. Deployment examples allow 30 seconds to stop.
-- The demo seed script no longer prints passwords; design comparison scripts match literal slugs without interpreting them as regular expressions.
+- The demo seed script no longer prints passwords.
 
-### Verification and documentation
+### Documentation and dependencies
 
-- Add regressions for counting, conditional requests, migration, retries, shutdown and full backup restoration.
-- Add a 1k/10k/100k capacity tool measuring latency percentiles, memory, SQLite waits, flushing and WAL; remove an unnecessary content-table join from unfiltered list counts.
 - Correct online file-backup and two-second loss promises, distinguish live totals from committed aggregates, and check version consistency and critical documentation semantics.
-- Update docs and design-tool build dependencies and audit JavaScript dependencies in CI.
-- Normalize spaces around prose links, emphasis and inline code, wrap long inline code on small screens, and match thin scrollbars to both themes; simplify the home page and mark the hosted docs as live.
 - Fix the `source-map-js` build dependency vulnerability, update SQLite and build tools, and add CodeQL checks for Go, JavaScript/TypeScript, Python and GitHub Actions.
-- Use Ubuntu 24.04 for CI, code scanning and releases; pin mise and remove warnings caused by stale toolchain caches and duplicate Go cache restoration.
 
 ### Upgrading
 

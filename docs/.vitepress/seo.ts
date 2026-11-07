@@ -66,8 +66,8 @@ const descriptions: Record<string, { zh: string; en: string }> = {
     en: 'Review Sani’s setup code, passwords and sessions, CSRF and CSP, SSRF defenses, files-domain isolation, input limits and vulnerability reporting.',
   },
   'project/progress': {
-    zh: '查看 Sani 的已实现功能、验收入口、文档与源码一致性检查、工具链版本、后续计划和明确不包含的能力。',
-    en: 'Track Sani’s implemented features, acceptance checks, documentation and source consistency, toolchain versions, planned work and non-goals.',
+    zh: '查看 Sani 的已实现功能、适用范围、文档与源码一致性检查、工具链版本、后续计划和明确不包含的能力。',
+    en: 'Track Sani’s implemented features, intended use, documentation and source consistency, toolchain versions, planned work and non-goals.',
   },
   'project/changelog': {
     zh: 'Sani 更新日志：已发布版本与未发布变更、修复、功能、不兼容调整及数据库升级说明。',

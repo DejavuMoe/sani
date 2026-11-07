@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBUG04ImportExactIntegerSpellings(t *testing.T) {
+func TestImportExactIntegerSpellings(t *testing.T) {
 	for _, format := range []string{"sani", "shlink-flat", "shlink-nested"} {
 		t.Run(format, func(t *testing.T) {
 			e := newEnv(t, Options{})
@@ -64,7 +64,7 @@ func TestBUG04ImportExactIntegerSpellings(t *testing.T) {
 	}
 }
 
-func TestBUG04ImportRejectsInvalidCounters(t *testing.T) {
+func TestImportRejectsInvalidCounters(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
 	for _, field := range []string{"clicks", "maxClicks"} {
@@ -88,7 +88,7 @@ func TestBUG04ImportRejectsInvalidCounters(t *testing.T) {
 	}
 }
 
-func TestBUG04ShlinkRejectsMalformedCounters(t *testing.T) {
+func TestShlinkRejectsMalformedCounters(t *testing.T) {
 	e := newEnv(t, Options{})
 	e.signIn()
 	for _, field := range []string{`"visitsSummary":{"total":%s}`, `"meta":{"maxVisits":%s}`} {

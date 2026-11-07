@@ -162,7 +162,7 @@ describe('lists racing local writes', () => {
 
 describe('management state recovery', () => {
   for (const kind of ['url', 'text', 'file'] as const) {
-    it.each(['审计', 'café'])('AUD-006 keeps %s ' + kind + ' results through updates and failed deletion', async slug => {
+    it.each(['审计', 'café'])('keeps %s ' + kind + ' results through updates and failed deletion', async slug => {
       const link = { ...old, kind, slug, shortUrl: `http://localhost/${kind === 'url' ? '' : 'p/'}${slug}` };
       links.items = [link];
       links.query = new URL(link.shortUrl).href;
@@ -193,7 +193,7 @@ describe('management state recovery', () => {
     ['single decode', 'http://localhost/%25C3%25A9'],
     ['malformed escape', 'http://localhost/%GG'],
     ['invalid UTF8', 'http://localhost/%FF'],
-  ])('AUD-006 preserves %s during local reconciliation', (_name, query) => {
+  ])('preserves %s during local reconciliation', (_name, query) => {
     const link = { ...old, url: 'https://destination.invalid/caf%C3%A9', title: 'Literal %C3%A9 %GG %FF' };
     links.query = query;
     links.upsert(link);
@@ -201,7 +201,7 @@ describe('management state recovery', () => {
     expect(links.total).toBe(1);
   });
 
-  it('BUG-01 keeps cancelled selection outside the picked set and protects the draft from deletion', async () => {
+  it('keeps cancelled selection outside the picked set and protects the draft from deletion', async () => {
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
     links.togglePick(old.id);
@@ -215,7 +215,7 @@ describe('management state recovery', () => {
     expect(links.items).toEqual([old]);
   });
 
-  it('BUG-01 resumes the complete selection action once after discarding the draft', () => {
+  it('resumes the complete selection action once after discarding the draft', () => {
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
     links.togglePick(old.id);
@@ -227,7 +227,7 @@ describe('management state recovery', () => {
     expect([...links.picked]).toEqual([]);
   });
 
-  it('BUG-01 guards bulk deletion of a dirty editor even with an existing picked ID', async () => {
+  it('guards bulk deletion of a dirty editor even with an existing picked ID', async () => {
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
     links.picked.add(old.id);
@@ -239,7 +239,7 @@ describe('management state recovery', () => {
     expect(links.items).toEqual([old]);
   });
 
-  it.each(['/old', 'http://localhost/old', ' /p/old '])('BUG-22 restores a failed deletion in the %s search', async query => {
+  it.each(['/old', 'http://localhost/old', ' /p/old '])('restores a failed deletion in the %s search', async query => {
     links.query = query;
     vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
     await links.remove(old);
@@ -247,7 +247,7 @@ describe('management state recovery', () => {
     expect(links.total).toBe(1);
   });
 
-  it('BUG-23 removes an edited last search match and its count immediately', async () => {
+  it('removes an edited last search match and its count immediately', async () => {
     links.query = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
@@ -260,7 +260,7 @@ describe('management state recovery', () => {
     expect(links.editingId).toBeNull();
   });
 
-  it('BUG-23 retains a dirty search result during an unrelated metadata update', () => {
+  it('retains a dirty search result during an unrelated metadata update', () => {
     links.query = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
@@ -270,7 +270,7 @@ describe('management state recovery', () => {
     expect(links.refreshFailed).toBe(true);
   });
 
-  it('BUG-23 preserves a dirty editor while a tag request or save is pending', () => {
+  it('preserves a dirty editor while a tag request or save is pending', () => {
     links.query = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
     editor.check = () => true;
@@ -282,7 +282,7 @@ describe('management state recovery', () => {
     expect(links.refreshFailed).toBe(true);
   });
 
-  it.each(['https://short.example:443', 'http://short.example:80', 'https://例子.test'])('BUG-22/23 preserves the exact short origin %s during reconciliation', async origin => {
+  it.each(['https://short.example:443', 'http://short.example:80', 'https://例子.test'])('preserves the exact short origin %s during reconciliation', async origin => {
     const link = { ...old, shortUrl: `${origin}/old` };
     links.items = [link];
     links.query = link.shortUrl;
@@ -294,7 +294,7 @@ describe('management state recovery', () => {
     expect(links.total).toBe(1);
   });
 
-  it('BUG-23 keeps normalized Unicode matches and treats wildcard characters literally', () => {
+  it('keeps normalized Unicode matches and treats wildcard characters literally', () => {
     links.query = 'e\u0301';
     links.upsert({ ...fresh, title: 'ÉCLAIR' });
     expect(links.items).toHaveLength(1);
@@ -304,7 +304,7 @@ describe('management state recovery', () => {
     expect(links.total).toBe(0);
   });
 
-  it('BUG-23 keeps a text first-line match after an unrelated edit', () => {
+  it('keeps a text first-line match after an unrelated edit', () => {
     links.query = 'first line';
     const text = { ...fresh, kind: 'text' as const, url: '', content: { format: 'plain' as const, preview: 'The first line', lines: 2, size: 20, rawUrl: null } };
     links.upsert(text);
@@ -312,7 +312,7 @@ describe('management state recovery', () => {
     expect(links.total).toBe(1);
   });
 
-  it.each([['οσ', 'ΟΣ'], ['ib', 'İB']])('BUG-03/23 follows server case normalization for %s', (query, title) => {
+  it.each([['οσ', 'ΟΣ'], ['ib', 'İB']])('follows server case normalization for %s', (query, title) => {
     links.query = query;
     links.upsert({ ...fresh, title });
     expect(links.items).toHaveLength(1);
