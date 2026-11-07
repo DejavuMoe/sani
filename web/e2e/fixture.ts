@@ -4,6 +4,9 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+// The app reads the shortcut modifier from navigator.platform, which follows the runner's OS.
+export const modEnter = process.platform === 'darwin' ? 'Meta+Enter' : 'Control+Enter';
+
 // Starts a throwaway Sani on the port of `base`, without any SANI_* setting from the caller's environment.
 export async function startSani(base: string, password: string): Promise<ChildProcess> {
   const port = new URL(base).port;

@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import type { ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { startSani, stopSani } from './fixture';
+import { modEnter, startSani, stopSani } from './fixture';
 
 const base = 'http://127.0.0.1:18773';
 const password = 'local-access-fixture';
@@ -56,7 +56,7 @@ test('a text shared with a generated password: popover, clipboard, list, detail 
   await expect(panel.getByLabel('Text to share')).toHaveValue('Deploy notes');
 
   const created = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith('/api/admin/v1/texts'));
-  await panel.getByLabel('Text to share').press('Control+Enter');
+  await panel.getByLabel('Text to share').press(modEnter);
   const link = await (await created).json();
   expect(link.password).toBe('blue-otter');
   await expect(page.locator('.toast').first()).toContainText('Link and password copied');

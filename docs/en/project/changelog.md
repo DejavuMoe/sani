@@ -5,6 +5,7 @@
 ## Unreleased
 
 - The placeholder shown while the first page of links is slow to load now lines up with the list: it shows the real header, and its row height, columns and the phone’s stacked layout match the list, so nothing moves when the links arrive. Its bars use a clearer interface colour.
+- Keep the expiry, click-limit and password popovers fully inside the viewport when their trigger sits near or below the bottom edge, so their Apply button stays reachable.
 
 ## v1.0.3
 

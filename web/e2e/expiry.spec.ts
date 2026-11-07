@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { startSani, stopSani } from './fixture';
+import { modEnter, startSani, stopSani } from './fixture';
 
 const base = 'http://127.0.0.1:18776';
 const password = 'local-expiry-fixture';
@@ -133,7 +133,7 @@ test('applied expiry persists through real creation and editor save for links, t
     await pop.getByPlaceholder('HH:mm').fill('09:07');
     await pop.getByRole('button', { name: 'Apply date and time' }).click();
     const created = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith(`/api/admin/v1/${endpoint}`));
-    if (mode === 'text') await panel.getByLabel('Text to share').press('Control+Enter');
+    if (mode === 'text') await panel.getByLabel('Text to share').press(modEnter);
     else if (mode === 'url') await panel.locator('.url').press('Enter');
     else await panel.locator('.go').click();
     const response = await created; expect(response.ok()).toBe(true);

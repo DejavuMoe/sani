@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { modEnter } from './fixture';
 
 // One server and database for the whole file: each test builds on the last,
 // the way an owner actually uses Sani.
@@ -96,7 +97,7 @@ test('the destination can be edited and takes effect immediately', async () => {
   await page.keyboard.press('e');
   const url = row.getByLabel('Destination');
   await url.fill('https://svelte.dev/docs');
-  await page.keyboard.press('Control+Enter');
+  await page.keyboard.press(modEnter);
   await expect(page.locator('.toast').last()).toContainText('Saved');
   expect((await follow('svelte')).location).toBe('https://svelte.dev/docs');
 });
@@ -189,7 +190,7 @@ test('a text is shared at /p/ and served raw from the files origin', async () =>
   const body = page.getByLabel('Text to share');
   await body.fill(text);
   await page.locator('#create-panel-text').getByRole('radio', { name: 'Code' }).click();
-  await body.press('Control+Enter');
+  await body.press(modEnter);
   await expect(page.locator('.toast').last()).toContainText('Copied');
 
   const short = await clipboard();

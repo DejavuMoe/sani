@@ -50,7 +50,7 @@
     let top = r.bottom + 6;
     if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;
     pop.style.left = `${left}px`;
-    pop.style.top = `${Math.max(8, top)}px`;
+    pop.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`;
   }
 
   function close() {
