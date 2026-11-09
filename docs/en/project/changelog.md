@@ -2,7 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.4
+
+2026-11-09 · Show a neutral notice instead of a refresh failure when unsaved edits pause list updates, fix link states shown during refresh and enabling, and align the first-load placeholder with the list. Database schema remains 7 with no new migration.
+
+Upgrading from v1.0.3 needs no data migration; the API, public contracts and existing links are unchanged. Take a complete snapshot as described in [backup and restore](../guide/operations#backup-files) before upgrading.
 
 - Show a neutral notice when unsaved edits pause list updates, then refresh automatically after saving, discarding or reverting the draft. Navigation requested during a save continues after success; a failed save keeps the editor open.
 - Clear stale pagination errors after a successful refresh and avoid briefly showing expired or exhausted links as active when enabling them.
