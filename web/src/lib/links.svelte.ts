@@ -23,11 +23,17 @@ const PAGE = 50;
 /** The server takes at most this many links per bulk request. */
 export const MAX_PICK = 500;
 
+/** Query: loading → ready/failed; load/search → loading.
+ * Ready sync: idle → refreshing/paging → idle/failure; dirty row removal → held,
+ * editor settles → refreshing. A new query resets sync to idle. */
+type QueryState = 'loading' | 'ready' | 'failed';
+type SyncState = 'idle' | 'refreshing' | 'paging' | 'pagingFailed' | 'refreshFailed' | 'held';
+
 class LinksStore {
   items = $state<Link[]>([]);
   total = $state(0);
   next = $state<string | null>(null);
-  query = $state('');
+  searchQuery = $state('');
   sort = $state<Sort>('created');
   /** Show only links of this kind; null shows all of them. */
   kind = $state<LinkKind | null>(null);
@@ -84,7 +90,7 @@ class LinksStore {
 
   clearFilters() {
     if (editor.check?.()) { editor.request(() => this.clearFilters()); return; }
-    this.query = '';
+    this.searchQuery = '';
     this.kind = null;
     this.tag = null;
     clearTimeout(this.searchTimer);
@@ -97,7 +103,7 @@ class LinksStore {
 
   private matchesView(link: Link) {
     // Match the API's pasted short-URL search before comparing stored fields.
-    let query = this.query.trim();
+    let query = this.searchQuery.trim();
     const prefix = link.shortUrl.match(/^[^/]+:\/\/[^/]+\//)?.[0];
     const shortPath = (prefix && query.startsWith(prefix)) || query.startsWith('/') || query.startsWith('p/');
     if (prefix && query.startsWith(prefix)) query = query.slice(prefix.length);
@@ -109,18 +115,28 @@ class LinksStore {
     return (!query || fields.some(value => lookupKey(value).includes(query))) &&
       (!this.kind || this.kind === link.kind) && this.matchesTag(link);
   }
-  /** First page for the current query has arrived. */
-  loaded = $state(false);
-  loading = $state(false);
-  loadingMore = $state(false);
-  failed = $state(false);
-  moreFailed = $state(false);
-  refreshFailed = $state(false);
-  refreshing = $state(false);
+  /** Retain old rows during foreground loads and failures. */
+  hasData = $state(false);
+  query = $state<QueryState>('loading');
+  sync = $state<SyncState>('idle');
+  get loaded() { return this.hasData; }
+  get loading() { return this.query === 'loading'; }
+  get failed() { return this.query === 'failed'; }
+  get loadingMore() { return this.query === 'ready' && this.sync === 'paging'; }
+  get moreFailed() { return this.query === 'ready' && this.sync === 'pagingFailed'; }
+  get refreshFailed() { return this.query === 'ready' && this.sync === 'refreshFailed'; }
+  get refreshing() { return this.query === 'ready' && this.sync === 'refreshing'; }
   overviewFailed = $state(false);
+  // Race guards: older requests must not publish over newer work.
   private refreshSeq = 0;
   private overviewSeq = 0;
   get stale() { return this.loading || this.failed; }
+
+  constructor() {
+    editor.onSettle(() => {
+      if (this.query === 'ready' && this.sync === 'held') void this.refresh();
+    });
+  }
 
   private expanded = $state<number | null>(null);
   private editing = $state<number | null>(null);
@@ -151,8 +167,8 @@ class LinksStore {
   /** A bulk request is in flight. */
   busy = $state(false);
 
+  // Race guards for query changes and local writes, independent of UI state.
   private seq = 0;
-  // Lists started before a local write must not replace its result.
   private revision = 0;
   private ctrl: AbortController | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -162,26 +178,24 @@ class LinksStore {
     const ctrl = (this.ctrl = new AbortController());
     const seq = ++this.seq;
     const revision = this.revision;
-    this.loading = true;
-    this.failed = false;
-    this.moreFailed = this.refreshFailed = false;
+    this.query = 'loading';
+    this.sync = 'idle';
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
+      const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
       if (revision !== this.revision) { void this.load(); return; }
       this.items = res.items;
       this.total = res.total;
       this.next = res.next;
-      this.loaded = true;
+      this.hasData = true;
+      this.query = 'ready';
       // Checked links the new view doesn't show would be acted on unseen.
       this.picked.clear();
       this.anchor = null;
       if (this.selectedId !== null && !res.items.some((l) => l.id === this.selectedId)) this.selectedId = null;
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return;
-      if (seq === this.seq) this.failed = true;
-    } finally {
-      if (seq === this.seq) this.loading = false;
+      if (seq === this.seq) this.query = 'failed';
     }
   }
 
@@ -189,11 +203,10 @@ class LinksStore {
     if (!this.next || this.loadingMore || this.stale || this.refreshing) return;
     const seq = this.seq;
     const revision = this.revision;
-    this.loadingMore = true;
-    this.moreFailed = false;
+    this.sync = 'paging';
     let retry = false;
     try {
-      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
+      const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
       if (seq !== this.seq) return;
       if (revision !== this.revision) { retry = true; return; }
       const seen = new Set(this.items.map((l) => l.id));
@@ -201,9 +214,9 @@ class LinksStore {
       this.next = res.next;
       this.total = res.total;
     } catch {
-      if (seq === this.seq) this.moreFailed = true;
+      if (seq === this.seq) this.sync = 'pagingFailed';
     } finally {
-      this.loadingMore = false;
+      if (seq === this.seq && this.sync === 'paging') this.sync = 'idle';
       // The sentinel may stay visible, so it will not emit another entry.
       if (retry && seq === this.seq) void this.loadMore();
     }
@@ -211,9 +224,10 @@ class LinksStore {
 
   search(q: string) {
     editor.request(() => {
-      this.query = q;
+      this.searchQuery = q;
       this.ctrl?.abort(); ++this.seq;
-      this.loading = true;
+      this.query = 'loading';
+      this.sync = 'idle';
       clearTimeout(this.searchTimer);
       this.searchTimer = setTimeout(() => this.load(), q ? 140 : 0);
     });
@@ -235,13 +249,13 @@ class LinksStore {
     if (!this.loaded || this.stale || this.loadingMore) return;
     const seq = this.seq, revision = this.revision, refresh = ++this.refreshSeq;
     const wanted = Math.max(PAGE, this.items.length);
-    this.refreshing = true;
+    this.sync = 'refreshing';
     try {
       let cursor: string | null = null;
       let total = 0;
       const items: Link[] = [];
       do {
-        const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag,
+        const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag,
           limit: Math.min(200, wanted - items.length), ...(cursor ? { cursor } : {}) });
         if (seq !== this.seq || revision !== this.revision || refresh !== this.refreshSeq) return;
         items.push(...res.items); total = res.total;
@@ -250,19 +264,19 @@ class LinksStore {
       } while (cursor && items.length < wanted);
       // Never unmount a dirty editor because a background refresh lost its row.
       if (editor.check?.() && this.editingId !== null && !items.some(l => l.id === this.editingId)) {
-        this.refreshFailed = true;
+        this.sync = 'held';
         return;
       }
       this.items = items;
       this.total = total;
       this.next = cursor;
-      this.refreshFailed = false;
+      this.sync = 'idle';
       const ids = new Set(items.map(l => l.id));
       for (const id of this.picked) if (!ids.has(id)) this.picked.delete(id);
       if (this.selectedId !== null && !ids.has(this.selectedId)) this.selectedId = null;
       if (this.expandedId !== null && !ids.has(this.expandedId)) this.expandedId = null;
-    } catch { if (seq === this.seq && refresh === this.refreshSeq) this.refreshFailed = true; }
-    finally { if (refresh === this.refreshSeq) this.refreshing = false; }
+    } catch { if (seq === this.seq && refresh === this.refreshSeq) this.sync = 'refreshFailed'; }
+    finally { if (seq === this.seq && refresh === this.refreshSeq && this.sync === 'refreshing') this.sync = 'idle'; }
   }
 
   async refreshOverview() {
@@ -303,7 +317,7 @@ class LinksStore {
     if (Date.parse(link.updatedAt) < Date.parse(prev.updatedAt)) return;
     if (!this.matchesView(link)) {
       // Only an acknowledged editor save may remove its dirty row from the filter.
-      if (this.editingId === link.id && editor.check?.() && !fromEditor) { this.refreshFailed = true; return; }
+      if (this.editingId === link.id && editor.check?.() && !fromEditor) { this.sync = 'held'; return; }
       this.items = this.items.filter(l => l.id !== link.id);
       this.total = Math.max(0, this.total - 1);
       if (this.expandedId === link.id) this.expanded = null;
@@ -342,7 +356,7 @@ class LinksStore {
   }
 
   private added(link: Link) {
-    const filtered = !!this.query || !!this.kind || this.tag !== null || this.sort !== 'created';
+    const filtered = !!this.searchQuery || !!this.kind || this.tag !== null || this.sort !== 'created';
     if (filtered) { this.sort = 'created'; this.clearFilters(); toasts.show(t('created.filtersCleared')); }
     else this.place(link);
     this.flash(link.id);
@@ -379,7 +393,12 @@ class LinksStore {
   /** Optimistic toggle; reverts if the server says no. */
   async setEnabled(link: Link, enabled: boolean) {
     const prev = this.items.find((l) => l.id === link.id);
-    if (prev) this.upsert({ ...prev, enabled, status: enabled ? 'active' : 'disabled' });
+    if (prev) {
+      const toggleable = prev.status === 'active' || prev.status === 'disabled';
+      const available = (!prev.expiresAt || Date.parse(prev.expiresAt) > Date.now()) &&
+        (prev.maxClicks === null || prev.clicks < prev.maxClicks);
+      this.upsert({ ...prev, enabled, status: toggleable && (!enabled || available) ? (enabled ? 'active' : 'disabled') : prev.status });
+    }
     try {
       const updated = await this.update(link.id, { enabled });
       toasts.show(t(enabled ? 'detail.turnedOn' : 'detail.turnedOff', { slug: '/' + updated.slug }));

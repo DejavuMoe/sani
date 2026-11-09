@@ -24,16 +24,22 @@ function held<T>() {
   return { promise, resolve };
 }
 
+let guardToken: symbol | undefined;
+function registerDirty() {
+  guardToken = editor.register({ check: () => true, save: async () => false, discard: () => {} });
+}
+
 beforeEach(() => {
   vi.resetAllMocks();
-  editor.check = editor.save = editor.discard = editor.pending = null; editor.saving = false;
+  links.sync = 'idle';
+  editor.leave();
   links.editingId = links.expandedId = null;
   links.tagsLoaded = links.tagsFailed = false;
   links.items = [{ ...old }];
   links.total = 1;
-  links.loaded = true;
-  links.loading = links.loadingMore = links.failed = links.refreshFailed = links.refreshing = links.moreFailed = false;
-  links.query = '';
+  links.hasData = true;
+  links.query = 'ready';
+  links.searchQuery = '';
   links.kind = links.tag = null;
   links.sort = 'created';
   links.next = null;
@@ -115,7 +121,7 @@ describe('lists racing local writes', () => {
     const response = held<ReturnType<typeof list>>();
     vi.mocked(api.links).mockReturnValueOnce(response.promise).mockResolvedValue(list([fresh]));
     const pending = links.loadMore();
-    links.query = 'Saved';
+    links.searchQuery = 'Saved';
     await links.load();
     links.upsert(fresh);
     response.resolve(list([old]));
@@ -161,11 +167,85 @@ describe('lists racing local writes', () => {
 
 
 describe('management state recovery', () => {
+  it.each([false, true])('distinguishes foreground failure with hasData=%s', async hasData => {
+    links.hasData = hasData;
+    links.sync = 'held';
+    const response = held<ReturnType<typeof list>>();
+    vi.mocked(api.links).mockReturnValueOnce(response.promise);
+    const pending = links.load();
+    expect(links.query).toBe('loading');
+    expect(links.sync).toBe('idle');
+    expect(links.loaded).toBe(hasData);
+    response.resolve(list([old]));
+    await pending;
+    expect(links.query).toBe('ready');
+    expect(links.loaded).toBe(true);
+    links.hasData = hasData;
+    vi.mocked(api.links).mockRejectedValueOnce(new Error('offline'));
+    await links.load();
+    expect(links.query).toBe('failed');
+    expect(links.failed).toBe(true);
+    expect(links.stale).toBe(true);
+    expect(links.loaded).toBe(hasData);
+  });
+
+  it('clears a failed page after refreshing its cursors', async () => {
+    links.next = 'old-cursor';
+    vi.mocked(api.links).mockRejectedValueOnce(new Error('offline'));
+    await links.loadMore();
+    expect(links.sync).toBe('pagingFailed');
+    vi.mocked(api.links).mockResolvedValueOnce(list([fresh]));
+    await links.refresh();
+    expect(links.sync).toBe('idle');
+    expect(links.moreFailed).toBe(false);
+    expect(links.next).toBeNull();
+  });
+
+  it.each(['clean', 'closed', 'saved', 'discarded'] as const)('refreshes a held list once after the editor is %s', async how => {
+    links.expandedId = old.id;
+    links.editingId = old.id;
+    let dirty = true;
+    const token = editor.register({ check: () => dirty, save: async () => { dirty = false; return true; }, discard: () => {} });
+    vi.mocked(api.links).mockResolvedValue(list([]));
+    await links.refresh();
+    expect(links.sync).toBe('held');
+    expect(links.refreshFailed).toBe(false);
+    expect(links.items).toEqual([old]);
+    expect(api.links).toHaveBeenCalledTimes(1);
+    if (how === 'clean') { dirty = false; editor.settle(); }
+    else if (how === 'closed') editor.unregister(token);
+    else if (how === 'saved') await editor.save();
+    else editor.leave();
+    editor.settle();
+    await vi.waitFor(() => expect(links.sync).toBe('idle'));
+    expect(api.links).toHaveBeenCalledTimes(2);
+    expect(links.items).toEqual([]);
+  });
+
+  it.each([
+    { status: 'expired', expiresAt: '2000-01-01T00:00:00Z' },
+    { status: 'exhausted', clicks: 5, maxClicks: 5 },
+    { status: 'disabled', expiresAt: '2000-01-01T00:00:00Z' },
+    { status: 'disabled', clicks: 5, maxClicks: 5 },
+    { status: 'disabled' },
+  ] as const)('does not optimistically activate an unavailable link: %j', async fields => {
+    const link = { ...old, ...fields, enabled: false };
+    links.items = [link];
+    const response = held<Link>();
+    vi.mocked(api.updateLink).mockReturnValueOnce(response.promise);
+    const pending = links.setEnabled(link, true);
+    expect(links.items[0].enabled).toBe(true);
+    expect(links.items[0].status).toBe(Object.keys(fields).length === 1 ? 'active' : fields.status);
+    response.resolve({ ...link, enabled: true });
+    await pending;
+    expect(links.items[0].status).toBe(fields.status);
+  });
+
   for (const kind of ['url', 'text', 'file'] as const) {
     it.each(['审计', 'café'])('keeps %s ' + kind + ' results through updates and failed deletion', async slug => {
       const link = { ...old, kind, slug, shortUrl: `http://localhost/${kind === 'url' ? '' : 'p/'}${slug}` };
       links.items = [link];
-      links.query = new URL(link.shortUrl).href;
+      links.searchQuery = new URL(link.shortUrl).href;
       const updated = { ...link, clicks: 1 };
       links.upsert(updated);
       expect(links.items).toEqual([updated]);
@@ -174,12 +254,12 @@ describe('management state recovery', () => {
       await links.remove(updated);
       expect(links.items).toEqual([updated]);
       expect(links.total).toBe(1);
-      links.query = new URL(link.shortUrl).pathname;
+      links.searchQuery = new URL(link.shortUrl).pathname;
       links.upsert({ ...updated, clicks: 2 });
       expect(links.items).toHaveLength(1);
       expect(links.items[0].clicks).toBe(2);
       if (kind !== 'url') {
-        links.query = new URL(link.shortUrl).pathname.slice(1);
+        links.searchQuery = new URL(link.shortUrl).pathname.slice(1);
         links.upsert({ ...updated, clicks: 3 });
         expect(links.items).toHaveLength(1);
         expect(links.items[0].clicks).toBe(3);
@@ -195,7 +275,7 @@ describe('management state recovery', () => {
     ['invalid UTF8', 'http://localhost/%FF'],
   ])('preserves %s during local reconciliation', (_name, query) => {
     const link = { ...old, url: 'https://destination.invalid/caf%C3%A9', title: 'Literal %C3%A9 %GG %FF' };
-    links.query = query;
+    links.searchQuery = query;
     links.upsert(link);
     expect(links.items).toEqual([link]);
     expect(links.total).toBe(1);
@@ -203,7 +283,7 @@ describe('management state recovery', () => {
 
   it('keeps cancelled selection outside the picked set and protects the draft from deletion', async () => {
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
+    registerDirty();
     links.togglePick(old.id);
     expect(editor.pending).not.toBeNull();
     editor.pending = null;
@@ -217,7 +297,7 @@ describe('management state recovery', () => {
 
   it('resumes the complete selection action once after discarding the draft', () => {
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
+    registerDirty();
     links.togglePick(old.id);
     expect([...links.picked]).toEqual([]);
     editor.leave();
@@ -229,7 +309,7 @@ describe('management state recovery', () => {
 
   it('guards bulk deletion of a dirty editor even with an existing picked ID', async () => {
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
+    registerDirty();
     links.picked.add(old.id);
     vi.mocked(api.bulk).mockResolvedValue({ items: [old] });
     vi.mocked(api.links).mockResolvedValue(list([]));
@@ -240,7 +320,7 @@ describe('management state recovery', () => {
   });
 
   it.each(['/old', 'http://localhost/old', ' /p/old '])('restores a failed deletion in the %s search', async query => {
-    links.query = query;
+    links.searchQuery = query;
     vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
     await links.remove(old);
     expect(links.items).toEqual([old]);
@@ -248,10 +328,10 @@ describe('management state recovery', () => {
   });
 
   it('removes an edited last search match and its count immediately', async () => {
-    links.query = 'Before';
+    links.searchQuery = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
-    editor.saving = true;
+    registerDirty();
+    editor.setBusy(guardToken!, true);
     vi.mocked(api.updateLink).mockResolvedValue(fresh);
     await links.update(old.id, { title: fresh.title }, true);
     expect(links.items).toEqual([]);
@@ -261,31 +341,31 @@ describe('management state recovery', () => {
   });
 
   it('retains a dirty search result during an unrelated metadata update', () => {
-    links.query = 'Before';
+    links.searchQuery = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
+    registerDirty();
     links.upsert(fresh);
     expect(links.items).toEqual([old]);
     expect(links.total).toBe(1);
-    expect(links.refreshFailed).toBe(true);
+    expect(links.sync).toBe('held');
   });
 
   it('preserves a dirty editor while a tag request or save is pending', () => {
-    links.query = 'Before';
+    links.searchQuery = 'Before';
     links.expandedId = old.id; links.editingId = old.id;
-    editor.check = () => true;
-    editor.saving = true;
+    registerDirty();
+    editor.setBusy(guardToken!, true);
     links.upsert(fresh);
     expect(links.items).toEqual([old]);
     expect(links.total).toBe(1);
     expect(links.editingId).toBe(old.id);
-    expect(links.refreshFailed).toBe(true);
+    expect(links.sync).toBe('held');
   });
 
   it.each(['https://short.example:443', 'http://short.example:80', 'https://例子.test'])('preserves the exact short origin %s during reconciliation', async origin => {
     const link = { ...old, shortUrl: `${origin}/old` };
     links.items = [link];
-    links.query = link.shortUrl;
+    links.searchQuery = link.shortUrl;
     links.upsert({ ...link, clicks: 1 });
     expect(links.items).toHaveLength(1);
     vi.mocked(api.deleteLink).mockRejectedValue(new Error('offline'));
@@ -295,17 +375,17 @@ describe('management state recovery', () => {
   });
 
   it('keeps normalized Unicode matches and treats wildcard characters literally', () => {
-    links.query = 'e\u0301';
+    links.searchQuery = 'e\u0301';
     links.upsert({ ...fresh, title: 'ÉCLAIR' });
     expect(links.items).toHaveLength(1);
-    links.query = '%';
+    links.searchQuery = '%';
     links.upsert({ ...fresh, title: 'Nothing matches' });
     expect(links.items).toEqual([]);
     expect(links.total).toBe(0);
   });
 
   it('keeps a text first-line match after an unrelated edit', () => {
-    links.query = 'first line';
+    links.searchQuery = 'first line';
     const text = { ...fresh, kind: 'text' as const, url: '', content: { format: 'plain' as const, preview: 'The first line', lines: 2, size: 20, rawUrl: null } };
     links.upsert(text);
     expect(links.items).toEqual([text]);
@@ -313,7 +393,7 @@ describe('management state recovery', () => {
   });
 
   it.each([['οσ', 'ΟΣ'], ['ib', 'İB']])('follows server case normalization for %s', (query, title) => {
-    links.query = query;
+    links.searchQuery = query;
     links.upsert({ ...fresh, title });
     expect(links.items).toHaveLength(1);
     expect(links.total).toBe(1);
@@ -321,9 +401,9 @@ describe('management state recovery', () => {
 
   it('protects a dirty row from background removal and explicit deletion', async () => {
     links.tag = 1; links.expandedId = 1; links.editingId = 1;
-    editor.check = () => true;
+    registerDirty();
     links.upsert({...fresh,tags:[]});
-    expect(links.items).toHaveLength(1);expect(links.refreshFailed).toBe(true);
+    expect(links.items).toHaveLength(1);expect(links.sync).toBe('held');
     vi.mocked(api.links).mockResolvedValue(list([]));
     await links.refresh();expect(links.items).toHaveLength(1);
     await links.remove(old);expect(api.deleteLink).not.toHaveBeenCalled();expect(editor.pending).not.toBeNull();
@@ -360,13 +440,13 @@ describe('management state recovery', () => {
     await links.loadMore();expect(links.moreFailed).toBe(false);expect(links.items).toHaveLength(2);
   });
   it('failed tag deletion leaves associations and filters unchanged', async () => {
-    links.tag=1;links.kind='url';links.query='old';
+    links.tag=1;links.kind='url';links.searchQuery='old';
     links.tags=[{id:1,name:'tag',color:'blue',count:1}];
     vi.mocked(api.deleteTag).mockRejectedValueOnce(new Error('offline'));
     await expect(links.deleteTag(1)).rejects.toThrow('offline');
     expect(links.tag).toBe(1);expect(links.items[0].tags).toEqual([1]);expect(links.tags).toHaveLength(1);
     vi.mocked(api.deleteTag).mockResolvedValueOnce();
     vi.mocked(api.links).mockResolvedValueOnce(list([{...old,tags:[]}])) ;
-    await links.deleteTag(1);expect(links.tag).toBeNull();expect(links.kind).toBe('url');expect(links.query).toBe('old');expect(links.items[0].tags).toEqual([]);
+    await links.deleteTag(1);expect(links.tag).toBeNull();expect(links.kind).toBe('url');expect(links.searchQuery).toBe('old');expect(links.items[0].tags).toEqual([]);
   });
 });
