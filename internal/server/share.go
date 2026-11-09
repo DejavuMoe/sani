@@ -464,7 +464,7 @@ func (s *Server) sweepFiles(ctx context.Context, now time.Time) {
 // admit applies a link's limits to one visit, counting it when count is
 // set, and reports whether the visit may proceed.
 func (s *Server) admit(e *cache.Entry, count bool, r *http.Request, now time.Time) bool {
-	if !e.Enabled || (e.ExpiresAt != 0 && now.UnixMilli() >= e.ExpiresAt) {
+	if closed(e.Enabled, e.ExpiresAt, now.UnixMilli()) {
 		return false
 	}
 	if e.MaxClicks > 0 {

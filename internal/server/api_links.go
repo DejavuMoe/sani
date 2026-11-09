@@ -119,16 +119,7 @@ func (s *Server) toDTO(base string, l *store.Link, now int64) linkDTO {
 	if l.Password != "" {
 		d.Password = &l.Password
 	}
-	switch {
-	case !l.Enabled:
-		d.Status = "disabled"
-	case l.ExpiresAt != 0 && now >= l.ExpiresAt:
-		d.Status = "expired"
-	case l.MaxClicks > 0 && clicks >= l.MaxClicks:
-		d.Status = "exhausted"
-	default:
-		d.Status = "active"
-	}
+	d.Status = string(linkState(l.Enabled, l.ExpiresAt, l.MaxClicks, clicks, now))
 	return d
 }
 
