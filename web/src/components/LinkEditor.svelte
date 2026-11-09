@@ -1,6 +1,6 @@
 <script lang="ts">
   import { editor } from '../lib/editor.svelte';
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { onMount, onDestroy, tick, untrack } from 'svelte';
   import { api, ApiError, type Link, type LinkInput, type TextFormat } from '../lib/api';
   import { fromISO, sameExpiry, toISO, type Expiry } from '../lib/expiry';
   import { errorText, t } from '../lib/i18n.svelte';
@@ -88,17 +88,15 @@
   }
 
   const checkDirty = () => dirty;
+  let guardToken: symbol;
   onDestroy(() => {
-    if (editor.discard !== cancel) return;
-    editor.check = editor.save = editor.discard = null;
-    editor.saving = false;
+    if (!editor.unregister(guardToken)) return;
     if (links.editingId === link.id) links.editingId = null;
   });
-  $effect(() => { editor.saving = saving || tagBusy; });
+  $effect(() => { const busy = tagBusy; untrack(() => editor.setBusy(guardToken, busy)); });
+  $effect(() => { if (!dirty && !saving && !tagBusy) untrack(() => editor.settle()); });
   onMount(() => {
-    editor.check = checkDirty;
-    editor.save = save;
-    editor.discard = cancel;
+    guardToken = editor.register({ check: checkDirty, save, discard: cancel });
     if (!isText) {
       ready();
       return;
@@ -142,11 +140,11 @@
     if (form.maxClicks.trim() !== start.maxClicks && !validMaxClicks(form.maxClicks)) { errors = { maxClicks: t('err.max_clicks_invalid') }; return false; }
     if (!validPassword(form.password)) { errors = { password: t('err.password_invalid') }; return false; }
     const p = patch();
-    if (!Object.keys(p).length) { editor.check = null; editor.saving = false; links.editingId = null; return true; }
+    if (!Object.keys(p).length) { editor.unregister(guardToken); links.editingId = null; return true; }
     saving = true;
     try {
       await links.update(link.id, p, true);
-      editor.check = null; editor.saving = false;
+      editor.unregister(guardToken);
       links.editingId = null;
       toasts.success(t('detail.saved'));
       return true;
@@ -168,7 +166,7 @@
   function onkeydown(e: KeyboardEvent) {
     if (modEnter(e)) {
       e.preventDefault();
-      save();
+      void editor.save();
     } else if (e.key === 'Escape' && !e.defaultPrevented) {
       e.preventDefault();
       e.stopPropagation();
@@ -182,7 +180,7 @@
   class="editor"
   onsubmit={(e) => {
     e.preventDefault();
-    save();
+    void editor.save();
   }}
   {onkeydown}
   novalidate

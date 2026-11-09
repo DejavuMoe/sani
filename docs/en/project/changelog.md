@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Show a neutral notice when unsaved edits pause list updates, then refresh automatically after saving, discarding or reverting the draft. Navigation requested during a save continues after success; a failed save keeps the editor open.
+- Clear stale pagination errors after a successful refresh and avoid briefly showing expired or exhausted links as active when enabling them.
 - The placeholder shown while the first page of links is slow to load now lines up with the list: it shows the real header, and its row height, columns and the phone’s stacked layout match the list, so nothing moves when the links arrive. Its bars use a clearer interface colour.
 
 ## v1.0.3
