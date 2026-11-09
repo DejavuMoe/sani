@@ -11,6 +11,7 @@
   import { errorText, formatDateTime, formatNumber, formatRelative, t, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
   import { download, fileName, qrPNG, qrSVG } from '../lib/qr';
+  import { Resource } from '../lib/resource.svelte';
   import { toasts } from '../lib/toast.svelte';
   import { formatSize, mediaType } from '../lib/size';
   import { stripScheme } from '../lib/url';
@@ -27,11 +28,14 @@
   const editing = $derived(links.editingId === link.id);
 
   let range = $state(30);
-  let stats = $state<LinkStats | null>(null);
-  let loading = $state(false);
   let refetching = $state(false);
-  let failed = $state(false), statsRange = $state(30);
-  let statsSeq = 0;
+
+  // The stats on screen and the range they belong to; a reload keeps both.
+  const statsRes = new Resource<{ stats: LinkStats; range: number }>();
+  const stats = $derived(statsRes.value?.stats ?? null);
+  const statsRange = $derived(statsRes.value?.range ?? 30);
+  const loading = $derived(statsRes.loading);
+  const failed = $derived(statsRes.failed);
 
   // Depends on the id and range only: new click counts arriving for the
   // same link must not refetch the stats.
@@ -42,19 +46,15 @@
   });
 
   async function load(linkId: number, days: number) {
-    const seq = ++statsSeq;
-    loading = true; failed = false;
-    try {
-      const s = await api.stats(linkId, days);
-      if (linkId !== id || days !== range || seq !== statsSeq) return;
-      stats = s; statsRange = days;
-      links.upsert({ ...s.link, spark: undefined });
-    } catch (e) {
-      if (seq !== statsSeq) return;
-      failed = true;
+    const outcome = await statsRes.run(
+      () => api.stats(linkId, days).then((stats) => ({ stats, range: days })),
+      () => linkId === id && days === range,
+    );
+    if (outcome.status === 'ready') {
+      links.upsert({ ...outcome.value.stats.link, spark: undefined });
+    } else if (outcome.status === 'failed') {
+      const e = outcome.error;
       if (e instanceof ApiError && e.code === 'not_found' && !editing) links.expandedId = null;
-    } finally {
-      if (seq === statsSeq) loading = false;
     }
   }
 
@@ -66,30 +66,21 @@
   // Object replacements from stats/list refreshes must not reload an unchanged body.
   const kind = $derived(link.kind);
   const updatedAt = $derived(link.updatedAt);
-  let loadedBody = $state<{ id: number; text: string } | null>(null);
-  const body = $derived(loadedBody?.id === id ? loadedBody.text : null);
-  let bodyLoading = $state(false);
-  let bodyFailed = $state(false);
+  const bodyRes = new Resource<{ id: number; text: string }>();
+  const body = $derived(bodyRes.value?.id === id ? bodyRes.value.text : null);
+  const bodyLoading = $derived(bodyRes.loading);
+  const bodyFailed = $derived(bodyRes.failed);
   let bodyRetry = $state(0);
   $effect(() => {
     if (kind !== 'text') return;
     const linkId = id;
     void updatedAt;
     void bodyRetry;
-    let current = true;
-    bodyLoading = true;
-    bodyFailed = false;
-    untrack(async () => {
-      try {
-        const r = await api.linkText(linkId);
-        if (current) loadedBody = { id: linkId, text: r.text };
-      } catch {
-        if (current) bodyFailed = true;
-      } finally {
-        if (current) bodyLoading = false;
-      }
+    untrack(() => {
+      void bodyRes.run(() => api.linkText(linkId).then((r) => ({ id: linkId, text: r.text })));
     });
-    return () => { current = false; };
+    // A body from a superseded link must not land.
+    return () => bodyRes.invalidate();
   });
 
   async function copyBody() {

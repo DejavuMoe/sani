@@ -15,6 +15,7 @@
   import { copyText } from '../lib/clipboard';
   import { errorText, formatDate, formatRelative, i18n, t, type Lang, type MessageKey } from '../lib/i18n.svelte';
   import { links } from '../lib/links.svelte';
+  import { Resource } from '../lib/resource.svelte';
   import { prefs, type ThemePref } from '../lib/prefs.svelte';
   import { router } from '../lib/router.svelte';
   import { session } from '../lib/session.svelte';
@@ -85,7 +86,10 @@
     finally { defaultsBusy = false; }
   }
   // Tokens
-  let tokens = $state<Token[] | null>(null);
+  const tokensRes = new Resource<Token[]>();
+  const tokens = $derived(tokensRes.value);
+  const tokensLoading = $derived(tokensRes.loading);
+  const tokensFailed = $derived(tokensRes.failed);
   let tokenName = $state('');
   let tokenBusy = $state(false);
   let tokenError = $state('');
@@ -93,13 +97,9 @@
   let confirming = $state<number | null>(null);
   let confirmTimer: ReturnType<typeof setTimeout> | undefined;
 
-  let tokensFailed = $state(false), tokensLoading = $state(false);
   async function loadTokens() {
-    if (tokensLoading) return;
-    tokensLoading = true; tokensFailed = false;
-    try { tokens = (await api.tokens()).items; }
-    catch { tokensFailed = true; }
-    finally { tokensLoading = false; }
+    if (tokensRes.loading) return;
+    await tokensRes.run(() => api.tokens().then((r) => r.items));
   }
   onMount(() => {
     void loadTokens();
@@ -115,7 +115,7 @@
     try {
       const tok = await api.createToken(tokenName.trim());
       revealed = tok;
-      tokens = [{ ...tok, token: undefined }, ...(tokens ?? [])];
+      tokensRes.value = [{ ...tok, token: undefined }, ...(tokens ?? [])];
       tokenName = '';
     } catch (err) {
       tokenError = errorText(err instanceof ApiError ? err.code : 'unknown');
@@ -134,7 +134,7 @@
     confirming = null;
     try {
       await api.deleteToken(tok.id);
-      tokens = (tokens ?? []).filter((x) => x.id !== tok.id);
+      tokensRes.value = (tokens ?? []).filter((x) => x.id !== tok.id);
       if (revealed?.id === tok.id) revealed = null;
       toasts.show(t('settings.tokenRevoked', { name: tok.name }));
     } catch (err) {
