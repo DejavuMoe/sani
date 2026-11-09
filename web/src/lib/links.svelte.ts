@@ -23,17 +23,19 @@ const PAGE = 50;
 /** The server takes at most this many links per bulk request. */
 export const MAX_PICK = 500;
 
-/** Query: loading → ready/failed; load/search → loading.
- * Ready sync: idle → refreshing/paging → idle/failure; dirty row removal → held,
- * editor settles → refreshing. A new query resets sync to idle. */
-type QueryState = 'loading' | 'ready' | 'failed';
+/** Two explicit machines replace the old loose flags:
+ * phase: loading → ready | failed; load() or search() → loading.
+ * sync (while ready): idle → refreshing | paging → idle | refreshFailed | pagingFailed;
+ * a refresh that would unmount a dirty editor's row → held, and the editor
+ * settling (saved, discarded, reverted, closed) → refreshing. load() resets sync to idle. */
+type ListPhase = 'loading' | 'ready' | 'failed';
 type SyncState = 'idle' | 'refreshing' | 'paging' | 'pagingFailed' | 'refreshFailed' | 'held';
 
 class LinksStore {
   items = $state<Link[]>([]);
   total = $state(0);
   next = $state<string | null>(null);
-  searchQuery = $state('');
+  query = $state('');
   sort = $state<Sort>('created');
   /** Show only links of this kind; null shows all of them. */
   kind = $state<LinkKind | null>(null);
@@ -90,7 +92,7 @@ class LinksStore {
 
   clearFilters() {
     if (editor.check?.()) { editor.request(() => this.clearFilters()); return; }
-    this.searchQuery = '';
+    this.query = '';
     this.kind = null;
     this.tag = null;
     clearTimeout(this.searchTimer);
@@ -103,7 +105,7 @@ class LinksStore {
 
   private matchesView(link: Link) {
     // Match the API's pasted short-URL search before comparing stored fields.
-    let query = this.searchQuery.trim();
+    let query = this.query.trim();
     const prefix = link.shortUrl.match(/^[^/]+:\/\/[^/]+\//)?.[0];
     const shortPath = (prefix && query.startsWith(prefix)) || query.startsWith('/') || query.startsWith('p/');
     if (prefix && query.startsWith(prefix)) query = query.slice(prefix.length);
@@ -117,15 +119,17 @@ class LinksStore {
   }
   /** Retain old rows during foreground loads and failures. */
   hasData = $state(false);
-  query = $state<QueryState>('loading');
+  /** Foreground load of the first page for the current filters. */
+  phase = $state<ListPhase>('loading');
+  /** Background work on a loaded list; only meaningful while phase is 'ready'. */
   sync = $state<SyncState>('idle');
   get loaded() { return this.hasData; }
-  get loading() { return this.query === 'loading'; }
-  get failed() { return this.query === 'failed'; }
-  get loadingMore() { return this.query === 'ready' && this.sync === 'paging'; }
-  get moreFailed() { return this.query === 'ready' && this.sync === 'pagingFailed'; }
-  get refreshFailed() { return this.query === 'ready' && this.sync === 'refreshFailed'; }
-  get refreshing() { return this.query === 'ready' && this.sync === 'refreshing'; }
+  get loading() { return this.phase === 'loading'; }
+  get failed() { return this.phase === 'failed'; }
+  get loadingMore() { return this.phase === 'ready' && this.sync === 'paging'; }
+  get moreFailed() { return this.phase === 'ready' && this.sync === 'pagingFailed'; }
+  get refreshFailed() { return this.phase === 'ready' && this.sync === 'refreshFailed'; }
+  get refreshing() { return this.phase === 'ready' && this.sync === 'refreshing'; }
   overviewFailed = $state(false);
   // Race guards: older requests must not publish over newer work.
   private refreshSeq = 0;
@@ -134,7 +138,7 @@ class LinksStore {
 
   constructor() {
     editor.onSettle(() => {
-      if (this.query === 'ready' && this.sync === 'held') void this.refresh();
+      if (this.phase === 'ready' && this.sync === 'held') void this.refresh();
     });
   }
 
@@ -178,24 +182,24 @@ class LinksStore {
     const ctrl = (this.ctrl = new AbortController());
     const seq = ++this.seq;
     const revision = this.revision;
-    this.query = 'loading';
+    this.phase = 'loading';
     this.sync = 'idle';
     try {
-      const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, limit: PAGE }, ctrl.signal);
       if (seq !== this.seq) return;
       if (revision !== this.revision) { void this.load(); return; }
       this.items = res.items;
       this.total = res.total;
       this.next = res.next;
       this.hasData = true;
-      this.query = 'ready';
+      this.phase = 'ready';
       // Checked links the new view doesn't show would be acted on unseen.
       this.picked.clear();
       this.anchor = null;
       if (this.selectedId !== null && !res.items.some((l) => l.id === this.selectedId)) this.selectedId = null;
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return;
-      if (seq === this.seq) this.query = 'failed';
+      if (seq === this.seq) this.phase = 'failed';
     }
   }
 
@@ -206,7 +210,7 @@ class LinksStore {
     this.sync = 'paging';
     let retry = false;
     try {
-      const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
+      const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag, cursor: this.next, limit: PAGE });
       if (seq !== this.seq) return;
       if (revision !== this.revision) { retry = true; return; }
       const seen = new Set(this.items.map((l) => l.id));
@@ -224,9 +228,9 @@ class LinksStore {
 
   search(q: string) {
     editor.request(() => {
-      this.searchQuery = q;
+      this.query = q;
       this.ctrl?.abort(); ++this.seq;
-      this.query = 'loading';
+      this.phase = 'loading';
       this.sync = 'idle';
       clearTimeout(this.searchTimer);
       this.searchTimer = setTimeout(() => this.load(), q ? 140 : 0);
@@ -255,7 +259,7 @@ class LinksStore {
       let total = 0;
       const items: Link[] = [];
       do {
-        const res = await api.links({ q: this.searchQuery, sort: this.sort, kind: this.kind, tag: this.tag,
+        const res = await api.links({ q: this.query, sort: this.sort, kind: this.kind, tag: this.tag,
           limit: Math.min(200, wanted - items.length), ...(cursor ? { cursor } : {}) });
         if (seq !== this.seq || revision !== this.revision || refresh !== this.refreshSeq) return;
         items.push(...res.items); total = res.total;
@@ -356,7 +360,7 @@ class LinksStore {
   }
 
   private added(link: Link) {
-    const filtered = !!this.searchQuery || !!this.kind || this.tag !== null || this.sort !== 'created';
+    const filtered = !!this.query || !!this.kind || this.tag !== null || this.sort !== 'created';
     if (filtered) { this.sort = 'created'; this.clearFilters(); toasts.show(t('created.filtersCleared')); }
     else this.place(link);
     this.flash(link.id);

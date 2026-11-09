@@ -60,7 +60,7 @@
   const allPicked = $derived(pickable.length > 0 && pickable.every((l) => links.picked.has(l.id)));
   const nonePicked = $derived(links.picked.size === 0);
   const empty = $derived(links.loaded && !links.stale && links.items.length === 0);
-  const blank = $derived(empty && !links.searchQuery && !links.kind && links.tag === null);
+  const blank = $derived(empty && !links.query && !links.kind && links.tag === null);
 
   /** Splits a message around {key} placeholders so keys render as keycaps. */
   function withKeys(text: string, keys: Record<string, string[]>) {
@@ -90,21 +90,21 @@
   <TagFilters />
   {#if !blank}
   <div class="toolbar">
-    <label class="search" class:active={searchFocused || links.searchQuery}>
+    <label class="search" class:active={searchFocused || links.query}>
       <Icon name="search" />
       <span class="sr-only">{t('list.search')}</span>
       <input
         bind:this={search}
         type="search"
         placeholder={t('list.search')}
-        value={links.searchQuery}
-          oninput={(e) => { links.search(e.currentTarget.value); e.currentTarget.value = links.searchQuery; }}
+        value={links.query}
+          oninput={(e) => { links.search(e.currentTarget.value); e.currentTarget.value = links.query; }}
         onfocus={() => (searchFocused = true)}
         onblur={() => (searchFocused = false)}
         onkeydown={(e) => {
           if (e.key === 'Escape') {
             e.preventDefault();
-            if (links.searchQuery) links.search('');
+            if (links.query) links.search('');
             else search?.blur();
           } else if (e.key === 'ArrowDown' && links.items.length) {
             e.preventDefault();
@@ -116,7 +116,7 @@
         autocomplete="off"
         spellcheck="false"
       />
-      {#if links.searchQuery}
+      {#if links.query}
         <button class="clear" aria-label={t('list.clearSearch')} onclick={() => (links.search(''), search?.focus())}>
           <Icon name="x" size={14} />
         </button>
@@ -124,7 +124,7 @@
         <kbd class="slash" aria-hidden="true">/</kbd>
       {/if}
     </label>
-    {#if (links.searchQuery || links.kind || links.tag !== null) && links.loaded && !links.stale}
+    {#if (links.query || links.kind || links.tag !== null) && links.loaded && !links.stale}
       <span class="count" aria-live="polite">{t('list.results', { n: links.total })}</span>
     {/if}
     <button
@@ -211,7 +211,7 @@
 
   {#if (links.failed && links.loaded) || links.refreshFailed}
     <div class="state-notice error" role="alert"><span>{t(links.failed ? 'list.queryFailed' : 'list.refreshFailed')}</span><Button size="sm" loading={links.refreshing} onclick={() => links.failed ? links.load() : links.refresh()}>{t('act.retry')}</Button></div>
-  {:else if links.query === 'ready' && links.sync === 'held'}
+  {:else if links.phase === 'ready' && links.sync === 'held'}
     <div class="state-notice" role="status"><span>{t('list.held')}</span></div>
   {/if}
   {#if blank}
@@ -232,10 +232,10 @@
       </p>
     </div>
   {:else if empty && links.tag !== null}
-    <div class="blank"><p>{t(links.searchQuery || links.kind ? 'list.emptyCombined' : 'list.emptyTag', {name:links.tag === 'untagged' ? t('tags.untagged') : links.tags.find(tag=>tag.id===links.tag)?.name ?? ''})}</p><button class="text-btn" onclick={() => links.setTag(null)}>{t('list.clearTag')}</button>{#if links.kind}<button class="text-btn" onclick={()=>links.setKind(null)}>{t('list.clearKind')}</button>{/if}{#if links.searchQuery}<button class="text-btn" onclick={()=>links.search('')}>{t('list.clearSearch')}</button>{/if}</div>
-  {:else if empty && links.searchQuery}
+    <div class="blank"><p>{t(links.query || links.kind ? 'list.emptyCombined' : 'list.emptyTag', {name:links.tag === 'untagged' ? t('tags.untagged') : links.tags.find(tag=>tag.id===links.tag)?.name ?? ''})}</p><button class="text-btn" onclick={() => links.setTag(null)}>{t('list.clearTag')}</button>{#if links.kind}<button class="text-btn" onclick={()=>links.setKind(null)}>{t('list.clearKind')}</button>{/if}{#if links.query}<button class="text-btn" onclick={()=>links.search('')}>{t('list.clearSearch')}</button>{/if}</div>
+  {:else if empty && links.query}
     <div class="blank">
-      <p>{t('list.noResults', { q: links.searchQuery })}</p>
+      <p>{t('list.noResults', { q: links.query })}</p>
       <button class="text-btn" onclick={() => links.search('')}>{t('list.clearSearch')}</button>
     </div>
   {:else if empty}

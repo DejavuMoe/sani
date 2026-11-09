@@ -89,7 +89,7 @@
         links.expandedId = null;
         rowButton(id)?.focus();
       } else if (links.picking) links.stopPicking();
-      else if (links.searchQuery) links.search('');
+      else if (links.query) links.search('');
       else links.selectedId = null;
       return;
     }
