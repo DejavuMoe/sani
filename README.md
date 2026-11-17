@@ -16,10 +16,10 @@ A self-hosted link shortener with text and file sharing, for one administrator. 
 Paste a long URL, press Enter, and the short link is already on your clipboard. Sani fetches the page title and icon so you can recognize links later, counts clicks without slowing redirects down, and stays out of the way otherwise.
 
 - **Fast where it matters.** Redirects are served from memory: about 130,000 requests per second with sub-millisecond median latency on an 8-core laptop, with every click counted ([numbers below](#performance)).
-- **Quick to use.** Paste a link anywhere on the page, or drop one in. Custom slugs are checked as you type, the whole dashboard works from the keyboard, and deleting offers undo instead of a confirmation dialog.
+- **Quick to use.** Paste a link, text snippet or file anywhere on the page, or drop one in. Custom slugs are checked as you type, the whole dashboard works from the keyboard, editing guards unsaved changes, and deleting offers undo instead of a confirmation dialog.
 - **Simple statistics.** Total and daily clicks, top referrers, last visit. Clicks from crawlers, link previews, prefetches and your own dashboard are not counted.
 - **Tags for organization.** Assign colored tags to links, texts and files while creating or editing them, then filter by a tag or find untagged items. Tags stay private to the administrator.
-- **Per-link controls.** Expiry dates, visit limits, temporary or permanent redirects, and an off switch. You can edit the destination and the change applies immediately.
+- **Per-link controls.** Expiry, visit limits, access passwords, temporary or permanent redirects, and an off switch. You can edit the destination and the change applies immediately.
 - **Texts and files, too.** Share a note up to 1 MB, a config snippet (monospace, with line numbers) or a file up to 99 MB by default at `/p/…`, with the same expiry, visit limit and statistics. File uploads and raw downloads require a separate files hostname.
 - **Works with what you use.** A bookmarklet, the Android share sheet (install it as an app), API tokens for scripts and Shortcuts, and import from Shlink or Sani CSV/JSON.
 - **Unicode slugs.** `s.example.com/简历` works. Slugs match case-insensitively.
@@ -90,7 +90,7 @@ The admin app lives at `/admin/`, the API at `/api/` and shared texts and files 
 
 ## Everyday use
 
-**Keyboard.** `N` new link · `/` search · `J`/`K` move · `Enter` open · `C` copy · `E` edit · `Del` (or `⌘⌫` on a Mac) delete, with undo · `X` check several links to turn them on, off or delete them at once · `Esc` close · `?` all shortcuts. Paste a URL anywhere on the page to start shortening it.
+**Keyboard.** `N` new · `/` search · `J`/`K` move · `Enter` open · `C` copy · `E` edit · `Ctrl`+`Enter` (or `⌘`+`Enter` on Mac) save · `Del` (or `⌘⌫` on a Mac) delete, with undo · `X` check several items to turn them on, off or delete them at once · `Esc` close/clear · `?` all shortcuts. Paste a URL, text snippet or file anywhere on the page to start.
 
 **Bookmarklet.** Settings → Shortcuts → drag “Shorten this page” to your bookmarks bar. Clicking it opens a small window with the page URL and title filled in. Review them and click “Shorten” to create a link or reuse an existing one, then copy the result.
 

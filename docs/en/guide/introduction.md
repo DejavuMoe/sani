@@ -9,7 +9,7 @@
 - **Paste and done.** Paste a link anywhere in the admin app and press Enter: the short link is created and already on your clipboard. The page title and icon are fetched in the background, so you can recognize links later.
 - **Cached redirects.** Cache hits avoid database queries, and clicks aggregate in memory before batch writes. The published test measured about 130,000 redirects per second and checked the counts; this is a measurement in one environment, not a capacity or durability guarantee. See [Performance](../internals/performance).
 - **Enough statistics.** Total and daily clicks, referring sites and the last visit. Crawlers, link previews, browser prefetches and your own clicks don’t count.
-- **Control over every link.** Access passwords, expiry dates, visit limits, temporary or permanent redirects, and an off switch. A new destination applies to the next request that reaches Sani; browsers may keep using a cached permanent redirect.
+- **Control over every link.** Access passwords, expiry, visit limits, temporary or permanent redirects, and an off switch. A new destination applies to the next request that reaches Sani; browsers may keep using a cached permanent redirect.
 - **Tags.** Assign colored tags to URLs, texts and files, then filter by tag or find untagged items. Tags are visible only to the administrator.
 - **Texts and files too.** Share a note, a snippet of code or a file at `/p/…`, with the same expiry, visit limit and statistics as a link. See [Everyday use](./usage#shares).
 - **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 25 MB, and there’s no Redis, PostgreSQL or anything else to run next to it.

@@ -62,7 +62,7 @@ Locally, short links look like `http://127.0.0.1:8080/k7m2p`: without [`SANI_BAS
 
 ## Look at the statistics
 
-Click a row, or select it with <kbd>J</kbd> <kbd>K</kbd> and press <kbd>Enter</kbd>, to see daily clicks, referring sites and a QR code, and to edit, turn off or delete the link.
+Click a row, or select it with <kbd>J</kbd> / <kbd>K</kbd> and press <kbd>Enter</kbd>, to see daily clicks, referring sites and a QR code, and to edit, turn off or delete the link.
 
 <Screenshot name="detail" alt="Link details: a bar chart of daily clicks, the top referring sites and a QR code, next to the edit, turn off and delete actions." />
 

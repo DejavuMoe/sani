@@ -34,15 +34,15 @@ Expiry, visit limit and access password sit below the input, next to the submit 
 
 | Option | What it does |
 |---|---|
-| Expires | Never, or after 1 hour, 1 day, 7 days or 30 days, or at a time you pick. Afterwards visitors see a “no longer available” page. |
+| Expiry | Never, or after 1 hour, 1 day, 7 days or 30 days, or at a time you pick. Afterwards visitors see a “no longer available” page. |
 | Visit limit | How many visits the link allows. Only visits that count toward the statistics use it up; see [Statistics](./statistics#visit-limits). |
 | Password | Opens with a fresh six-character code; press Enter to use it, or type 4 to 64 characters of your own. Visitors enter it first; comparison ignores ASCII letter case and surrounding whitespace. It lasts as long as the link, and you can show or copy it in the details, or change or clear it in the editor. After creating, the clipboard holds the link and its password. |
 | Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani.<br>**Permanent** (301): without expiry or a visit limit, browsers can cache it for a day; repeat visits skip Sani, so they aren’t counted and see changes only later. All redirect types disallow caching when expiry or a visit limit is set. The API also offers 307 and 308. |
 | Turned off | Visitors see a “no longer available” page until you turn the link back on. |
 
-Custom expiry opens in a popover: pick a day or type the date, and type the time or choose hours and minutes from the clock button beside it (arrow keys, Home and End work there). Nothing changes until you choose “Apply date and time”; Cancel, Escape or a click outside keeps the previous setting. The time uses the device time zone and rejects invalid or past times.
+Custom expiry opens in a popover: pick a day or type the date, and type the time or choose hours and minutes from the clock button beside it (arrow keys, Home and End navigate within columns, <kbd>Tab</kbd> moves directly to “Done”, and <kbd>Shift</kbd>+<kbd>Tab</kbd> returns). The popover stays within short viewports. Nothing changes until you choose “Apply date and time”; clicking “Cancel”, pressing <kbd>Esc</kbd> or clicking outside keeps the previous setting. The time uses the device time zone and rejects invalid or past times.
 
-The Shorten and Share buttons show their Enter shortcut as a key badge (hidden on touch and narrow screens). Tooltips also work on keyboard focus and close with <kbd>Esc</kbd>.
+The Shorten and Share buttons show their Enter shortcut as a key badge (hidden on touch and narrow screens). The link and share composers share identical field heights, focus and invalid rings, and button insets; long placeholders truncate cleanly with an ellipsis on narrow viewports. Tooltips also work on keyboard focus and close on <kbd>Esc</kbd> or when another popover opens.
 
 ## Grouping with tags {#tags}
 
@@ -56,11 +56,11 @@ Tags are private to administrators. Undoing deletion restores assignments. Tag n
 
 Use **Manage tags** above the list or inside the tag picker to search the catalog, show unused tags, edit names/colors globally, or delete a tag. Removing a badge in an item editor only changes that item. Deleting a tag removes all its associations, including those on soft-deleted items, but keeps the content and other tags; it cannot be undone. The confirmation count includes URL links, text and files, including disabled/expired items. The active tag filter is removed after deletion; search and type filters remain. **More tags** keeps a large catalog searchable without filling the toolbar.
 
-Unsaved item edits prompt before leaving: keep editing, discard, or save and leave. A failed save retains the draft. Submission locks the corresponding creation form; file uploads can still be cancelled. Same-query refreshes preserve loaded pages and selection, while changing filters clears selection. Failed query results are not actionable; pagination errors keep loaded items available with a retry action.
+Leaving an item editor with unsaved changes (such as pressing <kbd>Esc</kbd> or navigating away) prompts to keep editing, discard, or save and leave; clicking the editor's “Cancel” button discards changes immediately without prompting. A failed save retains the draft. Submitting a new item locks the corresponding form fields, while in-progress file uploads can still be cancelled. Signing out resets the list and clears drafts. Refreshing with the same query preserves loaded pages and selection, whereas changing filters clears selection. Failed query results cannot be operated on; pagination errors keep previously loaded items accessible with a retry action.
 
 ## Editing and deleting
 
-- **Edit.** Select a link and press <kbd>E</kbd> to change its destination, slug, title or options. The next request that reaches Sani uses the new settings; browsers may keep using a cached permanent redirect.
+- **Edit.** Select a link and press <kbd>E</kbd> (or open details and choose “Edit”) to change its destination, slug, title, tags or options. Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac) or click “Save” to commit changes. Clicking “Cancel” discards edits immediately and exits; pressing <kbd>Esc</kbd> prompts before leaving if there are unsaved changes. The next request reaching Sani uses the updated settings; browsers may keep using a cached permanent redirect.
 - **Renaming a slug.** The old slug stops working as soon as you save.
 - **Changing the destination.** If the title was fetched automatically, the new destination’s title is fetched.
 - **Delete.** Press <kbd>Del</kbd> (<kbd>⌘</kbd> <kbd>⌫</kbd> on a Mac). There’s no confirmation dialog; the notification offers undo instead. Background maintenance purges records and statistics deleted more than an hour ago, then reclaims files asynchronously. Reusing a slug removes the old record early. See [share cleanup](./operations#share-cleanup).
@@ -116,16 +116,16 @@ Press <kbd>?</kbd> in the admin app to see them any time.
 | Keys | Action |
 |---|---|
 | <kbd>N</kbd> | Focus the current creation form |
-| <kbd>Ctrl</kbd> <kbd>V</kbd> / <kbd>⌘</kbd> <kbd>V</kbd> | Paste a link anywhere |
+| <kbd>Ctrl</kbd> <kbd>V</kbd> / <kbd>⌘</kbd> <kbd>V</kbd> | Paste a link, text or file anywhere |
 | <kbd>/</kbd> | Search |
 | <kbd>J</kbd> / <kbd>K</kbd>, or <kbd>↓</kbd> / <kbd>↑</kbd> | Move the selection |
 | <kbd>Enter</kbd> | Open or close details |
 | <kbd>C</kbd> | Copy the share URL |
-| <kbd>E</kbd> | Edit |
-| <kbd>Ctrl</kbd> <kbd>Enter</kbd> / <kbd>⌘</kbd> <kbd>Enter</kbd> | Save changes |
+| <kbd>E</kbd> | Edit the selected item |
+| <kbd>Ctrl</kbd> <kbd>Enter</kbd> / <kbd>⌘</kbd> <kbd>Enter</kbd> | Save changes or submit creation |
 | <kbd>Del</kbd> / <kbd>⌘</kbd> <kbd>⌫</kbd> | Delete, with undo; with links checked, deletes all of them |
 | <kbd>X</kbd> | Check or uncheck, for [bulk actions](#bulk) |
-| <kbd>Esc</kbd> | Close or clear |
+| <kbd>Esc</kbd> | Close details, leave selection mode or clear search (prompts if an editor has unsaved changes) |
 | <kbd>?</kbd> | Show shortcuts |
 
 ## Bookmarklet
