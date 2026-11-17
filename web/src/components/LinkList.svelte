@@ -138,7 +138,7 @@
       <Icon name="select" size={14} />
       <span class="pick-text">{t('bulk.start')}</span>
     </button>
-    <Menu triggerClass={['kind', links.kind && 'on'].filter(Boolean).join(' ')} label={t('filter.label')} align="end" minWidth={160}>
+    <Menu triggerClass={['kind', links.kind && 'on'].filter(Boolean).join(' ')} label={`${t('filter.label')}: ${t(`filter.${links.kind ?? 'all'}`)}`} align="end" minWidth={160}>
       {#snippet button()}
         <Icon name={links.kind ? kindIcon[links.kind] : 'sliders'} size={14} />
         <span class="kind-text">{t(`filter.${links.kind ?? 'all'}`)}</span>
@@ -156,7 +156,7 @@
         {/each}
       {/snippet}
     </Menu>
-    <Menu triggerClass="sort" label={t('list.sortBy')} align="end" minWidth={160}>
+    <Menu triggerClass="sort" label={`${t('list.sortBy')}: ${t(`sort.${links.sort}`)}`} align="end" minWidth={160}>
       {#snippet button()}
         <Icon name="sort" size={14} />
         {t(`sort.${links.sort}`)}

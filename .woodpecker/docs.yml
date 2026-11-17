@@ -12,10 +12,10 @@ when:
 
 steps:
   - name: build-docs
-    image: node:24.21.0-alpine3.24
+    image: node:26.13.1-alpine3.24
     commands:
       - apk add --no-cache git
-      - npm install --global pnpm@12.5.1
+      - npm install --global pnpm@12.21.0
       - pnpm install --frozen-lockfile --prefer-offline
       - pnpm docs:check
       - pnpm docs:build

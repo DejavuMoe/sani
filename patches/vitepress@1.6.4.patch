@@ -17,3 +17,13 @@ diff --git a/dist/node/chunk-D3CUZ4fa.js b/dist/node/chunk-D3CUZ4fa.js
        config.logger.info(`Built site served at http://localhost:${port}/`);
      });
    }
+diff --git a/dist/client/theme-default/components/VPNavBarSearchButton.vue b/dist/client/theme-default/components/VPNavBarSearchButton.vue
+--- a/dist/client/theme-default/components/VPNavBarSearchButton.vue
++++ b/dist/client/theme-default/components/VPNavBarSearchButton.vue
+@@ -1,0 +2 @@
++import { useMediaQuery } from '@vueuse/core'
+@@ -3,0 +5 @@
++const desktop = useMediaQuery('(min-width: 768px)')
+@@ -17 +19 @@
+-  <button type="button" class="DocSearch DocSearch-Button" :aria-label="translate('button.buttonAriaLabel')">
++  <button type="button" class="DocSearch DocSearch-Button" :aria-label="desktop ? undefined : translate('button.buttonAriaLabel')">

@@ -107,7 +107,7 @@
   <div class="calendar" role="group" aria-label={t('calendar.choose')}>
     {#each (i18n.lang === 'zh' ? ['一', '二', '三', '四', '五', '六', '日'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S']) as day}<span aria-hidden="true">{day}</span>{/each}
     {#each Array(first) as _}<span aria-hidden="true"></span>{/each}
-    {#each Array(days) as _, i}<button type="button" aria-label={dateFor(i+1)} aria-pressed={date === dateFor(i+1)} onclick={() => date = dateFor(i+1)}>{i+1}</button>{/each}
+    {#each Array(days) as _, i}<button type="button" aria-label={new Date(month.getFullYear(), month.getMonth(), i+1).toLocaleDateString(i18n.locale, {dateStyle: 'long'})} aria-pressed={date === dateFor(i+1)} onclick={() => date = dateFor(i+1)}>{i+1}</button>{/each}
   </div>
   <div class="date-fields">
     <div class="input"><label for="{id}-date">{t('calendar.date')}</label><input id="{id}-date" class="field" placeholder="YYYY-MM-DD" bind:value={date} onkeydown={applyOnEnter} aria-invalid={!valid || undefined} aria-describedby={!valid ? `${id}-error` : undefined} /></div>

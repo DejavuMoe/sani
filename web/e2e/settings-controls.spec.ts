@@ -164,7 +164,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
     await expect(time).toHaveValue('12:30');
     await expect(calendar.getByRole('button').last()).toBeEnabled();
-    await expect(calendar.getByRole('button', { name: '2032-02-29', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(calendar.getByRole('button', { name: lang === 'zh' ? '2032年2月29日' : 'February 29, 2032', exact: true })).toHaveAttribute('aria-pressed', 'true');
     expect((await (await page.request.get(`${base}/api/admin/v1/links`)).json()).items).toEqual([]);
     await audit(page);
     await calendar.scrollIntoViewIfNeeded();
