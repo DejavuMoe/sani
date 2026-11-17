@@ -10,7 +10,8 @@ const port = Number(process.env.SANI_E2E_PORT ?? 18765);
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: false,
-  workers: 1,
+  // Each file owns its service and data; tests within a file still run in order.
+  workers: 2,
   reporter: [['list']],
   timeout: 30_000,
   expect: { timeout: 5_000 },

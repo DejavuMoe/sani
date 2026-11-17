@@ -17,6 +17,28 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  build:
+    name: Shared application build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: make build VERSION="ci-${GITHUB_SHA::7}"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 8e374df55bdbd4a45353c1f6eeec2bfc3a671635
+          path: .upgrade-legacy
+      - run: make -C .upgrade-legacy install build RUN=
+      # tar preserves executable bits and the hidden legacy directory.
+      - run: tar -cf "$RUNNER_TEMP/build.tar" bin/sani internal/webui/dist .upgrade-legacy/bin/sani
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-${{ github.sha }}
+          path: ${{ runner.temp }}/build.tar
+          compression-level: 1
+          retention-days: 7
+
   dependency-graph:
     name: Dependency graph (${{ matrix.manifest }})
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
@@ -34,12 +56,10 @@ jobs:
             manager: pnpm
           - manifest: .agents/skills/baoyu-design/agents/gen-pptx/package.json
             manager: npm
-          - manifest: .agents/skills/baoyu-design/agents/gen-pptx/package-lock.json
-            manager: npm
+            lockfile: .agents/skills/baoyu-design/agents/gen-pptx/package-lock.json
           - manifest: .agents/skills/baoyu-design/agents/gen-video/package.json
             manager: npm
-          - manifest: .agents/skills/baoyu-design/agents/gen-video/package-lock.json
-            manager: npm
+            lockfile: .agents/skills/baoyu-design/agents/gen-video/package-lock.json
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,6 +87,14 @@ jobs:
           filePattern: dependencies.spdx.json
           manifestPath: ${{ matrix.manifest }}
           correlator: dependency-graph-${{ matrix.manifest }}
+      # Both tracked manifests keep their snapshots, using one locked export.
+      - if: matrix.manager == 'npm'
+        uses: advanced-security/spdx-dependency-submission-action@b009efcf8b9d562a4569d2028c276522232e631f # v0.4.0
+        with:
+          filePath: ${{ runner.temp }}
+          filePattern: dependencies.spdx.json
+          manifestPath: ${{ matrix.lockfile }}
+          correlator: dependency-graph-${{ matrix.lockfile }}
 
   check:
     name: Check and test
@@ -107,14 +135,15 @@ jobs:
 
   e2e:
     name: End-to-end and accessibility
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       - run: pnpm --dir web exec playwright install --with-deps chromium
-      - run: make e2e
-      - run: make smoke
+      - uses: ./.github/actions/download-build
+      - run: pnpm --dir web e2e
       - name: axe over the admin app
         run: |
           go run ./scripts/seed -data "$RUNNER_TEMP/demo" -password sani-demo -icons=false
@@ -133,21 +162,17 @@ jobs:
 
   api-contract:
     name: HTTP contract and snapshot rollback
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: 8e374df55bdbd4a45353c1f6eeec2bfc3a671635
-          path: .upgrade-legacy
-      - run: make -C .upgrade-legacy install build
-      - run: OLD_BIN=.upgrade-legacy/bin/sani make upgrade-drill
-      - name: Upgrade and rollback on non-root Docker bind storage
-        run: |
-          docker build -t sani:upgrade .
-          bash scripts/test-docker-storage.sh sani:upgrade .upgrade-legacy/bin/sani
+          install: 'false'
+      - uses: ./.github/actions/download-build
+      - run: node scripts/smoke.mjs
+      - run: OLD_BIN=.upgrade-legacy/bin/sani node scripts/api-contract.mjs --upgrade
 
   docs:
     name: Docs
@@ -170,6 +195,7 @@ jobs:
 
   image:
     name: Docker image
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -180,31 +206,36 @@ jobs:
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           build-args: VERSION=ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=sani-image
+          cache-to: type=gha,scope=sani-image,mode=max
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           load: true
           tags: sani:ci
           build-args: VERSION=ci
-          cache-from: type=gha
-      - name: Verify non-root storage and health checks
+          cache-from: type=gha,scope=sani-image
+      - uses: ./.github/actions/download-build
+      - name: Upgrade and rollback on non-root Docker bind storage
         run: |
           docker image inspect -f 'image size: {{.Size}} bytes' sani:ci
-          bash scripts/test-docker-storage.sh sani:ci
+          bash scripts/test-docker-storage.sh sani:ci .upgrade-legacy/bin/sani
 
   dist:
     name: Release archives
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
-      - run: make web dist VERSION="ci-${GITHUB_SHA::7}"
-      - run: cat dist/SHA256SUMS
+        with:
+          install: 'false'
+      - uses: ./.github/actions/download-build
+      - run: make dist VERSION="ci-${GITHUB_SHA::7}"
+      - run: cd dist && sha256sum -c SHA256SUMS
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sani-${{ github.sha }}
@@ -218,6 +249,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
+        with:
+          install: 'false'
       - name: Audit web, docs and tracked design tools
         run: |
           pnpm audit --audit-level=moderate

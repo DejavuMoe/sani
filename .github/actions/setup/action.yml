@@ -1,6 +1,11 @@
 name: Set up
 description: The toolchain pinned in mise.toml, and the dependencies of the pnpm workspace and the Go module.
 
+inputs:
+  install:
+    description: Install workspace packages; disable for jobs using prebuilt assets or lockfile-only audits.
+    default: 'true'
+
 runs:
   using: composite
   steps:
@@ -16,14 +21,27 @@ runs:
         echo "gomod=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
         echo "gobuild=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
 
-    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+    - if: inputs.install == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: |
           ${{ steps.paths.outputs.pnpm }}
-          ${{ steps.paths.outputs.gomod }}
-          ${{ steps.paths.outputs.gobuild }}
-        key: deps-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'go.sum', 'mise.toml') }}
-        restore-keys: deps-${{ runner.os }}-
+        key: pnpm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml', 'mise.toml') }}
+        restore-keys: pnpm-${{ runner.os }}-${{ runner.arch }}-
 
-    - shell: bash
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.paths.outputs.gomod }}
+        key: gomod-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('go.mod', 'go.sum', 'mise.toml') }}
+        restore-keys: gomod-${{ runner.os }}-${{ runner.arch }}-
+
+    # Immutable dependency keys never saved newly compiled code after source edits.
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.paths.outputs.gobuild }}
+        key: gobuild-${{ runner.os }}-${{ runner.arch }}-${{ github.job }}-${{ hashFiles('go.mod', 'go.sum', 'mise.toml') }}-${{ github.sha }}
+        restore-keys: gobuild-${{ runner.os }}-${{ runner.arch }}-${{ github.job }}-${{ hashFiles('go.mod', 'go.sum', 'mise.toml') }}-
+
+    - if: inputs.install == 'true'
+      shell: bash
       run: make install
