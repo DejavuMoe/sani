@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Update Go and the container builder to 1.27.4 for GO-2026-6859, and upgrade golang.org/x/net to v0.62.0 and golang.org/x/crypto to v0.59.0 with their required Go module dependencies.
+
 ## v1.0.4
 
 2026-11-09 · Show a neutral notice instead of a refresh failure when unsaved edits pause list updates, fix link states shown during refresh and enabling, and align the first-load placeholder with the list. Database schema remains 7 with no new migration.
