@@ -2,7 +2,11 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.6
+
+2026-11-17 · Refine the composer, expiry and editor interactions and accessibility, and align the bilingual documentation. Database schema remains 7 with no new migration.
+
+Upgrading from v1.0.5 needs no data migration; APIs, public contracts and existing links are unchanged. Take a complete snapshot as described in [backup and restore](../guide/operations#backup-files) before upgrading.
 
 - Fix double horizontal/bottom padding in tag manager and leave-editor dialogs, and clamp the custom expiry popover within short viewports.
 - Improve keyboard reachability and accessibility in the date/time editor and expiry picker (reaching “Done” via `Tab`, keeping `aria-expanded="true"` while the custom time popover is open, exposing the selected expiry in the accessible name, and enlarging mobile touch targets).

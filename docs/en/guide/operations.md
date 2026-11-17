@@ -100,7 +100,7 @@ In an isolated local instance, check `/healthz`, login, URL redirects, text bodi
 
 ## Upgrading {#upgrade}
 
-**v1.0.5 retains schema 7**, with no new database migration from v1.0.0–v1.0.4. APIs, public contracts and existing links remain unchanged. Take a complete snapshot as described in [Backups and restores](#backup-files) before upgrading; check the migration notes for each future release.
+**v1.0.6 retains schema 7**, with no new database migration from v1.0.0–v1.0.5. APIs, public contracts and existing links remain unchanged. Take a complete snapshot as described in [Backups and restores](#backup-files) before upgrading; check the migration notes for each future release.
 
 v1.0.1 corrected bias in generated access passwords. Existing passwords are not rotated automatically; use the link editor to generate a replacement if needed. See the [v1.0.1 changelog](../project/changelog#v1-0-1).
 

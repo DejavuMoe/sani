@@ -57,7 +57,7 @@ Requests `/healthz` from the local service and exits with 0 on a `200`, and 1 ot
 
 ## `sani version`
 
-Prints the version, such as `sani v1.0.5`. Builds from source take it from `git describe`, or use `dev` without Git metadata. `sani -v` and `sani --version` do the same.
+Prints the version, such as `sani v1.0.6`. Builds from source take it from `git describe`, or use `dev` without Git metadata. `sani -v` and `sani --version` do the same.
 
 ## `sani preflight`
 
