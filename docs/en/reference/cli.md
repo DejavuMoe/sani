@@ -57,7 +57,7 @@ Requests `/healthz` from the local service and exits with 0 on a `200`, and 1 ot
 
 ## `sani version`
 
-Prints the version, such as `sani v0.3.0`. Builds from source take it from `git describe`, or use `dev` without Git metadata. `sani -v` and `sani --version` do the same.
+Prints the version, such as `sani v1.0.5`. Builds from source take it from `git describe`, or use `dev` without Git metadata. `sani -v` and `sani --version` do the same.
 
 ## `sani preflight`
 
@@ -69,4 +69,4 @@ Run the **new binary** against stopped data or an isolated full copy, with the o
 SANI_DATA_DIR=/path/to/stopped-data ./new-sani preflight
 ```
 
-The database must be schema 1–6, or an empty schema-0 database left by an interrupted first initialization. This scans all referenced file bytes; allow time for large stores. Probes do not guarantee enough free disk space. Normal startup of an older schema runs these checks, creates a private `sani.db.pre-vN-to-v6-TIMESTAMP.db` database safety copy, then migrates in one immediate transaction. Concurrent migration writers serialize or fail with an explicit lock error; retry after the other instance stops. Failed upgrades roll back all pending migrations. A failed attempt removes its safety copy only after verifying the old schema, integrity and files, preventing repeated restarts from accumulating copies; otherwise it retains the copy and reports its path. Successful migrations retain their copy. The database safety copy is **not** a replacement for the full pre-upgrade database/files/config snapshot. Current-schema startup does not rehash all files; run preflight explicitly when needed.
+The database must be schema 1–6, or an empty schema-0 database left by an interrupted first initialization. This scans all referenced file bytes; allow time for large stores. Probes do not guarantee enough free disk space. Normal startup of an older schema runs these checks, creates a private `sani.db.pre-vN-to-v7-TIMESTAMP.db` database safety copy, then migrates in one immediate transaction. Concurrent migration writers serialize or fail with an explicit lock error; retry after the other instance stops. Failed upgrades roll back all pending migrations. A failed attempt removes its safety copy only after verifying the old schema, integrity and files, preventing repeated restarts from accumulating copies; otherwise it retains the copy and reports its path. Successful migrations retain their copy. The database safety copy is **not** a replacement for the full pre-upgrade database/files/config snapshot. Current-schema (schema 7) startup does not rehash all files; run preflight explicitly when needed.

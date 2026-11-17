@@ -47,14 +47,14 @@ docker compose up -d
 
 镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
 
-模板固定使用 `v1.0.4`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v1.0.5`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
 每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS、Windows 和 FreeBSD 的压缩包，附校验和与构建来源证明：
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.4/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.5/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
@@ -96,7 +96,7 @@ SANI_BASE_URL=https://s.example.com ./sani
 
 **移动端支持**：在 Android 系统上使用支持 Web Share Target 的浏览器将 Sani 安装为 PWA 后，可直接从其他系统的分享菜单接收网址并预填；核对无误后点击“缩短”即可。具体支持情况取决于浏览器与操作系统。
 
-**API（v1.0.4）**：API 路由自 v0.9.5 起调整；从 v0.9.4 或更早版本升级时，须按[当前 API](docs/reference/api.md)更新调用脚本。旧版本契约请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建 API 令牌，然后：
+**API**：API 路由自 v0.9.5 起调整；从 v0.9.4 或更早版本升级时，须按[当前 API](docs/reference/api.md)更新调用脚本。旧版本契约请查看 [API 归档](docs/reference/api-archive.md)。先在设置中保存固定分享域名并创建 API 令牌，然后：
 
 ```sh
 curl -X POST https://s.example.com/api/v1/links \
@@ -141,7 +141,7 @@ Sani 资源 API 使用 `/api/v1`，后台能力使用 `/api/admin/v1`；遵循�
 ## 项目结构
 
 ```
-cmd/sani            入口：serve、passwd、backup、healthcheck、version
+cmd/sani            入口：serve、passwd、backup、preflight、healthcheck、version
 internal/server     HTTP：跳转、JSON API、内嵌界面、访问者页面
 internal/cache      跳转缓存：未命中缓存与写入竞争保护
 internal/clicks     点击的内存聚合与批量写入

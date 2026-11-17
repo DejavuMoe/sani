@@ -10,11 +10,11 @@
 mkdir -p ~/sani && cd ~/sani
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker run -d --name sani -p 127.0.0.1:8080:8080 \
-  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.4
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.5
 ```
 
 ```sh [Binary]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.4/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.5/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_LISTEN=127.0.0.1:8080 ./sani     # keeps its data in ./data
 ```
 
@@ -70,6 +70,6 @@ Opening a short link from the admin app doesn’t count as a click, so your own 
 
 ## Next
 
+- [Everyday use](./usage): manage links, access passwords, tags, text and file sharing, shortcuts and bookmarklets.
 - [Deployment](./deploy): put it on a server with your domain and HTTPS.
-- [Everyday use](./usage): shortcuts, the bookmarklet and your phone’s share menu.
 - [HTTP API](../reference/api): create and manage links from scripts.

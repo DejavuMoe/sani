@@ -10,11 +10,11 @@
 mkdir -p ~/sani && cd ~/sani
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker run -d --name sani -p 127.0.0.1:8080:8080 \
-  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.4
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.5
 ```
 
 ```sh [二进制文件]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.4/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.5/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 ```
 
@@ -70,6 +70,6 @@ time=2026-09-29T14:03:12.418+08:00 level=WARN msg="no admin password yet: open /
 
 ## 下一步
 
-- [部署](./deploy)：生产服务器部署、域名解析与 HTTPS 配置。
-- [日常使用](./usage)：快捷键、书签脚本及移动端快捷分享。
+- [日常使用](./usage)：管理短链接、访问密码、标签、文本与文件分享、快捷键与书签脚本。
+- [部署指南](./deploy)：生产服务器部署、域名解析与 HTTPS 配置。
 - [HTTP API](../reference/api)：通过接口自动化创建与管理链接。

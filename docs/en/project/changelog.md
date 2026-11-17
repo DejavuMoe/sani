@@ -2,9 +2,14 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v1.0.5
+
+2026-11-17 · Update Go and module dependencies for security fixes, and reorganize the bilingual documentation. Database schema remains 7 with no new migration.
+
+Upgrading from v1.0.4 needs no data migration; APIs, public contracts and existing links are unchanged. Take a complete snapshot as described in [backup and restore](../guide/operations#backup-files) before upgrading.
 
 - Update Go and the container builder to 1.27.4 for GO-2026-6859, and upgrade golang.org/x/net to v0.62.0 and golang.org/x/crypto to v0.59.0 with their required Go module dependencies.
+- Reorganize the Chinese and English usage guides and navigation, correct the preflight backup filename, document the missing CLI command and schema 7, and clarify upgrade requirements.
 
 ## v1.0.4
 

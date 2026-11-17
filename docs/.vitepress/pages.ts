@@ -27,20 +27,20 @@ export const groups: PageGroup[] = [
     ],
   },
   {
-    zh: '部署与运维',
-    en: 'Deploy and operate',
-    pages: [
-      { path: 'guide/deploy', zh: '部署', en: 'Deployment' },
-      { path: 'guide/operations', zh: '运维', en: 'Operations' },
-    ],
-  },
-  {
-    zh: '使用',
+    zh: '使用指南',
     en: 'Using Sani',
     pages: [
       { path: 'guide/usage', zh: '日常使用', en: 'Everyday use' },
       { path: 'guide/statistics', zh: '统计口径', en: 'Statistics' },
       { path: 'guide/import-export', zh: '导入与导出', en: 'Import and export' },
+    ],
+  },
+  {
+    zh: '部署与运维',
+    en: 'Deploy and operate',
+    pages: [
+      { path: 'guide/deploy', zh: '部署', en: 'Deployment' },
+      { path: 'guide/operations', zh: '运维', en: 'Operations' },
     ],
   },
   {

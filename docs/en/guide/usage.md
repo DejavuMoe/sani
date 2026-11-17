@@ -16,20 +16,6 @@ The page title and icon are fetched in the background and usually show up within
 
 You can shorten the same URL as often as you like, and each time you get a new link. The bookmarklet and the share menu are the exception: if you shortened the page before, they hand you that link again.
 
-## Grouping with tags {#tags}
-
-Choose existing tags or create one by name when creating a URL, text or file link. Each item supports up to 5 tags. Names allow 24 Unicode code points, are trimmed and NFC-normalized, and are matched case-insensitively. New tags can have a color; the default is blue. Each instance supports up to 1,000 tags.
-
-Open a link's details and choose Edit to change its tags. Saving applies assignments; canceling keeps the previous grouping. Creating a tag saves it to the catalog immediately, so it remains available even if you later cancel the link edit.
-
-Filter by one tag or Untagged alongside search and type filters. Tag counts include all non-deleted links, including disabled and expired links, and do not change with filters. A successful creation clears filters to show the new link. Tags have their own column on desktop and appear under the destination on phones. Creation time appears only in details; sorting by Newest and Last visited remains available.
-
-Tags are private to administrators. Undoing deletion restores assignments. Tag names and colors are also kept in [link exports](./import-export).
-
-Use **Manage tags** above the list or inside the tag picker to search the catalog, show unused tags, edit names/colors globally, or delete a tag. Removing a badge in an item editor only changes that item. Deleting a tag removes all its associations, including those on deleted items, but keeps the content and other tags; it cannot be undone. The confirmation count includes URL links, text and files, including disabled/expired items. The active tag filter is removed after deletion; search and type filters remain. **More tags** keeps a large catalog searchable without filling the toolbar.
-
-Unsaved item edits prompt before leaving: keep editing, discard, or save and leave. A failed save retains the draft. Submission locks the corresponding creation form; file uploads can still be cancelled. Same-query refreshes preserve loaded pages and selection, while changing filters clears selection. Failed query results are not actionable; pagination errors keep loaded items available with a retry action.
-
 ## Slugs {#slugs}
 
 Leave the slug empty and Sani makes one up. By default, generated URL slugs are 5 characters from the 31 in `23456789abcdefghjkmnpqrstuvwxyz`, which leaves out look-alikes such as 0 and o or 1, l and i, so they survive being read aloud. When random slugs start colliding with existing ones, new ones grow by a character. Settings controls the URL length (3–32) and look-alike exclusion; an explicit [`SANI_SLUG_LENGTH`](../reference/configuration#sani-slug-length) takes priority and locks the URL length. Shares have independent length settings, described below.
@@ -51,12 +37,30 @@ Expiry, visit limit and access password sit below the input, next to the submit 
 | Expires | Never, or after 1 hour, 1 day, 7 days or 30 days, or at a time you pick. Afterwards visitors see a “no longer available” page. |
 | Visit limit | How many visits the link allows. Only visits that count toward the statistics use it up; see [Statistics](./statistics#visit-limits). |
 | Password | Opens with a fresh six-character code; press Enter to use it, or type 4 to 64 characters of your own. Visitors enter it first; comparison ignores ASCII letter case and surrounding whitespace. It lasts as long as the link, and you can show or copy it in the details, or change or clear it in the editor. After creating, the clipboard holds the link and its password. |
-| Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani. **Permanent** (301): without expiry or a visit limit, browsers can cache it for a day; repeat visits skip Sani, so they aren’t counted and see changes only later. All redirect types disallow caching when expiry or a visit limit is set. The API also offers 307 and 308. |
+| Redirect | **Temporary** (302, the default): you can change the destination any time, and every visit goes through Sani.<br>**Permanent** (301): without expiry or a visit limit, browsers can cache it for a day; repeat visits skip Sani, so they aren’t counted and see changes only later. All redirect types disallow caching when expiry or a visit limit is set. The API also offers 307 and 308. |
 | Turned off | Visitors see a “no longer available” page until you turn the link back on. |
+
+Custom expiry opens in a popover: pick a day or type the date, and type the time or choose hours and minutes from the clock button beside it (arrow keys, Home and End work there). Nothing changes until you choose “Apply date and time”; Cancel, Escape or a click outside keeps the previous setting. The time uses the device time zone and rejects invalid or past times.
+
+The Shorten and Share buttons show their Enter shortcut as a key badge (hidden on touch and narrow screens). Tooltips also work on keyboard focus and close with <kbd>Esc</kbd>.
+
+## Grouping with tags {#tags}
+
+Choose existing tags or create one by name when creating a URL, text or file link. Each item supports up to 5 tags. Names allow up to 24 Unicode code points, are trimmed and NFC-normalized, and are matched case-insensitively. New tags offer 12 preset colors, app-styled RGB sliders, and HEX/RGB/HSL input support; the default is blue. Each instance supports up to 1,000 tags.
+
+Open a link's details and choose Edit to change its tags. Saving applies assignments; canceling keeps the previous grouping. Creating a tag saves it to the catalog immediately, so it remains available even if you later cancel the link edit.
+
+Filter by one tag or Untagged alongside search and type filters. Tag counts include all non-deleted links, including disabled and expired links, and do not change with filters. A successful creation clears filters to show the new link. Tags have their own column on desktop and appear under the destination on phones. Creation time appears only in details; sorting by Newest and Last visited remains available.
+
+Tags are private to administrators. Undoing deletion restores assignments. Tag names and colors are also kept in [link exports](./import-export).
+
+Use **Manage tags** above the list or inside the tag picker to search the catalog, show unused tags, edit names/colors globally, or delete a tag. Removing a badge in an item editor only changes that item. Deleting a tag removes all its associations, including those on soft-deleted items, but keeps the content and other tags; it cannot be undone. The confirmation count includes URL links, text and files, including disabled/expired items. The active tag filter is removed after deletion; search and type filters remain. **More tags** keeps a large catalog searchable without filling the toolbar.
+
+Unsaved item edits prompt before leaving: keep editing, discard, or save and leave. A failed save retains the draft. Submission locks the corresponding creation form; file uploads can still be cancelled. Same-query refreshes preserve loaded pages and selection, while changing filters clears selection. Failed query results are not actionable; pagination errors keep loaded items available with a retry action.
 
 ## Editing and deleting
 
-- **Edit.** Select a link and press <kbd>E</kbd> to change its destination, slug, title or options. The next visit follows the new settings.
+- **Edit.** Select a link and press <kbd>E</kbd> to change its destination, slug, title or options. The next request that reaches Sani uses the new settings; browsers may keep using a cached permanent redirect.
 - **Renaming a slug.** The old slug stops working as soon as you save.
 - **Changing the destination.** If the title was fetched automatically, the new destination’s title is fetched.
 - **Delete.** Press <kbd>Del</kbd> (<kbd>⌘</kbd> <kbd>⌫</kbd> on a Mac). There’s no confirmation dialog; the notification offers undo instead. Background maintenance purges records and statistics deleted more than an hour ago, then reclaims files asynchronously. Reusing a slug removes the old record early. See [share cleanup](./operations#share-cleanup).
@@ -75,7 +79,7 @@ Search first and then check everything to handle a group of related links at onc
 Besides links, Sani shares a piece of text or a file. Switch to the Text or File tab above the link box, or start from anywhere on the page:
 
 - **Paste text.** Pasting text with several lines, or a line that isn’t a link, opens it in the Text tab. A link on its own is shortened as usual.
-- **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 99 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that.
+- **Paste or drop a file.** It lands in the File tab, ready to upload. Files up to 99 MB by default; [`SANI_MAX_FILE_MB`](../reference/configuration#sani-max-file-mb) changes that. Files over 25 MB automatically upload in chunks (up to 25,000,000 bytes per chunk).
 
 A text is **plain text**, shown as running text that wraps, or **code**, shown monospace with line numbers and never wrapped. Texts are limited to 1 MiB. Nothing is rendered: Markdown and HTML show as written.
 
@@ -154,12 +158,19 @@ A token has full access and keeps working after a password change. It’s shown 
 - **Access passwords.** A link, text or file with a password first shows a page asking for it, with nothing on it but the short address. Short links ask on every visit; texts and files stay open in that browser for 12 hours. Five wrong passwords from one visitor within a minute make them wait. Details are in the [API reference](../reference/api#access-password).
 - **Error pages.** Unknown slugs get a 404 page, and expired, turned off or used-up links a 410 page, in English or Chinese depending on the visitor’s browser, and marked so search engines don’t index them.
 
-Creation defaults in Settings control URL, text/code and file slug lengths independently (each 3–32), URL look-alike exclusion and the whole-file size limit. Tags offer 12 Radix presets, app-styled RGB sliders and HEX/RGB/HSL inputs; editing a tag changes every reference to it. Files over 25 MB upload in chunks; keep this page open to retry completed chunks, or cancel to remove the pending upload. Reloading the page does not resume an upload.
+## Creation defaults and settings
+
+In Settings → Creation defaults, you can customize general creation preferences:
+
+- URL, text/code, and file slug lengths can be configured independently from 3 to 32 characters. Explicit environment variables take precedence over saved settings.
+- URL slugs can toggle exclusion of ambiguous look-alike characters (0/o, 1/l/i). Share slugs always exclude look-alikes.
+- Configure the whole-file upload size limit (default 99 MB). Files over 25 MB automatically upload in chunks; keep the page open to retry incomplete chunks, or cancel to abort. Reloading the page does not resume an upload.
 
 ## Page metadata and proxies
 
-In Settings → Page metadata, enable fetching and choose Direct, HTTP(S) or SOCKS5. Enter the proxy host, port and optional authentication in the admin app. The HTTPS toggle encrypts the hop to an HTTP(S) proxy; SOCKS5 does not provide that encryption. There is no built-in public commercial relay. Test connection checks the current form; new requests use it only after Save. Failures never fall back to direct connections. With fetching off, titles can still be entered manually.
+In Settings → Page metadata, enable fetching and choose Direct, HTTP(S) or SOCKS5:
 
-Saved passwords are never displayed. Replace one or cancel the replacement; turn authentication off and save to clear stored credentials. Changing the proxy address, scheme, port or account requires entering the password again. Environment-locked settings are read-only; see [configuration](../reference/configuration#sani-meta-proxy) for precedence and password storage.
-
-Custom expiry opens in a popover: pick a day or type the date, and type the time or choose hours and minutes from the clock button beside it (arrow keys, Home and End work there). Nothing changes until you choose Apply date and time; Cancel, Escape or a click outside keeps the previous setting. Then create or save the link as usual. It uses the device time zone and rejects invalid or past times. The Shorten and Share buttons show their Enter shortcut as a key badge (hidden on touch and narrow screens). Tooltips also work on keyboard focus and close with Escape.
+- Enter the proxy host, port and optional authentication in the admin app. The HTTPS toggle encrypts the hop to an HTTP(S) proxy; SOCKS5 does not provide that encryption. There is no built-in public commercial relay.
+- “Test connection” checks the current form parameters; new requests use the proxy only after clicking Save. Failures never fall back to direct connections, preventing accidental leaks. With fetching off, titles can still be entered manually.
+- Saved passwords are never displayed in the UI. You can replace a password or turn authentication off and save to clear stored credentials. Changing the proxy scheme, host, port or username requires re-entering the password.
+- Environment-locked settings are read-only; see [configuration](../reference/configuration#sani-meta-proxy) for precedence and credential storage rules.
