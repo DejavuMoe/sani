@@ -17,7 +17,7 @@ import { data as status } from '../.vitepress/data/status.data'
 | 访问密码 | <span class="sn-status done">已完成</span> | 链接、文本与文件的密码保护，访客验证、错误限流及密码导入导出（v1.0.0 起） |
 | HTTP API | <span class="sn-status done">已完成</span> | 核心能力全量覆盖、API 令牌长效认证 |
 | 导入与导出 | <span class="sn-status done">已完成</span> | 导入 Sani、Shlink CSV/JSON；导出网址链接为 Sani JSON 或 CSV |
-| 部署生态 | <span class="sn-status done">已完成</span> | 基于 `scratch` 的极简 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
+| 部署生态 | <span class="sn-status done">已完成</span> | 基于 distroless static 的非特权 Docker 镜像，systemd、Caddy 与 nginx 生产配置 |
 | 系统运维 | <span class="sn-status done">已完成</span> | 在线数据库快照、停机冷备及文件配套恢复、密码重置、健康度探针 |
 | 双语文档 | <span class="sn-status done">已完成</span> | 中英双语站点，构建期核对配置、接口等已纳入检查的源码规则 |
 | 发布流水线 | <span class="sn-status done">已完成</span> | Tag 触发自动发布：GHCR 多平台镜像，多操作系统与架构二进制，附校验和与构建来源 Attestation |

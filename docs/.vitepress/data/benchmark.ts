@@ -28,5 +28,6 @@ export const benchmark = {
   clicks: { served: 2129275, counted: 2129275 },
   // go test -bench, per operation.
   micro: { redirectNs: 608.0, cacheHitNs: 108.4, recordClickNs: 92.09 },
-  imageMB: 25.6,
+  // 2026-11-17 linux/amd64, docker image inspect .Size (decimal MB, uncompressed).
+  imageMB: 32.1,
 };

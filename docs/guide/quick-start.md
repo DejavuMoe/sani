@@ -20,7 +20,7 @@ SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 
 ```sh [从源码构建]
 git clone https://github.com/DejavuMoe/sani && cd sani
-make install build                      # 需 Go 1.27+、Node 24 和 pnpm
+make install build                      # 需 Go 1.27+、Node 26 LTS 和 pnpm
 SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # 数据保存在 ./data 目录
 ```
 

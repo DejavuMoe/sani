@@ -20,7 +20,7 @@ SANI_LISTEN=127.0.0.1:8080 ./sani     # keeps its data in ./data
 
 ```sh [From source]
 git clone https://github.com/DejavuMoe/sani && cd sani
-make install build                      # needs Go 1.27+, Node 24 and pnpm
+make install build                      # needs Go 1.27+, Node 26 LTS and pnpm
 SANI_LISTEN=127.0.0.1:8080 ./bin/sani   # keeps its data in ./data
 ```
 

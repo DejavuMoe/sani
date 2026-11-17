@@ -45,7 +45,7 @@ Live totals use a shared counter instead of adding a database value and a commit
 
 ## The database
 
-SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure Go implementation. Without cgo the binary links statically, and the image can be `FROM scratch`.
+SQLite comes from [modernc.org/sqlite](https://gitlab.com/cznic/sqlite), a pure Go implementation. Without cgo the binary links statically and runs in `distroless/static-debian13:nonroot` without a libc.
 
 - **WAL mode** permits normal reads alongside writes, though pool and lock waits remain possible. It uses `synchronous=NORMAL`; see [Operations](../guide/operations) for power-loss durability.
 - **One writer connection**: writes in this process queue up, and transactions start with `BEGIN IMMEDIATE`. External writers can still cause lock waits and errors.

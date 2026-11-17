@@ -170,7 +170,7 @@ https://s.example.com/gh?utm_source=weekly
 
 ### `TZ`
 
-默认继承操作系统时区。自然日指标统计与“今日”判定均依此时区计算。程序静态内置完整时区数据库，在精简 `scratch` 容器中配置 `TZ=Asia/Shanghai` 亦可原生解析。Docker 镜像未显式指定时默认采用 UTC。
+默认继承操作系统时区。自然日指标统计与“今日”判定均依此时区计算。程序静态内置完整时区数据库，无系统时区文件时也能解析 `TZ=Asia/Shanghai`；distroless 镜像另含系统时区数据。Docker 镜像未显式指定时默认采用 UTC。
 
 ### `HTTPS_PROXY` 与 `HTTP_PROXY`
 

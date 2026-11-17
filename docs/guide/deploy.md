@@ -10,7 +10,9 @@
 
 ## Docker Compose 部署
 
-官方发布的多平台镜像 `ghcr.io/dejavumoe/sani` 原生支持 `linux/amd64`、`linux/arm64` 与 `linux/arm/v7`（如树莓派）。在服务器新建目录并保存生成的 `compose.yaml`。**启动前必须创建 `./sani-data` 并授予容器用户 `65532:65532` 写权限**，在 Compose 文件所在目录执行：
+以下平台矩阵对应当前源码；停止 ARMv7 和 FreeBSD 制品的变更尚未发布，历史版本不受影响。迁移要求见[未发布变更](../project/changelog#unreleased)。
+
+官方发布的多平台镜像 `ghcr.io/dejavumoe/sani` 原生支持 `linux/amd64` 与 `linux/arm64`。在服务器新建目录并保存生成的 `compose.yaml`。**启动前必须创建 `./sani-data` 并授予容器用户 `65532:65532` 写权限**，在 Compose 文件所在目录执行：
 
 ```sh
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
@@ -21,8 +23,10 @@ docker compose up -d
 
 - **仅监听本地回环**：端口映射为 `127.0.0.1:8080:8080`，外部请求全部经由反向代理转发。
 - **绑定本地目录**：SQLite 数据库与文件上传保存在 Compose 文件旁的 `./sani-data`，绑定到容器内 `/data`，容器重建不会丢失该目录中的持久化数据。默认不使用命名卷。
-- **极小基础镜像**：基于 `scratch` 构建，大小仅约 25 MB，仅含 `sani` 可执行文件与 CA 证书。以 `65532` 非特权用户运行且无 shell。如需执行维护命令可直接调用容器内的 `/sani`（例如 `docker exec -it sani /sani passwd`）。
+- **精简运行镜像**：使用按多架构 digest 固定的 `gcr.io/distroless/static-debian13:nonroot`，由上游维护 CA 证书、时区和基础系统文件。Sani 仍为无 cgo 的静态二进制，以 `65532:65532` 非特权用户运行，不含 shell 或包管理器。如需执行维护命令可直接调用 `/sani`（例如 `docker exec -it sani /sani passwd`）。原有 `/data` 目录与权限保持兼容。
 - **内置健康检查**：已配置 `HEALTHCHECK`，可通过 `docker ps` 查看容器 `healthy` 状态。
+
+此迁移尚未发布，模板仍固定 v1.0.6。运行层原先是 `scratch`，Alpine 只用于构建阶段。迁移到 distroless 便于维护基础文件，但会增加少量镜像体积，不代表请求处理更快。选择 `static` 是因为程序不需要 libc；选择 `nonroot` 是为了保持现有权限；固定 `debian13` 和 digest 则避免浮动标签改变发行版。基础镜像更新由 Dependabot 每周提出 PR，通过测试后再合入。
 
 ### 镜像版本
 
@@ -92,14 +96,12 @@ docker exec sani /sani healthcheck
 |---|---|---|
 | Linux | x86-64 | `sani-linux-amd64.tar.gz` |
 | Linux | ARM64 | `sani-linux-arm64.tar.gz` |
-| Linux | ARMv7（32 位） | `sani-linux-armv7.tar.gz` |
 | macOS | Intel | `sani-darwin-amd64.tar.gz` |
 | macOS | Apple 芯片 | `sani-darwin-arm64.tar.gz` |
 | Windows | x86-64 | `sani-windows-amd64.zip` |
 | Windows | ARM64 | `sani-windows-arm64.zip` |
-| FreeBSD | x86-64 | `sani-freebsd-amd64.tar.gz` |
 
-所有二进制文件均为静态编译，不依赖宿主机动态链接库。macOS、Windows 与 FreeBSD 解压后直接执行 `sani`（Windows 为 `sani.exe`），配置项完全一致。在 Linux 服务器上按如下步骤安装：
+所有二进制文件均为静态编译，不依赖宿主机动态链接库。macOS 与 Windows 解压后直接执行 `sani`（Windows 为 `sani.exe`），配置项完全一致。在 Linux 服务器上按如下步骤安装：
 
 ::: code-group
 

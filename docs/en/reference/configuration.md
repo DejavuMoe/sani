@@ -174,7 +174,7 @@ Default `text`. `text` is readable `key=value` lines; `json` writes one JSON obj
 
 ### `TZ`
 
-Default: the system time zone. “Today” and the daily statistics follow it. The binary carries its own time zone data, so `TZ=Europe/Berlin` works even in the `scratch` image, which has no zone files. Without `TZ`, the Docker image uses UTC.
+Default: the system time zone. “Today” and the daily statistics follow it. The binary carries its own time zone data, so `TZ=Europe/Berlin` works even without system zone files; the distroless image also supplies system time zone data. Without `TZ`, the Docker image uses UTC.
 
 ### `HTTPS_PROXY` and `HTTP_PROXY`
 

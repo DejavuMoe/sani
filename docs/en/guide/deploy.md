@@ -10,7 +10,9 @@ The builder edits the repository’s actual `compose.yaml`, `deploy/sani.service
 
 ## With Docker Compose
 
-Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64`, `linux/arm64` and `linux/arm/v7` (a Raspberry Pi, for example). Create a directory on the server and save the generated `compose.yaml` in it. **Before starting, create `./sani-data` and grant the container user `65532:65532` write access.** Run these commands beside the Compose file:
+The platform matrix below follows the current source. Removal of ARMv7 and FreeBSD artifacts is unreleased; historical releases are unchanged. See the [unreleased migration notes](../project/changelog#unreleased).
+
+Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64` and `linux/arm64`. Create a directory on the server and save the generated `compose.yaml` in it. **Before starting, create `./sani-data` and grant the container user `65532:65532` write access.** Run these commands beside the Compose file:
 
 ```sh
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
@@ -21,8 +23,10 @@ A few things worth knowing about `compose.yaml`:
 
 - **Localhost only.** The port is published as `127.0.0.1:8080:8080`, so outside traffic has to come through the reverse proxy.
 - **Data in a local directory.** The database and shared files live in `./sani-data` beside the Compose file, bound to `/data` in the container. Recreating the container keeps this directory. The default does not use a named volume.
-- **A tiny image.** It’s built `FROM scratch`, about 25 MB, and holds only the `sani` binary and CA certificates. It runs as the unprivileged user 65532 and has no shell, so to run a command inside, call `/sani` directly, as in `docker exec -it sani /sani passwd`.
+- **A minimal runtime.** The image uses `gcr.io/distroless/static-debian13:nonroot`, pinned by its multi-platform digest. Upstream maintains CA certificates, time zones and basic system files. Sani remains a static binary without cgo, runs as UID/GID `65532:65532`, and has no shell or package manager. Call `/sani` directly for maintenance, as in `docker exec -it sani /sani passwd`. Existing `/data` directories and permissions remain compatible.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
+
+This migration is unreleased; the template still pins v1.0.6. The previous runtime was `scratch`; Alpine was used only in build stages. Distroless simplifies maintenance of base files but adds some image size and does not make request handling faster. `static` avoids an unnecessary libc; `nonroot` preserves existing permissions; pinning `debian13` and a digest prevents floating tags from changing the distribution. Dependabot proposes base-image updates weekly for review and testing.
 
 ### Image versions
 
@@ -92,14 +96,12 @@ Without Docker, let systemd run the binary. Every release has archives for these
 |---|---|---|
 | Linux | x86-64 | `sani-linux-amd64.tar.gz` |
 | Linux | ARM64 | `sani-linux-arm64.tar.gz` |
-| Linux | ARMv7 (32-bit) | `sani-linux-armv7.tar.gz` |
 | macOS | Intel | `sani-darwin-amd64.tar.gz` |
 | macOS | Apple silicon | `sani-darwin-arm64.tar.gz` |
 | Windows | x86-64 | `sani-windows-amd64.zip` |
 | Windows | ARM64 | `sani-windows-arm64.zip` |
-| FreeBSD | x86-64 | `sani-freebsd-amd64.tar.gz` |
 
-The binary is statically linked and needs no libraries on the server. On macOS, Windows or FreeBSD, unpack it and run `sani` (`sani.exe` on Windows), configured the same way. On a Linux server, download it, check it against the checksums, and install it:
+The binary is statically linked and needs no libraries on the server. On macOS or Windows, unpack it and run `sani` (`sani.exe` on Windows), configured the same way. On a Linux server, download it, check it against the checksums, and install it:
 
 ::: code-group
 

@@ -56,7 +56,7 @@ Update both languages; the check names what's missing. Anything else the docs cl
 ## Invariants
 
 - **Redirects never touch the database** when the slug is cached, and never wait on a write. Clicks are counted in memory and flushed in batches. Check `make bench` before and after changing `redirect.go`, `cache` or `clicks`.
-- **No cgo.** SQLite is `modernc.org/sqlite`; the image is `FROM scratch`.
+- **No cgo.** SQLite is `modernc.org/sqlite`; the runtime image is digest-pinned `gcr.io/distroless/static-debian13:nonroot`.
 - **Security boundaries stay in place:** the SSRF guard in `internal/meta` (pre-resolve and dial-time checks), blocked URL schemes in `internal/links`, the setup code for the first password, session cookies scoped to `/api/`, `http.CrossOriginProtection`, the admin CSP (inline scripts only by hash; `web.go` computes the hashes), and shared bytes served only from the files origin (`SANI_FILES_URL`, a separate host) with sandboxing headers.
 - **Untrusted input is bounded:** referrer hosts per link, limiter keys, request bodies, fetched pages and icons all have caps. New maps keyed by client input need one too.
 - **Every UI string exists in both `zh` and `en`** in `web/src/lib/i18n.svelte.ts`; `zh` defines the keys and the type of `en` requires all of them. Chinese copy is written for Chinese readers, not translated word for word. The same goes for the docs: every page exists in both languages.

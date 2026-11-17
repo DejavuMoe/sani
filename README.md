@@ -45,20 +45,20 @@ docker compose up -d
 
 Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first visit also asks for the setup code Sani prints to its log (`docker logs sani`), so nobody else can claim a fresh instance; when `SANI_BASE_URL` is set, the log line includes a link with the code already filled in. Set `SANI_PASSWORD` instead to skip this step. Put a TLS reverse proxy in front of it; [deploy/](deploy/) has Caddy, nginx and systemd examples.
 
-The image, `ghcr.io/dejavumoe/sani`, is built `FROM scratch` for `linux/amd64`, `linux/arm64` and `linux/arm/v7`: about 25 MB, running as an unprivileged user, with the data in the `/data` volume.
+The source-built image for `ghcr.io/dejavumoe/sani` uses digest-pinned `gcr.io/distroless/static-debian13:nonroot` for `linux/amd64` and `linux/arm64`. It runs as UID/GID `65532:65532`, has no shell or package manager, and keeps data in the `/data` volume. The amd64 image is about 32 MB uncompressed (measured 2026-11-17). This migration is unreleased; the template below still uses the published v1.0.6 image.
 
 The template pins `v1.0.6`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
-Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS, Windows and FreeBSD, with `SHA256SUMS` and build provenance:
+Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS and Windows, with `SHA256SUMS` and build provenance:
 
 ```sh
 curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
-The binary embeds the admin app and needs nothing else at runtime. To build it yourself, `make install build` (Go 1.27+, Node 24 and pnpm) produces `./bin/sani`. `sani passwd` resets the password and signs out every session (with Docker: `docker exec -it sani /sani passwd`).
+The binary embeds the admin app and needs nothing else at runtime. To build it yourself, `make install build` (Go 1.27+, Node 26 LTS and pnpm) produces `./bin/sani`. `sani passwd` resets the password and signs out every session (with Docker: `docker exec -it sani /sani passwd`).
 
 ## Configuration
 

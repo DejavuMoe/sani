@@ -12,7 +12,7 @@
 - **Control over every link.** Access passwords, expiry, visit limits, temporary or permanent redirects, and an off switch. A new destination applies to the next request that reaches Sani; browsers may keep using a cached permanent redirect.
 - **Tags.** Assign colored tags to URLs, texts and files, then filter by tag or find untagged items. Tags are visible only to the administrator.
 - **Texts and files too.** Share a note, a snippet of code or a file at `/p/…`, with the same expiry, visit limit and statistics as a link. See [Everyday use](./usage#shares).
-- **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 25 MB, and there’s no Redis, PostgreSQL or anything else to run next to it.
+- **Simple to run.** One binary with the admin app inside, and one SQLite file. The Docker image is about 32 MB (amd64, uncompressed), and there’s no Redis, PostgreSQL or anything else to run next to it.
 - **Any language.** A slug like `s.example.com/简历` just works, and both the admin app and the pages visitors see come in English and Chinese.
 
 ## Who it’s for

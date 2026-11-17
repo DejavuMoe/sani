@@ -45,7 +45,7 @@
 
 ## 底层存储设计
 
-数据库采用纯 Go 实现的 [modernc.org/sqlite](https://gitlab.com/cznic/sqlite)，不依赖 cgo，使程序能够完全静态编译，并直接运行于 `scratch` 基础镜像中：
+数据库采用纯 Go 实现的 [modernc.org/sqlite](https://gitlab.com/cznic/sqlite)，不依赖 cgo，使程序能够完全静态编译，并直接运行于 `distroless/static-debian13:nonroot` 基础镜像中：
 
 - **WAL 日志模式**：允许普通读操作与写入并发，连接池和外部锁仍可能造成等待。配置 `synchronous=NORMAL`，断电持久性详见[运维](../guide/operations)。
 - **单写连接池**：本进程的写入在一个连接上排队，以 `BEGIN IMMEDIATE` 开启事务，减少写锁竞争；外部写入者仍可能引发忙等待或错误。

@@ -58,7 +58,7 @@ deploy/             systemd、Caddy 与 nginx 生产配置模板
 ## 架构核心原则（不变量）
 
 - **跳转路径无 DB 交互**：缓存命中时直接从内存返回，不触发 SQLite 查询与磁盘 I/O。修改 `redirect.go`、`cache` 或 `clicks` 前后必须运行 `make bench` 评估延迟基线。
-- **不依赖 cgo**：SQLite 采用 `modernc.org/sqlite`，确保完全静态链接并支持 `scratch` 容器环境。
+- **不依赖 cgo**：SQLite 采用 `modernc.org/sqlite`，确保完全静态链接；运行镜像为按 digest 固定的 `distroless/static-debian13:nonroot`。
 - **维护既有安全防护边界**：元数据抓取层预解析与 Dial 拨号双重防 SSRF、危险 URL 协议过滤、首次运行日志设置码机制、会话 Cookie 限域（SameSite=Strict 且限定为 `/api/` 作用域）、跨站防护与后台严格 CSP 策略。
 - **外部输入严格施加容量边界**：任何以客户端输入为 Key 的映射结构必须配置显式容量上限。
 - **UI 文案双语同源**：文案统一维护于 `web/src/lib/i18n.svelte.ts`。中文表达地道自然，拒绝生硬机器直译。
@@ -150,14 +150,16 @@ cd web && SANI_URL=http://127.0.0.1:18080 SANI_FRESH_URL=http://127.0.0.1:8080 n
 
 发布流程先用 `scripts/check-release.mjs` 校验标签所指提交：该 SHA 在 `master` 上最新的 CI 与 CodeQL 必须完成且成功，接受推送、定时和手动运行，不接受拉取请求的运行记录。CI 必须包含已通过的 `Known vulnerabilities`，四种 CodeQL 语言的作业必须齐全，所有作业均不得失败或跳过；较新的定时漏洞检查失败时，不得使用旧的成功记录放行。缺失、仍在运行、失败或查询 API 出错都会在构建归档和推送镜像之前阻止发布；检查完成后重跑原 Release，不移动标签。只读预检也可单独运行：`node scripts/check-release.mjs OWNER/REPO COMMIT_SHA`，需要已登录的 `gh`。
 
-预检通过后，发布流程确认英文更新日志里有这个版本的条目（没有就停下），再运行一遍检查和测试，然后构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v1.0.6-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
+预检通过后，发布流程确认英文更新日志里有这个版本的条目（没有就停下），归档与镜像任务并行运行，构建各平台的压缩包和 `SHA256SUMS`、推送多平台镜像（附 SBOM），为两者生成构建来源证明，最后创建 GitHub Release，说明取自更新日志。`v1.0.6-rc.1` 这样的标签会标记为预发布。镜像始终使用完整版本标签，不发布 `latest` 或浮动标签。
 
 在本地可以用 `make web dist VERSION=v0.2.0` 得到和发布时相同的压缩包。同一个提交构建两次，结果逐字节相同。
 
 HTTP 契约与升级门槛：`make install` 后执行 `make contract`，并使用 schema 5 基线二进制执行 `OLD_BIN=/absolute/path/to/old-sani make upgrade-drill`。仍需 `make check test`、`make e2e`、`make smoke`。契约脚本使用 Node 标准库、fetch 和 FormData，不依赖 s.ee SDK。
 
 
-Docker 存储演练：先构建本地镜像，再执行 `bash scripts/test-docker-storage.sh sani:upgrade /absolute/path/to/old-sani`。脚本从待测镜像提取真实二进制，在 UID 65532、真实绑定目录和临时 Node 测试容器中复用完整 HTTP/迁移/回滚演练；Node 仅用于测试，正式镜像仍为 scratch。额外验证只读数据库被预检拒绝，以及隔离的 16 MiB tmpfs 耗尽产生真实 ENOSPC：三次失败启动不遗留半成品副本，释放空间后旧 schema 与文件仍可预检。
+Docker 存储演练：先构建本地镜像，再执行 `bash scripts/test-docker-storage.sh sani:upgrade /absolute/path/to/old-sani`。脚本从待测镜像提取真实二进制，在 UID 65532、真实绑定目录和临时 Node 测试容器中复用完整 HTTP/迁移/回滚演练；Node 仅用于测试，正式镜像使用 distroless static。另检查 CA 证书、时区、非特权用户记录与标准输出备份。额外验证只读数据库被预检拒绝，以及隔离的 16 MiB tmpfs 耗尽产生真实 ENOSPC：三次失败启动不遗留半成品副本，释放空间后旧 schema 与文件仍可预检。
+
+镜像构建保留 Alpine 工具链阶段，以构建机原生架构交叉编译两个 Linux 目标，不运行 QEMU。Go 编译使用 BuildKit 缓存挂载，适用于同一 builder 上的后续构建；GitHub Actions 的远程缓存只导出构建层，不会自动保存缓存挂载内容。CI、升级演练和发布共用 `sani-image` 缓存范围；CI 的 pnpm、Go 模块和按 job/commit 更新的 Go 编译缓存分别保存。应用和旧版基线各构建一次，按提交 SHA 上传归档并保留可执行权限；E2E、HTTP/备份、容器回滚和发布归档任务复用产物，独立运行。无需工作区依赖的任务跳过 pnpm 安装。E2E 文件使用独立服务和数据目录，以两个 worker 并发运行，文件内保持顺序；发布归档复用精确提交的 CI 门禁，不重复执行整套检查。
 
 ## 消融与依赖检查 {#ablation}
 

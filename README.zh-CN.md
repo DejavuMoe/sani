@@ -45,20 +45,20 @@ docker compose up -d
 
 打开 `http://127.0.0.1:8080/admin/`，初始化管理员密码。首次设置时需要输入 Sani 打印在启动日志中的一次性设置码（通过 `docker logs sani` 查看），以避免新建实例在未设密时被未授权访问；若配置了 `SANI_BASE_URL`，日志中还会输出已携带设置码的初始化链接。亦可预先通过环境变量 `SANI_PASSWORD` 指定密码直接跳过此步骤。对外提供服务时请在前端配置 TLS 反向代理，[deploy/](deploy/) 目录提供了 Caddy、nginx 和 systemd 的参考配置。
 
-镜像 `ghcr.io/dejavumoe/sani` 基于 `scratch` 构建，支持 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7`：约 25 MB，以非特权用户运行，数据保存在 `/data` 卷中。
+源码构建的 `ghcr.io/dejavumoe/sani` 镜像使用按 digest 固定的 `gcr.io/distroless/static-debian13:nonroot`，支持 `linux/amd64` 和 `linux/arm64`。以 UID/GID `65532:65532` 运行，不含 shell 或包管理器，数据保存在 `/data` 卷中。amd64 解压体积约 32 MB（2026-11-17 实测）。此迁移尚未发布，下方模板仍使用已发布的 v1.0.6 镜像。
 
 模板固定使用 `v1.0.6`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
-每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS、Windows 和 FreeBSD 的压缩包，附校验和与构建来源证明：
+每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS 和 Windows 的压缩包，附校验和与构建来源证明：
 
 ```sh
 curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
-二进制文件内嵌了管理界面，运行时无需其他外部依赖。如需从源码编译，运行 `make install build`（需要 Go 1.27+、Node 24 与 pnpm），构建产物位于 `./bin/sani`。若遗忘密码，运行 `sani passwd` 可重置密码并使所有已登录会话失效（在 Docker 中执行：`docker exec -it sani /sani passwd`）。
+二进制文件内嵌了管理界面，运行时无需其他外部依赖。如需从源码编译，运行 `make install build`（需要 Go 1.27+、Node 26 LTS 与 pnpm），构建产物位于 `./bin/sani`。若遗忘密码，运行 `sani passwd` 可重置密码并使所有已登录会话失效（在 Docker 中执行：`docker exec -it sani /sani passwd`）。
 
 ## 配置
 

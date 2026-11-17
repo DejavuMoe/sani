@@ -46,7 +46,7 @@ const numbers = computed(() => [
     value: String(Math.round(benchmark.imageMB)),
     unit: 'MB',
     label: pick('Docker 镜像', 'Docker image'),
-    note: pick('FROM scratch，无 cgo', 'FROM scratch, no cgo'),
+    note: pick('Distroless，无 cgo', 'Distroless, no cgo'),
   },
 ]);
 
