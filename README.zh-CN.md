@@ -27,7 +27,7 @@
 
 ## 文档
 
-Sani 面向单实例、单管理员使用，不提供多用户托管或多实例同时写入能力。1.x 系列遵循[兼容规则](docs/project/versioning.md)，升级前请阅读更新日志。对外服务前应配置 HTTPS、持久化存储，按需设置独立文件域名，并演练[完整备份与恢复](docs/guide/operations.md)。仓库测试和公开基准不代表具体部署的容量或可用性保证。
+Sani 面向单实例、单管理员使用，不提供多用户托管或多实例同时写入能力。2.x 系列遵循[兼容规则](docs/project/versioning.md)；v2.0.0 移除 ARMv7 与 FreeBSD 发布制品，保留 schema 7、现有 API 与链接行为。升级前请阅读更新日志。对外服务前应配置 HTTPS、持久化存储，按需设置独立文件域名，并演练[完整备份与恢复](docs/guide/operations.md)。仓库测试和公开基准不代表具体部署的容量或可用性保证。
 
 完整的中英文文档位于 [docs/](docs/) 目录：包含[部署](docs/guide/deploy.md)与[运维](docs/guide/operations.md)指南，[配置项](docs/reference/configuration.md)、[HTTP API](docs/reference/api.md) 与[命令行](docs/reference/cli.md)参考，以及系统内部架构说明。文档站点基于 VitePress 构建，运行 `make install docs-dev` 即可在 `127.0.0.1:5174` 本地预览；部署页面内置配置生成器，输入域名即可生成完整部署文件。文档在构建时会与源码进行自动化一致性校验，确保文档记录的配置项、接口、错误码及命令均与程序实际实现保持一致。
 
@@ -45,16 +45,16 @@ docker compose up -d
 
 打开 `http://127.0.0.1:8080/admin/`，初始化管理员密码。首次设置时需要输入 Sani 打印在启动日志中的一次性设置码（通过 `docker logs sani` 查看），以避免新建实例在未设密时被未授权访问；若配置了 `SANI_BASE_URL`，日志中还会输出已携带设置码的初始化链接。亦可预先通过环境变量 `SANI_PASSWORD` 指定密码直接跳过此步骤。对外提供服务时请在前端配置 TLS 反向代理，[deploy/](deploy/) 目录提供了 Caddy、nginx 和 systemd 的参考配置。
 
-源码构建的 `ghcr.io/dejavumoe/sani` 镜像使用按 digest 固定的 `gcr.io/distroless/static-debian13:nonroot`，支持 `linux/amd64` 和 `linux/arm64`。以 UID/GID `65532:65532` 运行，不含 shell 或包管理器，数据保存在 `/data` 卷中。amd64 解压体积约 32 MB（2026-11-17 实测）。此迁移尚未发布，下方模板仍使用已发布的 v1.0.6 镜像。
+v2.0.0 的 `ghcr.io/dejavumoe/sani` 镜像使用按 digest 固定的 `gcr.io/distroless/static-debian13:nonroot`，支持 `linux/amd64` 和 `linux/arm64`。以 UID/GID `65532:65532` 运行，不含 shell 或包管理器，数据保存在 `/data` 卷中。amd64 源码构建镜像的解压体积约 32 MB（2026-11-17 实测）。部署前请确认目标版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases)；当前源码可能正在准备尚未发布制品的版本。
 
-模板固定使用 `v1.0.6`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
+模板固定使用 `v2.0.0`，镜像标签保留 `v`，与 Git tag、Release 一致。请使用已发布的版本，升级时手动修改标签。数据默认绑定到 Compose 文件旁的 `./sani-data`，容器内路径为 `/data`。上面的 `install` 命令不能省略：它创建目录并设置 `65532:65532` 所有权，让容器可以写入。如果此前启动已创建了 root 所有的目录，请先[修复权限](docs/guide/deploy.md#data-permissions)。
 
 ### 单个二进制文件
 
 每个[版本](https://github.com/DejavuMoe/sani/releases/latest)都提供 Linux、macOS 和 Windows 的压缩包，附校验和与构建来源证明：
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 

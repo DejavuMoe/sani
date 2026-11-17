@@ -56,7 +56,7 @@ sani backup /backups/sani-2026-09-29.db
 
 ## `sani version`
 
-输出当前构建版本（例如 `sani v1.0.6`）。从源码构建时，版本号提取自 `git describe`；无 Git 元数据时标记为 `dev`。`-v` 与 `--version` 标志效果等同。
+输出当前构建版本（例如 `sani v2.0.0`）。从源码构建时，版本号提取自 `git describe`；无 Git 元数据时标记为 `dev`。`-v` 与 `--version` 标志效果等同。
 
 ## `sani preflight`
 

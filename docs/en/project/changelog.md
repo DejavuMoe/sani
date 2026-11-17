@@ -1,8 +1,12 @@
 # Changelog
 
-<p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
+<p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, documented public contracts stay compatible within each major version. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v2.0.0
+
+2026-11-17 · Narrow the release platform matrix, adopt the distroless runtime, update dependencies and share CI builds. Database schema remains 7.
+
+Upgrading from v1.0.0–v1.0.6 adds no database migration; existing APIs, short links and file URLs are unchanged. Confirm that the target host is supported, then back up the database, files and configuration together. Rollback requires that snapshot and the original version. See the ARMv7 and FreeBSD migration requirements below.
 
 - Move the runtime from `scratch` to digest-pinned `distroless/static-debian13:nonroot`, with upstream-maintained CA certificates, time zones and base files; preserve UID/GID `65532:65532` and `/data`.
 - Upgrade the toolchain to Node 26.13.1 LTS and update pnpm, SQLite, Ecoku and compatible frontend/test dependencies; retain cgo-free builds and the existing database schema.
@@ -10,11 +14,12 @@
 - Fix the VitePress docs search button's accessible name: use visible text and shortcuts on desktop, retaining the icon button's label on mobile.
 - Skip the negative-cache lookup on redirect-cache hits, shortening the read-lock hold time while preserving miss caching, shared concurrent loads and invalidation semantics.
 - Share application and legacy-upgrade build artifacts from the same commit across parallel E2E, HTTP/backup, container and archive jobs; combine container storage and rollback checks, separate dependency and Go compilation caches and run isolated E2E files concurrently. Releases still require exact-commit CI gates; add weekly base-image, Go module and Actions update checks.
+- Update artifact upload/download, mise, CodeQL and container-login Actions; align reusable Action pins with the workflows and include them in Dependabot updates.
 
 ### Breaking changes
 
 - Stop building and publishing Linux ARMv7 (32-bit) and FreeBSD artifacts. Container images support only `linux/amd64` and `linux/arm64`; archives cover the six amd64/arm64 combinations for Linux, macOS and Windows. Historical release artifacts remain available.
-- ARMv7 users must move to a supported 64-bit system; FreeBSD users must move to a supported system or maintain and validate their own source builds. Stop the service, back up the database, files and configuration, then follow [backup and restore](../guide/operations#backup-files) on the new host. This distribution compatibility change requires the next major release under the [versioning policy](./versioning); it must not ship as a 1.x patch.
+- ARMv7 users must move to a supported 64-bit system; FreeBSD users must move to a supported system or maintain and validate their own source builds. Stop the service, back up the database, files and configuration, then follow [backup and restore](../guide/operations#backup-files) on the new host. Historical 1.x artifacts remain available, but no separate 1.x security-fix branch is maintained. This distribution compatibility change ships as v2.0.0 under the [versioning policy](./versioning).
 
 ## v1.0.6
 

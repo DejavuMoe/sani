@@ -4,7 +4,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 # Status
 
-<p class="lead">The latest release is {{ status.latestVersion }}. Sani is now maintained as a stable 1.x series. This page describes what it does today, what it is meant for and what comes next; see the <a href="./changelog">changelog</a> for individual releases.</p>
+<p class="lead">These docs describe {{ status.latestVersion }}; check <a href="https://github.com/DejavuMoe/sani/releases">Releases</a> for published artifacts. Sani’s 2.x series targets the supported 64-bit platforms. This page describes what it does today, what it is meant for and what comes next; see the <a href="./changelog">changelog</a> for individual releases.</p>
 
 ## Where things stand {#current}
 
@@ -28,7 +28,7 @@ import { data as status } from '../../.vitepress/data/status.data'
 
 Sani is intended for **one administrator, one server process and a local persistent data directory**. A reverse proxy provides HTTPS, and file sharing uses a separate hostname. The operator owns backups, disk capacity, log monitoring and upgrade recovery. Multiple processes sharing a database do not synchronize their in-memory caches or visit allowances, so replicas are not a supported high-availability setup. A share URL is not visitor authentication, and click statistics do not promise zero loss after a power failure.
 
-After deploying, verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [1.x compatibility promises](./versioning#stable) apply from v1.0.0.
+After deploying, verify HTTPS, proxy trust, both domains, volume permissions, backup recovery and monitoring as described in [Operations](../guide/operations). `/healthz` reports liveness, not database writability or complete application health. The [compatibility promises within each major version](./versioning#stable) apply from v1.0.0.
 
 ## Build-time checks {#checks}
 

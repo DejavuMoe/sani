@@ -102,4 +102,4 @@ Schema 5 rebuilds the tags table to accept normalized six-digit HEX colors as we
 
 Schema 6 appends `contents.delete_key` with a unique nonempty index, backfills random keys for existing files, and does not rewrite resources or public URL paths. `/api/v1` and `/api/admin/v1` share input validation, resource creation/update, streaming uploads, SQLite and cache invalidation. The resource API checks a configured single domain; the global slug namespace remains unchanged.
 
-Schema 7 adds an optional access password column (`password`, defaulting to empty string) to the `links` table. It is kept readable so the administrator can inspect and re-share it at any time; an empty string indicates no password protection. Versions v1.0.0 through v1.0.6 use schema 7, with no new migrations between these versions.
+Schema 7 adds an optional access password column (`password`, defaulting to empty string) to the `links` table. It is kept readable so the administrator can inspect and re-share it at any time; an empty string indicates no password protection. Versions v1.0.0 through v1.0.6 and v2.0.0 use schema 7, with no new migrations between these versions.

@@ -22,6 +22,12 @@ Export JSON in the old admin app, stop cleanly and back up the database, files a
 
 **v1.0.0 is the first stable release, adding access passwords and migrating to schema 7.** The 1.x series preserves the documented public contracts below; incompatible changes require the next major version. Existing public addresses and access without passwords are preserved. Back up the database, files and configuration before upgrading; older versions cannot read schema 7, so rollback requires the complete pre-upgrade snapshot. See the [v1.0.0 changelog](./changelog#v1-0-0).
 
+### v2.0.0 platform changes {#v200}
+
+**v2.0.0 stops publishing Linux ARMv7 and FreeBSD artifacts.** This distribution compatibility change requires a major version; historical artifacts remain available. Images support Linux amd64/arm64, and archives support amd64/arm64 on Linux, macOS and Windows. The 2.x series retains the promises below within this platform matrix.
+
+Database schema remains 7, with no new migration from v1.0.0–v1.0.6. APIs, configuration, CLI and existing public URLs are unchanged. Check the host platform and take a complete backup before upgrading; see the [v2.0.0 changelog](./changelog#v2-0-0) and [operations guide](../guide/operations#upgrade) for migration and rollback steps.
+
 ## What stays the same {#stable}
 
 ### Short links

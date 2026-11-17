@@ -10,7 +10,7 @@
 
 ## Docker Compose 部署
 
-以下平台矩阵对应当前源码；停止 ARMv7 和 FreeBSD 制品的变更尚未发布，历史版本不受影响。迁移要求见[未发布变更](../project/changelog#unreleased)。
+以下平台矩阵从 v2.0.0 起适用，停止发布 ARMv7 和 FreeBSD 制品，历史版本制品保留。迁移要求见 [v2.0.0 更新日志](../project/changelog#v2-0-0)。
 
 官方发布的多平台镜像 `ghcr.io/dejavumoe/sani` 原生支持 `linux/amd64` 与 `linux/arm64`。在服务器新建目录并保存生成的 `compose.yaml`。**启动前必须创建 `./sani-data` 并授予容器用户 `65532:65532` 写权限**，在 Compose 文件所在目录执行：
 
@@ -26,16 +26,16 @@ docker compose up -d
 - **精简运行镜像**：使用按多架构 digest 固定的 `gcr.io/distroless/static-debian13:nonroot`，由上游维护 CA 证书、时区和基础系统文件。Sani 仍为无 cgo 的静态二进制，以 `65532:65532` 非特权用户运行，不含 shell 或包管理器。如需执行维护命令可直接调用 `/sani`（例如 `docker exec -it sani /sani passwd`）。原有 `/data` 目录与权限保持兼容。
 - **内置健康检查**：已配置 `HEALTHCHECK`，可通过 `docker ps` 查看容器 `healthy` 状态。
 
-此迁移尚未发布，模板仍固定 v1.0.6。运行层原先是 `scratch`，Alpine 只用于构建阶段。迁移到 distroless 便于维护基础文件，但会增加少量镜像体积，不代表请求处理更快。选择 `static` 是因为程序不需要 libc；选择 `nonroot` 是为了保持现有权限；固定 `debian13` 和 digest 则避免浮动标签改变发行版。基础镜像更新由 Dependabot 每周提出 PR，通过测试后再合入。
+v2.0.0 将运行层从 `scratch` 迁移到 distroless，Alpine 只用于构建阶段。迁移到 distroless 便于维护基础文件，但会增加少量镜像体积，不代表请求处理更快。选择 `static` 是因为程序不需要 libc；选择 `nonroot` 是为了保持现有权限；固定 `debian13` 和 digest 则避免浮动标签改变发行版。基础镜像更新由 Dependabot 每周提出 PR，通过测试后再合入。
 
 ### 镜像版本
 
 | 标签 | 指向 |
 |---|---|
-| `v1.0.6` | 对应 Git tag 和 GitHub Release `v1.0.6` 的具体版本 |
-| `v1.0.6-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
+| `v2.0.0` | 对应 Git tag 和 GitHub Release `v2.0.0` 的具体版本 |
+| `v2.0.0-rc.1` | 对应同名 Git tag 的预发布版（仅在发布该版本后可用） |
 
-从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v1.0.6`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
+从 v0.7.0 起，镜像标签与 Git tag、GitHub Release 完全一致，保留 `v` 前缀；不再发布 `latest`、主版本或次版本浮动标签。仓库模板与配置生成器固定使用 `ghcr.io/dejavumoe/sani:v2.0.0`。部署前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases) 中；发布准备分支中的版本可能尚未发布。
 
 升级时先[备份](./operations#backup)，再手动将 `compose.yaml` 的 `image:` 改为目标版本的完整标签，随后执行：
 
@@ -106,7 +106,7 @@ docker exec sani /sani healthcheck
 ::: code-group
 
 ```sh [下载]
-base=https://github.com/DejavuMoe/sani/releases/download/v1.0.6
+base=https://github.com/DejavuMoe/sani/releases/download/v2.0.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -121,7 +121,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-下载路径固定到 `v1.0.6`；升级时将路径中的标签改为已发布的目标版本。
+下载路径固定到 `v2.0.0`；升级时将路径中的标签改为已发布的目标版本。
 
 ### 校验来源与签名 {#verify}
 
@@ -129,7 +129,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v1.0.6 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v2.0.0 -R DejavuMoe/sani
 ```
 
 将生成的 `sani.service` 写入 `/etc/systemd/system/` 并启动：

@@ -4,17 +4,19 @@
 
 ## Start Sani
 
+Examples pin v2.0.0. Confirm that it appears in [Releases](https://github.com/DejavuMoe/sani/releases) before running them; during release preparation, choose a published version or build from source.
+
 ::: code-group
 
 ```sh [Docker]
 mkdir -p ~/sani && cd ~/sani
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker run -d --name sani -p 127.0.0.1:8080:8080 \
-  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.6
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v2.0.0
 ```
 
 ```sh [Binary]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_LISTEN=127.0.0.1:8080 ./sani     # keeps its data in ./data
 ```
 

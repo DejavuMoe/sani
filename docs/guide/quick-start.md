@@ -4,17 +4,19 @@
 
 ## 启动 Sani
 
+示例固定使用 v2.0.0；执行前确认该版本已出现在 [Releases](https://github.com/DejavuMoe/sani/releases)。发布准备期间可选择已发布的版本或从源码构建。
+
 ::: code-group
 
 ```sh [Docker]
 mkdir -p ~/sani && cd ~/sani
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
 docker run -d --name sani -p 127.0.0.1:8080:8080 \
-  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v1.0.6
+  --mount "type=bind,source=$(pwd)/sani-data,target=/data" ghcr.io/dejavumoe/sani:v2.0.0
 ```
 
 ```sh [二进制文件]
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_LISTEN=127.0.0.1:8080 ./sani     # 数据保存在 ./data 目录
 ```
 

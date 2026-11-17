@@ -100,7 +100,9 @@ In an isolated local instance, check `/healthz`, login, URL redirects, text bodi
 
 ## Upgrading {#upgrade}
 
-**v1.0.6 retains schema 7**, with no new database migration from v1.0.0–v1.0.5. APIs, public contracts and existing links remain unchanged. Take a complete snapshot as described in [Backups and restores](#backup-files) before upgrading; check the migration notes for each future release.
+**v2.0.0 retains schema 7**, with no new database migration from v1.0.0–v1.0.6. APIs, public contracts and existing links remain unchanged. Containers still use UID/GID `65532:65532` and `/data`, so existing volume permissions need no change. Take a complete snapshot as described in [Backups and restores](#backup-files) before upgrading; check the migration notes for each future release.
+
+**v2.0.0 no longer provides ARMv7 or FreeBSD artifacts.** Confirm that the host uses a supported 64-bit platform. Move the database, files and configuration from unsupported hosts to a supported host, or maintain and validate your own builds. Historical artifacts remain available, but no separate 1.x security-fix branch is maintained. See the [v2.0.0 migration notes](../project/changelog#v2-0-0).
 
 v1.0.1 corrected bias in generated access passwords. Existing passwords are not rotated automatically; use the link editor to generate a replacement if needed. See the [v1.0.1 changelog](../project/changelog#v1-0-1).
 

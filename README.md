@@ -27,7 +27,7 @@ Paste a long URL, press Enter, and the short link is already on your clipboard. 
 
 ## Documentation
 
-Sani is designed for a single running instance and one administrator, not multi-user hosting or active-active replicas. The 1.x series follows the [compatibility policy](docs/en/project/versioning.md). Read the release notes before upgrading. For public service, configure HTTPS, persistent storage and a separate files domain when needed, then rehearse a complete [backup and restore](docs/en/guide/operations.md). Repository tests and published benchmarks do not certify your deployment’s capacity or availability.
+Sani is designed for a single running instance and one administrator, not multi-user hosting or active-active replicas. The 2.x series follows the [compatibility policy](docs/en/project/versioning.md); v2.0.0 removes ARMv7 and FreeBSD release artifacts while preserving schema 7 and existing APIs and links. Read the release notes before upgrading. For public service, configure HTTPS, persistent storage and a separate files domain when needed, then rehearse a complete [backup and restore](docs/en/guide/operations.md). Repository tests and published benchmarks do not certify your deployment’s capacity or availability.
 
 The documentation, in English and Chinese, lives in [docs/](docs/): guides for [deployment](docs/en/guide/deploy.md) and [operations](docs/en/guide/operations.md), the [configuration](docs/en/reference/configuration.md), [HTTP API](docs/en/reference/api.md) and [command line](docs/en/reference/cli.md) references, and how Sani works inside. It's a VitePress site; `make install docs-dev` serves it on `127.0.0.1:5174`, and its deploy page has a config builder that writes the deployment files for your domain. Every build checks the docs against the source, so the settings, endpoints, error codes and commands they list are the ones the code has.
 
@@ -45,16 +45,16 @@ docker compose up -d
 
 Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first visit also asks for the setup code Sani prints to its log (`docker logs sani`), so nobody else can claim a fresh instance; when `SANI_BASE_URL` is set, the log line includes a link with the code already filled in. Set `SANI_PASSWORD` instead to skip this step. Put a TLS reverse proxy in front of it; [deploy/](deploy/) has Caddy, nginx and systemd examples.
 
-The source-built image for `ghcr.io/dejavumoe/sani` uses digest-pinned `gcr.io/distroless/static-debian13:nonroot` for `linux/amd64` and `linux/arm64`. It runs as UID/GID `65532:65532`, has no shell or package manager, and keeps data in the `/data` volume. The amd64 image is about 32 MB uncompressed (measured 2026-11-17). This migration is unreleased; the template below still uses the published v1.0.6 image.
+The v2.0.0 image for `ghcr.io/dejavumoe/sani` uses digest-pinned `gcr.io/distroless/static-debian13:nonroot` for `linux/amd64` and `linux/arm64`. It runs as UID/GID `65532:65532`, has no shell or package manager, and keeps data in the `/data` volume. The amd64 source-built image is about 32 MB uncompressed (measured 2026-11-17). Check [Releases](https://github.com/DejavuMoe/sani/releases) before deploying: this source tree may prepare a version whose artifacts are not published yet.
 
-The template pins `v1.0.6`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
+The template pins `v2.0.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS and Windows, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v1.0.6/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.0/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 

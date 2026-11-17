@@ -10,9 +10,9 @@ The builder edits the repository’s actual `compose.yaml`, `deploy/sani.service
 
 ## With Docker Compose
 
-The platform matrix below follows the current source. Removal of ARMv7 and FreeBSD artifacts is unreleased; historical releases are unchanged. See the [unreleased migration notes](../project/changelog#unreleased).
+The platform matrix below applies from v2.0.0, which stops publishing ARMv7 and FreeBSD artifacts. Historical artifacts remain available. See the [v2.0.0 migration notes](../project/changelog#v2-0-0).
 
-Every release publishes the multi-platform image `ghcr.io/dejavumoe/sani`, for `linux/amd64` and `linux/arm64`. Create a directory on the server and save the generated `compose.yaml` in it. **Before starting, create `./sani-data` and grant the container user `65532:65532` write access.** Run these commands beside the Compose file:
+From v2.0.0, releases publish the multi-platform image `ghcr.io/dejavumoe/sani` for `linux/amd64` and `linux/arm64`. Create a directory on the server and save the generated `compose.yaml` in it. **Before starting, create `./sani-data` and grant the container user `65532:65532` write access.** Run these commands beside the Compose file:
 
 ```sh
 sudo install -d -m 750 -o 65532 -g 65532 ./sani-data
@@ -26,16 +26,16 @@ A few things worth knowing about `compose.yaml`:
 - **A minimal runtime.** The image uses `gcr.io/distroless/static-debian13:nonroot`, pinned by its multi-platform digest. Upstream maintains CA certificates, time zones and basic system files. Sani remains a static binary without cgo, runs as UID/GID `65532:65532`, and has no shell or package manager. Call `/sani` directly for maintenance, as in `docker exec -it sani /sani passwd`. Existing `/data` directories and permissions remain compatible.
 - **A built-in health check.** The image defines a `HEALTHCHECK`, so `docker ps` shows it as `healthy`.
 
-This migration is unreleased; the template still pins v1.0.6. The previous runtime was `scratch`; Alpine was used only in build stages. Distroless simplifies maintenance of base files but adds some image size and does not make request handling faster. `static` avoids an unnecessary libc; `nonroot` preserves existing permissions; pinning `debian13` and a digest prevents floating tags from changing the distribution. Dependabot proposes base-image updates weekly for review and testing.
+v2.0.0 moves the runtime from `scratch` to distroless; Alpine is used only in build stages. Distroless simplifies maintenance of base files but adds some image size and does not make request handling faster. `static` avoids an unnecessary libc; `nonroot` preserves existing permissions; pinning `debian13` and a digest prevents floating tags from changing the distribution. Dependabot proposes base-image updates weekly for review and testing.
 
 ### Image versions
 
 | Tag | Points at |
 |---|---|
-| `v1.0.6` | The exact version matching Git tag and GitHub Release `v1.0.6` |
-| `v1.0.6-rc.1` | The matching prerelease Git tag, available only once published |
+| `v2.0.0` | The exact version matching Git tag and GitHub Release `v2.0.0` |
+| `v2.0.0-rc.1` | The matching prerelease Git tag, available only once published |
 
-From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v1.0.6`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
+From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v2.0.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
 
 To upgrade, [back up](./operations#backup), change `image:` in `compose.yaml` to the target version's full tag, then run:
 
@@ -106,7 +106,7 @@ The binary is statically linked and needs no libraries on the server. On macOS o
 ::: code-group
 
 ```sh [Download]
-base=https://github.com/DejavuMoe/sani/releases/download/v1.0.6
+base=https://github.com/DejavuMoe/sani/releases/download/v2.0.0
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -121,7 +121,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-The download path pins `v1.0.6`. When upgrading, replace it with the published target version's tag.
+The download path pins `v2.0.0`. When upgrading, replace it with the published target version's tag.
 
 ### Checking where a build came from {#verify}
 
@@ -129,7 +129,7 @@ Release files and images are built by GitHub Actions from the tagged commit, wit
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v1.0.6 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v2.0.0 -R DejavuMoe/sani
 ```
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:

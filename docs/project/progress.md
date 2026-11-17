@@ -4,7 +4,7 @@ import { data as status } from '../.vitepress/data/status.data'
 
 # 项目状态
 
-<p class="lead">最近发布版本为 {{ status.latestVersion }}。Sani 已进入 1.x 稳定维护阶段，本页说明已有能力、适用范围与后续计划；各版本变更见<a href="./changelog">更新日志</a>。</p>
+<p class="lead">本文档对应 {{ status.latestVersion }}，制品发布状态以 <a href="https://github.com/DejavuMoe/sani/releases">Releases</a> 为准。Sani 的 2.x 系列面向受支持的 64 位平台，本页说明已有能力、适用范围与后续计划；各版本变更见<a href="./changelog">更新日志</a>。</p>
 
 ## 功能现状 {#current}
 
@@ -28,7 +28,7 @@ import { data as status } from '../.vitepress/data/status.data'
 
 Sani 面向**单管理员、单个服务进程、本地持久化数据目录**的自托管部署。前置代理负责 HTTPS，文件分享使用独立主机名；备份、磁盘余量、日志监控和升级恢复由部署者负责。多个进程共享数据库时，内存缓存与访问额度不会同步，因此不支持通过多副本实现高可用。短码是分享地址，不是访客身份认证；点击统计也不承诺断电时零丢失。
 
-部署后请按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。v1.0.0 起执行[1.x 兼容承诺](./versioning#stable)。
+部署后请按[运维](../guide/operations)验证 HTTPS、反代信任、两个域名、卷权限、备份恢复和监控。`/healthz` 是存活探针，不代表数据库可写或完整功能健康。v1.0.0 起执行[同一主版本内的兼容承诺](./versioning#stable)。
 
 ## 构建期一致性校验 {#checks}
 
