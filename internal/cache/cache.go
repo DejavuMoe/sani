@@ -89,11 +89,12 @@ func (c *Cache) Get(ctx context.Context, key string) (*Entry, error) {
 	s := c.shard(key)
 	s.mu.RLock()
 	e, hit := s.hits[key]
-	_, miss := s.miss[key]
-	s.mu.RUnlock()
 	if hit {
+		s.mu.RUnlock()
 		return e, nil
 	}
+	_, miss := s.miss[key]
+	s.mu.RUnlock()
 	if miss {
 		return nil, nil
 	}
