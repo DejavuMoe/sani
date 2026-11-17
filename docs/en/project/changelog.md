@@ -15,6 +15,7 @@ Upgrading from v1.0.0–v1.0.6 adds no database migration; existing APIs, short 
 - Skip the negative-cache lookup on redirect-cache hits, shortening the read-lock hold time while preserving miss caching, shared concurrent loads and invalidation semantics.
 - Share application and legacy-upgrade build artifacts from the same commit across parallel E2E, HTTP/backup, container and archive jobs; combine container storage and rollback checks, separate dependency and Go compilation caches and run isolated E2E files concurrently. Releases still require exact-commit CI gates; add weekly base-image, Go module and Actions update checks.
 - Update artifact upload/download, mise, CodeQL and container-login Actions; align reusable Action pins with the workflows and include them in Dependabot updates.
+- Disable Node's experimental file-backed storage in unit tests to remove the `localStorage` warning after the Node upgrade; browser storage remains covered by E2E.
 
 ### Breaking changes
 

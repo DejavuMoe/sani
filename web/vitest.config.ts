@@ -6,5 +6,7 @@ export default defineConfig({
   plugins: [svelte()],
   test: {
     include: ['src/**/*.test.ts'],
+    // Node's file-backed storage is not the browser storage exercised by E2E.
+    execArgv: ['--no-experimental-webstorage'],
   },
 });
