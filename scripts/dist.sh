@@ -11,16 +11,14 @@ set -euo pipefail
 version=${VERSION:?set VERSION, e.g. VERSION=v0.1.0}
 out=$PWD/dist
 
-# GOOS/GOARCH, and GOARM for 32-bit ARM.
+# Supported 64-bit GOOS/GOARCH pairs.
 targets=(
   linux/amd64
   linux/arm64
-  linux/arm/7
   darwin/amd64
   darwin/arm64
   windows/amd64
   windows/arm64
-  freebsd/amd64
 )
 
 if [ ! -f internal/webui/dist/index.html ]; then
@@ -37,14 +35,14 @@ rm -rf "$out"
 mkdir -p "$out"
 
 for target in "${targets[@]}"; do
-  IFS=/ read -r os arch arm <<<"$target"
-  name=sani-$os-$arch${arm:+v$arm}
+  IFS=/ read -r os arch <<<"$target"
+  name=sani-$os-$arch
   exe=sani
   [ "$os" = windows ] && exe=sani.exe
   dir=$work/$name
   mkdir -p "$dir"
 
-  CGO_ENABLED=0 GOOS=$os GOARCH=$arch GOARM=$arm \
+  CGO_ENABLED=0 GOOS=$os GOARCH=$arch \
     go build -trimpath -ldflags "-s -w -buildid= -X main.version=$version" -o "$dir/$exe" ./cmd/sani
   cp LICENSE README.md "$dir/"
   chmod 644 "$dir/LICENSE" "$dir/README.md"

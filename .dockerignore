@@ -1,4 +1,7 @@
 .git
+.agents
+.github
+.woodpecker
 .upgrade-legacy
 bin
 data

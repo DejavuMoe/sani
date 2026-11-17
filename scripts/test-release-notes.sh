@@ -11,6 +11,7 @@ for tag in v0.7.0 v0.7.0-rc.1; do
   printf '\n[Version](./versioning#v095-exception) and [Upgrade](../guide/operations#step-2).\n' >> docs/en/project/changelog.md
   bash "$script" "$tag" > notes.md
   grep -Fxq "docker pull ghcr.io/dejavumoe/sani:$tag" notes.md
+  grep -Fxq 'With Docker, for linux/amd64 and linux/arm64:' notes.md
   grep -Fq '[Version](https://github.com/DejavuMoe/sani/blob/master/docs/en/project/versioning.md)' notes.md
   grep -Fq '[Upgrade](https://github.com/DejavuMoe/sani/blob/master/docs/en/guide/operations.md)' notes.md
 done

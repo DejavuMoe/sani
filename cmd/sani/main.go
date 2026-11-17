@@ -381,7 +381,7 @@ func backup() error {
 		return errors.New("standard output is a terminal; redirect it to a file")
 	}
 	// The copy is staged next to the database: the data directory is known
-	// to be writable, and a FROM scratch image has no /tmp.
+	// to be writable even when the container root filesystem is read-only.
 	tmp := filepath.Join(cfg.DataDir, fmt.Sprintf(".backup-%d.db", time.Now().UnixNano()))
 	defer os.Remove(tmp)
 	if err := store.Backup(ctx, src, tmp); err != nil {

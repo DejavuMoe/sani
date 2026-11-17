@@ -50,6 +50,15 @@ test ! -e "$work/sani-data"
 healthy "$name-compose"
 docker logs "$name-compose" 2>&1 | grep -q setup_code
 docker exec "$name-compose" /sani version
+# The runtime owns these assets now; a successful Go build cannot verify them.
+docker cp "$name-compose:/etc/ssl/certs/ca-certificates.crt" "$work/ca-certificates.crt"
+grep -q 'BEGIN CERTIFICATE' "$work/ca-certificates.crt"
+docker cp "$name-compose:/usr/share/zoneinfo/Asia/Shanghai" "$work/zoneinfo"
+test -s "$work/zoneinfo"
+docker cp "$name-compose:/etc/passwd" "$work/passwd"
+grep -q '^nonroot:x:65532:65532:' "$work/passwd"
+docker exec "$name-compose" /sani backup - >"$work/backup.db"
+test -s "$work/backup.db"
 test "$(docker inspect -f '{{(index .Mounts 0).Type}}' "$name-compose")" = bind
 test "$(sudo stat -c '%u:%g' "$work/sani-data/sani.db")" = 65532:65532
 inode=$(sudo stat -c %i "$work/sani-data/sani.db")
@@ -91,7 +100,7 @@ if [ -n "$old_bin" ]; then
     --mount "type=bind,src=$work/api-contract.mjs,dst=/api-contract.mjs,readonly" \
     --tmpfs /full:rw,size=16m,uid=65532,gid=65532,mode=0700 \
     -e TMPDIR=/work -e BIN=/sani -e OLD_BIN=/old-sani -e MOUNT_MARKER="$name" -e SANI_TEST_FULL_DIR=/full \
-    node:24-alpine sh -ec 'test "$(cat /work/mount-marker)" = "$MOUNT_MARKER"; node /api-contract.mjs --upgrade; id -u > /work/uid'
+    node:26.13.1-alpine3.24 sh -ec 'test "$(cat /work/mount-marker)" = "$MOUNT_MARKER"; node /api-contract.mjs --upgrade; id -u > /work/uid'
   test "$(sudo cat "$work/upgrade/uid")" = 65532
   test "$(sudo stat -c '%u:%g' "$work/upgrade/uid")" = 65532:65532
   echo 'storage: image binary upgrade and complete snapshot rollback as UID 65532 on bind storage passed'

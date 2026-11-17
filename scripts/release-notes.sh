@@ -28,7 +28,7 @@ $notes
 
 ## Install
 
-With Docker, for linux/amd64, linux/arm64 and linux/arm/v7:
+With Docker, for linux/amd64 and linux/arm64:
 
 \`\`\`sh
 docker pull ghcr.io/dejavumoe/sani:${tag}

@@ -128,7 +128,7 @@ export interface Release {
   image: string;
   /** Archive file names, such as sani-linux-amd64.tar.gz, from scripts/dist.sh. */
   archives: string[];
-  /** Image platforms, such as linux/arm/v7, from the release workflow. */
+  /** Image platforms, such as linux/arm64, from the release workflow. */
   platforms: string[];
 }
 
@@ -140,8 +140,8 @@ export function release(): Release {
   const targets = /^targets=\(\n([^)]*)\)/m.exec(read('scripts/dist.sh'))?.[1].trim().split(/\s+/);
   if (!image || !platforms || !targets) throw new Error('release targets not found in scripts/dist.sh and .github/workflows/release.yml');
   const archives = targets.map((t) => {
-    const [os, arch, arm] = t.split('/');
-    return `sani-${os}-${arch}${arm ? `v${arm}` : ''}.${os === 'windows' ? 'zip' : 'tar.gz'}`;
+    const [os, arch] = t.split('/');
+    return `sani-${os}-${arch}.${os === 'windows' ? 'zip' : 'tar.gz'}`;
   });
   return { image, archives, platforms };
 }
