@@ -147,7 +147,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await page.screenshot({ path: info.outputPath('color.png') });
     await page.keyboard.press('Escape');
     await expect(pop).toBeHidden();
-    await panel.getByRole('button', { name: lang === 'zh' ? '有效期' : 'Expires', exact: true }).click();
+    await panel.getByRole('button', { name: lang === 'zh' ? /^有效期(?::|\s)/ : /^Expires(?::|\s)/ }).click();
     await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
     const calendar = panel.locator('.date-editor');
     await expect(calendar).toBeVisible();
@@ -160,7 +160,7 @@ for (const lang of ['zh', 'en']) for (const theme of ['light', 'dark']) {
     await date.fill('2032-02-29'); await time.fill('12:30');
     await time.press('Enter');
     await expect(calendar).toHaveCount(0);
-    await panel.getByRole('button', { name: lang === 'zh' ? '有效期' : 'Expires', exact: true }).click();
+    await panel.getByRole('button', { name: lang === 'zh' ? /^有效期(?::|\s)/ : /^Expires(?::|\s)/ }).click();
     await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
     await expect(time).toHaveValue('12:30');
     await expect(calendar.getByRole('button').last()).toBeEnabled();
@@ -259,7 +259,7 @@ for (const touch of [false, true]) for (const lang of ['zh', 'en']) for (const t
       await page.screenshot({ path: info.outputPath('tag-open.png') });
       await page.keyboard.press('Escape');
       await expect(urlPanel.locator('.tag-add')).toBeFocused();
-      await urlPanel.getByRole('button', { name: lang === 'zh' ? '有效期' : 'Expires', exact: true }).press('Enter');
+      await urlPanel.getByRole('button', { name: lang === 'zh' ? /^有效期(?::|\s)/ : /^Expires(?::|\s)/ }).press('Enter');
       await page.getByRole('menuitemradio', { name: lang === 'zh' ? '自定义时间…' : 'Pick a time…' }).click();
       const calendar = urlPanel.locator('.date-editor');
       await expect(page.locator('.menu:visible')).toHaveCount(0);

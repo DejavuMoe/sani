@@ -69,7 +69,10 @@
 <style>
   .body {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
+    min-width: 0;
+    width: 100%;
     padding: 8px 8px 4px;
     font-size: 13px;
   }
@@ -94,7 +97,12 @@
   }
 
   .field.invalid {
-    --hbt: var(--danger-line); --hbr: var(--danger-line); --hbb: var(--danger-line); --hbl: var(--danger-line);
+    --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
+  }
+
+  .field.invalid:focus-within {
+    --hbt: var(--danger); --hbr: var(--danger); --hbb: var(--danger); --hbl: var(--danger);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--danger) 16%, transparent);
   }
 
   .field input {

@@ -18,6 +18,7 @@
     triggerClass = '',
     popClass = '',
     width = 288,
+    open = $bindable(false),
     onopen,
   }: {
     trigger?: Snippet;
@@ -27,13 +28,13 @@
     triggerClass?: string;
     popClass?: string;
     width?: number;
+    open?: boolean;
     onopen?: () => void;
   } = $props();
 
   const id = `pop-${Math.random().toString(36).slice(2, 9)}`;
   let button = $state<HTMLButtonElement>();
   let pop = $state<HTMLDivElement>();
-  let open = $state(false);
   const anchorEl = () => button ?? anchor?.() ?? undefined;
 
   export function show() {
@@ -50,7 +51,7 @@
     let top = r.bottom + 6;
     if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;
     pop.style.left = `${left}px`;
-    pop.style.top = `${Math.max(8, top)}px`;
+    pop.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`;
   }
 
   function close() {

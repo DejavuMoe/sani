@@ -648,7 +648,8 @@
 
   .inline {
     min-width: 0;
-    height: var(--control-compact);
+    height: var(--control-field);
+    min-height: max(var(--control-field), calc(1lh + 8px));
     padding: 0 8px;
     border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
@@ -660,9 +661,11 @@
     flex: 1;
   }
 
-  .inline:focus {
+  .inline:focus,
+  .inline:focus-visible {
     outline: none;
     --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
   }
 
   .problem,
@@ -683,15 +686,16 @@
   }
 
   @media (max-width: 640px) {
-    .options {
-      padding-left: 14px;
-    }
-
     .gap {
       flex-basis: 100%;
       height: 0;
     }
+  }
 
+  @media (max-width: 640px), (pointer: coarse) {
+    .options {
+      padding: 8px 8px 8px 14px;
+    }
   }
   .options :global(.creation-action) { margin-left: auto; }
 </style>

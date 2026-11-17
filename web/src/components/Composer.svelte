@@ -216,7 +216,7 @@
       <span class="cell">
         <span class="k" id="composer-redirect">{t('composer.redirect')}</span>
         <Segmented
-          size="sm"
+          size="lg"
           label={t('composer.redirect')}
           value={redirect}
           onchange={(v) => (redirect = v)}
@@ -369,21 +369,23 @@
   .inline {
     font-size: var(--input-font-size, 13px);
     min-width: 0;
-    height: var(--control-compact);
+    height: var(--control-field);
+    min-height: max(var(--control-field), calc(1lh + 8px));
     padding: 0 8px;
     border: 0; --hbt: var(--line-2); --hbr: var(--line-2); --hbb: var(--line-2); --hbl: var(--line-2);
     border-radius: var(--radius);
     background: var(--surface);
-    font-size: 13px;
   }
 
   .grow .inline {
     flex: 1;
   }
 
-  .inline:focus {
+  .inline:focus,
+  .inline:focus-visible {
     outline: none;
     --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
   }
 
   .problem,
@@ -404,10 +406,6 @@
   }
 
   @media (max-width: 640px) {
-    .main {
-      padding-left: 14px;
-    }
-
     .main :global(.lead) {
       display: none;
     }
@@ -419,6 +417,13 @@
     .gap {
       flex-basis: 100%;
       height: 0;
+    }
+  }
+
+  @media (max-width: 640px), (pointer: coarse) {
+    .main {
+      height: 56px;
+      padding: 0 8px 0 14px;
     }
   }
 </style>

@@ -177,6 +177,45 @@ class LinksStore {
   private ctrl: AbortController | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
 
+  reset() {
+    this.ctrl?.abort();
+    this.ctrl = null;
+    clearTimeout(this.searchTimer);
+    this.searchTimer = undefined;
+    ++this.seq;
+    ++this.revision;
+    ++this.refreshSeq;
+    ++this.overviewSeq;
+    ++this.tagSeq;
+    this.items = [];
+    this.total = 0;
+    this.next = null;
+    this.query = '';
+    this.sort = 'created';
+    this.kind = null;
+    this.tag = null;
+    this.tags = [];
+    this.allCount = 0;
+    this.untaggedCount = 0;
+    this.tagsLoaded = false;
+    this.tagsFailed = false;
+    this.managingTags = false;
+    this.hasData = false;
+    this.phase = 'loading';
+    this.sync = 'idle';
+    this.overviewFailed = false;
+    this.overview = null;
+    this.expanded = null;
+    this.editing = null;
+    this.selectedId = null;
+    this.fresh.clear();
+    this.leaving.clear();
+    this.picking = false;
+    this.picked.clear();
+    this.anchor = null;
+    this.busy = false;
+  }
+
   async load() {
     this.ctrl?.abort();
     const ctrl = (this.ctrl = new AbortController());

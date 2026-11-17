@@ -255,7 +255,7 @@
         {@render head(true)}
         <ul aria-hidden="true">
           {#each GHOSTS as ghost, i (i)}
-            <li class="ghost" style:--d="{i * 90}ms">
+            <li class="ghost">
               <span class="g-main">
                 <span class="g-slug bar" style:--w="{ghost.slug}px"></span>
                 <span class="g-target">
@@ -352,6 +352,7 @@
     background: transparent;
     color: var(--text);
     font-size: var(--input-font-size, 13px);
+    text-overflow: ellipsis;
   }
 
   .search input:focus {
@@ -749,7 +750,6 @@
     gap: 14px;
     min-height: 66px;
     padding: 8px 10px 8px 16px;
-    animation: breathe 1.1s ease-in-out var(--d) infinite alternate;
   }
 
   .bar::before {
@@ -843,15 +843,6 @@
     height: 16px;
     border-radius: var(--radius-xs);
     background: var(--surface-3);
-  }
-
-  @keyframes breathe {
-    from {
-      opacity: 0.5;
-    }
-    to {
-      opacity: 1;
-    }
   }
 
   .sentinel {

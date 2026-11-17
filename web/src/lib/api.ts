@@ -301,14 +301,14 @@ export const api = {
   createLink: (input: LinkInput) => request<Link>('POST', '/links', input),
   createText: (input: LinkInput & { text: string }) => request<Link>('POST', '/texts', input),
   uploadFile,
-  linkText: (id: number) => request<{ text: string }>('GET', `/links/${id}/text`),
+  linkText: (id: number, signal?: AbortSignal) => request<{ text: string }>('GET', `/links/${id}/text`, undefined, { signal }),
   updateLink: (id: number, input: LinkInput) => request<Link>('PATCH', `/links/${id}`, input),
   deleteLink: (id: number) => request<void>('DELETE', `/links/${id}`),
   restoreLink: (id: number) => request<Link>('POST', `/links/${id}/restore`),
   /** Returns the links that changed; for delete, as they were. */
   bulk: (action: BulkAction, ids: number[]) => request<{ items: Link[] }>('POST', '/links/bulk', { action, ids }),
   refreshLink: (id: number) => request<Link>('POST', `/links/${id}/refresh`),
-  stats: (id: number, days: number) => request<LinkStats>('GET', `/links/${id}/stats?days=${days}`),
+  stats: (id: number, days: number, signal?: AbortSignal) => request<LinkStats>('GET', `/links/${id}/stats?days=${days}`, undefined, { signal }),
   checkSlug: (slug: string, signal?: AbortSignal) =>
     request<{ available: boolean; reason?: string }>('GET', `/slugs/${encodeURIComponent(slug)}`, undefined, { signal }),
 

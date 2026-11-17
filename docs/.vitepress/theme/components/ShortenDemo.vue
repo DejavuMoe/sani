@@ -180,8 +180,8 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
         <span class="prefix">{{ DOMAIN }}/</span><span class="auto">{{ s('composer.slugAuto') }}</span>
         <span class="gap" />
         <span class="opt">
-          <span class="k">{{ s('composer.expiry') }}</span>
-          {{ s('expiry.never') }}
+          <Icon name="clock" :size="14" />
+          <span>{{ s('expiry.never') }}</span>
         </span>
       </div>
       <p v-if="toast" class="toast" role="status"><Icon name="check" :size="14" :stroke="2" />{{ toast }}</p>
@@ -195,8 +195,8 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 
     <TransitionGroup tag="ul" name="row" class="rows" :aria-label="pick('短链接列表', 'Short links')">
       <li v-for="r in rows" :key="r.id" class="row" :class="{ fresh: r.fresh }">
-        <span class="tile" :style="{ '--h': hue(r.host || r.slug) }" aria-hidden="true">{{ letter(r.host || r.slug) }}</span>
         <span class="slug"><span class="slash">/</span>{{ r.slug }}</span>
+        <span class="tile" :style="{ '--h': hue(r.host || r.slug) }" aria-hidden="true">{{ letter(r.host || r.slug) }}</span>
         <span class="target">
           <span class="title">{{ r.title || r.host || r.rest }}</span>
           <span class="dest">
@@ -259,8 +259,8 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 56px;
-  padding: 0 8px 0 16px;
+  height: 52px;
+  padding: 0 10px 0 16px;
 }
 
 .main :deep(.lead) {
@@ -274,7 +274,8 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
   border: 0;
   background: transparent;
   color: var(--sn-text);
-  font-size: 15.5px;
+  font-size: 13px;
+  text-overflow: ellipsis;
 }
 
 .url::placeholder {
@@ -288,21 +289,32 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 .go {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 38px;
-  padding: 0 8px 0 14px;
+  min-width: 88px;
+  height: 32px;
+  padding: 0 6px 0 12px;
   border-radius: 8px;
-  background: var(--sn-ink);
-  color: var(--sn-on-ink);
-  font-size: 13.5px;
-  font-weight: 550;
+  background: var(--sn-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
   transition:
     background-color 0.12s var(--sn-ease),
     transform 80ms var(--sn-ease);
 }
 
 .go:hover {
-  background: var(--sn-ink-hover);
+  background: var(--sn-accent-hover);
+}
+
+.dark .go {
+  background: #3e63dd;
+}
+
+.dark .go:hover {
+  background: #5472e4;
 }
 
 .go:active {
@@ -315,11 +327,36 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 }
 
 .go kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 20px;
   height: 20px;
+  padding: 0 4px;
   border: 0;
-  background: color-mix(in oklab, var(--sn-on-ink) 16%, transparent);
-  color: var(--sn-on-ink);
+  border-radius: 4px;
+  background: color-mix(in oklab, #ffffff 18%, transparent);
+  color: #ffffff;
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+  .main {
+    height: 56px;
+    padding: 0 8px 0 14px;
+  }
+
+  .url {
+    font-size: 16px;
+  }
+
+  .go {
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .go kbd {
+    display: none;
+  }
 }
 
 .options {
@@ -349,13 +386,10 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 
 .opt {
   display: inline-flex;
+  align-items: center;
   gap: 6px;
   color: var(--sn-text-2);
   white-space: nowrap;
-}
-
-.opt .k {
-  color: var(--sn-text-3);
 }
 
 .toast {
@@ -444,7 +478,7 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 
 .row {
   display: grid;
-  grid-template-columns: 18px minmax(64px, 7.5em) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(64px, 7.5em) 18px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 11px 16px;
@@ -490,7 +524,7 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
 }
 
 .slash {
-  color: var(--sn-text-4);
+  color: var(--sn-text-3);
   font-weight: 400;
 }
 
@@ -545,17 +579,23 @@ const number = (n: number) => n.toLocaleString(lang.value === 'zh' ? 'zh-CN' : '
   }
 
   .slug {
-    grid-column: 2;
-  }
-
-  .target {
-    grid-column: 2 / -1;
-    grid-row: 2;
+    grid-column: 1 / 3;
+    grid-row: 1;
   }
 
   .clicks {
     grid-column: 3;
     grid-row: 1;
+  }
+
+  .tile {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .target {
+    grid-column: 2 / -1;
+    grid-row: 2;
   }
 }
 </style>

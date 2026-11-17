@@ -40,6 +40,7 @@ export class Resource<T> {
     fn: (signal: AbortSignal) => Promise<T>,
     isCurrent?: () => boolean,
   ): Promise<ResourceOutcome<T>> {
+    const prev = this.phase;
     const seq = ++this.seq;
     this.ctrl?.abort();
     const ctrl = (this.ctrl = new AbortController());
@@ -49,7 +50,7 @@ export class Resource<T> {
       if (seq !== this.seq) return { status: 'stale' };
       if (isCurrent && !isCurrent()) {
         // The caller moved on: keep what is on screen.
-        this.phase = 'ready';
+        this.phase = prev === 'failed' ? 'failed' : this.value !== null ? 'ready' : 'idle';
         return { status: 'stale' };
       }
       this.value = value;
@@ -57,6 +58,10 @@ export class Resource<T> {
       return { status: 'ready', value };
     } catch (error) {
       if (seq !== this.seq) return { status: 'stale' };
+      if (isCurrent && !isCurrent()) {
+        this.phase = prev === 'failed' ? 'failed' : this.value !== null ? 'ready' : 'idle';
+        return { status: 'stale' };
+      }
       this.phase = 'failed';
       return { status: 'failed', error };
     }
@@ -67,5 +72,8 @@ export class Resource<T> {
     ++this.seq;
     this.ctrl?.abort();
     this.ctrl = null;
+    if (this.phase === 'loading') {
+      this.phase = this.value !== null ? 'ready' : 'idle';
+    }
   }
 }

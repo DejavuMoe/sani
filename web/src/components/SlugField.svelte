@@ -150,6 +150,7 @@
     background: transparent;
     color: var(--text);
     font-family: var(--font-mono);
+    text-overflow: ellipsis;
   }
 
   input:focus {

@@ -41,7 +41,18 @@
     return () => { menu.removeEventListener('toggle', reveal); cancelAnimationFrame(frame); };
   });
 
+  let lastTimeItem: HTMLElement | null = null;
+
   function timeKeys(e: KeyboardEvent) {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      const done = timeEntry.querySelector<HTMLElement>('.time-done [role="menuitem"]');
+      if (done) {
+        if (document.activeElement instanceof HTMLElement && timeEntry.querySelector('.time-columns')?.contains(document.activeElement)) {
+          lastTimeItem = document.activeElement;
+        }
+        e.preventDefault(); e.stopPropagation(); done.focus(); return;
+      }
+    }
     const column = (e.target as HTMLElement).closest('[data-time-column]');
     if (!column) return;
     const options = [...column.querySelectorAll<HTMLElement>('[role="menuitemradio"]')];
@@ -56,7 +67,17 @@
       target = sibling.querySelector<HTMLElement>('[aria-checked="true"]') ?? sibling.querySelector<HTMLElement>('[role="menuitemradio"]');
     }
     if (current < 0 && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) target = column.querySelector<HTMLElement>('[aria-checked="true"]') ?? options[0];
-    if (target) { e.preventDefault(); e.stopPropagation(); target.focus(); }
+    if (target) { lastTimeItem = target; e.preventDefault(); e.stopPropagation(); target.focus(); }
+  }
+
+  function doneKeys(e: KeyboardEvent) {
+    if ((e.key === 'Tab' && e.shiftKey) || e.key === 'ArrowUp') {
+      const target =
+        (lastTimeItem?.isConnected ? lastTimeItem : null) ??
+        timeEntry.querySelector<HTMLElement>('.time-columns [aria-checked="true"]') ??
+        timeEntry.querySelector<HTMLElement>('.time-columns [role="menuitemradio"]');
+      if (target) { e.preventDefault(); e.stopPropagation(); target.focus(); }
+    }
   }
   let month = $state(untrack(() => {
     const d = new Date(value);
@@ -109,7 +130,8 @@
             {/each}
           </div>
           <div class="sep" role="separator"></div>
-          <div class="time-done"><MenuItem onclick={close}>{t('calendar.done')}</MenuItem></div>
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div class="time-done" onkeydown={doneKeys}><MenuItem onclick={close}>{t('calendar.done')}</MenuItem></div>
         {/snippet}
       </Menu>
     </div></div>
@@ -147,4 +169,20 @@
   .time-options { height: 180px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-3) transparent; }
   .time-options :global(.item) { font-variant-numeric: tabular-nums; }
   .sep { height: 0.5px; margin: 4px 6px; background: var(--line); }
+
+  @media (max-width: 640px), (pointer: coarse) {
+    .date-fields { grid-template-columns: minmax(0, 1fr) 124px; }
+    .time-entry > input { padding-right: 40px; }
+    .time-entry :global(.time-trigger) { width: 36px; }
+    .time-entry :global(.time-trigger)::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+    .calendar button { min-height: 36px; }
+  }
 </style>

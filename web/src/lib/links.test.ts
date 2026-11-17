@@ -449,4 +449,46 @@ describe('management state recovery', () => {
     vi.mocked(api.links).mockResolvedValueOnce(list([{...old,tags:[]}])) ;
     await links.deleteTag(1);expect(links.tag).toBeNull();expect(links.kind).toBe('url');expect(links.query).toBe('old');expect(links.items[0].tags).toEqual([]);
   });
+
+  it('reset() clears all state, filters, tags, selection and ignores in-flight responses', async () => {
+    const pending = held<ReturnType<typeof list>>();
+    vi.mocked(api.links).mockReturnValueOnce(pending.promise);
+    const loading = links.load();
+    links.query = 'abc';
+    links.kind = 'url';
+    links.tag = 1;
+    links.sort = 'clicks';
+    links.tags = [{ id: 1, name: 'tag', color: 'blue', count: 1 }];
+    links.tagsLoaded = true;
+    links.expandedId = old.id;
+    links.selectedId = old.id;
+    links.startPicking();
+    links.picked.add(old.id);
+    links.overview = { links: 1, clicks: 2, today: 1, days: [] };
+
+    links.reset();
+    expect(links.items).toEqual([]);
+    expect(links.total).toBe(0);
+    expect(links.next).toBeNull();
+    expect(links.hasData).toBe(false);
+    expect(links.phase).toBe('loading');
+    expect(links.sync).toBe('idle');
+    expect(links.query).toBe('');
+    expect(links.kind).toBeNull();
+    expect(links.tag).toBeNull();
+    expect(links.sort).toBe('created');
+    expect(links.tags).toEqual([]);
+    expect(links.tagsLoaded).toBe(false);
+    expect(links.expandedId).toBeNull();
+    expect(links.editingId).toBeNull();
+    expect(links.selectedId).toBeNull();
+    expect(links.picking).toBe(false);
+    expect(links.picked.size).toBe(0);
+    expect(links.overview).toBeNull();
+
+    pending.resolve(list([old]));
+    await loading;
+    expect(links.items).toEqual([]);
+    expect(links.hasData).toBe(false);
+  });
 });

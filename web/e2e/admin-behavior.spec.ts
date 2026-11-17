@@ -163,6 +163,13 @@ test('slow creation locks submitted fields, failure preserves the draft, and edi
   await expect(page.locator('.editor .error-text')).toBeVisible();await expect(body).toHaveValue('Keep my changed body');
   await page.unroute(`**/api/admin/v1/links/${link.id}`);await page.getByRole('link',{name:'Settings',exact:true}).click();await guard.getByRole('button',{name:'Save and leave'}).click();
   await expect(page).toHaveURL(/settings$/);expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Keep my changed body');
+  await page.getByRole('link',{name:'Back',exact:true}).click();
+  await row.getByRole('button',{name:/^Edit/}).click();
+  await body.fill('Discard via Cancel button');
+  await row.locator('form.editor').getByRole('button',{name:'Cancel',exact:true}).click();
+  await expect(guard).toHaveCount(0);
+  await expect(row.locator('form.editor')).toHaveCount(0);
+  expect((await (await page.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Keep my changed body');
 });
 
 test('query and statistics errors offer retry without presenting empty data or a false range', async ({page})=>{

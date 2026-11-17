@@ -2,6 +2,13 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, the 1.x series preserves documented public contracts. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Fix double horizontal/bottom padding in tag manager and leave-editor dialogs, and clamp the custom expiry popover within short viewports.
+- Improve keyboard reachability and accessibility in the date/time editor and expiry picker (reaching “Done” via `Tab`, keeping `aria-expanded="true"` while the custom time popover is open, exposing the selected expiry in the accessible name, and enlarging mobile touch targets).
+- Align title input height, focus/invalid rings, creation button insets, and static loading placeholders across the link and share composers, with ellipsis truncation for narrow-viewport placeholders.
+- Make the link editor’s “Cancel” button discard directly, fix `Resource` state-machine edge cases and text preview update error alerts, reset list state on sign-out, and update the docs homepage interactive demo.
+
 ## v1.0.5
 
 2026-11-17 · Update Go and module dependencies for security fixes, and reorganize the bilingual documentation. Database schema remains 7 with no new migration.

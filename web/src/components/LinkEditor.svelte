@@ -130,6 +130,11 @@
     links.editingId = null;
   }
 
+  function discard() {
+    editor.unregister(guardToken);
+    links.editingId = null;
+  }
+
   async function save(): Promise<boolean> {
     if (saving || tagBusy || !loaded) return false;
     errors = {};
@@ -329,7 +334,7 @@
     {#if errors.other}<p class="error-text">{errors.other}</p>{/if}
     <span class="spacer"></span>
     <span class="kbd-hint"><kbd>{mod}</kbd><kbd>↵</kbd></span>
-    <Button size="sm" variant="ghost" onclick={cancel}>{t('act.cancel')}</Button>
+    <Button size="sm" variant="ghost" onclick={discard}>{t('act.cancel')}</Button>
     <Button size="sm" variant="primary" type="submit" loading={saving} disabled={!dirty || tagBusy}>{t('act.save')}</Button>
   </footer>
   </fieldset>
@@ -392,6 +397,11 @@
 
   .editor :global(.picker-field .chev) {
     color: var(--text-3);
+  }
+
+  .editor :global(.picker-field[aria-expanded='true']) {
+    --hbt: var(--accent); --hbr: var(--accent); --hbb: var(--accent); --hbl: var(--accent);
+    box-shadow: var(--hair-shadow), 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
   }
 
   .editor :global(.expiry) {

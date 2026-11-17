@@ -136,7 +136,7 @@ test('failed initial body load retries and an edited body keeps the old content 
   await page.goto(`${base}/admin/`);
   const row = page.locator(`[data-link="${link.id}"]`);
   await row.locator('button.main').click();
-  await expect(row.getByRole('status')).toContainText('Could not load');
+  await expect(row.getByRole('alert')).toContainText('Could not load');
   await page.unroute(path);
   await row.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(row.locator('.preview')).toHaveText('Original meeting notes');

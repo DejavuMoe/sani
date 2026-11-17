@@ -15,6 +15,7 @@
     align = 'start',
     minWidth = 180,
     disabled = false,
+    expanded = false,
   }: {
     button: Snippet<[boolean]>;
     children: Snippet<[() => void]>;
@@ -23,6 +24,7 @@
     align?: 'start' | 'end';
     minWidth?: number;
     disabled?: boolean;
+    expanded?: boolean;
   } = $props();
 
   const id = `menu-${Math.random().toString(36).slice(2, 9)}`;
@@ -96,11 +98,11 @@
   class={triggerClass}
   popovertarget={id}
   aria-haspopup="menu"
-  aria-expanded={open}
+  aria-expanded={open || expanded}
   aria-label={label}
   {disabled}
 >
-  {@render button(open)}
+  {@render button(open || expanded)}
 </button>
 
 <div bind:this={pop} {id} popover="auto" role="menu" tabindex="-1" class="menu" style:min-width="{minWidth}px" {ontoggle} {onkeydown}>

@@ -74,16 +74,56 @@ describe('resource phases', () => {
     const outcome = await res.run(async () => 'value', () => false);
     expect(outcome.status).toBe('stale');
     expect(res.value).toBeNull();
+    expect(res.phase).toBe('idle');
+  });
+
+  it('keeps ready phase when !isCurrent() after a previous value', async () => {
+    const res = new Resource<string>();
+    await res.run(async () => 'first');
+    const outcome = await res.run(async () => 'second', () => false);
+    expect(outcome.status).toBe('stale');
+    expect(res.value).toBe('first');
     expect(res.phase).toBe('ready');
   });
 
-  it('drops the result of an invalidated load', async () => {
+  it('drops a rejection when !isCurrent() without entering failed', async () => {
+    const res = new Resource<string>();
+    const emptyOutcome = await res.run(async () => { throw new Error('late'); }, () => false);
+    expect(emptyOutcome.status).toBe('stale');
+    expect(res.value).toBeNull();
+    expect(res.phase).toBe('idle');
+    expect(res.failed).toBe(false);
+
+    await res.run(async () => 'first');
+    const cachedOutcome = await res.run(async () => { throw new Error('late'); }, () => false);
+    expect(cachedOutcome.status).toBe('stale');
+    expect(res.value).toBe('first');
+    expect(res.phase).toBe('ready');
+    expect(res.failed).toBe(false);
+  });
+
+  it('drops the result of an invalidated load and clears loading phase', async () => {
     const res = new Resource<string>();
     const pending = deferred<string>();
     const running = res.run(() => pending.promise);
+    expect(res.loading).toBe(true);
     res.invalidate();
+    expect(res.loading).toBe(false);
+    expect(res.phase).toBe('idle');
     pending.resolve('late');
     expect((await running).status).toBe('stale');
     expect(res.value).toBeNull();
+    expect(res.phase).toBe('idle');
+
+    await res.run(async () => 'first');
+    const next = deferred<string>();
+    const reloading = res.run(() => next.promise);
+    expect(res.loading).toBe(true);
+    res.invalidate();
+    expect(res.loading).toBe(false);
+    expect(res.phase).toBe('ready');
+    expect(res.value).toBe('first');
+    next.resolve('late');
+    expect((await reloading).status).toBe('stale');
   });
 });

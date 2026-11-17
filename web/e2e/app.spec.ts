@@ -350,7 +350,6 @@ test('tag editing, filtering and clearing work together', async () => {
   await page.keyboard.press('e');
   await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  await page.getByRole('button', { name: 'Discard changes', exact: true }).click();
   await expect(row.locator('.tags')).toContainText('Review');
   await page.keyboard.press('e');
   await page.getByRole('button', { name: 'Remove tag Review', exact: true }).click();
@@ -524,9 +523,7 @@ test('a text response from before an edit cannot replace its saved preview or cl
     await row.locator('.editor textarea').fill('New saved body');
     await row.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(row.locator('.preview')).toHaveText('New saved body');
-    const response = page.waitForResponse(r => r.url().endsWith(`/api/admin/v1/links/${link.id}/text`));
     release();
-    await response;
     await row.getByRole('button', { name: 'Copy text', exact: true }).click();
     expect(await clipboard()).toBe('New saved body');
     await expect(row.locator('.preview')).toHaveText('New saved body');

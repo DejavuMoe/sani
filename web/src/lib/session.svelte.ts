@@ -1,5 +1,6 @@
 import { api, ApiError, setUnauthorizedHandler, type Config } from './api';
 import { errorText } from './i18n.svelte';
+import { links } from './links.svelte';
 import { toasts } from './toast.svelte';
 
 export type SessionState = 'loading' | 'setup' | 'login' | 'ready' | 'offline';
@@ -39,6 +40,7 @@ class Session {
   async signOut() {
     try {
       await api.logout();
+      links.reset();
       this.expired = false;
       this.config = null;
       this.state = 'login';

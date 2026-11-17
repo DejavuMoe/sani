@@ -19,7 +19,7 @@ async function login(page: Page, lang = 'en', theme = 'light') {
 }
 
 async function openExpiry(scope: Locator, zh = false) {
-  await scope.getByRole('button', { name: zh ? '有效期' : 'Expires', exact: true }).click();
+  await scope.getByRole('button', { name: zh ? /^有效期(?::|\s)/ : /^Expires(?::|\s)/ }).click();
   await scope.getByRole('menuitemradio', { name: zh ? '自定义时间…' : 'Pick a time…' }).click();
   const pop = scope.locator('.expiry-pop:popover-open');
   await expect(pop).toBeVisible();
@@ -34,9 +34,10 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
     page.on('pageerror', e => errors.push(e.message));
     await login(page, lang, theme);
     const zh = lang === 'zh', panel = page.locator('#create-panel-url');
-    const trigger = panel.getByRole('button', { name: zh ? '有效期' : 'Expires', exact: true });
+    const trigger = panel.getByRole('button', { name: zh ? /^有效期(?::|\s)/ : /^Expires(?::|\s)/ });
     const original = await trigger.innerText(), height = (await panel.boundingBox())!.height;
     let pop = await openExpiry(panel, zh);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     const date = pop.getByPlaceholder('YYYY-MM-DD'), time = pop.getByPlaceholder('HH:mm');
     const apply = pop.getByRole('button', { name: zh ? '应用时间' : 'Apply date and time' });
     await expect(apply).toBeEnabled();
@@ -71,7 +72,15 @@ for (const width of [1280, 390]) for (const lang of ['zh', 'en']) for (const the
     await page.keyboard.press('ArrowRight'); await expect(minute('59')).toBeFocused();
     await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter'); await expect(time).toHaveValue('00:00');
     await page.keyboard.press('End'); await expect(minute('59')).toBeFocused();
-    await menu.getByRole('menuitem', { name: zh ? '完成' : 'Done', exact: true }).click();
+    await page.keyboard.press('Tab');
+    const doneItem = menu.getByRole('menuitem', { name: zh ? '完成' : 'Done', exact: true });
+    await expect(doneItem).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(minute('59')).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(doneItem).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(menu).toHaveCount(0); await expect(choose).toBeFocused();
     await pop.getByRole('button', { name: zh ? '取消' : 'Cancel', exact: true }).click();
     await expect(trigger).toHaveText(original); await expect(trigger).toBeFocused();
     pop = await openExpiry(panel, zh);
@@ -141,7 +150,10 @@ test('applied expiry persists through real creation and editor save for links, t
     const row = page.locator(`[data-link="${link.id}"]`);
     await row.locator('button.main').press('e');
     const editor = row.locator('form.editor');
+    const editTrigger = editor.getByRole('button', { name: /^Expires:/ });
+    await expect(editTrigger).toHaveAccessibleName(/Expires: .*09:07|Expires: Feb 29, 2032/);
     const editPop = await openExpiry(editor);
+    await expect(editTrigger).toHaveAttribute('aria-expanded', 'true');
     await expect(editPop.getByPlaceholder('HH:mm')).toHaveValue('09:07');
     await editPop.getByPlaceholder('HH:mm').fill('18:45');
     await editPop.getByRole('button', { name: 'Apply date and time' }).click();
@@ -172,3 +184,17 @@ test('time columns remain tappable in a narrow touch viewport', async ({ browser
     await expect(pop).toHaveCount(0);
   } finally { await context.close(); }
 });
+
+for (const [width, height] of [[1280, 560], [390, 600]] as const) {
+  test(`expiry popover stays clamped within short viewport ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await login(page, 'en', 'light');
+    const pop = await openExpiry(page.locator('#create-panel-url'));
+    const box = (await pop.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(8);
+    expect(box.y + box.height).toBeLessThanOrEqual(height - 8);
+    const apply = pop.getByRole('button', { name: 'Apply date and time' });
+    await apply.scrollIntoViewIfNeeded();
+    await expect(apply).toBeInViewport();
+  });
+}

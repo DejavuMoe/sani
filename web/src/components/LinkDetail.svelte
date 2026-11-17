@@ -47,7 +47,7 @@
 
   async function load(linkId: number, days: number) {
     const outcome = await statsRes.run(
-      () => api.stats(linkId, days).then((stats) => ({ stats, range: days })),
+      (signal) => api.stats(linkId, days, signal).then((stats) => ({ stats, range: days })),
       () => linkId === id && days === range,
     );
     if (outcome.status === 'ready') {
@@ -77,7 +77,7 @@
     void updatedAt;
     void bodyRetry;
     untrack(() => {
-      void bodyRes.run(() => api.linkText(linkId).then((r) => ({ id: linkId, text: r.text })));
+      void bodyRes.run((signal) => api.linkText(linkId, signal).then((r) => ({ id: linkId, text: r.text })));
     });
     // A body from a superseded link must not land.
     return () => bodyRes.invalidate();
@@ -158,7 +158,10 @@
                 <pre class={['preview', c.format === 'code' && 'code']} tabindex="0">{body}</pre>
               {/if}
               {#if body === null || bodyFailed || bodyLoading}
-                <div class={body === null ? 'preview-state' : 'preview-update'} role="status">
+                <div
+                  class={bodyFailed ? 'state-notice error preview-error' : body === null ? 'preview-state' : 'preview-update'}
+                  role={bodyFailed ? 'alert' : 'status'}
+                >
                   <span>{bodyFailed ? t('detail.bodyLoadFailed') : body === null ? t('share.loading') : t('detail.bodyUpdating')}</span>
                   {#if bodyFailed}
                     <Button size="sm" onclick={() => bodyRetry++}>{t('act.retry')}</Button>
@@ -456,8 +459,17 @@
   }
 
   .preview-update {
+    margin-top: 8px;
     color: var(--text-3);
     font-size: 12px;
+  }
+
+  .preview-error {
+    margin-bottom: 0;
+  }
+
+  .preview-shell > .preview-error:first-child {
+    margin-top: 0;
   }
 
   .preview.code {

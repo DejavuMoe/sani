@@ -1,8 +1,22 @@
 // An action keeps the original trigger's layout and semantics intact.
 let dismissCurrent: (() => void) | undefined;
 let nextId = 0;
+let watchingTopLayer = false;
+
+function watchTopLayer() {
+  if (watchingTopLayer || typeof document === 'undefined') return;
+  watchingTopLayer = true;
+  document.addEventListener(
+    'toggle',
+    (e) => {
+      if ((e.target as HTMLElement)?.matches?.('dialog[open], [popover="auto"]:popover-open')) dismissCurrent?.();
+    },
+    true,
+  );
+}
 
 export function tooltip(node: HTMLElement, text: string | undefined) {
+  watchTopLayer();
   const id = `sani-tooltip-${++nextId}`;
   let tip: HTMLDivElement | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -27,6 +41,8 @@ export function tooltip(node: HTMLElement, text: string | undefined) {
   function show() {
     clearTimeout(timer);
     if (tip || !text) return;
+    const topLayer = [...document.querySelectorAll<HTMLElement>('dialog[open], [popover="auto"]:popover-open')].at(-1);
+    if (topLayer && !topLayer.contains(node)) return;
     dismissCurrent?.(); dismissCurrent = hide;
     tip = document.createElement('div');
     tip.className = 'sani-tooltip'; tip.id = id; tip.role = 'tooltip'; tip.popover = 'manual'; tip.textContent = text;

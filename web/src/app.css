@@ -101,6 +101,8 @@
 .composer .btn.creation-action:has(.go-kbd) { padding-right: 6px; }
 .composer .creation-action .go-kbd {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 2px;
   min-width: 20px;
   height: 20px;
@@ -206,6 +208,10 @@ select {
 input,
 textarea {
   font-size: var(--input-font-size, inherit);
+}
+
+input {
+  text-overflow: ellipsis;
 }
 
 button {

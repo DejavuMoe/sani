@@ -18,6 +18,7 @@
   const custom = $derived('at' in value);
   let host: HTMLSpanElement;
   let pop: AccessPopover;
+  let customOpen = $state(false);
   // The editor works on a copy; only Apply writes it back to `value`.
   let draft = $state('');
 
@@ -30,7 +31,12 @@
 </script>
 
 <span class="expiry" bind:this={host}>
-  <Menu triggerClass={triggerClass} label={t('composer.expiry')} minWidth={176}>
+  <Menu
+    triggerClass={triggerClass}
+    label={showLabel ? undefined : `${t('composer.expiry')}: ${expiryLabel(value)}`}
+    expanded={customOpen}
+    minWidth={176}
+  >
     {#snippet button()}
       {#if icon}<Icon name={icon} size={14} />{/if}
       {#if showLabel}<span class="k">{t('composer.expiry')}</span>{/if}
@@ -57,7 +63,7 @@
       >
     {/snippet}
   </Menu>
-  <AccessPopover bind:this={pop} anchor={() => host.querySelector('button')} label={t('expiry.custom').replace('…', '')} popClass="expiry-pop" width={304}>
+  <AccessPopover bind:this={pop} bind:open={customOpen} anchor={() => host.querySelector('button')} label={t('expiry.custom').replace('…', '')} popClass="expiry-pop" width={304}>
     {#snippet children(close)}
       <DateEditor value={draft} onchange={at => { value = { at }; close(); }} oncancel={close} {id} />
     {/snippet}

@@ -86,7 +86,7 @@ async function captureReauth(page: Page, stage: string) {
 }
 
 async function expiry(page: Page, form: Locator) {
-  await form.getByRole('button', { name: 'Expires', exact: true }).click();
+  await form.getByRole('button', { name: /^Expires(?::|\s)/ }).click();
   await page.getByRole('menuitemradio', { name: '1 hour', exact: true }).click();
 }
 
@@ -219,7 +219,7 @@ for (const leaveDialog of [false, true]) {
     await editor.getByLabel('Title', { exact: true }).fill('Unsaved editor title');
     await editor.getByLabel('Visit limit').fill('23');
     if (leaveDialog) {
-      await editor.getByRole('button', { name: 'Cancel', exact: true }).click();
+      await editor.locator('textarea').press('Escape');
       await expect(page.getByRole('dialog', { name: 'Save changes before leaving?' })).toBeVisible();
     }
 
@@ -270,7 +270,7 @@ for (const leaveDialog of [false, true]) {
       await expect(file.locator('.fname')).toHaveText('ui-retry.bin');
       await expect(file.getByLabel('Title', { exact: true })).toHaveValue('Unsaved file title');
       await expect(limitTrigger(file)).toContainText('19 visits');
-      await expect(file.getByRole('button', { name: 'Expires', exact: true })).toContainText('1 hour');
+      await expect(file.getByRole('button', { name: /^Expires(?::|\s)/ })).toContainText('1 hour');
       await page.getByRole('tab', { name: 'Text', exact: true }).click();
       await expect(text.getByLabel('Text to share')).toHaveValue('Unsaved composer text');
       await expect(text.getByRole('radio', { name: 'Code', exact: true })).toHaveAttribute('aria-checked', 'true');
@@ -278,7 +278,7 @@ for (const leaveDialog of [false, true]) {
       await expect(url.getByLabel('URL', { exact: true })).toHaveValue('https://example.com/unsaved-url');
       await expect(url.getByLabel('Title', { exact: true })).toHaveValue('Unsaved URL title');
       await expect(limitTrigger(url)).toContainText('17 visits');
-      await expect(url.getByRole('button', { name: 'Expires', exact: true })).toContainText('1 hour');
+      await expect(url.getByRole('button', { name: /^Expires(?::|\s)/ })).toContainText('1 hour');
       expect((await (await other.request.get(`${base}/api/admin/v1/links/${link.id}/text`)).json()).text).toBe('Saved body');
       expect(writes).toEqual([]);
       await captureReauth(page, 'restored');
@@ -398,10 +398,12 @@ for (const kind of ['url', 'text', 'file', 'chunked file'] as const) {
     // An invalid limit never leaves the popover, so it can't reach a request.
     for (const value of ['9'.repeat(309), '1000000000001', '9007199254740993', '0', '-1', '1.5']) {
       await limitTrigger(panel).click();
-      const field = page.locator('[popover]:popover-open').getByLabel('Visit limit');
+      const pop = page.locator('[popover]:popover-open');
+      const field = pop.getByLabel('Visit limit');
       await field.fill(value);
       await field.press('Enter');
       await expect(field).toHaveAttribute('aria-invalid', 'true');
+      expect(await pop.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
       await field.press('Escape');
       await expect(limitTrigger(panel)).toContainText('No limit');
       expect(writes, `nonempty invalid limit ${value} must not leave the browser`).toEqual([]);
