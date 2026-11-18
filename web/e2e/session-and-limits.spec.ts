@@ -1,68 +1,16 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
+import { startSani, stopSani, type SaniFixture } from './fixture';
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const base = 'http://127.0.0.1:18771';
 const password = 'local-ui-regressions';
 const hour = 3_600_000;
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
-let server: ChildProcess;
-let serverLog = '';
-
-test.beforeAll(async () => {
-  const env = { ...process.env };
-  for (const key of Object.keys(env)) if (key.startsWith('SANI_')) delete env[key];
-  server = spawn('../bin/sani', [], {
-    env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-ui-regressions-')),
-      SANI_LISTEN: '127.0.0.1:18771', SANI_FILES_URL: 'http://localhost:18771',
-      SANI_PASSWORD: password, SANI_FETCH_META: 'false', SANI_LOG_LEVEL: 'info' },
-    stdio: ['ignore', 'ignore', 'pipe'],
-  });
-  serverLog = '';
-  server.stderr!.on('data', chunk => { serverLog = (serverLog + chunk.toString()).slice(-8192); });
-  await new Promise<void>((resolve, reject) => {
-    let checking = false;
-    const finish = (error?: Error) => {
-      clearTimeout(timer);
-      server.off('exit', exited);
-      server.off('error', errored);
-      server.stderr!.off('data', ready);
-      if (error) reject(new Error(`${error.message}\n${serverLog}`));
-      else resolve();
-    };
-    const exited = (code: number | null, signal: NodeJS.Signals | null) => finish(new Error(`UI fixture exited: ${code ?? signal}`));
-    const errored = (error: Error) => finish(error);
-    const ready = () => {
-      if (checking || !serverLog.includes('sani is ready')) return;
-      checking = true;
-      // The child emits this only after binding; another process's health is insufficient.
-      void fetch(`${base}/healthz`, { signal: AbortSignal.timeout(2000) }).then(response => {
-        if (!response.ok || server.exitCode !== null || server.signalCode !== null) {
-          finish(new Error(`UI fixture health failed: ${response.status}`));
-        } else finish();
-      }, errored);
-    };
-    const timer = setTimeout(() => finish(new Error('UI fixture startup timed out')), 10_000);
-    server.once('exit', exited);
-    server.once('error', errored);
-    server.stderr!.on('data', ready);
-  });
-});
-
-test.afterAll(async () => {
-  if (!server?.pid || server.exitCode !== null || server.signalCode !== null) return;
-  const stop = (signal: NodeJS.Signals, timeout: number) => new Promise<boolean>(resolve => {
-    if (server.exitCode !== null || server.signalCode !== null) { resolve(true); return; }
-    const exited = () => { clearTimeout(timer); resolve(true); };
-    const timer = setTimeout(() => { server.off('exit', exited); resolve(false); }, timeout);
-    server.once('exit', exited);
-    server.kill(signal);
-  });
-  if (!await stop('SIGTERM', 5000) && !await stop('SIGKILL', 2000)) throw new Error(`UI fixture did not exit\n${serverLog}`);
-});
+let server: SaniFixture | undefined;
+test.beforeAll(async () => { server = await startSani(base, password); });
+test.afterAll(() => stopSani(server));
 
 async function login(page: Page) {
   await page.addInitScript(() => {

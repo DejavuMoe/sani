@@ -1,16 +1,22 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { startSani, stopSani, type SaniFixture } from './fixture';
 
 // One server and database for the whole file: each test builds on the last,
 // the way an owner actually uses Sani.
 test.describe.configure({ mode: 'serial' });
 
 const PASSWORD = 'correct horse battery';
+const port = Number(process.env.SANI_E2E_PORT ?? 18765);
+const base = new URL(`http://127.0.0.1:${port}`).origin;
+const filesOrigin = new URL(`http://localhost:${port}`).origin;
+let server: SaniFixture | undefined;
 let page: Page;
 let context: BrowserContext | undefined;
 const pageErrors: string[] = [];
 
 test.beforeAll(async ({ browser }) => {
+  server = await startSani(base, '', { SANI_SETUP_CODE: 'e2e-test-code', TZ: 'Asia/Shanghai' });
   context = await browser.newContext();
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   page = await context.newPage();
@@ -18,7 +24,11 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterAll(async () => {
-  await context?.close();
+  try {
+    await context?.close();
+  } finally {
+    await stopSani(server);
+  }
   expect(pageErrors).toEqual([]);
 });
 
@@ -64,8 +74,9 @@ test('a pasted URL becomes a short link on the clipboard', async () => {
   await expect(page.locator('.toast')).toContainText('Copied');
 
   const short = await clipboard();
-  expect(short).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/[a-z0-9]{5}$/);
   const slug = short.split('/').pop()!;
+  expect(short).toBe(`${base}/${slug}`);
+  expect(slug).toMatch(/^[a-z0-9]{5}$/);
   await expect(page.locator('.row').first()).toContainText(`/${slug}`);
 
   const hop = await follow(slug);
@@ -180,9 +191,6 @@ test('several links at once: turn off, turn on, delete with undo', async () => {
   await expect(bar).toHaveCount(0);
 });
 
-const port = Number(process.env.SANI_E2E_PORT ?? 18765);
-const filesOrigin = `http://localhost:${port}`;
-
 test('a text is shared at /p/ and served raw from the files origin', async () => {
   const text = 'func main() {\n\tprintln("<hi>")\n}\n';
   await page.getByRole('tab', { name: 'Text' }).click();
@@ -193,8 +201,9 @@ test('a text is shared at /p/ and served raw from the files origin', async () =>
   await expect(page.locator('.toast').last()).toContainText('Copied');
 
   const short = await clipboard();
-  expect(short).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/p\/[a-z0-9]{10}$/);
   const slug = short.split('/').pop()!;
+  expect(short).toBe(`${base}/p/${slug}`);
+  expect(slug).toMatch(/^[a-z0-9]{10}$/);
   const row = page.locator('.row', { hasText: `/p/${slug}` });
   await expect(row).toContainText('func main() {');
   await expect(row.locator('.part')).toHaveText(['Code', '3 lines', /B$/]);
@@ -694,7 +703,7 @@ test('large file retries the failed chunk without resending confirmed bytes', as
     expect(offsets).toEqual([0,25_000_000,25_000_000]);
     const link = await (await completed).json();
     expect(link).toBeTruthy();
-    const file = await page.request.get(`http://localhost:${new URL(page.url()).port}/${link.slug}/large-upload.bin`, {headers:{'User-Agent':'Mozilla/5.0'}});
+    const file = await page.request.get(`${filesOrigin}/${link.slug}/large-upload.bin`, {headers:{'User-Agent':'Mozilla/5.0'}});
     expect(file.status()).toBe(200);
     const downloaded = await file.body();
     expect(downloaded.length).toBe(bytes.length);

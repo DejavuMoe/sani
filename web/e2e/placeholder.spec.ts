@@ -1,42 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
+import { startSani, stopSani, type SaniFixture } from './fixture';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { tmpdir } from 'node:os';
 import { isAbsolute, join } from 'node:path';
 
 // Its own server, so it runs the same alone or in a full run.
 const base = 'http://127.0.0.1:18777';
 const password = 'placeholder-regressions';
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
-let server: ChildProcess;
-let serverLog = '';
-
-test.beforeAll(async () => {
-  const env = { ...process.env };
-  for (const key of Object.keys(env)) if (key.startsWith('SANI_')) delete env[key];
-  server = spawn('../bin/sani', [], {
-    env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-placeholder-')),
-      SANI_LISTEN: '127.0.0.1:18777', SANI_FILES_URL: 'http://localhost:18777',
-      SANI_PASSWORD: password, SANI_FETCH_META: 'false', SANI_LOG_LEVEL: 'info' },
-    stdio: ['ignore', 'ignore', 'pipe'],
-  });
-  server.stderr!.on('data', chunk => { serverLog = (serverLog + chunk.toString()).slice(-8192); });
-  await expect.poll(async () => {
-    if (server.exitCode !== null || server.signalCode !== null) throw new Error(`Placeholder fixture exited early\n${serverLog}`);
-    // Only this child's own "ready" line proves the port is ours.
-    if (!serverLog.includes('sani is ready')) return 0;
-    return fetch(`${base}/healthz`, { signal: AbortSignal.timeout(1000) }).then(r => r.status, () => 0);
-  }, { timeout: 10_000 }).toBe(200);
-});
-
-test.afterAll(async () => {
-  if (!server?.pid || server.exitCode !== null || server.signalCode !== null) return;
-  const stopped = new Promise<void>(done => server.once('exit', () => done()));
-  server.kill('SIGTERM');
-  await Promise.race([stopped, new Promise(done => setTimeout(done, 5000))]);
-  if (server.exitCode === null && server.signalCode === null) server.kill('SIGKILL');
-});
+let server: SaniFixture | undefined;
+test.beforeAll(async () => { server = await startSani(base, password); });
+test.afterAll(() => stopSani(server));
 
 // One profile for each layout the list has: the full table, without the activity column, and the phone's stacked rows.
 const profiles = [

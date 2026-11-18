@@ -1,24 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { startSani, stopSani, type SaniFixture } from './fixture';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 // A separate temporary instance leaves the main suite's environment-lock fixture intact.
 const base = 'http://127.0.0.1:18767';
 const password = 'local-e2e-fixture';
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
-let server: ChildProcess;
-test.beforeAll(async () => {
-  const env = { ...process.env };
-  for (const key of ['SANI_FETCH_META', 'SANI_META_PROXY', 'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy']) delete env[key];
-  server = spawn('../bin/sani', [], { env: { ...env, SANI_DATA_DIR: mkdtempSync(join(tmpdir(), 'sani-e2e-')), SANI_LISTEN: '127.0.0.1:18767', SANI_FILES_URL: 'http://localhost:18767', SANI_PASSWORD: password, SANI_LOG_LEVEL: 'error' }, stdio: 'ignore' });
-  await expect.poll(async () => { try { return (await fetch(`${base}/healthz`)).status; } catch { return 0; } }).toBe(200);
-});
-test.afterAll(async () => {
-  if (server?.exitCode === null) await new Promise<void>(resolve => { server.once('exit', () => resolve()); server.kill('SIGTERM'); });
-});
+let server: SaniFixture | undefined;
+test.beforeAll(async () => { server = await startSani(base, password, { SANI_FETCH_META: undefined }); });
+test.afterAll(() => stopSani(server));
 
 async function login(page: Page, lang = 'en', theme = 'light') {
   await page.addInitScript(({ lang, theme }) => { localStorage.setItem('sani.lang', lang); localStorage.setItem('sani.theme', theme); }, { lang, theme });

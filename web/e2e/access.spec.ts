@@ -1,13 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import type { ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { startSani, stopSani } from './fixture';
+import { startSani, stopSani, type SaniFixture } from './fixture';
 
 const base = 'http://127.0.0.1:18773';
 const password = 'local-access-fixture';
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
-let server: ChildProcess;
+let server: SaniFixture | undefined;
 
 test.beforeAll(async () => { server = await startSani(base, password); });
 test.afterAll(() => stopSani(server));

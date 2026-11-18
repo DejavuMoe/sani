@@ -1,7 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { startSani, stopSani, type SaniFixture } from './fixture';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import type { Link, LinkInput } from '../src/lib/api';
@@ -9,64 +8,9 @@ import type { Link, LinkInput } from '../src/lib/api';
 // Independent of app.spec.ts setup order, including focused --grep runs.
 const base = 'http://127.0.0.1:18770';
 const PASSWORD = 'correct horse battery';
-let server: ChildProcess;
-let dataDir: string;
-let childStopped: Promise<void>;
-let childLog = '';
-
-test.beforeAll(async () => {
-  const env = { ...process.env };
-  for (const key of Object.keys(env)) if (key.startsWith('SANI_')) delete env[key];
-  dataDir = mkdtempSync(join(tmpdir(), 'sani-audit-e2e-'));
-  childLog = '';
-  server = spawn('../bin/sani', [], {
-    env: { ...env, SANI_DATA_DIR: dataDir, SANI_LISTEN: '127.0.0.1:18770',
-      SANI_FILES_URL: 'http://localhost:18770', SANI_PASSWORD: PASSWORD,
-      SANI_FETCH_META: 'false', SANI_LOG_LEVEL: 'info', SANI_LOG_FORMAT: 'json' },
-    stdio: ['ignore', 'ignore', 'pipe'],
-  });
-  let spawnError: Error | undefined;
-  server.on('error', error => { spawnError = error; });
-  childStopped = new Promise<void>(done => { server.once('exit', () => done()); });
-  let ready = false;
-  server.stderr!.setEncoding('utf8');
-  server.stderr!.on('data', (chunk: string) => {
-    childLog = (childLog + chunk).slice(-8192);
-    ready ||= childLog.split('\n').some(line => line.includes('"msg":"sani is ready"')
-      && line.includes('"addr":"127.0.0.1:18770"') && line.includes(`"data":${JSON.stringify(dataDir)}`));
-  });
-  try {
-    await expect.poll(async () => {
-      if (spawnError) throw spawnError;
-      if (server.exitCode !== null || server.signalCode !== null) throw new Error(`Child exited before readiness: ${server.exitCode ?? server.signalCode}`);
-      // A different process answering this port cannot establish ownership.
-      if (!ready) return 0;
-      let status = 0;
-      try { status = (await fetch(`${base}/healthz`, { signal: AbortSignal.timeout(1000) })).status; } catch { /* poll until deadline */ }
-      if (spawnError) throw spawnError;
-      if (server.exitCode !== null || server.signalCode !== null) throw new Error(`Child exited during health check: ${server.exitCode ?? server.signalCode}`);
-      return status;
-    }, { timeout: 10_000 }).toBe(200);
-  } catch (error) {
-    throw new Error(`Audit child startup failed: ${String(error)}\n${childLog}`);
-  }
-});
-
-test.afterAll(async () => {
-  if (!server?.pid || server.exitCode !== null || server.signalCode !== null) return;
-  if (!server.kill('SIGTERM')) throw new Error(`Could not terminate owned audit child ${server.pid}\n${childLog}`);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    await Promise.race([childStopped, new Promise<never>((_, reject) => {
-      timer = setTimeout(() => {
-        const sent = server.kill('SIGKILL');
-        reject(new Error(`Owned audit child ${server.pid} did not exit within 12 seconds; SIGKILL sent: ${sent}\n${childLog}`));
-      }, 12_000);
-    })]);
-  } finally {
-    clearTimeout(timer);
-  }
-});
+let server: SaniFixture | undefined;
+test.beforeAll(async () => { server = await startSani(base, PASSWORD); });
+test.afterAll(() => stopSani(server));
 
 test.afterEach(async ({ page }, info) => {
   if (!process.env.SANI_QA_DIR) return;
@@ -416,7 +360,7 @@ for (const bareState of ['failed', 'different'] as const) {
     const bareBytes = readFileSync('public/icon-512.png');
     expect(wwwBytes.equals(bareBytes)).toBe(false);
     // There is no cache-write API: seed only this suite's disposable SQLite database.
-    const db = new DatabaseSync(join(dataDir, 'sani.db'));
+    const db = new DatabaseSync(join(server!.dataDir, 'sani.db'));
     try {
       db.exec('PRAGMA busy_timeout = 5000');
       const put = db.prepare('INSERT OR REPLACE INTO favicons (host, type, data, fetched_at) VALUES (?, ?, ?, ?)');
