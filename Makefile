@@ -11,7 +11,8 @@ install:
 
 # Formatting, vet and type checks, and the docs-against-source sync check.
 check:
-	@test -z "$($(RUN) gofmt -l cmd internal scripts)" || ($(RUN) gofmt -l cmd internal scripts; echo "run gofmt -w" >&2; exit 1)
+	@files=$$($(RUN) gofmt -l cmd internal scripts) || exit $$?; \
+	if [ -n "$$files" ]; then printf '%s\n' "$$files"; echo "run gofmt -w" >&2; exit 1; fi
 	$(RUN) go vet ./...
 	$(RUN) pnpm --dir web check
 	$(RUN) pnpm --dir docs check
