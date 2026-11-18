@@ -97,6 +97,20 @@ try {
     headers: { 'Content-Type': 'application/json' },
   });
   cookie = setup.headers.get('set-cookie').split(';')[0];
+
+  const upload = await json('/api/admin/v1/uploads', { name: 'in-progress.txt', size: 6 }, 201);
+  const chunkPath = '/api/admin/v1/uploads/' + upload.id;
+  const chunk = async (offset, body) => (await (await request(chunkPath, {
+    method: 'PUT', body, headers: { 'Upload-Offset': String(offset) },
+  })).json()).offset;
+  assert.equal(await chunk(0, 'abc'), 3);
+  const failedStart = cli(['serve']);
+  assert.equal(failedStart.status, 1, failedStart.stderr.toString());
+  assert.match(failedStart.stderr.toString(), /address already in use/);
+  assert.equal(await chunk(3, 'def'), 6);
+  const completed = await json(chunkPath + '/complete', {}, 201);
+  assert.equal(completed.content.sha256, hash('abcdef'));
+
   const tag = await json('/api/admin/v1/tags', { name: 'Recovery', color: 'blue' });
   const link = await json('/api/admin/v1/links', { slug: 'kept', url: 'https://example.com/never-fetched', tags: [tag.id] }, 201);
   const note = await json('/api/admin/v1/texts', { slug: 'note', text: 'hello <world>\n', tags: [tag.id] }, 201);

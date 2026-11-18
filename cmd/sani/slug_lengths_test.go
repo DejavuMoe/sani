@@ -146,7 +146,7 @@ func TestServeSlugLengthStartup(t *testing.T) {
 				} else if state == "legacy-passwd" {
 					urlLength = 24 // The stored URL setting also survives passwd.
 				}
-				base, stop := startSlugTestServer(t, dir, extra)
+				base, stop, _ := startTestServer(t, dir, extra)
 				jar, err := cookiejar.New(nil)
 				if err != nil {
 					t.Fatal(err)
@@ -182,7 +182,7 @@ func TestServeSlugLengthStartup(t *testing.T) {
 	}
 }
 
-func startSlugTestServer(t *testing.T, dir string, extra []string) (string, func()) {
+func startTestServer(t *testing.T, dir string, extra []string) (string, func(), string) {
 	t.Helper()
 	exe, err := os.Executable()
 	if err != nil {
@@ -224,7 +224,7 @@ func startSlugTestServer(t *testing.T, dir string, extra []string) (string, func
 			output.WriteString(line + "\n")
 			var event struct{ Msg, Addr string }
 			if json.Unmarshal([]byte(line), &event) == nil && event.Msg == "sani is ready" {
-				started <- ready{addr: event.Addr}
+				started <- ready{addr: event.Addr, output: output.String()}
 				io.Copy(io.Discard, stderr)
 				return
 			}
@@ -236,9 +236,9 @@ func startSlugTestServer(t *testing.T, dir string, extra []string) (string, func
 		if result.addr == "" {
 			t.Fatalf("server failed to start: %s", result.output)
 		}
-		return "http://" + result.addr, stop
+		return "http://" + result.addr, stop, result.output
 	case <-ctx.Done():
 		t.Fatal("server startup timed out")
-		return "", stop
+		return "", stop, ""
 	}
 }

@@ -6,6 +6,7 @@
 
 - Undo for a bulk deletion restores only the links deleted by that request.
 - Exports read links and tags from one database snapshot so a concurrent tag deletion cannot make an import skip a link.
+- Bind the listener before touching stored data so a duplicate start on an occupied port leaves ongoing uploads intact.
 
 ## v2.0.0
 

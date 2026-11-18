@@ -149,6 +149,13 @@ func serve() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	// Reject an occupied address before startup can remove in-progress uploads.
+	ln, err := net.Listen("tcp", cfg.Listen)
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
+
 	st, err := openStore(ctx, cfg)
 	if err != nil {
 		return err
@@ -218,10 +225,6 @@ func serve() error {
 		IdleTimeout:       120 * time.Second,
 		MaxHeaderBytes:    32 << 10,
 		ErrorLog:          slog.NewLogLogger(log.Handler(), slog.LevelDebug),
-	}
-	ln, err := net.Listen("tcp", cfg.Listen)
-	if err != nil {
-		return err
 	}
 	ready := []any{"addr", ln.Addr().String(), "data", cfg.DataDir, "tz", time.Local.String(), "version", version}
 	if cfg.FilesURL != "" {

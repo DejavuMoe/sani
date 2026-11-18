@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -55,16 +54,10 @@ func TestSetupURLRoundTrip(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			// Startup prints the setup URL before binding; an invalid address
-			// terminates this fixture without starting a listener or background jobs.
-			out, err := opsRegressionCLI(t, "serve", "SANI_DATA_DIR="+dir,
-				"SANI_LISTEN=invalid-listener", "SANI_SETUP_CODE="+code,
-				"SANI_BASE_URL=http://127.0.0.1:18765", "SANI_LOG_FORMAT=json", "SANI_FETCH_META=false")
-			var exit *exec.ExitError
-			if !errors.As(err, &exit) || exit.ExitCode() != 1 || !strings.Contains(string(out), "missing port in address") {
-				t.Fatalf("expected bounded startup to stop at invalid listener: %v\n%s", err, out)
-			}
-			for _, line := range strings.Split(string(out), "\n") {
+			_, stop, out := startTestServer(t, dir, []string{"SANI_PASSWORD=", "SANI_SETUP_CODE=" + code,
+				"SANI_BASE_URL=http://127.0.0.1:18765"})
+			defer stop()
+			for _, line := range strings.Split(out, "\n") {
 				var event struct {
 					URL       string `json:"url"`
 					SetupCode string `json:"setup_code"`
