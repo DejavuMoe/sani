@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -430,11 +429,7 @@ func TestPublicMutationRechecksIdentityAfterConcurrentRename(t *testing.T) {
 			}
 			// Refresh used_at before locking so the blocked write is the mutation, not token bookkeeping.
 			publicData(t, e.req("GET", "/api/v1/domains", nil, "Authorization", key))
-			db, err := sql.Open("sqlite", "file:"+strings.ReplaceAll(e.dbPath, "?", "%3F"))
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer db.Close()
+			db := e.openDB()
 			tx, err := db.BeginTx(ctx, nil)
 			if err != nil {
 				t.Fatal(err)

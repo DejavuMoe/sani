@@ -1,12 +1,79 @@
 package server
 
 import (
+	"database/sql/driver"
 	"fmt"
+	"net/http/httptest"
 	"os"
 	"reflect"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
+
+	"modernc.org/sqlite"
 )
+
+var exportTestSequence atomic.Uint64
+
+func TestExportKeepsTagsFromOneSnapshot(t *testing.T) {
+	readStarted, resume := make(chan struct{}), make(chan struct{})
+	unblock := sync.OnceFunc(func() { close(resume) })
+	gate := fmt.Sprintf("sani_export_gate_%d", exportTestSequence.Add(1))
+	signalRead := sync.OnceFunc(func() { close(readStarted) })
+	sqlite.MustRegisterScalarFunction(gate, 0, func(*sqlite.FunctionContext, []driver.Value) (driver.Value, error) {
+		signalRead()
+		<-resume
+		return "image/png", nil
+	})
+	source := newEnv(t, Options{})
+	source.signIn()
+	tag := source.req("POST", "/api/admin/v1/tags", map[string]string{"name": "Work", "color": "blue"})
+	if tag.status != 200 {
+		t.Fatal(string(tag.body))
+	}
+	id := int64(tag.json()["id"].(float64))
+	source.create(map[string]any{"slug": "snapshot", "url": "https://example.org/a", "tags": []int64{id}})
+
+	// Pause while the export reads the link row, with its SQLite snapshot open.
+	db := source.openDB()
+	if _, err := db.Exec("ALTER TABLE favicons RENAME TO saved_favicons"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.Exec("CREATE VIEW favicons AS SELECT 'example.org' AS host, " + gate + "() AS type"); err != nil {
+		t.Fatal(err)
+	}
+	rec := httptest.NewRecorder()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		source.srv.export(rec, httptest.NewRequestWithContext(t.Context(), "GET", "/api/admin/v1/export", nil))
+	}()
+	defer func() { unblock(); <-done }()
+	select {
+	case <-readStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("export did not reach the read gate")
+	}
+	if deleted := source.req("DELETE", fmt.Sprintf("/api/admin/v1/tags/%d", id), nil); deleted.status != 204 {
+		t.Fatalf("delete tag: %d %s", deleted.status, deleted.body)
+	}
+	unblock()
+	<-done
+	if rec.Code != 200 {
+		t.Fatalf("export: %d %s", rec.Code, rec.Body)
+	}
+	target := newEnv(t, Options{})
+	target.signIn()
+	imported := target.req("POST", "/api/admin/v1/import", rec.Body.String())
+	if imported.status != 200 || imported.json()["created"] != float64(1) {
+		t.Fatalf("export could not be reimported: %d %s; export: %s", imported.status, imported.body, rec.Body)
+	}
+	if tags := target.req("GET", "/api/admin/v1/tags", nil); tags.status != 200 || !strings.Contains(string(tags.body), "\"name\":\"Work\"") {
+		t.Fatalf("export did not preserve the snapshot tag: %s", tags.body)
+	}
+}
 
 func TestDeleteTagAPIKeepsSharedContents(t *testing.T) {
 	e := newEnv(t, Options{FilesURL: "http://" + filesHost, FilesDir: t.TempDir()})

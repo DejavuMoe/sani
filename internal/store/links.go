@@ -128,6 +128,7 @@ func scanLink(row scanner) (*Link, error) {
 
 type querier interface {
 	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
 func getLink(ctx context.Context, q querier, id int64) (*Link, error) {
@@ -672,7 +673,41 @@ func (s *Store) StoredFiles(ctx context.Context) (map[string]bool, error) {
 
 // AllLinks returns every live link that redirects, oldest first.
 func (s *Store) AllLinks(ctx context.Context) ([]*Link, error) {
-	rows, err := s.r.QueryContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+
+	return allLinks(ctx, s.r)
+}
+
+// ExportLinks reads live redirects and the tag catalog from the same snapshot.
+func (s *Store) ExportLinks(ctx context.Context) ([]*Link, []Tag, error) {
+	tx, err := s.r.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, nil, err
+	}
+	defer tx.Rollback()
+	links, err := allLinks(ctx, tx)
+	if err != nil {
+		return nil, nil, err
+	}
+	rows, err := tx.QueryContext(ctx, "SELECT id, name, color FROM tags")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+	var tags []Tag
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(&tag.ID, &tag.Name, &tag.Color); err != nil {
+			return nil, nil, err
+		}
+		tags = append(tags, tag)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
+	}
+	return links, tags, tx.Commit()
+}
+
+func allLinks(ctx context.Context, q querier) ([]*Link, error) {
+	rows, err := q.QueryContext(ctx, `SELECT `+linkCols+` FROM `+linkFrom+
 		` WHERE l.deleted_at = 0 AND l.kind = 0 ORDER BY l.created_at, l.id`)
 	if err != nil {
 		return nil, err

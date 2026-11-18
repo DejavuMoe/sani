@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -120,11 +119,7 @@ func TestIndependentSlugPatchAtomicity(t *testing.T) {
 		t.Fatal(string(r.body))
 	}
 	// A database failure must leave both the base URL and generation settings intact.
-	db, err := sql.Open("sqlite", e.dbPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
+	db := e.openDB()
 	if _, err := db.Exec(`CREATE TRIGGER reject_creation_update BEFORE UPDATE ON settings WHEN NEW.key = 'creation' BEGIN SELECT RAISE(ABORT, 'test failure'); END`); err != nil {
 		t.Fatal(err)
 	}

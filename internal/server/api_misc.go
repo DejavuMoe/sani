@@ -205,19 +205,14 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 	if err := s.clicks.Flush(r.Context()); err != nil {
 		s.log.Warn("flush clicks", "err", err)
 	}
-	all, err := s.store.AllLinks(r.Context())
+	all, catalog, err := s.store.ExportLinks(r.Context())
 	if err != nil {
 		s.internalError(w, r, err)
 		return
 	}
 	stamp := time.Now().Format("20060102-150405")
-	catalog, err := s.store.Tags(r.Context())
-	if err != nil {
-		s.internalError(w, r, err)
-		return
-	}
-	byID := make(map[int64]exportTag, len(catalog.Items))
-	for _, tag := range catalog.Items {
+	byID := make(map[int64]exportTag, len(catalog))
+	for _, tag := range catalog {
 		byID[tag.ID] = exportTag{Name: tag.Name, Color: tag.Color}
 	}
 	tagsOf := func(l *store.Link) []exportTag {

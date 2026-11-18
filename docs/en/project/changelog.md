@@ -5,6 +5,7 @@
 ## Unreleased
 
 - Undo for a bulk deletion restores only the links deleted by that request.
+- Exports read links and tags from one database snapshot so a concurrent tag deletion cannot make an import skip a link.
 
 ## v2.0.0
 

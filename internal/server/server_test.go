@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -29,6 +30,22 @@ type env struct {
 	ts     *httptest.Server
 	c      *http.Client
 	dbPath string
+}
+
+func (e *env) openDB() *sql.DB {
+	e.t.Helper()
+	abs, err := filepath.Abs(e.dbPath)
+	if err != nil {
+		e.t.Fatal(err)
+	}
+	path := "/" + strings.TrimPrefix(filepath.ToSlash(abs), "/")
+	uri := url.URL{Scheme: "file", Path: path, RawQuery: "mode=rw"}
+	db, err := sql.Open("sqlite", uri.String())
+	if err != nil {
+		e.t.Fatal(err)
+	}
+	e.t.Cleanup(func() { db.Close() })
+	return db
 }
 
 var testUI = fstest.MapFS{

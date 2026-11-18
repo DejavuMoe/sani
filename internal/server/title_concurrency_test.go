@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http/httptest"
 	"strings"
@@ -30,11 +29,7 @@ func TestMetadataChangesKeepConcurrentlySavedManualTitle(t *testing.T) {
 			// The external writer has saved an uncommitted manual title. WAL
 			// lets the handler read the old title, then blocks its write until
 			// we commit. InUse proves that it reached that write boundary.
-			db, err := sql.Open("sqlite", "file:"+strings.ReplaceAll(e.dbPath, "?", "%3F"))
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer db.Close()
+			db := e.openDB()
 			tx, err := db.BeginTx(ctx, nil)
 			if err != nil {
 				t.Fatal(err)
