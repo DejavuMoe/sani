@@ -2,6 +2,10 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, documented public contracts stay compatible within each major version. Breaking changes include upgrade instructions here.</p>
 
+## Unreleased
+
+- Undo for a bulk deletion restores only the links deleted by that request.
+
 ## v2.0.0
 
 2026-11-17 · Narrow the release platform matrix, adopt the distroless runtime, update dependencies and share CI builds. Database schema remains 7.

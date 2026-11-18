@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, request, test, type Page } from '@playwright/test';
 import { startSani, stopSani, type SaniFixture } from './fixture';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
@@ -53,6 +53,38 @@ async function search(page: Page, query: string) {
   expect((await loaded).ok()).toBe(true);
   await expect(page.locator('.card[aria-busy=true]')).toHaveCount(0);
 }
+
+test('bulk undo restores only links deleted by that request', async ({ page }) => {
+  const api = base + '/api/admin/v1';
+  await login(page);
+  const first = await create(page, { slug: 'undo-batch-first', url: 'https://example.com/first' });
+  const second = await create(page, { slug: 'undo-batch-second', url: 'https://example.com/second' });
+  await page.goto(base + '/admin/');
+  await search(page, 'undo-batch-');
+  const rows = page.locator('.row');
+  await expect(rows).toHaveCount(2);
+  await page.getByRole('button', { name: 'Select multiple items' }).click();
+  await page.getByRole('checkbox', { name: 'Select all loaded items' }).click();
+  const bar = page.getByRole('group', { name: 'Bulk actions' });
+  await expect(bar).toContainText('2 selected');
+
+  const other = await request.newContext();
+  try {
+    expect((await other.post(api + '/session', { data: { password: PASSWORD } })).ok()).toBe(true);
+    expect((await other.delete(api + '/links/' + first.id)).status()).toBe(204);
+  } finally {
+    await other.dispose();
+  }
+  await bar.getByRole('button', { name: 'Delete' }).click();
+  const toast = page.locator('.toast').last();
+  const undo = toast.getByRole('button', { name: 'Undo' });
+  await expect(undo).toBeVisible();
+  await expect.soft(toast).toContainText('Deleted 1 item');
+  await undo.click();
+  await expect(rows.filter({ hasText: '/' + second.slug })).toBeVisible();
+  expect((await page.request.head(base + '/' + first.slug, { maxRedirects: 0 })).status()).toBe(404);
+  expect((await page.request.head(base + '/' + second.slug, { maxRedirects: 0 })).status()).toBe(302);
+});
 
 async function openDetails(page: Page, id: number) {
   const row = page.locator(`[data-link="${id}"]`);

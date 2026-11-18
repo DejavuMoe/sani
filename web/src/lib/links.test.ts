@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, type Link } from './api';
 import { links } from './links.svelte';
 import { editor } from './editor.svelte';
+import { toasts } from './toast.svelte';
 
 vi.mock('./api', async (original) => ({
   ...await original<typeof import('./api')>(),
@@ -32,6 +33,7 @@ function registerDirty() {
 beforeEach(() => {
   vi.resetAllMocks();
   links.sync = 'idle';
+  editor.pending = null;
   editor.leave();
   links.editingId = links.expandedId = null;
   links.tagsLoaded = links.tagsFailed = false;
@@ -141,12 +143,39 @@ describe('lists racing local writes', () => {
     const response = held<{ items: Link[] }>();
     vi.mocked(api.bulk).mockReturnValue(response.promise);
     const pending = links.bulk('delete');
-    vi.mocked(api.links).mockResolvedValue(list([other]));
+    vi.mocked(api.links).mockResolvedValueOnce(list([other])).mockRejectedValue(new Error('offline'));
     await links.refresh();
     response.resolve({ items: [old] });
     await pending;
+    expect(links.refreshFailed).toBe(true);
     expect(links.items).toEqual([other]);
     expect(links.total).toBe(1);
+  });
+
+  it.each([true, false])('removes already-deleted rows if the refresh fails (request changed a row: %s)', async changed => {
+    const absent = { ...old, id: 2, slug: 'absent' };
+    links.items = [old, absent];
+    links.total = 2;
+    links.startPicking();
+    links.togglePickAll();
+    links.selectedId = absent.id;
+    vi.mocked(api.bulk).mockResolvedValue({ items: changed ? [old] : [] });
+    vi.mocked(api.links).mockRejectedValue(new Error('offline'));
+
+    await links.bulk('delete');
+
+    expect(links.refreshFailed).toBe(true);
+    expect(links.items).toEqual([]);
+    expect(links.total).toBe(0);
+    expect(links.selectedId).toBeNull();
+    if (changed) {
+      const action = vi.mocked(toasts.show).mock.lastCall?.[1]?.action;
+      expect(action).toBeDefined();
+      await action!.run();
+      expect(api.bulk).toHaveBeenLastCalledWith('restore', [old.id]);
+    } else {
+      expect(toasts.show).toHaveBeenCalledWith('bulk.unchanged');
+    }
   });
 
   it('does not count a restoration twice when a refresh already saw its commit', async () => {

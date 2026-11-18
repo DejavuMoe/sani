@@ -555,25 +555,34 @@ class LinksStore {
   }
 
   private async bulkDelete(targets: Link[]) {
-    const ids = new Set(targets.map((l) => l.id));
-    const removed = this.items.map((link, index) => ({ link, index })).filter((x) => ids.has(x.link.id));
+    const selected = new Set(targets.map((l) => l.id));
+    const candidates = this.items.map((link, index) => ({ link, index })).filter((x) => selected.has(x.link.id));
+    let result: Awaited<ReturnType<typeof api.bulk>>;
     try {
-      await api.bulk('delete', [...ids]);
+      result = await api.bulk('delete', [...selected]);
     } catch (e) {
       toasts.error(errorText(e instanceof ApiError ? e.code : 'unknown'));
       return;
     }
+    const deleted = new Set(result.items.map((l) => l.id));
+    const removed = candidates.filter((x) => deleted.has(x.link.id));
     ++this.revision;
-    for (const id of ids) {
+    // A successful delete also confirms that skipped IDs were already absent.
+    for (const id of selected) {
       this.leaving.add(id);
       setTimeout(() => this.leaving.delete(id), 400);
     }
-    this.items = this.items.filter((l) => !ids.has(l.id));
-    this.total = Math.max(0, this.total - ids.size);
-    if (this.selectedId !== null && ids.has(this.selectedId)) this.selectedId = null;
+    const before = this.items.length;
+    this.items = this.items.filter((l) => !selected.has(l.id));
+    this.total = Math.max(0, this.total - (before - this.items.length));
+    if (this.selectedId !== null && selected.has(this.selectedId)) this.selectedId = null;
     this.stopPicking();
     await this.refresh();
-    toasts.show(t('bulk.deleted', { n: ids.size }), {
+    if (!deleted.size) {
+      toasts.show(t('bulk.unchanged'));
+      return;
+    }
+    toasts.show(t('bulk.deleted', { n: deleted.size }), {
       action: { label: t('act.undo'), run: () => this.bulkRestore(removed) },
     });
   }
