@@ -45,8 +45,7 @@
     const target = anchorEl();
     if (!target || !pop) return;
     const r = target.getBoundingClientRect();
-    const w = pop.offsetWidth;
-    const h = pop.offsetHeight;
+    const { width: w, height: h } = pop.getBoundingClientRect();
     const left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8));
     let top = r.bottom + 6;
     if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;

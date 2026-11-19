@@ -184,15 +184,20 @@ test('time columns remain tappable in a narrow touch viewport', async ({ browser
   } finally { await context.close(); }
 });
 
-for (const [width, height] of [[1280, 560], [390, 600]] as const) {
-  test(`expiry popover stays clamped within short viewport ${width}x${height}`, async ({ page }) => {
+for (const [width, height, fractional = false] of [[1280, 560], [390, 600], [390, 600, true]] as const) {
+  test(`expiry popover stays clamped within short viewport ${width}x${height}${fractional ? ' with a fractional height' : ''}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await login(page, 'en', 'light');
+    if (fractional) await page.addStyleTag({ content: '.expiry-pop { height: 540.09375px; }' });
     const pop = await openExpiry(page.locator('#create-panel-url'));
+    const apply = pop.getByRole('button', { name: 'Apply date and time' });
+    await expect(apply).toBeVisible();
+    await pop.evaluate(async el => {
+      await Promise.all(el.getAnimations().map(animation => animation.finished));
+    });
     const box = (await pop.boundingBox())!;
     expect(box.y).toBeGreaterThanOrEqual(8);
     expect(box.y + box.height).toBeLessThanOrEqual(height - 8);
-    const apply = pop.getByRole('button', { name: 'Apply date and time' });
     await apply.scrollIntoViewIfNeeded();
     await expect(apply).toBeInViewport();
   });

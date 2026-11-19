@@ -4,11 +4,12 @@
 
 ## v2.0.1
 
-2026-11-19 · Fix bulk deletion undo, link exports and startup on an occupied port.
+2026-11-19 · Fix bulk deletion undo, form popover placement, link exports and startup on an occupied port.
 
 Upgrading from v2.0.0 requires no database migration. The database remains on schema 7. Take a [complete stopped-service backup](../guide/operations#backup-files) before upgrading.
 
 - After a bulk deletion, Undo restores only the links deleted by that request. The list removes deleted rows and updates its count even if the refresh fails.
+- Position form popovers using their rendered dimensions so they keep their viewport margin on short screens, even when their dimensions include fractional pixels.
 - Read URL links and tags from a single SQLite snapshot when exporting JSON or CSV. The export retains the tag data needed to reimport those links if a tag is deleted during export.
 - Bind the listen address before opening the data directory. If the running instance already owns that address, a second start fails before accessing stored data, leaving the running instance's upload chunks intact.
 - Make `make check` fail on unformatted Go files or formatter errors. Playwright verifies the instances it starts, cleans up temporary data and reports startup and shutdown failures. CI collects failure traces from the test results directory.
