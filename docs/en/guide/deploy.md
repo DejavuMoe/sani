@@ -32,10 +32,10 @@ v2.0.0 moves the runtime from `scratch` to distroless; Alpine is used only in bu
 
 | Tag | Points at |
 |---|---|
-| `v2.0.0` | The exact version matching Git tag and GitHub Release `v2.0.0` |
-| `v2.0.0-rc.1` | The matching prerelease Git tag, available only once published |
+| `v2.0.1` | The exact version matching Git tag and GitHub Release `v2.0.1` |
+| `v2.0.1-rc.1` | The matching prerelease Git tag, available only once published |
 
-From v0.7.0, image tags match Git tags and GitHub Releases exactly, including the `v` prefix. Releases no longer publish `latest`, major or minor floating tags. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v2.0.0`. Check that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying; a release preparation branch may refer to a version that is not published yet.
+Since v0.7.0, images use full version tags that match Git tags and GitHub Releases, including the `v` prefix. The repository template and configuration builder pin `ghcr.io/dejavumoe/sani:v2.0.1`. Confirm that the version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying.
 
 To upgrade, [back up](./operations#backup), change `image:` in `compose.yaml` to the target version's full tag, then run:
 
@@ -106,7 +106,7 @@ The binary is statically linked and needs no libraries on the server. On macOS o
 ::: code-group
 
 ```sh [Download]
-base=https://github.com/DejavuMoe/sani/releases/download/v2.0.0
+base=https://github.com/DejavuMoe/sani/releases/download/v2.0.1
 curl -fsSLO "$base/sani-linux-amd64.tar.gz" -O "$base/SHA256SUMS"
 sha256sum --ignore-missing -c SHA256SUMS
 tar -xzf sani-linux-amd64.tar.gz sani
@@ -121,7 +121,7 @@ ssh server sudo install -m 755 /tmp/sani /usr/local/bin/sani
 
 :::
 
-The download path pins `v2.0.0`. When upgrading, replace it with the published target version's tag.
+The download path pins `v2.0.1`. When upgrading, replace it with the published target version's tag.
 
 ### Checking where a build came from {#verify}
 
@@ -129,7 +129,7 @@ Release files and images are built by GitHub Actions from the tagged commit, wit
 
 ```sh
 gh attestation verify sani-linux-amd64.tar.gz -R DejavuMoe/sani
-gh attestation verify oci://ghcr.io/dejavumoe/sani:v2.0.0 -R DejavuMoe/sani
+gh attestation verify oci://ghcr.io/dejavumoe/sani:v2.0.1 -R DejavuMoe/sani
 ```
 
 Save the generated `sani.service` in `/etc/systemd/system/` and enable it:

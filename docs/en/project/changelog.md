@@ -2,11 +2,16 @@
 
 <p class="lead">Every release’s changes are recorded here. Versions follow <a href="./versioning">semantic versioning</a>; from v1.0.0, documented public contracts stay compatible within each major version. Breaking changes include upgrade instructions here.</p>
 
-## Unreleased
+## v2.0.1
 
-- Undo for a bulk deletion restores only the links deleted by that request.
-- Exports read links and tags from one database snapshot so a concurrent tag deletion cannot make an import skip a link.
-- Bind the listener before touching stored data so a duplicate start on an occupied port leaves ongoing uploads intact.
+2026-11-19 · Fix bulk deletion undo, link exports and startup on an occupied port.
+
+Upgrading from v2.0.0 requires no database migration. The database remains on schema 7. Take a [complete stopped-service backup](../guide/operations#backup-files) before upgrading.
+
+- After a bulk deletion, Undo restores only the links deleted by that request. The list removes deleted rows and updates its count even if the refresh fails.
+- Read URL links and tags from a single SQLite snapshot when exporting JSON or CSV. The export retains the tag data needed to reimport those links if a tag is deleted during export.
+- Bind the listen address before opening the data directory. If the running instance already owns that address, a second start fails before accessing stored data, leaving the running instance's upload chunks intact.
+- Make `make check` fail on unformatted Go files or formatter errors. Playwright verifies the instances it starts, cleans up temporary data and reports startup and shutdown failures. CI collects failure traces from the test results directory.
 
 ## v2.0.0
 

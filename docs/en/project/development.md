@@ -135,15 +135,15 @@ To release a new version:
 
 Push to Forgejo: `origin` must point to `ssh://git@ssh.via.moe/dejavu/sani.git`. Forgejo automatically mirrors pushes to GitHub, triggering application CI and release builds. `.woodpecker/docs.yml` deploys the documentation to `https://sani.zsh.moe` on Forgejo `master` pushes; pushing only to GitHub or only pushing a tag does not trigger documentation deployment.
 
-1. Turn the “Unreleased” section of both changelogs into a heading such as `## v2.0.0`, followed by the date. Update the full version tag in Compose, bilingual download examples and image verification examples.
-2. Run `make check test e2e smoke docs VERSION=v2.0.0` and `bash scripts/test-release-notes.sh`; confirm `scripts/release-notes.sh v2.0.0` generates the notes.
+1. Turn the “Unreleased” section of both changelogs into a heading such as `## v2.0.1`, followed by the date. Update the full version tag in Compose, bilingual download examples and image verification examples.
+2. Run `make check test e2e smoke docs VERSION=v2.0.1` and `bash scripts/test-release-notes.sh`; confirm `scripts/release-notes.sh v2.0.1` generates the notes.
 3. Commit, verify the Forgejo address with `git remote get-url origin`, then run `git push origin master`. Confirm GitHub mirrors the same commit, wait for that commit's CI and CodeQL to pass, and check Woodpecker documentation deployment.
 4. Create a signed annotated tag on the verified commit, verify its signature, and push it to the same Forgejo remote:
 
    ```sh
-   git tag -s v2.0.0 -m "Sani v2.0.0"
-   git verify-tag v2.0.0
-   git push origin refs/tags/v2.0.0
+   git tag -s v2.0.1 -m "Sani v2.0.1"
+   git verify-tag v2.0.1
+   git push origin refs/tags/v2.0.1
    ```
 
 5. Wait for the GitHub Release to succeed and compare tag objects and target commits on Forgejo and GitHub. Verify every archive's SHA-256 and provenance, the multi-platform image and runtime version, and the live documentation's version and content in both languages. Never move, recreate or force-push a published tag; synchronize a missing tag by pushing its original object.

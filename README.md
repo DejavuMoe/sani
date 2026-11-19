@@ -45,16 +45,16 @@ docker compose up -d
 
 Open `http://127.0.0.1:8080/admin/` and choose the admin password. The first visit also asks for the setup code Sani prints to its log (`docker logs sani`), so nobody else can claim a fresh instance; when `SANI_BASE_URL` is set, the log line includes a link with the code already filled in. Set `SANI_PASSWORD` instead to skip this step. Put a TLS reverse proxy in front of it; [deploy/](deploy/) has Caddy, nginx and systemd examples.
 
-The v2.0.0 image for `ghcr.io/dejavumoe/sani` uses digest-pinned `gcr.io/distroless/static-debian13:nonroot` for `linux/amd64` and `linux/arm64`. It runs as UID/GID `65532:65532`, has no shell or package manager, and keeps data in the `/data` volume. The amd64 source-built image is about 32 MB uncompressed (measured 2026-11-17). Check [Releases](https://github.com/DejavuMoe/sani/releases) before deploying: this source tree may prepare a version whose artifacts are not published yet.
+The `ghcr.io/dejavumoe/sani` image uses digest-pinned `gcr.io/distroless/static-debian13:nonroot` for `linux/amd64` and `linux/arm64`. It runs as UID/GID `65532:65532`, has no shell or package manager, and keeps data in the `/data` volume. The v2.0.0 amd64 image built from source measured about 32 MB uncompressed on 2026-11-17. Confirm that your target version appears in [Releases](https://github.com/DejavuMoe/sani/releases) before deploying.
 
-The template pins `v2.0.0`; image tags include `v`, exactly like Git tags and Releases. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. The `install` command above is required: it creates the directory with ownership `65532:65532` for the container to write. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
+The template pins `v2.0.1`. Image tags include `v` and match the Git tag and GitHub Release. Use a published version and change the pin explicitly when upgrading. Data is bound from `./sani-data` beside the Compose file to `/data`. Run the `install` command above to create the directory with ownership `65532:65532` so the container can write to it. If an earlier start created a root-owned directory, [repair its permissions](docs/en/guide/deploy.md#data-permissions).
 
 ### A single binary
 
 Every [release](https://github.com/DejavuMoe/sani/releases/latest) has archives for Linux, macOS and Windows, with `SHA256SUMS` and build provenance:
 
 ```sh
-curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.0/sani-linux-amd64.tar.gz | tar -xz sani
+curl -fsSL https://github.com/DejavuMoe/sani/releases/download/v2.0.1/sani-linux-amd64.tar.gz | tar -xz sani
 SANI_BASE_URL=https://s.example.com ./sani
 ```
 
