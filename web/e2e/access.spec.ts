@@ -101,8 +101,9 @@ test('the visit limit popover validates before anything is sent', async ({ page 
 for (const [lang, theme] of [['zh', 'light'], ['en', 'dark']] as const) {
   test(`visitors unlock a protected share and a protected redirect (${lang}/${theme})`, async ({ browser, page }) => {
     await login(page);
+    const destination = `http://localhost:${new URL(base).port}/robots.txt`;
     const text = await (await page.request.post(`${base}/api/admin/v1/texts`, { data: { text: 'Visible after unlock', password: '7KQ2MX' } })).json();
-    const url = await (await page.request.post(`${base}/api/admin/v1/links`, { data: { url: 'https://example.com/after-unlock', password: 'H3KP9W' } })).json();
+    const url = await (await page.request.post(`${base}/api/admin/v1/links`, { data: { url: destination, password: 'H3KP9W' } })).json();
 
     const visitor = await browser.newContext({ locale: lang === 'zh' ? 'zh-CN' : 'en-US', colorScheme: theme });
     try {
@@ -125,11 +126,13 @@ for (const [lang, theme] of [['zh', 'light'], ['en', 'dark']] as const) {
       expect((await visitor.request.get(raw!.split('?')[0])).status()).toBe(403);
       await audit(v);
 
-      await v.route('https://example.com/**', route => route.fulfill({ body: 'destination' }));
       await v.goto(url.shortUrl);
       await v.locator('#password').fill('H3KP9W');
+      const unlocked = v.waitForResponse(response => response.url() === url.shortUrl && response.request().method() === 'POST');
       await v.locator('#password').press('Enter');
-      await expect(v).toHaveURL('https://example.com/after-unlock');
+      expect((await unlocked).status()).toBe(303);
+      await expect(v).toHaveURL(destination);
+      await expect(v.locator('body')).toContainText('Disallow: /');
     } finally {
       await visitor.close();
     }
