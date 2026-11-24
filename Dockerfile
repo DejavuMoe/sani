@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
  && mkdir -p /out/data
 
 # 3. Static Go needs no libc. Distroless maintains CA roots and time zone data.
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:aafe993665bf6200db38a02c11a9351e782a84b6a45e7f33b6695638c88e3931
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:8ce6dd87e9823c5b48dcfb2c8604714ccb351ce59607327bcc4957448da279b5
 LABEL org.opencontainers.image.title="Sani" \
       org.opencontainers.image.description="A small, fast link shortener you host yourself: one binary, one SQLite file." \
       org.opencontainers.image.source="https://github.com/DejavuMoe/sani" \
